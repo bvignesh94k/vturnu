@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VTurnU">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7B500"/>
+      <stop offset="45%" stop-color="#E8365D"/>
+      <stop offset="75%" stop-color="#9B59B6"/>
+      <stop offset="100%" stop-color="#29B8DB"/>
+    </linearGradient>
+  </defs>
+  <!-- Full bleed so the icon stays correct when a platform applies a maskable crop -->
+  <rect width="512" height="512" fill="#17181C"/>
+  <!-- Mark kept inside the central 80% safe zone -->
+  <path d="M150 156 L256 366 L362 156 L306 156 L256 258 L206 156 Z" fill="url(#g)"/>
+  <circle cx="256" cy="392" r="18" fill="#F7B500"/>
+</svg>

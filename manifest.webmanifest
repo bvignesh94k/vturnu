@@ -1,0 +1,54 @@
+{
+  "name": "VTurnU | Digital Marketing & Web Development",
+  "short_name": "VTurnU",
+  "description": "Performance-driven digital marketing, web and AI development from Chennai.",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#5B56C9",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["business", "marketing"],
+  "icons": [
+    {
+      "src": "/assets/img/vturnu-icon-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/img/vturnu-icon-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/img/vturnu-icon-mark.png",
+      "sizes": "464x440",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Get a Quote",
+      "short_name": "Quote",
+      "url": "/contact-us/?utm_source=pwa-shortcut",
+      "description": "Request a free quote and mini-audit"
+    },
+    {
+      "name": "Pricing",
+      "short_name": "Pricing",
+      "url": "/pricing/?utm_source=pwa-shortcut",
+      "description": "See plans and one-time build costs"
+    },
+    {
+      "name": "Case Studies",
+      "short_name": "Results",
+      "url": "/case-studies/?utm_source=pwa-shortcut",
+      "description": "Real engagements and real numbers"
+    }
+  ]
+}

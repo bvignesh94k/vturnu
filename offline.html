@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You're offline | VTurnU</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#5B56C9">
+<link rel="icon" type="image/svg+xml" href="/assets/img/vturnu-icon-mark.svg">
+<style>
+    /* Self-contained: this page must render with no network at all. */
+    :root { --brand:#5B56C9; --ink:#1D1936; --muted:#6F6992; --line:#E5E3F5; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+        min-height:100vh; display:grid; place-items:center; padding:24px;
+        font:16px/1.65 "Poppins","Segoe UI",system-ui,-apple-system,sans-serif;
+        color:var(--ink);
+        background:
+            radial-gradient(ellipse 800px 460px at 75% 10%, rgba(0,184,217,.16), transparent 60%),
+            radial-gradient(ellipse 620px 380px at 10% 92%, rgba(255,61,138,.12), transparent 60%),
+            #FFFFFF;
+    }
+    .wrap { max-width:520px; text-align:center; }
+    .mark { width:72px; height:72px; margin:0 auto 26px; display:block; }
+    h1 { font-size:clamp(1.7rem,5vw,2.4rem); line-height:1.15; letter-spacing:-.02em; margin-bottom:14px; }
+    p { color:var(--muted); margin-bottom:12px; }
+    .actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:26px; }
+    .btn {
+        display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:.95rem;
+        padding:13px 26px; border-radius:999px; border:0; cursor:pointer;
+        text-decoration:none; color:var(--ink);
+        background:linear-gradient(135deg,#FF9100,#5B56C9 60%,#FF9100);
+    }
+    .btn-ghost { background:transparent; border:2px solid rgba(23,24,28,.22); padding:11px 24px; }
+    .tip { margin-top:30px; padding-top:22px; border-top:1px solid var(--line); font-size:.88rem; }
+    .tip a { color:#D62C74; font-weight:700; }
+    @media (prefers-color-scheme: dark) {
+        body { background:#17133A; color:#F5F4FE; }
+        p, .tip { color:#9A93BC; }
+        .btn-ghost { color:#F5F4FE; border-color:rgba(255,255,255,.28); }
+    }
+</style>
+</head>
+<body>
+<main class="wrap">
+    <svg class="mark" viewBox="0 0 106 100" aria-hidden="true">
+        <defs>
+            <linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00b8d9"/><stop offset="1" stop-color="#4338ca"/></linearGradient>
+            <linearGradient id="u" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3d8a"/><stop offset="1" stop-color="#ff9100"/></linearGradient>
+        </defs>
+        <path d="M16 18 L38 80 L60 18" stroke="url(#v)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" style="mix-blend-mode:multiply"/>
+        <path d="M54 24 L54 56 Q54 80 71 80 Q88 80 88 56 L88 24" stroke="url(#u)" stroke-width="14" stroke-linecap="round" fill="none" style="mix-blend-mode:multiply"/>
+    </svg>
+
+    <h1>You're offline</h1>
+    <p>We couldn't reach the network. Any page you've already visited will still open. Everything else needs a connection.</p>
+
+    <div class="actions">
+        <button class="btn" onclick="location.reload()">Try Again</button>
+        <a class="btn btn-ghost" href="/">Go to Homepage</a>
+    </div>
+
+    <p class="tip">Need us urgently? Message us on
+        <a href="https://wa.me/919363731498">WhatsApp</a>,
+        it'll send as soon as you're back online.</p>
+</main>
+<script>
+    // Reload automatically the moment connectivity returns.
+    window.addEventListener('online', function () { location.reload(); });
+</script>
+</body>
+</html>

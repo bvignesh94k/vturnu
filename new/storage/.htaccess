@@ -1,0 +1,12 @@
+# Lead data and admin credentials: never web-accessible.
+# Belt-and-braces: holds even if the root .htaccess is missing, mod_rewrite is
+# off, or the site is installed under a subfolder.
+<IfModule mod_authz_core.c>
+    # Apache 2.4+
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    # Apache 2.2
+    Order allow,deny
+    Deny from all
+</IfModule>

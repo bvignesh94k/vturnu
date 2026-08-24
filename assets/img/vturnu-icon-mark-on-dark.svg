@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="dkv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e3ff"></stop><stop offset="1" stop-color="#818cf8"></stop></linearGradient>
+    <linearGradient id="dku" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5ea0"></stop><stop offset="1" stop-color="#ffb020"></stop></linearGradient>
+  </defs>
+  <g transform="translate(130 130) scale(7.74)">
+    <path d="M16 18 L38 80 L60 18" stroke="url(#dkv)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+    <path d="M54 24 L54 56 Q54 80 71 80 Q88 80 88 56 L88 24" stroke="url(#dku)" stroke-width="14" stroke-linecap="round" fill="none" opacity="0.92"></path>
+  </g>
+</svg>

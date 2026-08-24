@@ -1,0 +1,151 @@
+# VTurnU, https://vturnu.com
+# Search engines and AI answer engines are both welcome.
+# Private paths are listed once under the catch-all below; every named agent
+# inherits nothing from it, so the sensitive paths are repeated per agent
+# only where a crawler is known to ignore the wildcard group.
+
+User-agent: *
+Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
+Disallow: /*?utm_
+Disallow: /*?fbclid
+
+# ---------------------------------------------------------------
+# Traditional search crawlers
+# ---------------------------------------------------------------
+
+User-agent: Googlebot
+Allow: /
+Disallow: /storage/
+Disallow: /admin/
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Disallow: /storage/
+Disallow: /admin/
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+Disallow: /storage/
+Disallow: /admin/
+
+User-agent: Yandex
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /storage/
+Disallow: /admin/
+
+User-agent: Sogou web spider
+Allow: /
+
+User-agent: Naver
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+User-agent: SeznamBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# ---------------------------------------------------------------
+# AI answer engines, explicitly allowed so the brand can be cited
+# in generated answers. Blocking these removes VTurnU from AI search
+# results entirely, which is the opposite of the goal.
+# ---------------------------------------------------------------
+
+# OpenAI / ChatGPT
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Google Gemini / AI Overviews
+User-agent: Google-Extended
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# xAI / Grok
+User-agent: xAI-Bot
+Allow: /
+
+User-agent: Grokbot
+Allow: /
+
+# Meta AI
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+
+# Common Crawl, a training and retrieval source for many engines
+User-agent: CCBot
+Allow: /
+
+# Others
+User-agent: cohere-ai
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: omgili
+Allow: /
+
+Sitemap: https://vturnu.com/sitemap.xml
+
+# Structured summary of the site for AI answer engines
+# https://vturnu.com/llms.txt

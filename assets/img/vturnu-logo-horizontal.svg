@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="1600" height="600">
+  <defs>
+    <linearGradient id="hov" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00b8d9"></stop><stop offset="1" stop-color="#4338ca"></stop></linearGradient>
+    <linearGradient id="hou" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3d8a"></stop><stop offset="1" stop-color="#ff9100"></stop></linearGradient>
+  </defs>
+  <g transform="translate(190 145) scale(3.11)">
+    <path d="M16 18 L38 80 L60 18" stroke="url(#hov)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" style="mix-blend-mode:multiply"></path>
+    <path d="M54 24 L54 56 Q54 80 71 80 Q88 80 88 56 L88 24" stroke="url(#hou)" stroke-width="14" stroke-linecap="round" fill="none" style="mix-blend-mode:multiply"></path>
+  </g>
+  <g font-family="Caprasimo" font-size="128" text-anchor="start">
+    <text x="610" y="320" fill="url(#hov)">V</text>
+    <text x="702.16" y="320" fill="#1d1936">Turn</text>
+    <text x="994" y="320" fill="url(#hou)">U</text>
+  </g>
+  <text font-family="Figtree" font-weight="600" font-size="30" letter-spacing="6.6" fill="#5b56c9" x="614" y="388" text-anchor="start">TOGETHER WE TURN HEADS</text>
+</svg>
