@@ -1,0 +1,17 @@
+# Live data and server state — never commit
+storage/
+new/
+
+# Deployment script — contains server IP
+deploy.sh
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# ZIP snapshots
+*.zip
