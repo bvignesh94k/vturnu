@@ -15,10 +15,14 @@ $PAGES = [
 
     '' => [
         'template' => 'home',
-        'title' => 'Best Digital Marketing Agency in Chennai, India | VTurnU',
-        'meta'  => 'Performance-driven digital marketing agency in Chennai serving India, the US & Canada. SEO, AEO, PPC, social, web & app development, built for measurable ROI.',
-        'h1'    => 'We grow brands that refuse to stay invisible.',
-        'lede'  => 'VTurnU is a performance-driven digital marketing, web & app development company. SEO, AEO, paid media and brand design, engineered for one outcome: measurable revenue.',
+        'title'    => 'Digital Marketing Agency in Chennai for Search & AI | VTurnU',
+        'meta'     => 'Chennai digital growth company for B2B firms and SMEs. We make you visible in Google and in AI answers, then turn that into qualified enquiries.',
+        /* Social cards get their own pair: the title tag carries the local
+           commercial intent, while a shared link should lead with the idea. */
+        'og_title' => 'Turn visibility into qualified demand | VTurnU',
+        'og_meta'  => 'Your buyers search Google, ask ChatGPT and read AI summaries before they ever reach your site. VTurnU makes growing businesses discoverable across all of it.',
+        'h1'       => 'Turn visibility into qualified demand.',
+        'lede'     => 'VTurnU makes growing businesses discoverable across search engines and AI answer engines, then turns that attention into enquiries your sales team can close.',
     ],
 
     'about-us' => [

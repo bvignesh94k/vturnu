@@ -17,8 +17,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="robots" content="<?= $slug === '__404__' ? 'noindex, follow' : 'index, follow' ?>">
 <meta property="og:type" content="<?= ($page['template'] ?? '') === 'blog-post' ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
-<meta property="og:title" content="<?= e($page['title']) ?>">
-<meta property="og:description" content="<?= e($page['meta']) ?>">
+<meta property="og:title" content="<?= e($page['og_title'] ?? $page['title']) ?>">
+<meta property="og:description" content="<?= e($page['og_meta'] ?? $page['meta']) ?>">
 <meta property="og:url" content="<?= e($canonical) ?>">
 <meta property="og:image" content="<?= e(abs_url('/assets/img/vturnu-logo-dark.png')) ?>">
 <meta property="og:image:width" content="1584">
@@ -28,8 +28,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:locale:alternate" content="en_IN">
 <meta property="og:locale:alternate" content="en_CA">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="<?= e($page['title']) ?>">
-<meta name="twitter:description" content="<?= e($page['meta']) ?>">
+<meta name="twitter:title" content="<?= e($page['og_title'] ?? $page['title']) ?>">
+<meta name="twitter:description" content="<?= e($page['og_meta'] ?? $page['meta']) ?>">
 <meta name="twitter:image" content="<?= e(abs_url('/assets/img/vturnu-logo-dark.png')) ?>">
 <meta name="geo.region" content="IN-TN">
 <meta name="geo.placename" content="Chennai">
@@ -56,13 +56,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <?php /* One family for the whole site (Poppins) plus Caprasimo for the logo
          wordmark. Loaded in a single request; display=swap so text paints
          immediately in the fallback rather than blocking first render. */ ?>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Caprasimo&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Caprasimo&display=swap"></noscript>
+<?php /* The homepage adds Figtree, its body face, to the same request. */
+$font_url = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800"
+    . ($slug === "" ? "&family=Figtree:wght@400;500;600;700" : "")
+    . "&family=Caprasimo&display=swap"; ?>
+<link rel="stylesheet" href="<?= e($font_url) ?>" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="<?= e($font_url) ?>"></noscript>
 <?php /* External + versioned so the browser caches it once instead of re-downloading
          the whole sheet inside every page's HTML. ?v= busts the cache on edit. */
 $css_v = @filemtime(BASE_PATH . '/assets/css/style.css') ?: time(); ?>
 <link rel="stylesheet" href="/assets/css/style.css?v=<?= $css_v ?>">
+<?php /* Homepage-only sheet. Every rule inside is scoped under .hp, so it
+         cannot reach any other template. */
+if ($slug === ""):
+    $home_css_v = @filemtime(BASE_PATH . "/assets/css/home.css") ?: time(); ?>
+<link rel="stylesheet" href="/assets/css/home.css?v=<?= $home_css_v ?>">
+<?php endif; ?>
+<?php /* The homepage emits its own richer Organization graph (ProfessionalService,
+         a service catalogue and the FAQ), so the shared one is skipped there
+         rather than defining the same @id twice. Every other page keeps it. */
+if ($slug !== ''): ?>
 <?= jsonld_script(jsonld_site()) . "\n" ?>
+<?php endif; ?>
 <?php if ($slug !== '__404__' && count($trail) > 1): ?>
 <?= jsonld_script(jsonld_breadcrumbs($trail)) . "\n" ?>
 <?php endif; ?>
@@ -79,7 +94,7 @@ $css_v = @filemtime(BASE_PATH . '/assets/css/style.css') ?: time(); ?>
 <?php endif; ?>
 <script src="https://www.google.com/recaptcha/api.js?render=6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg" async defer></script>
 </head>
-<body>
+<body<?= $slug === "" ? " class=\"hp\"" : "" ?>>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K68BCJ69"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

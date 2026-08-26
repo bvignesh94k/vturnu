@@ -3,10 +3,15 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
     # Canonical host: www always redirects to the bare domain, permanently.
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
     RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+    # Admin panel: explicit trailing slash for /admin (before generic rules)
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^admin$ /admin/ [L,R=301]
 
     # Canonical trailing slash: /seo -> /seo/, permanently.
     # Without this, index.php's trim($uri, '/') serves every page at two URLs
@@ -15,8 +20,6 @@ Options -Indexes
     # POST is excluded because a 301 would downgrade it to GET and drop the
     # body; real files, directories and anything with an extension
     # (sitemap.xml, robots.txt, llms.txt, feed.xml) are left alone.
-    # Substitution is directory-relative (not ^/…), like the rule below, so it
-    # still holds when the site is installed under a subfolder.
     RewriteCond %{REQUEST_METHOD} !=POST
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
