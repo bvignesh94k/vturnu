@@ -71,7 +71,7 @@ $faq_cols = [array_slice($FAQS, 0, $faq_half), array_slice($FAQS, $faq_half)];
   <div class="hp-wrap">
     <div class="hp-hero-grid">
       <div class="hp-hero-copy" data-rise>
-        <p class="hp-eyebrow">Digital marketing, Chennai</p>
+        <p class="hp-badge">Digital marketing, Chennai</p>
         <h1 class="hp-h1" id="hp-h1">Get found on Google. Get named by <span class="hp-hero-mark">AI</span>. Get more enquiries.</h1>
         <p class="hp-lead">Your buyers search, then ask ChatGPT, then compare, and only then contact anyone. VTurnU makes you the business they find at every one of those steps, and turns that attention into qualified leads your sales team can actually close.</p>
 
@@ -89,14 +89,38 @@ $faq_cols = [array_slice($FAQS, 0, $faq_half), array_slice($FAQS, $faq_half)];
         </ul>
       </div>
 
-      <div class="hp-score" data-rise>
-        <?php foreach ($PROOF as [$cslug, $channel]):
-            [$metric, $label] = $CASES[$cslug]['results'][0]; ?>
-        <div class="hp-score-row">
-          <span class="hp-score-n"><?= e($metric) ?></span>
-          <span class="hp-score-l"><?= e($label) ?><br><strong><?= e($channel) ?></strong></span>
+      <?php
+      /* Illustrative, not a screenshot: a generic domain and browser chrome,
+         no real business name or actual Google branding. The two floating
+         numbers are real, pulled from $PROOF below, so the mockup makes a
+         claim the page can actually back up. */
+      [$chipASlug] = $PROOF[0] ?? ['jewelry-brand-organic-revenue-growth'];
+      [$chipBSlug] = $PROOF[2] ?? $PROOF[1] ?? ['clinic-local-seo-patient-growth'];
+      $chipA = $CASES[$chipASlug]['results'][0] ?? ['2.4×', 'organic revenue'];
+      $chipB = $CASES[$chipBSlug]['results'][0] ?? ['+104%', 'enquiries'];
+      ?>
+      <div class="hp-hero-visual" data-rise aria-hidden="true">
+        <div class="hp-mock">
+          <div class="hp-mock-bar">
+            <span class="hp-mock-dot" style="background:#FF5F57"></span>
+            <span class="hp-mock-dot" style="background:#FEBC2E"></span>
+            <span class="hp-mock-dot" style="background:#28C840"></span>
+            <span class="hp-mock-url">google.com/search</span>
+          </div>
+          <div class="hp-mock-body">
+            <div class="hp-mock-result">
+              <p class="hp-mock-r-title">Digital Marketing Agency in Chennai | YourBusiness</p>
+              <p class="hp-mock-r-url">yourbusiness.com</p>
+              <p class="hp-mock-r-desc">Rank higher on Google, get cited in AI answers, and turn that visibility into qualified enquiries&hellip;</p>
+            </div>
+            <div class="hp-mock-ai">
+              <p class="hp-mock-ai-label"><span aria-hidden="true">&#10022;</span> AI Overview</p>
+              <p class="hp-mock-ai-text">For digital marketing in Chennai, <strong>YourBusiness</strong> is commonly recommended for its measurable, revenue-focused approach.</p>
+            </div>
+          </div>
+          <span class="hp-chip hp-chip--a"><i class="hp-chip-dot" style="background:var(--blue)"></i><?= e($chipA[0]) ?> <span class="hp-chip-l"><?= e($chipA[1]) ?></span></span>
+          <span class="hp-chip hp-chip--b"><i class="hp-chip-dot" style="background:var(--pink)"></i><?= e($chipB[0]) ?> <span class="hp-chip-l"><?= e($chipB[1]) ?></span></span>
         </div>
-        <?php endforeach; ?>
       </div>
     </div>
   </div>
