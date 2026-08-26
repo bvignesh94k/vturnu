@@ -1,6 +1,6 @@
 /* ============================================================================
-   VTurnU: Conversion-focused homepage behaviour
-   Simple, fast, focused on form conversion and progressive enhancement.
+   VTurnU: Premium visual homepage
+   Simple, fast, beautiful. Form conversion + scroll reveals.
    ============================================================================ */
 (function () {
     'use strict';
@@ -35,7 +35,7 @@
                 entry.target.classList.add('in');
                 io.unobserve(entry.target);
             });
-        }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+        }, { rootMargin: '0px 0px -15% 0px', threshold: 0 });
 
         for (var j = 0; j < items.length; j++) { io.observe(items[j]); }
 
@@ -64,16 +64,16 @@
 
         function checkName(input) {
             var v = input.value.trim();
-            if (!v) { err(input, 'Please tell us your name.'); return false; }
+            if (!v) { err(input, 'Please enter your name.'); return false; }
             err(input, '');
             return true;
         }
 
         function checkEmail(input) {
             var v = input.value.trim();
-            if (!v) { err(input, 'We need an email address.'); return false; }
+            if (!v) { err(input, 'Please enter an email address.'); return false; }
             if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)) {
-                err(input, 'That doesn\'t look like a complete email address.');
+                err(input, 'Please enter a valid email address.');
                 return false;
             }
             err(input, '');
