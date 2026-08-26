@@ -67,7 +67,9 @@
         </div>
 
         <div class="footer-bottom">
-            <p><?= e(COPYRIGHT) ?></p>
+            <?php /* The brand name links home: standard on agency sites, and it
+                     gives every page one more internal link to the homepage. */ ?>
+            <p>Copyright &copy; <?= date('Y') ?> <a class="copy-brand" href="/">VTurnU</a>. All rights reserved.</p>
             <ul class="footer-legal-links">
                 <li><a href="/privacy-policy/">Privacy Policy</a></li>
                 <li><a href="/terms-and-conditions/">Terms &amp; Conditions</a></li>

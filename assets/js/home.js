@@ -1,7 +1,8 @@
-/* ============================================================================
-   VTurnU: Premium visual homepage
-   Simple, fast, beautiful. Form conversion + scroll reveals.
-   ============================================================================ */
+/* ==========================================================================
+   VTurnU homepage behaviour.
+   Loaded only on "/". Everything here is an enhancement: with this file
+   blocked the page still renders, reads and submits correctly.
+   ========================================================================== */
 (function () {
     'use strict';
 
@@ -10,10 +11,12 @@
 
     document.documentElement.classList.add('hp-js');
 
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var reduce = reduceQuery.matches;
     var supportsIO = 'IntersectionObserver' in window;
 
-    /* ---------------------------------------------------------------- reveal */
+    /* ---------------------------------------------------------------- rise */
+
     (function reveal() {
         var items = hp.querySelectorAll('[data-rise]');
         if (!items.length) { return; }
@@ -24,6 +27,8 @@
 
         if (!supportsIO || reduce) { showAll(); return; }
 
+        /* Anything already on screen is shown at once, so the top of the page
+           is never blank while the observer warms up. */
         for (var i = 0; i < items.length; i++) {
             var box = items[i].getBoundingClientRect();
             if (box.top < window.innerHeight && box.bottom > 0) { items[i].classList.add('in'); }
@@ -35,22 +40,24 @@
                 entry.target.classList.add('in');
                 io.unobserve(entry.target);
             });
-        }, { rootMargin: '0px 0px -15% 0px', threshold: 0 });
-
+        }, { rootMargin: '0px 0px -10% 0px', threshold: 0 });
         for (var j = 0; j < items.length; j++) { io.observe(items[j]); }
 
+        /* Failsafe. If the observer never fires the page must not be left with
+           invisible content, so reveal everything after a short wait. */
         window.setTimeout(function () {
             if (hp.querySelectorAll('[data-rise].in').length === 0) { io.disconnect(); showAll(); }
         }, 2500);
     })();
 
-    /* ----------------------------------------------------------------- form */
+    /* ---------------------------------------------------------------- form */
+
     (function form() {
         var form = document.getElementById('hp-form');
         if (!form) { return; }
-        var nameField = document.getElementById('f-name');
-        var emailField = document.getElementById('f-email');
-        if (!nameField || !emailField) { return; }
+
+        var name = document.getElementById('f-name');
+        var email = document.getElementById('f-email');
 
         function err(input, message) {
             var slot = form.querySelector('[data-err-for="' + input.id + '"]');
@@ -62,54 +69,46 @@
             }
         }
 
-        function checkName(input) {
-            var v = input.value.trim();
-            if (!v) { err(input, 'Please enter your name.'); return false; }
-            err(input, '');
+        function checkName() {
+            if (!name) { return true; }
+            if (!name.value.trim()) { err(name, 'Please tell us your name so we know who we are replying to.'); return false; }
+            err(name, '');
             return true;
         }
 
-        function checkEmail(input) {
-            var v = input.value.trim();
-            if (!v) { err(input, 'Please enter an email address.'); return false; }
+        function checkEmail() {
+            if (!email) { return true; }
+            var v = email.value.trim();
+            if (!v) { err(email, 'We need an email address to send the audit to.'); return false; }
             if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)) {
-                err(input, 'Please enter a valid email address.');
+                err(email, 'That does not look like a complete email address.');
                 return false;
             }
-            err(input, '');
+            err(email, '');
             return true;
         }
 
-        [[nameField, checkName], [emailField, checkEmail]].forEach(function (pair) {
+        [[name, checkName], [email, checkEmail]].forEach(function (pair) {
             var field = pair[0], check = pair[1];
             if (!field) { return; }
-            field.addEventListener('blur', function () { check(field); });
+            field.addEventListener('blur', check);
             field.addEventListener('input', function () {
-                if (field.getAttribute('aria-invalid') === 'true') { check(field); }
+                if (field.getAttribute('aria-invalid') === 'true') { check(); }
             });
         });
 
         form.addEventListener('submit', function (e) {
-            var okName = checkName(nameField);
-            var okEmail = checkEmail(emailField);
-            if (!okName || !okEmail) {
-                e.preventDefault();
-                var bad = !okName ? nameField : emailField;
-                if (bad) { bad.focus(); }
-            }
+            var okName = checkName();
+            var okEmail = checkEmail();
+            if (okName && okEmail) { return; }
+            e.preventDefault();
+            var bad = !okName ? name : email;
+            if (bad) { bad.focus(); }
         });
     })();
 
-    /* ----------------------------------------------- reCAPTCHA token injection */
-    if (window.grecaptcha && document.getElementById('recaptcha-response')) {
-        window.grecaptcha.ready(function () {
-            window.grecaptcha.execute('6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg', { action: 'submit' }).then(function (token) {
-                document.getElementById('recaptcha-response').value = token;
-            });
-        });
-    }
+    /* ------------------------------------------------------ anchor scrolls */
 
-    /* ------------------------------------------------------ anchor smooth scroll */
     hp.addEventListener('click', function (e) {
         var link = e.target.closest ? e.target.closest('a[href^="#"]') : null;
         if (!link) { return; }
@@ -119,6 +118,7 @@
         if (!target) { return; }
         e.preventDefault();
         target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        // Move focus too, or keyboard users are left where they clicked.
         target.setAttribute('tabindex', '-1');
         target.focus({ preventScroll: true });
     });
