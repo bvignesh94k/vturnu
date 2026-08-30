@@ -5,3 +5,11 @@ storage/
 new/
 deploy.sh
 .htaccess
+
+# The root index.php is a thin proxy for local XAMPP dev and the VPS deploy
+# only. It must NOT ship to Vercel: a file with this exact name at the
+# deployment root gets served as a static download (this was the original
+# "vturnu.com downloads source code" bug). The leading slash anchors this to
+# the repo root only, so api/index.php (the real, executed entry point) is
+# unaffected.
+/index.php
