@@ -68,27 +68,35 @@ function audit_safe_url(string $raw): array
     return [$raw, ''];
 }
 
-/** Simple per-IP throttle so the endpoint cannot be used to hammer other sites. */
+/** Simple per-IP throttle so the endpoint cannot be used to hammer other sites.
+ *  Same 'forms'/'admin-lockout' rate_limits table as security.php, under its
+ *  own 'audit' bucket. Fails open on a database error: an audit-tool hiccup
+ *  must not block a real visitor. */
 function audit_rate_ok(string $ip): bool
 {
-    $file = BASE_PATH . '/storage/audit-rate.json';
-    $now = time();
-    $data = is_file($file) ? (json_decode((string) file_get_contents($file), true) ?: []) : [];
-
-    foreach ($data as $k => $stamps) {
-        $data[$k] = array_values(array_filter($stamps, fn($t) => $now - $t < AUDIT_RATE_WINDOW));
-        if (!$data[$k]) unset($data[$k]);
-    }
-
     $key = hash('sha256', $ip);
-    $mine = $data[$key] ?? [];
-    if (count($mine) >= AUDIT_RATE_MAX) {
-        return false;
+    $now = time();
+    try {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT hits FROM rate_limits WHERE bucket = ? AND key_hash = ?');
+        $stmt->execute(['audit', $key]);
+        $row = $stmt->fetch();
+        $hits = $row ? (json_decode($row['hits'], true) ?: []) : [];
+        $hits = array_values(array_filter($hits, fn($t) => $now - $t < AUDIT_RATE_WINDOW));
+
+        if (count($hits) >= AUDIT_RATE_MAX) {
+            return false;
+        }
+        $hits[] = $now;
+        $pdo->prepare(
+            'INSERT INTO rate_limits (bucket, key_hash, hits, updated_at) VALUES (?, ?, ?::jsonb, now())
+             ON CONFLICT (bucket, key_hash) DO UPDATE SET hits = excluded.hits, updated_at = now()'
+        )->execute(['audit', $key, json_encode($hits)]);
+        return true;
+    } catch (Throwable $e) {
+        error_log('audit_rate_ok: ' . $e->getMessage());
+        return true;
     }
-    $mine[] = $now;
-    $data[$key] = $mine;
-    @file_put_contents($file, json_encode($data), LOCK_EX);
-    return true;
 }
 
 /** Fetch a URL with size and time caps. */
@@ -376,9 +384,6 @@ function run_site_audit(string $url): array
 /** Email the audit report to the visitor. Lead recording/sales notification happens separately via save_enquiry(). */
 function audit_send_mail(array $audit, string $name, string $email): bool
 {
-    $hostname = parse_url(SITE_URL, PHP_URL_HOST) ?: 'vturnu.com';
-    $from = 'website@' . $hostname;
-
     $lines = [];
     $lines[] = 'Hi ' . ($name !== '' ? $name : 'there') . ',';
     $lines[] = '';
@@ -413,12 +418,6 @@ function audit_send_mail(array $audit, string $name, string $email): bool
     $lines[] = '';
     $lines[] = SITE_NAME . ' | ' . SITE_URL;
 
-    $headers = [
-        'From: ' . SITE_NAME . ' <' . $from . '>',
-        'Reply-To: ' . CONTACT_EMAIL,
-        'Content-Type: text/plain; charset=UTF-8',
-    ];
-
-    return @mail($email, 'Your SEO audit: ' . $audit['score'] . '/100 for ' . parse_url($audit['url'], PHP_URL_HOST),
-        implode("\n", $lines), implode("\r\n", $headers), '-f' . $from);
+    $subject = 'Your SEO audit: ' . $audit['score'] . '/100 for ' . parse_url($audit['url'], PHP_URL_HOST);
+    return send_email($email, $subject, implode("\n", $lines), ['reply_to' => CONTACT_EMAIL]);
 }

@@ -16,12 +16,19 @@ declare(strict_types=1);
    and anti-replay signal.                                             */
 /* ------------------------------------------------------------------ */
 
-/** Hidden input to drop into any form. */
-function csrf_field(): string
+/** The bare "$ts.$sig" value, for callers that need the token itself rather
+ *  than a full form field (admin.php's own CSRF field uses this). */
+function csrf_token(): string
 {
     $ts = time();
     $sig = hash_hmac('sha256', (string) $ts, SECURITY_SECRET);
-    return '<input type="hidden" name="csrf_token" value="' . $ts . '.' . $sig . '">';
+    return $ts . '.' . $sig;
+}
+
+/** Hidden input to drop into any form. */
+function csrf_field(): string
+{
+    return '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">';
 }
 
 /** True if the token is authentic and inside its validity window. */
@@ -52,7 +59,8 @@ function csrf_age(string $token): int
 }
 
 /* ------------------------------------------------------------------ */
-/* Rate limiting: generic per-IP token bucket, JSON file backed.       */
+/* Rate limiting: generic per-IP sliding-window token bucket, Postgres  */
+/* backed (rate_limits table, see db/schema.sql).                      */
 /* ------------------------------------------------------------------ */
 
 function security_client_ip(): string
@@ -63,29 +71,41 @@ function security_client_ip(): string
         ?? '0.0.0.0';
 }
 
-/** True if this IP is still under $max attempts inside $windowSeconds for $bucket. */
+/**
+ * True if this IP is still under $max attempts inside $windowSeconds for
+ * $bucket. Same sliding-window semantics as the old file-backed version:
+ * every hit is timestamped, and only hits inside the window still count.
+ *
+ * Fails OPEN on any database error, exactly like the old version's @-silenced
+ * file write: a persistence hiccup must never be the thing that blocks a
+ * real customer's enquiry.
+ */
 function security_rate_ok(string $bucket, int $max, int $windowSeconds): bool
 {
     $safeBucket = preg_replace('/[^a-z0-9_-]/', '', strtolower($bucket));
-    $file = BASE_PATH . '/storage/rate-' . $safeBucket . '.json';
-    $now = time();
-    $data = is_file($file) ? (json_decode((string) file_get_contents($file), true) ?: []) : [];
-
-    foreach ($data as $k => $stamps) {
-        $data[$k] = array_values(array_filter($stamps, fn($t) => $now - $t < $windowSeconds));
-        if (!$data[$k]) unset($data[$k]);
-    }
-
     $key = hash('sha256', security_client_ip());
-    $mine = $data[$key] ?? [];
-    if (count($mine) >= $max) {
-        @file_put_contents($file, json_encode($data), LOCK_EX);
-        return false;
+    $now = time();
+    try {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT hits FROM rate_limits WHERE bucket = ? AND key_hash = ?');
+        $stmt->execute([$safeBucket, $key]);
+        $row = $stmt->fetch();
+        $hits = $row ? (json_decode($row['hits'], true) ?: []) : [];
+        $hits = array_values(array_filter($hits, fn($t) => $now - $t < $windowSeconds));
+
+        if (count($hits) >= $max) {
+            return false;
+        }
+        $hits[] = $now;
+        $pdo->prepare(
+            'INSERT INTO rate_limits (bucket, key_hash, hits, updated_at) VALUES (?, ?, ?::jsonb, now())
+             ON CONFLICT (bucket, key_hash) DO UPDATE SET hits = excluded.hits, updated_at = now()'
+        )->execute([$safeBucket, $key, json_encode($hits)]);
+        return true;
+    } catch (Throwable $e) {
+        error_log('security_rate_ok(' . $safeBucket . '): ' . $e->getMessage());
+        return true;
     }
-    $mine[] = $now;
-    $data[$key] = $mine;
-    @file_put_contents($file, json_encode($data), LOCK_EX);
-    return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -197,18 +217,12 @@ function security_recaptcha_ok(string $token): bool
     return true;
 }
 
-/** Append-only diagnostic log so a recurring verification problem is visible
- *  without ever surfacing to the public site. Capped so it cannot grow forever. */
+/** Diagnostic log so a recurring verification problem is visible without
+ *  ever surfacing to the public site. Vercel's function logs are the
+ *  equivalent of the old self-trimming local file: nothing to prune here. */
 function security_recaptcha_log(string $msg): void
 {
-    $file = BASE_PATH . '/storage/recaptcha-issues.log';
-    $line = date('c') . ' [' . security_client_ip() . '] ' . $msg . "\n";
-    if (is_file($file) && filesize($file) > 262144) {
-        // Keep only the most recent ~half so the file self-trims over time.
-        $keep = substr((string) file_get_contents($file), -131072);
-        file_put_contents($file, $keep);
-    }
-    @file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
+    error_log('[recaptcha] [' . security_client_ip() . '] ' . $msg);
 }
 
 /* ------------------------------------------------------------------ */
@@ -373,47 +387,53 @@ function security_login_lock_remaining(): int
 
 function security_login_fail(): void
 {
-    $data = security_login_data();
     $key = hash('sha256', security_client_ip());
     $now = time();
-    $rec = $data[$key] ?? ['count' => 0, 'last' => 0];
+    $rec = security_login_record() ?? ['count' => 0, 'last' => 0];
     // A lockout that has fully expired starts counting fresh.
     if ($rec['count'] >= ADMIN_LOGIN_MAX_FAILS && ($now - $rec['last']) >= ADMIN_LOGIN_LOCK_SECONDS) {
         $rec = ['count' => 0, 'last' => 0];
     }
     $rec['count']++;
     $rec['last'] = $now;
-    $data[$key] = $rec;
-    security_login_save($data);
+    security_login_save($key, $rec);
 }
 
 function security_login_clear(): void
 {
-    $data = security_login_data();
-    unset($data[hash('sha256', security_client_ip())]);
-    security_login_save($data);
+    try {
+        db()->prepare('DELETE FROM rate_limits WHERE bucket = ? AND key_hash = ?')
+            ->execute(['admin-lockout', hash('sha256', security_client_ip())]);
+    } catch (Throwable $e) {
+        error_log('security_login_clear: ' . $e->getMessage());
+    }
 }
 
+/** {count,last} for this IP's failed-login history, stored under the
+ *  'admin-lockout' bucket in the same rate_limits table the form/audit
+ *  throttles use, just with a different shape in `hits`. */
 function security_login_record(): ?array
 {
-    $data = security_login_data();
-    return $data[hash('sha256', security_client_ip())] ?? null;
-}
-
-function security_login_data(): array
-{
-    $file = BASE_PATH . '/storage/admin-lockout.json';
-    return is_file($file) ? (json_decode((string) file_get_contents($file), true) ?: []) : [];
-}
-
-function security_login_save(array $data): void
-{
-    // Drop anything that's aged out so the file doesn't grow forever.
-    $now = time();
-    foreach ($data as $k => $rec) {
-        if (($now - ($rec['last'] ?? 0)) > ADMIN_LOGIN_LOCK_SECONDS * 4) {
-            unset($data[$k]);
-        }
+    try {
+        $stmt = db()->prepare('SELECT hits FROM rate_limits WHERE bucket = ? AND key_hash = ?');
+        $stmt->execute(['admin-lockout', hash('sha256', security_client_ip())]);
+        $row = $stmt->fetch();
+        return $row ? json_decode($row['hits'], true) : null;
+    } catch (Throwable $e) {
+        error_log('security_login_record: ' . $e->getMessage());
+        // Fail open: a database hiccup must not lock every admin out.
+        return null;
     }
-    @file_put_contents(BASE_PATH . '/storage/admin-lockout.json', json_encode($data), LOCK_EX);
+}
+
+function security_login_save(string $key, array $rec): void
+{
+    try {
+        db()->prepare(
+            'INSERT INTO rate_limits (bucket, key_hash, hits, updated_at) VALUES (?, ?, ?::jsonb, now())
+             ON CONFLICT (bucket, key_hash) DO UPDATE SET hits = excluded.hits, updated_at = now()'
+        )->execute(['admin-lockout', $key, json_encode($rec)]);
+    } catch (Throwable $e) {
+        error_log('security_login_save: ' . $e->getMessage());
+    }
 }

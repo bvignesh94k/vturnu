@@ -11,6 +11,7 @@ if (!ob_start('ob_gzhandler')) {
 }
 
 require __DIR__ . '/includes/config.php';
+require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
 require __DIR__ . '/includes/security.php';
 require __DIR__ . '/includes/data/menu.php';

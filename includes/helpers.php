@@ -269,6 +269,12 @@ function service_faqs(array $page): array
 /**
  * Validate + persist an enquiry from any form (contact page, home quote, pop-up).
  * Returns true when stored, false when validation fails (or honeypot tripped).
+ *
+ * The DB insert is wrapped so a persistence hiccup never blocks the visitor's
+ * "thank you" page or the follow-up email, exactly like the old file write
+ * (which silenced its own errors with @). The difference is this failure is
+ * no longer silent: it goes to error_log(), visible in Vercel's function logs,
+ * so a real outage is not indistinguishable from a page that just worked.
  */
 function save_enquiry(array $post, string $source): bool
 {
@@ -299,12 +305,19 @@ function save_enquiry(array $post, string $source): bool
         'budget' => trim($post['budget'] ?? ''),
         'message' => trim($post['message'] ?? ''),
     ];
-    $dir = BASE_PATH . '/storage';
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
+
+    try {
+        db()->prepare(
+            'INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message)
+             VALUES (:source, :name, :email, :mobile, :company, :designation, :service, :budget, :message)'
+        )->execute([
+            ':source' => $entry['source'], ':name' => $entry['name'], ':email' => $entry['email'],
+            ':mobile' => $entry['mobile'], ':company' => $entry['company'], ':designation' => $entry['designation'],
+            ':service' => $entry['service'], ':budget' => $entry['budget'], ':message' => $entry['message'],
+        ]);
+    } catch (Throwable $e) {
+        error_log('save_enquiry: DB insert failed: ' . $e->getMessage());
     }
-    // Log first. If mail delivery fails the lead is still captured and visible in admin.
-    file_put_contents($dir . '/enquiries.jsonl', json_encode($entry, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX);
 
     mail_enquiry($entry);
 
@@ -312,7 +325,7 @@ function save_enquiry(array $post, string $source): bool
 }
 
 /**
- * Forward an enquiry to the sales inbox.
+ * Forward an enquiry to the sales inbox via send_email().
  *
  * From: is a domain address, never the visitor's, or SPF/DMARC on the receiving
  * side treats the message as spoofed and drops it. The visitor's address goes in
@@ -320,13 +333,6 @@ function save_enquiry(array $post, string $source): bool
  */
 function mail_enquiry(array $entry): bool
 {
-    if (!function_exists('mail')) {
-        return false;
-    }
-
-    $host = parse_url(SITE_URL, PHP_URL_HOST) ?: 'vturnu.com';
-    $from = 'website@' . $host;
-
     $labels = [
         'name' => 'Name', 'email' => 'Email', 'mobile' => 'Phone / WhatsApp',
         'company' => 'Company', 'designation' => 'Designation', 'service' => 'Service needed',
@@ -348,20 +354,72 @@ function mail_enquiry(array $entry): bool
 
     $subject = sprintf('New enquiry: %s%s', $entry['name'], $entry['service'] !== '' ? ' (' . $entry['service'] . ')' : '');
 
-    $headers = [
-        'From: ' . SITE_NAME . ' Website <' . $from . '>',
-        'Reply-To: ' . $entry['name'] . ' <' . $entry['email'] . '>',
-        'Content-Type: text/plain; charset=UTF-8',
-        'X-Mailer: PHP/' . PHP_VERSION,
-    ];
+    return send_email(ENQUIRY_TO, $subject, implode("\n", $lines), [
+        'reply_to' => $entry['name'] . ' <' . $entry['email'] . '>',
+    ]);
+}
 
-    return @mail(
-        ENQUIRY_TO,
-        $subject,
-        implode("\n", $lines),
-        implode("\r\n", $headers),
-        '-f' . $from
-    );
+/**
+ * Single choke point for all outbound mail, via the Resend API. Every mail()
+ * call in the codebase (enquiry notifications, audit reports, ebook delivery)
+ * goes through this instead, because Vercel's runtime has no mail server for
+ * PHP's mail() to hand off to.
+ *
+ * @param array{html?:string,reply_to?:string,attachment?:array{filename:string,content:string}} $opts
+ *   attachment 'content' is raw bytes; this function base64-encodes it.
+ */
+function send_email(string $to, string $subject, string $body, array $opts = []): bool
+{
+    $apiKey = getenv('RESEND_API_KEY') ?: '';
+    if ($apiKey === '') {
+        error_log('send_email: RESEND_API_KEY is not set, dropping email to ' . $to);
+        return false;
+    }
+
+    $host = parse_url(SITE_URL, PHP_URL_HOST) ?: 'vturnu.com';
+    $payload = [
+        'from' => SITE_NAME . ' <noreply@' . $host . '>',
+        'to' => [$to],
+        'subject' => $subject,
+        'text' => $body,
+    ];
+    if (!empty($opts['html'])) {
+        $payload['html'] = $opts['html'];
+    }
+    if (!empty($opts['reply_to'])) {
+        $payload['reply_to'] = $opts['reply_to'];
+    }
+    if (!empty($opts['attachment'])) {
+        $payload['attachments'] = [[
+            'filename' => $opts['attachment']['filename'],
+            'content' => base64_encode($opts['attachment']['content']),
+        ]];
+    }
+
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $apiKey, 'Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $res = curl_exec($ch);
+    $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
+    curl_close($ch);
+
+    if ($res === false || $curlErr !== '') {
+        error_log('send_email: curl error sending to ' . $to . ': ' . $curlErr);
+        return false;
+    }
+    if ($httpCode < 200 || $httpCode >= 300) {
+        error_log('send_email: Resend HTTP ' . $httpCode . ' for ' . $to . ': ' . substr((string) $res, 0, 300));
+        return false;
+    }
+    return true;
 }
 
 /**

@@ -1,33 +1,75 @@
 <?php
 /**
  * VTurnU Admin: leads CRM + content manager with full editing.
- * Routed from index.php for any /admin/ URL. Session auth, CSRF-protected POSTs.
- * Storage: storage/admin.json (auth), storage/leads-meta.json (CRM state),
- *          storage/blog-custom.json, storage/cases-custom.json, storage/resources-custom.json
+ * Routed from index.php for any /admin/ URL. Stateless-cookie auth,
+ * CSRF-protected POSTs. Storage: Postgres (admin_users, enquiries,
+ * content_overrides — see db/schema.sql), not local files.
+ *
+ * Vercel's filesystem is not writable between requests, so there is no PHP
+ * session here: auth is a signed, expiring cookie instead (same HMAC pattern
+ * as csrf_token() and ebook_token()), verified on every request rather than
+ * looked up from server-side state.
  *
  * Default login: admin / vturnu@admin. Change it in Settings after first login.
  */
 
 declare(strict_types=1);
 
-session_name('vturnu_admin');
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'secure' => !empty($_SERVER['HTTPS']),
-    'httponly' => true,
-    'samesite' => 'Strict',
-]);
-session_start();
+const ADMIN_COOKIE = 'vt_admin';
+// Idle timeout: 2 hours. Every authenticated request reissues the cookie
+// with a fresh expiry, so this behaves like the old session idle-timeout
+// (logged out after 2 hours of inactivity) rather than a hard 2-hour cap.
+const ADMIN_SESSION_TTL = 7200;
 
-// Idle timeout: 2 hours since the last request logs the session out, so a
-// laptop left open at a shared desk doesn't stay authenticated indefinitely.
-const ADMIN_IDLE_TIMEOUT = 7200;
-if (!empty($_SESSION['admin_ok']) && !empty($_SESSION['last_seen']) && (time() - $_SESSION['last_seen']) > ADMIN_IDLE_TIMEOUT) {
-    $_SESSION = [];
-    session_regenerate_id(true);
+/** Issue (or renew) the signed admin session cookie for $user. */
+function admin_issue_session(string $user): void
+{
+    $exp = time() + ADMIN_SESSION_TTL;
+    $payload = $user . '|' . $exp;
+    $sig = hash_hmac('sha256', $payload, SECURITY_SECRET);
+    $token = rtrim(strtr(base64_encode($payload . '|' . $sig), '+/', '-_'), '=');
+    setcookie(ADMIN_COOKIE, $token, [
+        'expires' => 0, // a browser-session cookie; ADMIN_SESSION_TTL is what actually governs validity
+        'path' => '/admin/',
+        'secure' => !empty($_SERVER['HTTPS']),
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
 }
-$_SESSION['last_seen'] = time();
+
+/** The logged-in username, or null if there is no valid session cookie. */
+function admin_verify_session(): ?string
+{
+    $token = $_COOKIE[ADMIN_COOKIE] ?? '';
+    if ($token === '') {
+        return null;
+    }
+    $raw = base64_decode(strtr($token, '-_', '+/'), true);
+    if ($raw === false) {
+        return null;
+    }
+    $parts = explode('|', $raw);
+    if (count($parts) !== 3) {
+        return null;
+    }
+    [$user, $exp, $sig] = $parts;
+    $expected = hash_hmac('sha256', $user . '|' . $exp, SECURITY_SECRET);
+    if (!hash_equals($expected, $sig) || (int) $exp < time()) {
+        return null;
+    }
+    return $user;
+}
+
+function admin_clear_session(): void
+{
+    setcookie(ADMIN_COOKIE, '', [
+        'expires' => time() - 3600,
+        'path' => '/admin/',
+        'secure' => !empty($_SERVER['HTTPS']),
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
+}
 
 const ADMIN_STATUSES = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
 const ADMIN_PRIORITIES = ['low', 'normal', 'high'];
@@ -59,114 +101,126 @@ const BLOG_INTENTS = ['Informational', 'Commercial Investigation', 'How-to / Tut
 const BLOG_CATS = ['Strategy', 'SEO', 'AI Search', 'Paid Media', 'Content', 'Social', 'Web', 'Conversion', 'Innovation', 'Case Study'];
 const INDUSTRIES = ['Jewelry', 'SaaS & Tech', 'Healthcare', 'Real Estate', 'Ecommerce', 'Food & Hospitality', 'Legal Services', 'Fashion', 'Manufacturing', 'Education'];
 
-$storage = BASE_PATH . '/storage';
-if (!is_dir($storage)) { mkdir($storage, 0755, true); }
+/* ---------- Content override storage (Postgres content_overrides table) ---------- */
 
-/* ---------- Storage helpers ---------- */
-
-function admin_read_json(string $file, $default) {
-    if (!is_file($file)) return $default;
-    $d = json_decode((string) file_get_contents($file), true);
-    return is_array($d) ? $d : $default;
+function admin_get_overrides(string $type): array {
+    try {
+        $stmt = db()->prepare('SELECT slug, data FROM content_overrides WHERE content_type = ?');
+        $stmt->execute([$type]);
+        $out = [];
+        foreach ($stmt->fetchAll() as $row) { $out[$row['slug']] = json_decode($row['data'], true); }
+        return $out;
+    } catch (Throwable $e) {
+        error_log('admin_get_overrides(' . $type . '): ' . $e->getMessage());
+        return [];
+    }
 }
-function admin_write_json(string $file, $data): void {
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+function admin_save_override(string $type, string $slug, array $data): void {
+    db()->prepare(
+        'INSERT INTO content_overrides (content_type, slug, data, updated_at) VALUES (?, ?, ?::jsonb, now())
+         ON CONFLICT (content_type, slug) DO UPDATE SET data = excluded.data, updated_at = now()'
+    )->execute([$type, $slug, json_encode($data, JSON_UNESCAPED_UNICODE)]);
+}
+function admin_delete_override(string $type, string $slug): void {
+    db()->prepare('DELETE FROM content_overrides WHERE content_type = ? AND slug = ?')->execute([$type, $slug]);
 }
 
-/* Auth */
-$auth_file = $storage . '/admin.json';
-$auth = admin_read_json($auth_file, []);
-if (empty($auth['hash'])) {
-    $auth = ['user' => 'admin', 'hash' => password_hash('vturnu@admin', PASSWORD_DEFAULT)];
-    admin_write_json($auth_file, $auth);
-}
-
-/* ---------- Leads ---------- */
-
-function admin_load_leads(string $storage): array {
-    $file = $storage . '/enquiries.jsonl';
-    $leads = [];
-    if (is_file($file)) {
-        foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-            $l = json_decode($line, true);
-            if (!is_array($l)) continue;
-            $l['id'] = substr(md5(($l['date'] ?? '') . '|' . ($l['email'] ?? '') . '|' . ($l['message'] ?? '')), 0, 12);
-            $leads[] = $l;
+/* Auth: admin_users table, auto-seeded with the default login on first run,
+   exactly like the old admin.json did. */
+function admin_load_auth(): array {
+    try {
+        $row = db()->query('SELECT username, password_hash FROM admin_users ORDER BY id ASC LIMIT 1')->fetch();
+        if ($row) {
+            return ['user' => $row['username'], 'hash' => $row['password_hash']];
         }
+    } catch (Throwable $e) {
+        error_log('admin_load_auth: ' . $e->getMessage());
     }
-    $meta = admin_read_json($storage . '/leads-meta.json', []);
-    foreach ($leads as &$l) {
-        $m = $meta[$l['id']] ?? [];
-        $l['status']   = $m['status']   ?? 'new';
-        $l['notes']    = $m['notes']    ?? [];
-        /* CRM fields. All optional: a lead captured by a website form has
-           none of them until someone in sales fills them in. */
-        $l['value']    = $m['value']    ?? '';   // deal value, plain number
-        $l['priority'] = $m['priority'] ?? 'normal';
-        $l['owner']    = $m['owner']    ?? '';
-        $l['followup'] = $m['followup'] ?? '';   // Y-m-d
-        $l['tags']     = $m['tags']     ?? '';
-        $l['activity'] = $m['activity'] ?? [];
+    $seed = ['user' => 'admin', 'hash' => password_hash('vturnu@admin', PASSWORD_DEFAULT)];
+    try {
+        db()->prepare('INSERT INTO admin_users (username, password_hash) VALUES (?, ?) ON CONFLICT (username) DO NOTHING')
+            ->execute([$seed['user'], $seed['hash']]);
+    } catch (Throwable $e) {
+        error_log('admin_load_auth seed: ' . $e->getMessage());
     }
-    return array_reverse($leads);
+    return $seed;
+}
+$auth = admin_load_auth();
+
+/* ---------- Leads (Postgres enquiries table) ---------- */
+
+function admin_load_leads(): array {
+    try {
+        $rows = db()->query(
+            "SELECT id, created_at, source, name, email, mobile, company, designation, service, budget,
+                    message, status, notes, value, priority, owner,
+                    to_char(followup, 'YYYY-MM-DD') AS followup, tags, activity
+             FROM enquiries WHERE deleted_at IS NULL ORDER BY created_at DESC"
+        )->fetchAll();
+    } catch (Throwable $e) {
+        error_log('admin_load_leads: ' . $e->getMessage());
+        return [];
+    }
+    foreach ($rows as &$l) {
+        $l['id'] = (string) $l['id'];
+        $l['date'] = date('c', strtotime($l['created_at']));
+        $l['notes'] = json_decode($l['notes'] ?? '[]', true) ?: [];
+        $l['activity'] = json_decode($l['activity'] ?? '[]', true) ?: [];
+        $l['followup'] = $l['followup'] ?? '';
+    }
+    return $rows;
 }
 
 /** Append one entry to a lead's activity timeline. */
-function admin_log_activity(string $storage, string $id, string $text): void {
-    $meta = admin_read_json($storage . '/leads-meta.json', []);
-    $log = $meta[$id]['activity'] ?? [];
+function admin_log_activity(string $id, string $text): void {
+    if (!ctype_digit($id)) { return; }
+    $stmt = db()->prepare('SELECT activity FROM enquiries WHERE id = ?');
+    $stmt->execute([(int) $id]);
+    $row = $stmt->fetch();
+    $log = $row ? (json_decode($row['activity'] ?? '[]', true) ?: []) : [];
     $log[] = ['date' => date('Y-m-d H:i'), 'text' => $text];
-    // Keep the timeline bounded so the JSON file cannot grow without limit.
+    // Keep the timeline bounded so the column cannot grow without limit.
     if (count($log) > 200) { $log = array_slice($log, -200); }
-    admin_save_lead_meta($storage, $id, ['activity' => $log]);
+    db()->prepare('UPDATE enquiries SET activity = ?::jsonb WHERE id = ?')
+        ->execute([json_encode($log, JSON_UNESCAPED_UNICODE), (int) $id]);
 }
 
-function admin_save_lead_meta(string $storage, string $id, array $patch): void {
-    $file = $storage . '/leads-meta.json';
-    $meta = admin_read_json($file, []);
-    $meta[$id] = array_merge($meta[$id] ?? [], $patch);
-    admin_write_json($file, $meta);
+function admin_set_lead_status(string $id, string $status): void {
+    if (!ctype_digit($id)) { return; }
+    db()->prepare('UPDATE enquiries SET status = ? WHERE id = ? AND deleted_at IS NULL')
+        ->execute([$status, (int) $id]);
 }
 
-function admin_delete_lead(string $storage, string $id): void {
-    $file = $storage . '/enquiries.jsonl';
-    $meta_file = $storage . '/leads-meta.json';
-    if (!is_file($file)) return;
-
-    /* Snapshot before touching anything. Deletion is the only destructive
-       action in the panel and there is no undo, so a dated copy of the lead
-       file is kept and pruned to the last 10. Cheap insurance against a
-       mis-click on the only record of a paying customer. */
-    admin_backup_leads($storage);
-
-    $keep = [];
-    foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        $l = json_decode($line, true);
-        $lid = is_array($l) ? substr(md5(($l['date'] ?? '') . '|' . ($l['email'] ?? '') . '|' . ($l['message'] ?? '')), 0, 12) : '';
-        if ($lid !== $id) $keep[] = $line;
-    }
-    file_put_contents($file, $keep ? implode("\n", $keep) . "\n" : '', LOCK_EX);
-
-    /* This wrote to $file (enquiries.jsonl) rather than the meta file, so
-       deleting any single lead replaced the entire lead store with the CRM
-       metadata object and destroyed every remaining enquiry. */
-    $meta = admin_read_json($meta_file, []);
-    unset($meta[$id]);
-    admin_write_json($meta_file, $meta);
+function admin_get_lead_status(string $id): ?string {
+    if (!ctype_digit($id)) { return null; }
+    $stmt = db()->prepare('SELECT status FROM enquiries WHERE id = ?');
+    $stmt->execute([(int) $id]);
+    $row = $stmt->fetch();
+    return $row ? $row['status'] : null;
 }
 
-/** Dated copy of the lead file, keeping only the 10 most recent. */
-function admin_backup_leads(string $storage): void {
-    $file = $storage . '/enquiries.jsonl';
-    if (!is_file($file) || filesize($file) === 0) return;
-    $dir = $storage . '/backups';
-    if (!is_dir($dir)) { mkdir($dir, 0755, true); }
-    @copy($file, $dir . '/enquiries-' . date('Ymd-His') . '.jsonl');
-    $old = glob($dir . '/enquiries-*.jsonl') ?: [];
-    if (count($old) > 10) {
-        sort($old);
-        foreach (array_slice($old, 0, count($old) - 10) as $stale) { @unlink($stale); }
-    }
+function admin_update_lead_deal(string $id, array $fields): void {
+    if (!ctype_digit($id)) { return; }
+    db()->prepare('UPDATE enquiries SET value = ?, priority = ?, owner = ?, followup = ?, tags = ? WHERE id = ? AND deleted_at IS NULL')
+        ->execute([$fields['value'], $fields['priority'], $fields['owner'], $fields['followup'] !== '' ? $fields['followup'] : null, $fields['tags'], (int) $id]);
+}
+
+function admin_append_lead_note(string $id, string $text): void {
+    if (!ctype_digit($id)) { return; }
+    $stmt = db()->prepare('SELECT notes FROM enquiries WHERE id = ?');
+    $stmt->execute([(int) $id]);
+    $row = $stmt->fetch();
+    $notes = $row ? (json_decode($row['notes'] ?? '[]', true) ?: []) : [];
+    $notes[] = ['date' => date('Y-m-d H:i'), 'text' => $text];
+    db()->prepare('UPDATE enquiries SET notes = ?::jsonb WHERE id = ?')
+        ->execute([json_encode($notes, JSON_UNESCAPED_UNICODE), (int) $id]);
+}
+
+/** Soft delete: Postgres already has its own durability, so unlike the old
+ *  file-based version there is no need for a backup-before-delete dance. */
+function admin_delete_lead(string $id): void {
+    if (!ctype_digit($id)) { return; }
+    db()->prepare('UPDATE enquiries SET deleted_at = now() WHERE id = ?')->execute([(int) $id]);
 }
 
 /* ---------- Content helpers ---------- */
@@ -198,9 +252,8 @@ function admin_parse_sections(string $raw): array {
 
 /* ---------- Auth gate + actions ---------- */
 
-$logged_in = !empty($_SESSION['admin_ok']);
-if (empty($_SESSION['csrf'])) { $_SESSION['csrf'] = bin2hex(random_bytes(16)); }
-$csrf = $_SESSION['csrf'];
+$logged_in = admin_verify_session() !== null;
+$csrf = csrf_token();
 $view = $_GET['view'] ?? 'dashboard';
 $flash = '';
 
@@ -214,9 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $flash = "Too many failed attempts. Try again in {$mins} minute" . ($mins === 1 ? '' : 's') . '.';
         } elseif (hash_equals($auth['user'], trim($_POST['user'] ?? '')) && password_verify((string) ($_POST['pass'] ?? ''), $auth['hash'])) {
             security_login_clear();
-            session_regenerate_id(true);
-            $_SESSION['admin_ok'] = true;
-            $_SESSION['csrf'] = bin2hex(random_bytes(16));
+            admin_issue_session($auth['user']);
             header('Location: /admin/'); exit;
         } else {
             security_login_fail();
@@ -224,23 +275,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif (!$logged_in) {
         http_response_code(403); $flash = 'Session expired. Please log in again.';
-    } elseif (!hash_equals($csrf, $_POST['csrf'] ?? '')) {
+    } elseif (!csrf_verify($_POST['csrf'] ?? '')) {
         http_response_code(403); $flash = 'Invalid request token. Try again.';
     } else {
+        // Any authenticated action extends the idle-timeout window, matching
+        // the old session's "log out after 2 hours of inactivity" behaviour.
+        admin_issue_session($auth['user']);
         switch ($action) {
             case 'logout':
-                session_destroy();
+                admin_clear_session();
                 header('Location: /admin/'); exit;
 
             case 'lead_status':
                 $st = $_POST['status'] ?? 'new';
                 $lid = $_POST['id'] ?? '';
                 if (in_array($st, ADMIN_STATUSES, true) && $lid !== '') {
-                    $meta_now = admin_read_json($storage . '/leads-meta.json', []);
-                    $prev = $meta_now[$lid]['status'] ?? 'new';
-                    admin_save_lead_meta($storage, $lid, ['status' => $st]);
+                    $prev = admin_get_lead_status($lid) ?? 'new';
+                    admin_set_lead_status($lid, $st);
                     if ($prev !== $st) {
-                        admin_log_activity($storage, $lid, 'Status: ' . ucfirst($prev) . ' to ' . ucfirst($st));
+                        admin_log_activity($lid, 'Status: ' . ucfirst($prev) . ' to ' . ucfirst($st));
                     }
                     $flash = 'Status updated.';
                 }
@@ -254,14 +307,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $val = preg_replace('/[^0-9]/', '', (string) ($_POST['value'] ?? ''));
                     $fup = trim($_POST['followup'] ?? '');
                     if ($fup !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fup)) { $fup = ''; }
-                    admin_save_lead_meta($storage, $lid, [
+                    admin_update_lead_deal($lid, [
                         'value'    => $val,
                         'priority' => in_array($prio, ADMIN_PRIORITIES, true) ? $prio : 'normal',
                         'owner'    => trim($_POST['owner'] ?? ''),
                         'followup' => $fup,
                         'tags'     => trim($_POST['tags'] ?? ''),
                     ]);
-                    admin_log_activity($storage, $lid, 'Deal details updated');
+                    admin_log_activity($lid, 'Deal details updated');
                     $flash = 'Lead details saved.';
                 }
                 break;
@@ -269,22 +322,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'lead_note':
                 $note = trim($_POST['note'] ?? '');
                 if ($note !== '') {
-                    $meta = admin_read_json($storage . '/leads-meta.json', []);
                     $id = $_POST['id'] ?? '';
-                    $notes = $meta[$id]['notes'] ?? [];
-                    $notes[] = ['date' => date('Y-m-d H:i'), 'text' => $note];
-                    admin_save_lead_meta($storage, $id, ['notes' => $notes]);
-                    admin_log_activity($storage, $id, 'Note: ' . mb_substr($note, 0, 60));
+                    admin_append_lead_note($id, $note);
+                    admin_log_activity($id, 'Note: ' . mb_substr($note, 0, 60));
                     $flash = 'Note added.';
                 }
                 break;
 
             case 'lead_delete':
-                admin_delete_lead($storage, $_POST['id'] ?? '');
+                admin_delete_lead($_POST['id'] ?? '');
                 header('Location: /admin/?view=leads'); exit;
 
             case 'blog_save':
-                $custom = admin_read_json($storage . '/blog-custom.json', []);
+                $custom = admin_get_overrides('blog');
                 $orig = $_POST['orig_slug'] ?? '';
                 // Editing anything that already exists (built-in or custom) saves under
                 // its own slug, so a built-in post becomes an editable override.
@@ -309,17 +359,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ))),
                     'cta' => [trim($_POST['cta_head'] ?? ''), trim($_POST['cta_sub'] ?? ''), trim($_POST['cta_btn'] ?? '')]
                 ];
-                admin_write_json($storage . '/blog-custom.json', $custom);
+                admin_save_override('blog', $bslug, $custom[$bslug]);
                 header('Location: /admin/?view=blogs&saved=' . urlencode($bslug)); exit;
 
             case 'blog_delete':
-                $custom = admin_read_json($storage . '/blog-custom.json', []);
-                unset($custom[$_POST['slug'] ?? '']);
-                admin_write_json($storage . '/blog-custom.json', $custom);
+                admin_delete_override('blog', $_POST['slug'] ?? '');
                 header('Location: /admin/?view=blogs'); exit;
 
             case 'case_save':
-                $custom = admin_read_json($storage . '/cases-custom.json', []);
+                $custom = admin_get_overrides('case');
                 $orig = $_POST['orig_slug'] ?? '';
                 $known = $orig !== '' && (isset($custom[$orig]) || in_array($orig, $GLOBALS['CASES_BUILTIN'] ?? [], true));
                 $cslug = $known ? $orig : admin_slugify($_POST['title_h1'] ?? '');
@@ -343,17 +391,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'quote' => count($quote_parts) === 3 ? array_slice($quote_parts, 0, 3) : null,
                     'cta' => [trim($_POST['cta_head'] ?? ''), trim($_POST['cta_sub'] ?? ''), trim($_POST['cta_btn'] ?? '')]
                 ];
-                admin_write_json($storage . '/cases-custom.json', $custom);
+                admin_save_override('case', $cslug, $custom[$cslug]);
                 header('Location: /admin/?view=cases&saved=' . urlencode($cslug)); exit;
 
             case 'case_delete':
-                $custom = admin_read_json($storage . '/cases-custom.json', []);
-                unset($custom[$_POST['slug'] ?? '']);
-                admin_write_json($storage . '/cases-custom.json', $custom);
+                admin_delete_override('case', $_POST['slug'] ?? '');
                 header('Location: /admin/?view=cases'); exit;
 
             case 'resource_save':
-                $custom = admin_read_json($storage . '/resources-custom.json', []);
+                $custom = admin_get_overrides('resource');
                 $orig = $_POST['orig_slug'] ?? '';
                 $known = $orig !== '' && (isset($custom[$orig]) || in_array($orig, $GLOBALS['RESOURCES_BUILTIN'] ?? [], true));
                 $rslug = $known ? $orig : admin_slugify($_POST['title_h1'] ?? '');
@@ -373,13 +419,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'image' => trim($_POST['image'] ?? ''),
                     'cta' => [trim($_POST['cta_head'] ?? ''), trim($_POST['cta_sub'] ?? ''), trim($_POST['cta_btn'] ?? '')]
                 ];
-                admin_write_json($storage . '/resources-custom.json', $custom);
+                admin_save_override('resource', $rslug, $custom[$rslug]);
                 header('Location: /admin/?view=resources&saved=' . urlencode($rslug)); exit;
 
             case 'resource_delete':
-                $custom = admin_read_json($storage . '/resources-custom.json', []);
-                unset($custom[$_POST['slug'] ?? '']);
-                admin_write_json($storage . '/resources-custom.json', $custom);
+                admin_delete_override('resource', $_POST['slug'] ?? '');
                 header('Location: /admin/?view=resources'); exit;
 
             case 'password':
@@ -388,15 +432,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!password_verify($cur, $auth['hash'])) { $flash = 'Current password is wrong.'; }
                 elseif (strlen($new) < 8) { $flash = 'New password must be at least 8 characters.'; }
                 else {
-                    $auth['hash'] = password_hash($new, PASSWORD_DEFAULT);
-                    if (trim($_POST['user'] ?? '') !== '') { $auth['user'] = trim($_POST['user']); }
-                    admin_write_json($auth_file, $auth);
+                    $newHash = password_hash($new, PASSWORD_DEFAULT);
+                    $newUser = trim($_POST['user'] ?? '') !== '' ? trim($_POST['user']) : $auth['user'];
+                    db()->prepare('UPDATE admin_users SET username = ?, password_hash = ?, updated_at = now() WHERE username = ?')
+                        ->execute([$newUser, $newHash, $auth['user']]);
+                    $auth['user'] = $newUser;
+                    $auth['hash'] = $newHash;
+                    // The session cookie is bound to the username, so a
+                    // rename needs a fresh cookie or the old one stops verifying.
+                    admin_issue_session($newUser);
                     $flash = 'Credentials updated.';
                 }
                 break;
         }
     }
-    $logged_in = !empty($_SESSION['admin_ok']);
+    $logged_in = admin_verify_session() !== null;
 }
 
 /* CSV export */
@@ -409,7 +459,7 @@ if ($logged_in && $view === 'export') {
     $out = fopen('php://output', 'w');
     fputcsv($out, ['Date', 'Status', 'Priority', 'Owner', 'Deal value', 'Next follow-up', 'Tags',
                    'Source', 'Name', 'Email', 'Phone', 'Company', 'Service', 'Budget', 'Message', 'Notes']);
-    $rows = admin_load_leads($storage);
+    $rows = admin_load_leads();
     if ($segName !== 'all') { $rows = leads_in($rows, $segName); }
     foreach ($rows as $l) {
         $notes = implode(' | ', array_map(fn($n) => ($n['date'] ?? '') . ' ' . ($n['text'] ?? ''), $l['notes'] ?? []));
@@ -423,10 +473,10 @@ if ($logged_in && $view === 'export') {
 }
 
 /* Data for views */
-$leads = $logged_in ? admin_load_leads($storage) : [];
-$custom_posts = admin_read_json($storage . '/blog-custom.json', []);
-$custom_cases = admin_read_json($storage . '/cases-custom.json', []);
-$custom_resources = admin_read_json($storage . '/resources-custom.json', []);
+$leads = $logged_in ? admin_load_leads() : [];
+$custom_posts = admin_get_overrides('blog');
+$custom_cases = admin_get_overrides('case');
+$custom_resources = admin_get_overrides('resource');
 
 function e_a($v): string { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 
@@ -1679,7 +1729,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         </div>
         <div class="panel" style="max-width:500px">
             <h2>Data & Backups</h2>
-            <p style="font-size:.84rem;color:var(--muted);margin-bottom:12px">Leads stored in <span class="mono">storage/enquiries.jsonl</span> | CRM state in <span class="mono">leads-meta.json</span> | Custom content in <span class="mono">blog-custom.json</span>, <span class="mono">cases-custom.json</span>, <span class="mono">resources-custom.json</span>. Back these up regularly.</p>
+            <p style="font-size:.84rem;color:var(--muted);margin-bottom:12px">Leads, CRM state and custom content are all stored in Postgres (the <span class="mono">enquiries</span>, <span class="mono">admin_users</span> and <span class="mono">content_overrides</span> tables). Export leads to CSV below for an offline copy.</p>
             <a class="btn ghost" href="/admin/?view=export">Download Leads (CSV)</a>
         </div>
 

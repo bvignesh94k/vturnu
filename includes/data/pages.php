@@ -678,17 +678,25 @@ $RESOURCES_BUILTIN = array_keys($RESOURCES);
  * Saved fields win; anything the admin form does not cover (article sections,
  * takeaways, FAQs) falls back to the original post, so editing only the SEO
  * fields of a built-in article never blanks its body.
+ *
+ * Reads the content_overrides table (see db/schema.sql) instead of a local
+ * *-custom.json file, since Vercel's filesystem cannot hold admin edits
+ * between requests. Fails soft to $base on any database error: a DB hiccup
+ * should degrade to "no overrides applied" rather than a broken page.
  */
-function apply_content_overrides(array $base, string $file, array $defaults): array
+function apply_content_overrides(array $base, string $contentType, array $defaults): array
 {
-    if (!is_file($file)) {
+    try {
+        $stmt = db()->prepare('SELECT slug, data FROM content_overrides WHERE content_type = ?');
+        $stmt->execute([$contentType]);
+        $rows = $stmt->fetchAll();
+    } catch (Throwable $e) {
+        error_log('apply_content_overrides(' . $contentType . '): ' . $e->getMessage());
         return $base;
     }
-    $custom = json_decode((string) file_get_contents($file), true);
-    if (!is_array($custom)) {
-        return $base;
-    }
-    foreach ($custom as $slug => $item) {
+    foreach ($rows as $row) {
+        $slug = $row['slug'];
+        $item = json_decode($row['data'], true);
         if (!is_string($slug) || !preg_match('/^[a-z][a-z0-9-]*$/', $slug) || !is_array($item)) {
             continue;
         }
@@ -699,17 +707,17 @@ function apply_content_overrides(array $base, string $file, array $defaults): ar
     return $base;
 }
 
-$BLOG = apply_content_overrides($BLOG, BASE_PATH . '/storage/blog-custom.json', [
+$BLOG = apply_content_overrides($BLOG, 'blog', [
     'category' => 'Strategy', 'intent' => 'Informational',
     'sections' => [], 'takeaways' => [], 'faqs' => [],
 ]);
 
-$CASES = apply_content_overrides($CASES, BASE_PATH . '/storage/cases-custom.json', [
+$CASES = apply_content_overrides($CASES, 'case', [
     'industry' => '', 'service' => 'multi', 'date' => '', 'challenge' => '',
     'solution' => '', 'results' => [], 'quote' => null, 'cta' => ['', '', ''],
 ]);
 
-$RESOURCES = apply_content_overrides($RESOURCES, BASE_PATH . '/storage/resources-custom.json', [
+$RESOURCES = apply_content_overrides($RESOURCES, 'resource', [
     'type' => 'ebook', 'category' => '', 'size' => '', 'description' => '',
     'topics' => [], 'url' => '', 'image' => '', 'cta' => ['', '', ''],
 ]);

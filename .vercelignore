@@ -1,0 +1,7 @@
+# Local dev-only / server-state directories. Already covered by .gitignore
+# for git-connected deploys; listed again here so a direct `vercel` CLI
+# deploy from this working directory behaves the same way.
+storage/
+new/
+deploy.sh
+.htaccess

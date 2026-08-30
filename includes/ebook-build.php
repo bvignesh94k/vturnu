@@ -1,28 +1,23 @@
 <?php
 /**
- * Builds EPUB files from the chapter content in includes/data/ebooks/.
+ * Resolves EPUB files built from the chapter content in includes/data/ebooks/.
  *
- * Files are generated once and cached on disk, then served by the tokenised
- * download route. Generation is cheap (well under a second) but doing it per
- * request would be wasteful, and a cached file also means the download link
- * in a delivery email keeps working even if content files change later.
+ * On the VPS these were generated on first request and cached to local disk.
+ * Vercel's filesystem is read-only outside /tmp and not shared between
+ * invocations, so that cache would either fail to write or silently vanish
+ * on every cold start. Instead, `bin/build-ebooks.php` pre-builds every
+ * ebook once (run locally before a deploy that touches ebook content, see
+ * that script's header comment) into assets/downloads/, which ships as an
+ * ordinary static file and needs no PHP execution to serve.
  */
 
 declare(strict_types=1);
 
 require_once __DIR__ . '/epub.php';
 
-/** Where generated EPUB files live. Outside the web root by .htaccess rule. */
-function ebook_dir(): string
-{
-    $dir = BASE_PATH . '/storage/ebooks';
-    if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
-    return $dir;
-}
-
 function ebook_path(string $slug): string
 {
-    return ebook_dir() . '/' . preg_replace('/[^a-z0-9-]/', '', $slug) . '.epub';
+    return BASE_PATH . '/assets/downloads/' . preg_replace('/[^a-z0-9-]/', '', $slug) . '.epub';
 }
 
 /** True when a resource has authored chapter content available. */
@@ -32,40 +27,43 @@ function ebook_has_content(string $slug): bool
 }
 
 /**
- * Return the path to a built EPUB, generating it if missing or stale.
- * Returns null when the resource has no authored content.
+ * Build a single EPUB's bytes from its chapter content. Used by
+ * bin/build-ebooks.php to pre-render every resource; not called at request
+ * time any more.
+ */
+function ebook_build_bytes(string $slug, array $resource): ?string
+{
+    if (!ebook_has_content($slug)) {
+        return null;
+    }
+    $contentFile = BASE_PATH . '/includes/data/ebooks/' . preg_replace('/[^a-z0-9-]/', '', $slug) . '.php';
+    $content = require $contentFile;
+    $book = [
+        'uuid'        => epub_uuid($slug),
+        'title'       => $resource['h1'] ?? $slug,
+        'subtitle'    => $content['subtitle'] ?? '',
+        'description' => $content['description'] ?? ($resource['meta'] ?? ''),
+        'subjects'    => $content['subjects'] ?? [],
+        'author'      => SITE_NAME . ' Strategy Team',
+        'tagline'     => SITE_TAGLINE,
+        'edition'     => date('F Y') . ' edition',
+        'chapters'    => $content['chapters'],
+        'closing'     => $content['closing'] ?? '',
+    ];
+    return epub_build($book);
+}
+
+/**
+ * Return the path to a pre-built EPUB. Returns null when the resource has no
+ * authored content, or the pre-build step has not run yet for this slug.
  */
 function ebook_file(string $slug, array $resource): ?string
 {
     if (!ebook_has_content($slug)) {
         return null;
     }
-    $contentFile = BASE_PATH . '/includes/data/ebooks/' . preg_replace('/[^a-z0-9-]/', '', $slug) . '.php';
     $out = ebook_path($slug);
-
-    // Rebuild when the source content or the generator itself is newer.
-    $stale = !is_file($out)
-        || filemtime($out) < filemtime($contentFile)
-        || filemtime($out) < filemtime(__DIR__ . '/epub.php');
-
-    if ($stale) {
-        $content = require $contentFile;
-        $book = [
-            'uuid'        => epub_uuid($slug),
-            'title'       => $resource['h1'] ?? $slug,
-            'subtitle'    => $content['subtitle'] ?? '',
-            'description' => $content['description'] ?? ($resource['meta'] ?? ''),
-            'subjects'    => $content['subjects'] ?? [],
-            'author'      => SITE_NAME . ' Strategy Team',
-            'tagline'     => SITE_TAGLINE,
-            'edition'     => date('F Y') . ' edition',
-            'chapters'    => $content['chapters'],
-            'closing'     => $content['closing'] ?? '',
-        ];
-        $bytes = epub_build($book);
-        file_put_contents($out, $bytes, LOCK_EX);
-    }
-    return $out;
+    return is_file($out) ? $out : null;
 }
 
 /**
@@ -115,11 +113,6 @@ function ebook_token_verify(string $token): array
  */
 function ebook_send(string $slug, array $resource, string $name, string $email): bool
 {
-    if (!function_exists('mail')) {
-        return false;
-    }
-    $host = parse_url(SITE_URL, PHP_URL_HOST) ?: 'vturnu.com';
-    $from = 'website@' . $host;
     $isEbook = ($resource['type'] ?? 'ebook') === 'ebook';
     $label = $isEbook ? 'e-book' : 'guide';
     $title = $resource['h1'] ?? 'your download';
@@ -168,35 +161,15 @@ function ebook_send(string $slug, array $resource, string $name, string $email):
     $subject = 'Your ' . $label . ': ' . $title;
 
     if ($file && is_file($file) && filesize($file) < 4194304) {
-        $boundary = 'vt' . bin2hex(random_bytes(12));
-        $headers = implode("\r\n", [
-            'From: ' . SITE_NAME . ' <' . $from . '>',
-            'Reply-To: ' . CONTACT_EMAIL,
-            'MIME-Version: 1.0',
-            'Content-Type: multipart/mixed; boundary="' . $boundary . '"',
+        return send_email($email, $subject, $body, [
+            'reply_to' => CONTACT_EMAIL,
+            'attachment' => [
+                'filename' => preg_replace('/[^a-z0-9-]/', '', $slug) . '.epub',
+                'content' => (string) file_get_contents($file),
+            ],
         ]);
-        $attachment = chunk_split(base64_encode((string) file_get_contents($file)));
-        $filename = preg_replace('/[^a-z0-9-]/', '', $slug) . '.epub';
-
-        $msg  = '--' . $boundary . "\r\n";
-        $msg .= "Content-Type: text/plain; charset=UTF-8\r\n";
-        $msg .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-        $msg .= $body . "\r\n\r\n";
-        $msg .= '--' . $boundary . "\r\n";
-        $msg .= 'Content-Type: application/epub+zip; name="' . $filename . '"' . "\r\n";
-        $msg .= "Content-Transfer-Encoding: base64\r\n";
-        $msg .= 'Content-Disposition: attachment; filename="' . $filename . '"' . "\r\n\r\n";
-        $msg .= $attachment . "\r\n";
-        $msg .= '--' . $boundary . "--";
-
-        return @mail($email, $subject, $msg, $headers, '-f' . $from);
     }
 
     // No attachment available: still deliver the link.
-    $headers = implode("\r\n", [
-        'From: ' . SITE_NAME . ' <' . $from . '>',
-        'Reply-To: ' . CONTACT_EMAIL,
-        'Content-Type: text/plain; charset=UTF-8',
-    ]);
-    return @mail($email, $subject, $body, $headers, '-f' . $from);
+    return send_email($email, $subject, $body, ['reply_to' => CONTACT_EMAIL]);
 }
