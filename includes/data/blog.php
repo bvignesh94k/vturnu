@@ -8,6 +8,168 @@
 
 $BLOG = [
 
+/* Recovers a URL that was ranking (positions 22 to 30 for "cheap seo service",
+   "affordable seo services for small business" and related terms) and carrying
+   most of the site's US organic traffic, but 404'd after the rebuild.
+   Slug is deliberately identical to the previously indexed URL.
+
+   The nine non-VTurnU entries describe provider MODELS rather than naming
+   competitor agencies with invented pricing. Per-agency rates change
+   constantly and could not be verified from a primary source, and publishing
+   unverifiable numbers about named businesses would undercut the same E-E-A-T
+   this page is meant to build. The one hard figure quoted is attributed to a
+   published industry survey. */
+'affordable-seo-service-providers' => [
+    'title' => 'Affordable SEO Services for Small Business: 10 Providers',
+    'meta'  => 'Compare 10 affordable SEO service providers for small businesses: what each model really costs, who it suits, and how to spot cheap SEO that backfires.',
+    'h1'    => 'Affordable SEO Service Providers for Small Businesses',
+    'lede'  => 'Affordable SEO is not the cheapest quote you can find. It is the lowest cost at which someone can still do the work properly: technical fixes, content that matches buying intent, and reporting tied to enquiries rather than rankings. This guide compares ten types of provider, what each realistically costs, and who each one actually suits.',
+    'category' => 'SEO', 'intent' => 'Commercial Investigation', 'date' => '2026-08-31', 'read' => '11 min',
+    'sections' => [
+        ['What affordable SEO actually costs', [
+            'Before comparing providers, it helps to know the real market rate. In an Ahrefs survey of 439 SEO providers, the average monthly retainer was $2,917, but 68.8% of providers charged $2,000 or less, and the single most common price band was $501 to $1,000 per month.',
+            'That matters because it sets a floor. SEO is skilled labour: an audit, technical fixes, content, and monthly analysis take real hours. A $99 per month package cannot fund those hours, so something has to give, usually the strategy, the content quality, or the link sources. Understanding where a price sits against that survey tells you what you are actually buying.',
+        ], [
+            'Under $300 per month: usually automated reporting, directory submissions or a few hours of junior time. Rarely enough for a competitive market.',
+            '$500 to $1,000 per month: the most common band. Realistic for local businesses and narrow niches with a focused scope.',
+            '$1,000 to $3,000 per month: enough for technical work, ongoing content and link acquisition in a moderately competitive market.',
+            'Above $3,000 per month: competitive national or ecommerce SEO, or multi-location and multi-language programmes.',
+        ]],
+
+        ['The ten provider models at a glance', [
+            'Each model below is a different way of buying the same underlying work. The right one depends less on your budget than on what you already have in house: time, execution capacity, or neither.',
+        ], [], [
+            'caption' => 'Affordable SEO provider models compared: typical monthly cost and who each suits',
+            'head' => ['Provider model', 'Typical monthly cost', 'Best for'],
+            'rows' => [
+                ['1. VTurnU', 'Quoted after a call', 'Businesses needing enquiries attributed to revenue, across search and AI'],
+                ['2. Full-service performance agency', '$1,000 to $5,000', 'Running several channels under one accountable team'],
+                ['3. Local SEO specialist', '$300 to $1,000', 'Single or multi-location businesses serving a catchment'],
+                ['4. Technical SEO consultancy', 'Fixed project fee', 'Sites with indexing, speed or migration problems'],
+                ['5. Freelance marketplace', '$50 to $500 per task', 'Discrete, self-contained tasks you can judge yourself'],
+                ['6. White-label reseller', '$500 to $2,000', 'One relationship valued over direct practitioner access'],
+                ['7. DIY platform subscription', '$100 to $250', 'Early stage teams with more time than budget'],
+                ['8. Offshore or nearshore agency', '$400 to $1,500', 'More delivery hours per pound or dollar, remote working'],
+                ['9. AI-first SEO service', '$200 to $1,000', 'Scaling production where strategy already exists'],
+                ['10. Fractional SEO consultant', '$1,000 to $3,000', 'In-house teams that can execute but need direction'],
+            ],
+        ]],
+
+        ['1. VTurnU: SEO measured in enquiries, not rankings', [
+            'We build search programmes for B2B firms, manufacturers, clinics, ecommerce brands and professional services, generally companies between five and two hundred people that need qualified enquiries rather than brand awareness. Work covers technical SEO, content mapped to how buyers actually search, and AI search visibility so the brand is cited inside ChatGPT, Perplexity and Google AI Overviews as well as ranked in classic results.',
+            'What separates the engagement is the reporting: campaigns connect to your CRM, so you can see which channel produced which enquiry and what it was worth. Reporting is on pipeline, not on positions alone.',
+            'Published outcomes from client programmes include 2.4 times organic revenue for a jewellery ecommerce brand, a 104% rise in organic patient enquiries for a multi-location clinic group, four times inbound RFQs from organic for a precision components manufacturer, and three times demo bookings on the same budget for a B2B SaaS platform. Each is written up in full, including the approach and what the constraints were.',
+        ], [
+            'Best for: growing businesses that need enquiries attributable to revenue, not a monthly rankings PDF',
+            'Engagement: month to month after an initial ninety day window, the minimum honest period to judge a search programme',
+            'Pricing: quoted after one call, based on competitiveness and how much ground there is to make up. No setup fees and no long lock-in',
+            'Also covers: Google Ads, social, content and web, run as one strategy rather than separate budgets',
+        ]],
+
+        ['2. Full-service performance agencies', [
+            'These agencies run SEO alongside paid media, content and sometimes creative. The advantage is coordination: the same team decides whether a query is better won organically or bought, so budgets stop competing with each other.',
+            'The trade-off is that SEO can become a minor line item beside larger paid budgets. Ask specifically who does the SEO work and how many hours a month it receives.',
+        ], [
+            'Best for: businesses running several channels that want one accountable team',
+            'Watch for: SEO staffed thinly compared with the paid media side',
+        ]],
+
+        ['3. Local SEO specialists', [
+            'Local specialists focus on Google Business Profile optimisation, map pack rankings, location pages, citations and review generation. For a clinic, restaurant, trades business or any company serving a defined catchment, this is often the highest return work available and among the cheapest to deliver well.',
+            'It is a narrower scope than full SEO, which is exactly why it can be genuinely affordable rather than merely cheap.',
+        ], [
+            'Best for: single or multi-location businesses whose customers search with local intent',
+            'Watch for: providers that only submit citations and never touch the website itself',
+        ]],
+
+        ['4. Technical SEO consultancies', [
+            'Technical consultancies handle crawling and indexing problems, site architecture, page speed, structured data and migrations. They usually work on fixed-scope projects rather than monthly retainers, which makes cost predictable.',
+            'This suits businesses whose content is decent but whose site is holding it back, and it is frequently the correct first spend: content investment is wasted if pages cannot be crawled or rendered properly.',
+        ], [
+            'Best for: sites with indexing problems, slow pages, or a replatform or migration coming up',
+            'Watch for: a diagnosis with no one available to implement the fixes afterwards',
+        ]],
+
+        ['5. Freelance marketplaces such as Fiverr and Upwork', [
+            'Marketplaces give you direct access to individual practitioners at a wide range of rates, with reviews and escrow protection. Quality varies enormously, because the platform is a directory rather than a filter.',
+            'They work well for defined, self-contained tasks where you can judge the deliverable yourself. They work badly as a substitute for strategy, because nobody on a marketplace owns your overall outcome.',
+        ], [
+            'Best for: discrete tasks such as a technical audit, schema implementation or a batch of content briefs',
+            'Watch for: link packages sold by volume, which are the most common way to buy a penalty',
+        ]],
+
+        ['6. White-label and reseller agencies', [
+            'Many small agencies do not do SEO in house: they resell a white-label provider under their own brand. There is nothing wrong with this model, and it can be cost effective, but you should know when it applies because it adds a margin layer and puts distance between you and whoever does the work.',
+            'Ask directly whether delivery is in house. A straight answer is itself a useful signal.',
+        ], [
+            'Best for: businesses that value one relationship over direct access to the practitioner',
+            'Watch for: slow turnaround on questions, because every answer travels through an intermediary',
+        ]],
+
+        ['7. DIY platforms such as Semrush and Ahrefs', [
+            'If you have time but not budget, subscribing to a research platform and doing the work yourself is a legitimate option. These tools provide keyword research, site audits, rank tracking and competitor analysis for the price of a tool licence rather than a retainer.',
+            'The cost is your hours and the learning curve. It suits founders in the early stage, or in-house marketers who need capability rather than a supplier.',
+        ], [
+            'Best for: early stage businesses with more time than budget, or teams building the skill internally',
+            'Watch for: a tool telling you what is wrong is not the same as knowing which fixes matter most',
+        ]],
+
+        ['8. Offshore and nearshore agencies', [
+            'Offshore agencies deliver at lower rates because their cost base is lower. Plenty are excellent, VTurnU is itself based in Chennai and serves clients across India, the US, UK, Canada and Australia, so this is not a warning against the model.',
+            'The real variables are communication, timezone overlap and whether the content will read naturally to your market. Judge those directly rather than by location.',
+        ], [
+            'Best for: businesses comfortable with remote working who want more delivery hours per pound or dollar',
+            'Watch for: content written for a market the writer does not know, which reads as generic to buyers',
+        ]],
+
+        ['9. AI-first SEO services', [
+            'A newer category uses AI to produce content and audits at high volume and low cost. Used carefully, AI genuinely lowers the cost of research, briefing and first drafts.',
+            'Used carelessly, it produces large amounts of content that says nothing original, which is precisely what Google\'s helpful content guidance targets and what answer engines decline to cite. Ask what a human does before anything is published.',
+        ], [
+            'Best for: scaling production once strategy and editorial standards already exist',
+            'Watch for: volume presented as the deliverable, with no expert review step',
+        ]],
+
+        ['10. Fractional SEO consultants', [
+            'A fractional consultant gives you a few days of senior attention each month: strategy, prioritisation and oversight, while your team or contractors carry out the work. You are buying judgement rather than hours.',
+            'This is often the best value available to a company that already has people who can execute but nobody who knows what to execute first.',
+        ], [
+            'Best for: businesses with an in-house marketer who needs direction rather than another supplier',
+            'Watch for: needing execution capacity you do not actually have, which leaves recommendations undone',
+        ]],
+
+        ['How to tell affordable from merely cheap', [
+            'Price alone will not tell you. These signals will, and they apply whichever model you choose.',
+        ], [
+            'A specific scope: exactly what will be done in month one, and what a typical month looks like after that',
+            'No ranking guarantees: nobody controls Google\'s results, and guaranteeing a position is a reliable sign of a provider willing to say untrue things',
+            'Named links, or a clear policy: if link building is included, ask how links are earned. Bought links from private networks are the fastest route to a manual action',
+            'Reporting on enquiries: rankings and traffic are inputs. Ask to see a report that ends in leads or revenue',
+            'An honest timeline: paid search can produce enquiries in weeks, SEO usually shows movement around week eight and compounds after that. Anyone promising fast SEO results is guessing or misleading you',
+            'Access to whoever does the work: if every question routes through an account manager, diagnosis gets slow and expensive',
+        ]],
+    ],
+    'takeaways' => [
+        'Affordable means the lowest price at which the work can still be done properly, not the cheapest quote available.',
+        'In an Ahrefs survey of 439 providers, 68.8% charged $2,000 or less per month and $501 to $1,000 was the most common band.',
+        'Match the model to your situation: local specialists for catchment businesses, technical consultancies for broken sites, fractional consultants for teams that can execute but need direction.',
+        'Judge any provider on scope, link policy, reporting and timeline honesty. Ranking guarantees are a reliable warning sign.',
+    ],
+    'faqs' => [
+        ['How much should SEO cost for a small business?', 'Most small businesses land between $500 and $2,000 per month. An Ahrefs survey of 439 SEO providers found the average retainer was $2,917, but 68.8% charged $2,000 or less, with $501 to $1,000 the most common band. Below roughly $300 per month there are rarely enough hours to do meaningful work in a competitive market.'],
+        ['Is cheap SEO worth it?', 'Cheap SEO is worth it when the scope is genuinely narrow, for example local SEO for a single location, or a one-off technical audit. It is not worth it when a low price is achieved by cutting strategy and buying links, because recovering from a manual action costs far more than the saving.'],
+        ['What is the cheapest SEO that actually works?', 'For most small businesses, local SEO delivers the most return per pound or dollar because the scope is contained and the intent is high. If you have time rather than budget, a research tool subscription plus your own hours is a legitimate alternative to a retainer.'],
+        ['How long before affordable SEO shows results?', 'SEO usually shows measurable movement around week eight and compounds from there. AI search visibility often moves faster, within four to six weeks, because far fewer competitors are working on it. A cheaper package does not work faster; if anything it takes longer because fewer hours go in each month.'],
+        ['Should I hire an agency or do SEO myself?', 'Do it yourself if you have time to learn and your market is not highly competitive. Hire when the opportunity cost of your own hours exceeds the retainer, when the site has technical problems you cannot diagnose, or when competitors are investing and you are losing ground each month you wait.'],
+        ['Does affordable SEO include AI search visibility?', 'Rarely, and it is worth asking. Being cited inside ChatGPT, Perplexity and Google AI Overviews depends on entity clarity, structured data and content written the way people ask questions. Many providers still scope only for classic rankings, which leaves the faster moving surface unattended.'],
+    ],
+    'cta' => [
+        'Not sure which of these you actually need?',
+        'Tell us where you are now and we will send a short, specific read on where you are visible, where you are losing enquiries, and the fastest route to fixing it. Free, and useful whether or not you work with us.',
+        'Get My Free Growth Audit',
+    ],
+],
+
 'what-is-answer-engine-optimization' => [
     'title' => 'What Is Answer Engine Optimization? A Plain-English Guide',
     'meta'  => 'Answer Engine Optimization (AEO) makes your brand the answer ChatGPT, Perplexity and Google AI Overviews give. Learn how AEO works and how to start.',
