@@ -120,7 +120,7 @@ function audit_fetch(string $url, ?int $timeout = null): array
     $ms = (int) round((microtime(true) - $t0) * 1000);
     $info = curl_getinfo($ch);
     $err = curl_error($ch);
-    curl_close($ch);
+    // Deprecated in PHP 8.5 (the version Vercel runs) and a no-op since 8.0.
 
     return ['body' => $body === false ? '' : $body, 'ms' => $ms, 'info' => $info, 'error' => $err];
 }
@@ -137,7 +137,7 @@ function audit_exists(string $url): bool
     ]);
     curl_exec($ch);
     $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    // Deprecated in PHP 8.5 (the version Vercel runs) and a no-op since 8.0.
     return $code >= 200 && $code < 400;
 }
 

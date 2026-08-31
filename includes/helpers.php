@@ -506,7 +506,8 @@ function send_email(string $to, string $subject, string $body, array $opts = [])
     $res = curl_exec($ch);
     $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
-    curl_close($ch);
+    // No curl_close(): it has done nothing since PHP 8.0 and is deprecated in
+    // 8.5, which is the version Vercel runs. The handle frees itself.
 
     if ($res === false || $curlErr !== '') {
         error_log('send_email: curl error sending to ' . $to . ': ' . $curlErr);

@@ -182,7 +182,7 @@ function security_recaptcha_ok(string $token): bool
     $res = curl_exec($ch);
     $curlErr = curl_error($ch);
     $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    // Deprecated in PHP 8.5 (the version Vercel runs) and a no-op since 8.0.
 
     if ($res === false || $curlErr !== '') {
         security_recaptcha_log('curl error: ' . $curlErr);

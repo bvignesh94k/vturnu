@@ -5,6 +5,23 @@
 
 declare(strict_types=1);
 
+/* Never print PHP diagnostics into the response body in production.
+ *
+ * This is not cosmetic. Vercel runs PHP 8.5, where curl_close() is
+ * deprecated; the resulting warning was being emitted before the JSON of the
+ * /enquiry endpoint, so every AJAX form submission returned a body like
+ * "<br /><b>Deprecated</b>: ...{"ok":true}". That is not valid JSON, so
+ * response.json() threw in the browser and the form showed its generic
+ * failure message to the visitor even though the lead had been saved
+ * correctly. Silent, and the worst possible failure for a lead-gen site.
+ *
+ * Errors still go to the log (visible in Vercel's function logs), they just
+ * never reach the response. Local dev keeps them visible on screen. */
+$isServerless = getenv('VERCEL') !== false || getenv('AWS_LAMBDA_FUNCTION_NAME') !== false;
+ini_set('display_errors', $isServerless ? '0' : '1');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+
 date_default_timezone_set('Asia/Kolkata');
 
 define('SITE_NAME', 'VTurnU');

@@ -2,6 +2,34 @@
 (function () {
     'use strict';
 
+    /**
+     * Parse a JSON response that may have junk printed before it.
+     *
+     * Every lead form on the site posts to /enquiry/ and reads back JSON. A
+     * plain r.json() throws if anything at all precedes the payload, and the
+     * catch branch then tells the visitor their enquiry failed. That happened
+     * for real: PHP 8.5 on Vercel emitted a deprecation warning ahead of the
+     * JSON, so leads were being saved while every visitor was shown an error.
+     *
+     * The server side is fixed, but this stays as a safety net, because the
+     * failure mode is invisible to us and expensive: the lead is captured and
+     * the visitor is told to go away. Falling back to the trailing JSON object
+     * keeps the form honest even if some future notice slips through.
+     */
+    function readJsonTolerantly(response) {
+        return response.text().then(function (body) {
+            try {
+                return JSON.parse(body);
+            } catch (e) {
+                var match = body.match(/\{[\s\S]*\}\s*$/);
+                if (match) {
+                    try { return JSON.parse(match[0]); } catch (e2) { /* fall through */ }
+                }
+                return { ok: false };
+            }
+        });
+    }
+
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Scroll-reveal with per-batch stagger. Content stays visible without JS.
@@ -156,7 +184,7 @@
                 var tokenField = qmForm.querySelector('.js-recaptcha-token');
                 if (tokenField) tokenField.value = token;
                 fetch('/enquiry/', { method: 'POST', body: new FormData(qmForm) })
-                    .then(function (r) { return r.json(); })
+                    .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
                             qmForm.hidden = true;
@@ -207,7 +235,7 @@
                 var tokenField = newsForm.querySelector('.js-recaptcha-token');
                 if (tokenField) tokenField.value = token;
                 fetch('/enquiry/', { method: 'POST', body: new FormData(newsForm) })
-                    .then(function (r) { return r.json(); })
+                    .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
                             newsForm.hidden = true;
@@ -237,7 +265,7 @@
                 var tokenField = resForm.querySelector('.js-recaptcha-token');
                 if (tokenField) tokenField.value = token;
                 fetch('/enquiry/', { method: 'POST', body: new FormData(resForm) })
-                    .then(function (r) { return r.json(); })
+                    .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
                             resForm.hidden = true;
@@ -295,7 +323,7 @@
                 var tokenField = auditLeadForm.querySelector('.js-recaptcha-token');
                 if (tokenField) tokenField.value = token;
                 fetch('/enquiry/', { method: 'POST', body: new FormData(auditLeadForm) })
-                    .then(function (r) { return r.json(); })
+                    .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
                             auditLeadForm.hidden = true;
