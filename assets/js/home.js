@@ -112,6 +112,10 @@
     hp.addEventListener('click', function (e) {
         var link = e.target.closest ? e.target.closest('a[href^="#"]') : null;
         if (!link) { return; }
+        /* Modal CTAs are handled in main.js, which opens the quote pop-up.
+           Without this guard both listeners fire on the same click and the
+           page scrolls to the form behind the dialog that just opened. */
+        if (link.classList.contains('js-open-quote')) { return; }
         var id = link.getAttribute('href').slice(1);
         if (!id) { return; }
         var target = document.getElementById(id);

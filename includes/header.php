@@ -2,6 +2,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<?php /* Tawk.to is injected by Google Tag Manager, not by this codebase (the
+         embed in footer.php is commented out and still holds placeholder IDs),
+         so its own green launcher bubble appeared alongside our black Live Chat
+         button: two chat launchers stacked in the same corner.
+
+         Tawk_API has to exist before GTM loads Tawk, because Tawk reads this
+         object on init. hideWidget() suppresses only the launcher bubble; the
+         black button's Tawk_API.toggle() still opens the chat window normally. */ ?>
+<script>
+window.Tawk_API = window.Tawk_API || {};
+(function () {
+    var prev = window.Tawk_API.onLoad;
+    window.Tawk_API.onLoad = function () {
+        if (typeof prev === 'function') { prev(); }
+        if (typeof window.Tawk_API.hideWidget === 'function') { window.Tawk_API.hideWidget(); }
+    };
+})();
+</script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

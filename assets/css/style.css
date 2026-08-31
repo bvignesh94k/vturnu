@@ -1888,3 +1888,20 @@ h1, h2, .section-title { text-wrap: balance; }
     .product-upsell { padding: 24px 20px; }
     .product-upsell-actions .btn { width: 100%; text-align: center; }
 }
+
+/* ---------------------------------------------------------------------------
+   Tawk.to: suppress its own launcher bubble.
+
+   Tawk is injected by Google Tag Manager, not by this codebase, so it arrived
+   with its default green launcher and sat alongside our own black Live Chat
+   button: two chat launchers stacked in the same corner. header.php calls
+   Tawk_API.hideWidget() on load, which is the supported way to hide it; this
+   rule is the fallback covering the moment before Tawk's JS initialises.
+
+   Only the minified launcher containers are targeted. The panel Tawk opens
+   when our button calls Tawk_API.toggle() is a separate container and is
+   deliberately left alone.
+   --------------------------------------------------------------------------- */
+#tawkchat-minified-wrapper,
+#tawkchat-minified-container,
+.tawk-min-container { display: none !important; }

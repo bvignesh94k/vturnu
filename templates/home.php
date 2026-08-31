@@ -72,11 +72,14 @@ $faq_cols = [array_slice($FAQS, 0, $faq_half), array_slice($FAQS, $faq_half)];
     <div class="hp-hero-grid">
       <div class="hp-hero-copy" data-rise>
         <p class="hp-badge">Digital marketing, Chennai</p>
-        <h1 class="hp-h1" id="hp-h1">Get found on Google. Get named by <span class="hp-hero-mark">AI</span>. Get more enquiries.</h1>
-        <p class="hp-lead">Your buyers search, then ask ChatGPT, then compare, and only then contact anyone. VTurnU makes you the business they find at every one of those steps, and turns that attention into qualified leads your sales team can actually close.</p>
+        <?php /* Two lines by design. The previous headline carried three
+                 promises and broke to five ragged lines; the third promise
+                 now closes the tagline, where it reads better anyway. */ ?>
+        <h1 class="hp-h1" id="hp-h1">Get found on <span class="hp-hero-mark hp-hero-mark--blue">Google</span>. Get named by <span class="hp-hero-mark">AI</span>.</h1>
+        <p class="hp-lead">Your buyers search, then ask ChatGPT, then compare, and only then contact anyone. VTurnU makes you the business they find at every step, and turns that attention into <strong>qualified enquiries</strong>.</p>
 
         <div class="hp-actions">
-          <a class="hp-btn hp-btn--primary" href="#start">Get a free growth audit</a>
+          <a class="hp-btn hp-btn--primary js-open-quote" href="#start">Get a free growth audit</a>
           <?php if (isset($PAGES['case-studies'])): ?>
           <a class="hp-btn hp-btn--ghost" href="/case-studies/">See client results</a>
           <?php endif; ?>
@@ -188,7 +191,7 @@ $faq_cols = [array_slice($FAQS, 0, $faq_half), array_slice($FAQS, $faq_half)];
     </div>
 
     <div class="hp-actions" data-rise>
-      <a class="hp-btn hp-btn--on-ink" href="#start">Get the same for your business</a>
+      <a class="hp-btn hp-btn--on-ink js-open-quote" href="#start">Get the same for your business</a>
       <?php if (isset($PAGES['case-studies'])): ?>
       <a class="hp-btn hp-btn--ghost-on-ink" href="/case-studies/">Read the case studies</a>
       <?php endif; ?>
@@ -305,7 +308,7 @@ $faq_cols = [array_slice($FAQS, 0, $faq_half), array_slice($FAQS, $faq_half)];
 <?php /* Mobile only: the ask stays reachable no matter how far down they are. */ ?>
 <div class="hp-sticky">
   <a class="hp-btn hp-btn--ghost" href="tel:<?= e(preg_replace('/[^0-9+]/', '', CONTACT_PHONE)) ?>">Call us</a>
-  <a class="hp-btn hp-btn--primary" href="#start">Free audit</a>
+  <a class="hp-btn hp-btn--primary js-open-quote" href="#start">Free audit</a>
 </div>
 
 <?php

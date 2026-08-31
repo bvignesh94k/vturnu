@@ -37,7 +37,16 @@
 .hp-wrap { max-width: var(--shell); margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 3rem); }
 
 /* ---- type ------------------------------------------------------------- */
-.hp-h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.5rem, 6.4vw, 4.25rem); line-height: 1.06; letter-spacing: -.02em; margin: 0 0 var(--s4); color: var(--ink); }
+/* Sized to land on two lines in the widened column rather than five in a
+   narrow one. balance keeps those two lines close to even instead of leaving
+   one word stranded on the second. */
+.hp-h1 {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(2.375rem, 4.6vw, 4rem);
+    line-height: 1.08; letter-spacing: -.02em;
+    text-wrap: balance;
+    margin: 0 0 var(--s3); color: var(--ink);
+}
 .hp-h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.85rem, 4vw, 2.9rem); line-height: 1.12; letter-spacing: -.01em; margin: 0 0 var(--s3); color: var(--ink); }
 .hp-eyebrow { font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--violet); margin: 0 0 var(--s3); }
 .hp-badge {
@@ -88,7 +97,20 @@
 }
 
 /* ---- hero ------------------------------------------------------------- */
-.hp-hero { position: relative; padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(4rem, 7vw, 6rem); overflow: hidden; }
+/* The banner has to resolve inside one screen. It was 1112px tall against a
+   900px viewport, so the visual and the first CTA were both below the fold on
+   a laptop. min-height on the section plus centred content makes it fill
+   exactly one viewport minus the header, and the padding no longer stacks on
+   top of that height. */
+.hp-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: calc(100svh - 84px);
+    padding: clamp(1.5rem, 3vw, 2.5rem) 0 clamp(2rem, 4vw, 3rem);
+    overflow: hidden;
+}
+.hp-hero > .hp-wrap { width: 100%; }
 .hp-hero::before {
     content: ""; position: absolute; inset: -40% -15% auto -15%; height: 110%;
     background:
@@ -98,10 +120,36 @@
     pointer-events: none;
 }
 .hp-hero .hp-wrap { position: relative; }
-.hp-hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; }
-.hp-hero-copy { max-width: 42ch; }
-.hp-hero .hp-lead { margin-bottom: var(--s5); }
-.hp-hero-mark { color: var(--pink); }
+/* Copy column widened from 42ch. At 42ch the h1 broke into five ragged lines
+   in a 435px column while half the row sat empty, which is what made the
+   banner read as cramped. */
+.hp-hero-grid { display: grid; grid-template-columns: 1.55fr .8fr; gap: clamp(2rem, 3.5vw, 3rem); align-items: center; }
+.hp-hero-copy { max-width: none; }
+/* Wider than the 60ch body default so the tagline resolves in three lines
+   under the two-line heading instead of six in a narrow column. */
+.hp-hero .hp-lead { max-width: 54ch; margin-bottom: var(--s4); }
+
+/* Highlighted keywords. The underline is drawn behind the text and grows on
+   load, so the eye lands on "Google" and "AI" first. */
+.hp-hero-mark {
+    color: var(--pink);
+    position: relative;
+    white-space: nowrap;
+}
+.hp-hero-mark::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: .06em;
+    height: .1em; border-radius: 2px;
+    background: currentColor; opacity: .28;
+    transform: scaleX(0); transform-origin: left;
+    animation: hp-underline .7s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+.hp-hero-mark--blue { color: var(--blue); }
+.hp-hero-mark--blue::after { animation-delay: .18s; }
+@keyframes hp-underline { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+    .hp-hero-mark::after { animation: none; transform: scaleX(1); }
+}
 
 .hp-hero-note { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); margin: var(--s5) 0 0; padding: 0; list-style: none; }
 .hp-hero-note li { display: flex; align-items: center; gap: .5rem; font-size: .9375rem; font-weight: 500; color: var(--ink-70); }
@@ -232,6 +280,16 @@
 .hp-f textarea { min-height: 96px; resize: vertical; }
 .hp-f input::placeholder, .hp-f textarea::placeholder { color: rgba(246, 242, 234, .45); }
 .hp-f input:focus, .hp-f select:focus, .hp-f textarea:focus { outline: none; border-color: var(--cyan); background: rgba(0, 165, 196, .12); }
+
+/* The native dropdown list is drawn by the OS, not by this stylesheet, and it
+   inherits the select's light `color` while painting its own light background.
+   The result was pale text on a pale menu: every option after the first was
+   effectively invisible, so nobody could pick a service. Options need their
+   colours stated outright. */
+.hp-f select option {
+    color: #14102A;
+    background: #FFFFFF;
+}
 .hp-f input[aria-invalid="true"] { border-color: #FF7FA8; }
 .hp-f-err { font-size: .8125rem; color: #FF9CBB; min-height: 1.1em; }
 .hp-f-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
@@ -253,10 +311,7 @@
     .hp main { padding-bottom: 84px; }
 }
 
-/* Tawk sits bottom-right by default and covered the mobile CTA bar and the
-   submit button. Pin it left so both stay clickable. */
-#tawkchat-container iframe, iframe[title*="chat" i] { left: 12px !important; right: auto !important; }
-@media (max-width: 760px) { iframe[title*="chat" i] { bottom: 84px !important; } }
+/* Tawk's launcher is suppressed site-wide, see assets/css/style.css. */
 
 /* ---- responsive ------------------------------------------------------- */
 @media (max-width: 1000px) {
@@ -270,6 +325,65 @@
 @media (max-width: 760px) {
     .hp-faq-grid { grid-template-columns: 1fr; }
     .hp-band .hp-wrap { flex-direction: column; align-items: flex-start; }
+
+    /* Keeping the banner inside one phone screen. Stacked, the copy column
+       (661px) and the mockup (596px) came to 1345px against an 844px screen,
+       so the CTA sat well below the fold. Everything below is about buying
+       back that height without dropping the promise or the proof. */
+
+    /* The three trust lines repeat verbatim further down the page, so they
+       are the cheapest 106px to give up here. */
+    .hp-hero-note { display: none; }
+
+    /* The browser mockup is a desktop device. Stacked on a phone it cost
+       407px, which no amount of trimming could fit alongside 483px of copy on
+       a 667px screen. What actually matters in it is the two real client
+       numbers, so on phones the frame goes and the proof chips stay, as a
+       compact row. Roughly 50px instead of 407px, and the banner resolves in
+       one screen with the promise, the CTA and the evidence all visible. */
+    .hp-hero-visual { padding: 0; }
+    .hp-mock {
+        display: flex; flex-direction: row; flex-wrap: wrap;
+        gap: .5rem; max-width: none;
+        background: none; border: 0; box-shadow: none; transform: none;
+    }
+    .hp-mock-bar, .hp-mock-body { display: none; }
+    .hp-chip {
+        position: static; transform: none; margin: 0;
+        font-size: 1rem; padding: .5rem .8125rem;
+    }
+    .hp-chip--b { display: inline-flex; }
+
+    /* The secondary CTA drops to a text link: two stacked full-width buttons
+       cost 128px, and only the primary one needs that weight. */
+    .hp-hero .hp-actions .hp-btn--ghost {
+        border: 0; padding: .5rem 0; min-height: 0;
+        text-decoration: underline; text-underline-offset: 4px;
+    }
+    .hp-hero .hp-actions .hp-btn--ghost:hover { background: none; color: var(--ink); transform: none; }
+    .hp-mock-bar { padding: .5rem .75rem; }
+    .hp-mock-body { gap: var(--s2); padding: .875rem; }
+    .hp-mock-r-title { font-size: .9375rem; }
+    .hp-mock-r-desc { font-size: .8125rem; }
+    .hp-mock-ai { padding: .75rem; }
+    .hp-mock-ai-text { font-size: .8125rem; }
+    .hp-chip { font-size: 1rem; padding: .4375rem .75rem; }
+
+    .hp-hero-grid { gap: var(--s3); }
+    .hp-hero .hp-lead { margin-bottom: var(--s3); }
+}
+
+/* Short viewports (iPhone SE and similar, and any phone in landscape). The
+   min-height above is a floor, not a ceiling, so on a 667px screen the banner
+   still ran over by the height of its own spacing. This tightens the rhythm
+   rather than removing anything. */
+@media (max-height: 720px) and (max-width: 760px) {
+    .hp-hero { min-height: 0; padding-top: var(--s2); padding-bottom: var(--s3); }
+    .hp-badge { margin-bottom: var(--s2); padding: .375rem .75rem; }
+    .hp-h1 { font-size: clamp(1.75rem, 7.5vw, 2.25rem); margin-bottom: var(--s2); }
+    .hp-hero .hp-lead { font-size: 1rem; margin-bottom: var(--s2); }
+    .hp-hero-grid { gap: var(--s2); }
+    .hp-chip { font-size: .9375rem; padding: .375rem .6875rem; }
 }
 @media (max-width: 560px) {
     .hp-svc-grid { grid-template-columns: 1fr; }

@@ -152,8 +152,15 @@
     // Without JS (or without <dialog> support) links fall back to normal navigation.
     var modal = document.getElementById('quote-modal');
     if (modal && typeof modal.showModal === 'function') {
+        /* .js-open-quote is the explicit opt-in used by the homepage CTAs,
+           which point at the #start form section: without it they only
+           smooth-scrolled to the bottom of the page, so the visitor had to
+           travel the whole page before they could type anything. Opening the
+           form where they already are removes that step. The href stays a
+           real anchor so the CTA still works with JS disabled. */
         var openers = document.querySelectorAll(
-            'a.btn[href="/contact-us/"], a[href="#quote"], a[href="/#quote"], a.btn[href^="/contact-us/#"], a.float-cta, a.mb-quote'
+            'a.btn[href="/contact-us/"], a[href="#quote"], a[href="/#quote"], ' +
+            'a.btn[href^="/contact-us/#"], a.float-cta, a.mb-quote, .js-open-quote'
         );
         openers.forEach(function (a) {
             a.addEventListener('click', function (e) {
