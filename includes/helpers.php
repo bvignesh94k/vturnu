@@ -170,8 +170,10 @@ function jsonld_page(array $page, string $slug, string $canonical, string $templ
     /* A case study is an article about a real engagement. Fields come straight
        from the case record so the markup can never drift from the page. */
     if ($template === 'case-detail') {
-        $caseSlug = str_starts_with($slug, 'case-studies/') ? substr($slug, 13) : $slug;
-        $case = $GLOBALS['CASES'][$caseSlug] ?? null;
+        /* Resolve through $page['case'], the same key templates/case-detail.php
+           uses, rather than parsing the slug: the page and the case record are
+           deliberately allowed to have different names. */
+        $case = $GLOBALS['CASES'][$page['case'] ?? ''] ?? null;
 
         $node['headline'] = $page['h1'] ?? ($page['title'] ?? '');
         $node['mainEntityOfPage'] = ['@type' => 'WebPage', '@id' => $canonical];

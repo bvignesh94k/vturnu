@@ -4,15 +4,10 @@ if (!$case) { http_response_code(404); echo '<section class="section"><div class
 
 $related = related_ring($CASES, $page['case'], 3);
 
-echo jsonld_script([
-    '@context' => 'https://schema.org',
-    '@type' => 'Article',
-    'headline' => $case['h1'],
-    'description' => $case['meta'],
-    'author' => ['@type' => 'Organization', 'name' => SITE_NAME, 'url' => SITE_URL],
-    'publisher' => ['@type' => 'Organization', 'name' => SITE_NAME],
-    'mainEntityOfPage' => abs_url('/case-studies/' . $page['case'] . '/'),
-]);
+/* The Article node for this page is emitted by jsonld_page() from
+   includes/header.php. It used to be duplicated here: a second, thinner
+   Article with no @id and no link to the Organization or WebSite entities,
+   leaving two competing descriptions of the same page in the markup. */
 ?>
 <section class="page-hero case-hero">
     <div class="container">
