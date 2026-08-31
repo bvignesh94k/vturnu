@@ -34,12 +34,32 @@ function db(): PDO
     if ($parts === false || empty($parts['host'])) {
         throw new RuntimeException('POSTGRES_URL / DATABASE_URL is not a valid connection string.');
     }
-    $pdoDsn = sprintf(
-        'pgsql:host=%s;port=%s;dbname=%s;sslmode=require',
-        $parts['host'],
-        (string) ($parts['port'] ?? 5432),
-        ltrim($parts['path'] ?? '', '/')
-    );
+    $host = $parts['host'];
+
+    /* Neon routes connections by SNI, and the libpq bundled with the Vercel
+       PHP runtime is too old to send it. Without SNI the server cannot tell
+       which endpoint the connection is for and rejects it with:
+         "Endpoint ID is not specified ... pass the endpoint ID ... as a
+          parameter: '?options=endpoint%3D<endpoint-id>'"
+       That was the real reason every database call failed in production while
+       working anywhere with a modern libpq. Neon's documented workaround is to
+       carry the endpoint ID in the connection options, which is what this does.
+
+       The endpoint ID is the first label of the hostname. Pooled hosts add a
+       "-pooler" suffix that is not part of the ID itself, so it is stripped. */
+    $dsnParts = [
+        'host=' . $host,
+        'port=' . (string) ($parts['port'] ?? 5432),
+        'dbname=' . ltrim($parts['path'] ?? '', '/'),
+        'sslmode=require',
+    ];
+    if (str_ends_with($host, '.neon.tech')) {
+        $endpointId = preg_replace('/-pooler$/', '', strtok($host, '.'));
+        if ($endpointId !== '' && $endpointId !== false) {
+            $dsnParts[] = 'options=endpoint=' . $endpointId;
+        }
+    }
+    $pdoDsn = 'pgsql:' . implode(';', $dsnParts);
 
     /* Credentials arrive percent-encoded inside the URL, so a generated
        password containing @ / : or + would otherwise be passed through
