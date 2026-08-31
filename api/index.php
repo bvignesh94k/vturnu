@@ -128,60 +128,6 @@ if ($slug === 'llms.txt') {
     exit;
 }
 
-/* TEMPORARY diagnostic. Database writes are failing silently in production
-   and the cause is not reproducible locally, so this reports the facts needed
-   to fix it instead of guessing through deploy cycles. Gated by an HMAC of
-   SECURITY_SECRET, reports only booleans and a redacted driver message, never
-   a credential or connection string. Remove once the cause is found. */
-if ($slug === '__diag') {
-    header('Content-Type: application/json; charset=UTF-8');
-    header('X-Robots-Tag: noindex, nofollow');
-    $expected = hash_hmac('sha256', 'diag', SECURITY_SECRET);
-    if (!hash_equals($expected, (string) ($_GET['k'] ?? ''))) {
-        http_response_code(404);
-        echo json_encode(['error' => 'not found']);
-        exit;
-    }
-
-    $names = ['POSTGRES_URL', 'DATABASE_URL', 'POSTGRES_DATABASE_URL',
-              'POSTGRES_URL_NON_POOLING', 'POSTGRES_PRISMA_URL', 'RESEND_API_KEY',
-              'SECURITY_SECRET', 'RECAPTCHA_SECRET_KEY', 'VERCEL'];
-    $present = [];
-    foreach ($names as $n) {
-        $present[$n] = [
-            'getenv'  => getenv($n) !== false && getenv($n) !== '',
-            'env'     => isset($_ENV[$n]) && $_ENV[$n] !== '',
-            'server'  => isset($_SERVER[$n]) && $_SERVER[$n] !== '',
-        ];
-    }
-
-    // Redact anything that could carry a secret out of a driver message.
-    $scrub = function (string $m): string {
-        $m = preg_replace('~://[^@\s]+@~', '://[redacted]@', $m);
-        $m = preg_replace('~(password|pass)=\S+~i', '$1=[redacted]', $m);
-        return mb_substr($m, 0, 400);
-    };
-
-    $dbTest = ['attempted' => false, 'ok' => false, 'error' => null, 'rows' => null];
-    try {
-        $dbTest['attempted'] = true;
-        $n = db()->query('SELECT count(*) AS c FROM enquiries')->fetch();
-        $dbTest['ok'] = true;
-        $dbTest['rows'] = (int) ($n['c'] ?? -1);
-    } catch (Throwable $e) {
-        $dbTest['error'] = $scrub(get_class($e) . ': ' . $e->getMessage());
-    }
-
-    echo json_encode([
-        'php'        => PHP_VERSION,
-        'pdo_drivers' => PDO::getAvailableDrivers(),
-        'pgsql_ext'  => extension_loaded('pdo_pgsql'),
-        'env'        => $present,
-        'db'         => $dbTest,
-    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    exit;
-}
-
 /* Admin panel + CRM */
 if ($slug === 'admin' || str_starts_with($slug, 'admin/')) {
     require dirname(__DIR__) . '/includes/admin.php';
