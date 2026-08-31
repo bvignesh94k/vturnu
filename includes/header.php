@@ -32,7 +32,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <title><?= e($page['title']) ?></title>
 <meta name="description" content="<?= e($page['meta']) ?>">
 <link rel="canonical" href="<?= e($canonical) ?>">
-<meta name="robots" content="<?= $slug === '__404__' ? 'noindex, follow' : 'index, follow' ?>">
+<?php /* Pages can opt out of indexing via 'noindex' in includes/data/pages.php.
+         The thank-you page uses it: a confirmation URL has no business in
+         search results, and an indexed one gets hit directly by people who
+         never submitted anything. */
+$noindex = $slug === '__404__' || !empty($page['noindex']); ?>
+<meta name="robots" content="<?= $noindex ? 'noindex, follow' : 'index, follow' ?>">
 <meta property="og:type" content="<?= ($page['template'] ?? '') === 'blog-post' ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
 <meta property="og:title" content="<?= e($page['og_title'] ?? $page['title']) ?>">
@@ -57,8 +62,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="publisher" content="<?= e(SITE_NAME) ?>">
 <?php /* Bing, Yandex and Baidu read these; Google uses the generic robots tag.
          max-image-preview:large is what lets rich results show a full image. */ ?>
-<meta name="googlebot" content="<?= $slug === '__404__' ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' ?>">
-<meta name="bingbot" content="<?= $slug === '__404__' ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large' ?>">
+<meta name="googlebot" content="<?= $noindex ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' ?>">
+<meta name="bingbot" content="<?= $noindex ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large' ?>">
 <meta name="rating" content="general">
 <meta name="revisit-after" content="7 days">
 <link rel="icon" type="image/svg+xml" href="/assets/img/vturnu-icon-mark.svg">

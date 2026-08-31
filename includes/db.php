@@ -15,9 +15,18 @@ function db(): PDO
         return $pdo;
     }
 
-    $dsn = getenv('POSTGRES_URL') ?: getenv('DATABASE_URL') ?: '';
+    /* Neon (via the Vercel integration) creates several of these. Try the
+       pooled URL first, then the common alternatives, so the app does not
+       depend on one exact variable name surviving a dashboard change.
+       env_var() rather than getenv(): see the note in includes/config.php. */
+    $dsn = env_var('POSTGRES_URL')
+        ?? env_var('DATABASE_URL')
+        ?? env_var('POSTGRES_DATABASE_URL')
+        ?? env_var('POSTGRES_URL_NON_POOLING')
+        ?? env_var('POSTGRES_PRISMA_URL')
+        ?? '';
     if ($dsn === '') {
-        throw new RuntimeException('No database connection string set (POSTGRES_URL or DATABASE_URL).');
+        throw new RuntimeException('No database connection string set (tried POSTGRES_URL, DATABASE_URL, POSTGRES_DATABASE_URL, POSTGRES_URL_NON_POOLING, POSTGRES_PRISMA_URL).');
     }
 
     // Vercel/Neon inject a postgres:// URL; PDO's pgsql driver wants a DSN.
@@ -32,9 +41,16 @@ function db(): PDO
         ltrim($parts['path'] ?? '', '/')
     );
 
-    $pdo = new PDO($pdoDsn, $parts['user'] ?? '', $parts['pass'] ?? '', [
+    /* Credentials arrive percent-encoded inside the URL, so a generated
+       password containing @ / : or + would otherwise be passed through
+       verbatim and rejected by the server. */
+    $user = isset($parts['user']) ? rawurldecode($parts['user']) : '';
+    $pass = isset($parts['pass']) ? rawurldecode($parts['pass']) : '';
+
+    $pdo = new PDO($pdoDsn, $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_TIMEOUT => 8,
     ]);
     return $pdo;
 }

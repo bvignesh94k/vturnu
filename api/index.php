@@ -41,6 +41,11 @@ if ($slug === 'sitemap.xml') {
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     foreach ($PAGES as $s => $p) {
+        // A sitemap must only list indexable URLs; noindex pages (thank-you)
+        // would otherwise be advertised to crawlers and then refused.
+        if (!empty($p['noindex'])) {
+            continue;
+        }
         $loc = e(abs_url(page_url($s)));
         $tpl = $p['template'] ?? 'service';
         $priority = $s === '' ? '1.0' : ($tpl === 'hub' ? '0.8' : ($tpl === 'blog-post' ? '0.7' : '0.6'));
@@ -162,7 +167,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'enquiry') {
         }
     }
 
-    echo json_encode(['ok' => $saved]);
+    /* Hand back where to go next so the pop-up forms can send the visitor to
+       the same thank-you page the non-JS flow uses, instead of swapping in a
+       small panel underneath a form that is still on screen. */
+    echo json_encode([
+        'ok' => $saved,
+        'redirect' => $saved ? '/thank-you/?s=' . rawurlencode($src) : null,
+    ]);
     exit;
 }
 
@@ -193,12 +204,19 @@ if ($slug === 'download') {
     }
 }
 
-/* Enquiry form submission (contact page + home quote form) */
+/* Enquiry form submission (contact page + home quote form).
+   On success, redirect to the thank-you page rather than re-rendering the form
+   page with a flag: it gives the visitor a clean finish, gives analytics one
+   conversion URL to fire on, and means a refresh cannot resubmit the form. */
 $form_status = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''], true)) {
     $check = security_check_submission($_POST);
     $source = $slug === '' ? 'home-quote' : 'contact-page';
-    $form_status = ($check['ok'] && save_enquiry($_POST, $source)) ? 'success' : 'error';
+    if ($check['ok'] && save_enquiry($_POST, $source)) {
+        header('Location: /thank-you/?s=' . rawurlencode($source), true, 303);
+        exit;
+    }
+    $form_status = 'error';
 }
 
 /* Free SEO audit: fetch the visitor's site, score it, show it and email a copy. */

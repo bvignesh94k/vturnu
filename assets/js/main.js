@@ -194,9 +194,11 @@
                     .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
-                            qmForm.hidden = true;
-                            modal.querySelector('.qm-intro').hidden = true;
-                            qmSuccess.hidden = false;
+                            /* Go to the real thank-you page. The old behaviour
+                               revealed a success panel while leaving the form
+                               and its submit button on screen above it, which
+                               read as though nothing had happened. */
+                            window.location.href = data.redirect || '/thank-you/';
                         } else {
                             qmError.hidden = false;
                         }
@@ -275,9 +277,8 @@
                     .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
-                            resForm.hidden = true;
-                            var ok = document.querySelector('.r-success');
-                            if (ok) ok.hidden = false;
+                            // Thank-you page confirms the download is on its way.
+                            window.location.href = data.redirect || '/thank-you/?s=resource';
                         } else if (rErr) { rErr.hidden = false; }
                     })
                     .catch(function () { if (rErr) rErr.hidden = false; })
@@ -333,8 +334,7 @@
                     .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
-                            auditLeadForm.hidden = true;
-                            if (success) success.hidden = false;
+                            window.location.href = data.redirect || '/thank-you/?s=audit-consultation';
                         } else if (errBox) { errBox.hidden = false; }
                     })
                     .catch(function () { if (errBox) errBox.hidden = false; })

@@ -17,7 +17,28 @@ declare(strict_types=1);
  *
  * Errors still go to the log (visible in Vercel's function logs), they just
  * never reach the response. Local dev keeps them visible on screen. */
-$isServerless = getenv('VERCEL') !== false || getenv('AWS_LAMBDA_FUNCTION_NAME') !== false;
+/**
+ * Read an environment variable from every place a host might put it.
+ *
+ * getenv() alone is not reliable here. Depending on the SAPI and on PHP's
+ * variables_order ini setting, platform-injected variables can land in $_ENV
+ * or $_SERVER without ever reaching getenv(). That is not theoretical: with
+ * getenv() alone, POSTGRES_URL read as missing on Vercel, every database call
+ * threw, and because the lead path deliberately fails soft, enquiries were
+ * accepted and silently dropped. It was provable from outside: the rate
+ * limiter is Postgres-backed and 12 consecutive posts never tripped a limit
+ * of 10 per hour.
+ */
+function env_var(string $key, ?string $default = null): ?string
+{
+    $value = getenv($key);
+    if ($value === false || $value === '') {
+        $value = $_ENV[$key] ?? $_SERVER[$key] ?? null;
+    }
+    return ($value === null || $value === '') ? $default : (string) $value;
+}
+
+$isServerless = env_var('VERCEL') !== null || env_var('AWS_LAMBDA_FUNCTION_NAME') !== null;
 ini_set('display_errors', $isServerless ? '0' : '1');
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
@@ -79,13 +100,13 @@ define('SOCIAL_LINKS', [
 // hardcoded value stays as a local-dev fallback (XAMPP has no env var to
 // read), so nothing here is a real secret leak: whichever value is live in
 // production is the one set in the Vercel dashboard, never this file.
-define('SECURITY_SECRET', getenv('SECURITY_SECRET') ?: '8207431fffc74e211ad0a0102b7862fc33d383260ddcd835590833521f488afe');
+define('SECURITY_SECRET', env_var('SECURITY_SECRET', '8207431fffc74e211ad0a0102b7862fc33d383260ddcd835590833521f488afe'));
 
 // From https://www.google.com/recaptcha/admin (reCAPTCHA v3). Until real
 // keys are set, security_recaptcha_ok() passes every submission through
 // rather than blocking real customers on a misconfigured site key.
 define('RECAPTCHA_SITE_KEY', '6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg');
-define('RECAPTCHA_SECRET_KEY', getenv('RECAPTCHA_SECRET_KEY') ?: '6LfgqIMtAAAAAKk3SHntnhRQaVcBdagHuaVNajkH');
+define('RECAPTCHA_SECRET_KEY', env_var('RECAPTCHA_SECRET_KEY', '6LfgqIMtAAAAAKk3SHntnhRQaVcBdagHuaVNajkH'));
 
 /**
  * ISO 3166-1 alpha-2 country code -> E.164 calling code, for prefilling

@@ -34,6 +34,31 @@ $PAGES = [
         'parent' => null,
     ],
 
+    /* Every lead form lands here after a successful submission. A real page,
+       not an inline panel: it gives the visitor a clear finish, gives analytics
+       and ads a single conversion URL to fire on, and lets the confirmation
+       carry proper next steps instead of one line squeezed under the form.
+       noindex, because it should never appear in search results. */
+    'thank-you' => [
+        'template' => 'thank-you',
+        'noindex'  => true,
+        'title' => 'Thank You | VTurnU',
+        'meta'  => 'Your enquiry has reached the VTurnU team. We reply within one working day.',
+        'h1'    => 'Thank you. Your enquiry is in.',
+        'lede'  => 'A senior strategist reads every enquiry personally. You will hear back within one working day, usually sooner.',
+    ],
+
+    /* Human-readable index of the site. The XML sitemap stays where crawlers
+       expect it, at /sitemap.xml, and is no longer linked in the footer: it is
+       a machine file and visitors clicking it got a wall of raw XML. */
+    'sitemap' => [
+        'template' => 'sitemap',
+        'title' => 'Sitemap | Every Page on VTurnU',
+        'meta'  => 'Browse every page on vturnu.com: services, AI search, case studies, guides, e-books, articles and company information, grouped by section.',
+        'h1'    => 'Sitemap',
+        'lede'  => 'Every page on this site, grouped by section. Looking for the machine-readable version? That lives at /sitemap.xml.',
+    ],
+
     'contact-us' => [
         'template' => 'contact',
         'title' => 'Contact Us | Get a Free Digital Marketing Quote in 24 Hours',

@@ -73,7 +73,11 @@
             <ul class="footer-legal-links">
                 <li><a href="/privacy-policy/">Privacy Policy</a></li>
                 <li><a href="/terms-and-conditions/">Terms &amp; Conditions</a></li>
-                <li><a href="/sitemap.xml">Sitemap</a></li>
+                <?php /* Points at the readable sitemap, not /sitemap.xml.
+                         The XML file still exists for crawlers and is still
+                         declared in robots.txt; it just is not something to
+                         hand a visitor. */ ?>
+                <li><a href="/sitemap/">Sitemap</a></li>
             </ul>
         </div>
     </div>

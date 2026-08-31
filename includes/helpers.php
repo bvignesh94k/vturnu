@@ -403,6 +403,7 @@ function save_enquiry(array $post, string $source): bool
         'message' => trim($post['message'] ?? ''),
     ];
 
+    $stored = false;
     try {
         db()->prepare(
             'INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message)
@@ -412,11 +413,25 @@ function save_enquiry(array $post, string $source): bool
             ':mobile' => $entry['mobile'], ':company' => $entry['company'], ':designation' => $entry['designation'],
             ':service' => $entry['service'], ':budget' => $entry['budget'], ':message' => $entry['message'],
         ]);
+        $stored = true;
     } catch (Throwable $e) {
         error_log('save_enquiry: DB insert failed: ' . $e->getMessage());
     }
 
-    mail_enquiry($entry);
+    $emailed = mail_enquiry($entry);
+
+    /* A lead survives if it reached the database or the sales inbox. If
+       neither worked, say so, because the alternative is what happened
+       before: the visitor is thanked, the enquiry is gone, and nobody finds
+       out until someone wonders why the forms stopped producing business.
+       Returning false surfaces the error and invites them to call instead. */
+    if (!$stored && !$emailed) {
+        error_log('save_enquiry: LEAD LOST, neither database nor email accepted it: ' . $entry['email']);
+        return false;
+    }
+    if (!$stored) {
+        error_log('save_enquiry: DB unavailable, lead delivered by email only: ' . $entry['email']);
+    }
 
     return true;
 }
@@ -467,7 +482,8 @@ function mail_enquiry(array $entry): bool
  */
 function send_email(string $to, string $subject, string $body, array $opts = []): bool
 {
-    $apiKey = getenv('RESEND_API_KEY') ?: '';
+    // env_var() rather than getenv(): see the note in includes/config.php.
+    $apiKey = env_var('RESEND_API_KEY', '');
     if ($apiKey === '') {
         error_log('send_email: RESEND_API_KEY is not set, dropping email to ' . $to);
         return false;
