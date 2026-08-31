@@ -57,7 +57,9 @@ $PAGES = [
     'ai-visibility-tool' => [
         'template' => 'product',
         'title' => 'AI Visibility Tool | Track Your Brand in ChatGPT & Gemini',
-        'meta'  => 'See how often ChatGPT, Gemini, Perplexity and AI Overviews mention your brand. VTurnAI scores your SEO, AEO, GEO and HEO visibility from ₹499/month. 7-day free trial.',
+        // Trimmed to 159 chars: at 166 it was the one description on the site
+        // at risk of truncation in the SERP.
+        'meta'  => 'See how often ChatGPT, Gemini, Perplexity and AI Overviews mention your brand. VTurnAI scores your SEO, AEO, GEO and HEO visibility. 7-day free trial.',
         'h1'    => 'Track Your Brand Across AI Search',
         'lede'  => 'VTurnAI is our own monitoring platform. It watches ChatGPT, Gemini, Claude, Perplexity, Grok and Copilot, tells you how often each one mentions or recommends you, and scores exactly what to fix first.',
     ],

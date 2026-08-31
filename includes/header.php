@@ -91,6 +91,11 @@ if ($slug !== ''): ?>
     'url' => $canonical,
     'speakable' => ['@type' => 'SpeakableSpecification', 'cssSelector' => ['h1', '.answer-text']],
 ]) . "\n" ?>
+<?php /* Every other template: case studies, About, Contact, pricing, legal and
+         all listing pages. Without this they carried no page-level node at
+         all, only Organization/WebSite/BreadcrumbList. */
+elseif ($slug !== '__404__' && ($node = jsonld_page($page, $slug, $canonical, $page['template'] ?? 'service')) !== null): ?>
+<?= jsonld_script($node) . "\n" ?>
 <?php endif; ?>
 <script src="https://www.google.com/recaptcha/api.js?render=6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg" async defer></script>
 </head>

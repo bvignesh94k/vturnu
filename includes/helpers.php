@@ -121,6 +121,101 @@ function jsonld_faq(array $faqs): array
     return ['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => $items];
 }
 
+/**
+ * Page-level JSON-LD for every template that does not already emit its own.
+ *
+ * Before this, only service pages, blog posts, the homepage and resource
+ * pages carried a page-level node: case studies, About, Contact, pricing,
+ * legal and every listing page shipped nothing but Organization, WebSite and
+ * BreadcrumbList. That left 40 of 129 URLs with no machine-readable
+ * statement of what the page actually is, which is exactly the signal answer
+ * engines use to decide whether a page is worth citing.
+ *
+ * Every value here is read from data already rendered on the page. Nothing is
+ * invented: case studies carry no publish date in includes/data/cases.php, so
+ * datePublished is omitted rather than guessed.
+ *
+ * @return array|null null when the caller already emits richer schema.
+ */
+function jsonld_page(array $page, string $slug, string $canonical, string $template): ?array
+{
+    $orgId  = SITE_URL . '/#organization';
+    $siteId = SITE_URL . '/#website';
+
+    // Templates that already emit their own page-level node elsewhere.
+    if (in_array($template, ['service', 'blog-post', 'resource', 'home'], true)) {
+        return null;
+    }
+
+    $type = match ($template) {
+        'contact'    => 'ContactPage',
+        'about'      => 'AboutPage',
+        'case-detail' => 'Article',
+        'blog-list', 'case-list', 'resource-list', 'hub' => 'CollectionPage',
+        default      => 'WebPage',
+    };
+
+    $node = [
+        '@context' => 'https://schema.org',
+        '@type' => $type,
+        '@id' => $canonical . '#webpage',
+        'url' => $canonical,
+        'name' => $page['title'] ?? ($page['h1'] ?? ''),
+        'description' => $page['meta'] ?? '',
+        'inLanguage' => 'en',
+        'isPartOf' => ['@id' => $siteId],
+        'publisher' => ['@id' => $orgId],
+    ];
+
+    /* A case study is an article about a real engagement. Fields come straight
+       from the case record so the markup can never drift from the page. */
+    if ($template === 'case-detail') {
+        $caseSlug = str_starts_with($slug, 'case-studies/') ? substr($slug, 13) : $slug;
+        $case = $GLOBALS['CASES'][$caseSlug] ?? null;
+
+        $node['headline'] = $page['h1'] ?? ($page['title'] ?? '');
+        $node['mainEntityOfPage'] = ['@type' => 'WebPage', '@id' => $canonical];
+        $node['author'] = ['@id' => $orgId];
+        $node['image'] = abs_url('/assets/img/vturnu-logo-dark.png');
+
+        if ($case) {
+            if (!empty($case['industry'])) {
+                $node['about'] = ['@type' => 'Thing', 'name' => $case['industry']];
+            }
+            if (!empty($case['services']) && is_array($case['services'])) {
+                $node['mentions'] = array_values(array_map(
+                    fn($s) => ['@type' => 'Service', 'name' => $s[0], 'url' => abs_url($s[1])],
+                    array_filter($case['services'], fn($s) => is_array($s) && count($s) >= 2)
+                ));
+            }
+        }
+    }
+
+    /* The About and Contact pages are the two strongest entity-trust signals
+       on the site, so both point explicitly back at the Organization. */
+    if ($template === 'about' || $template === 'contact') {
+        $node['about'] = ['@id' => $orgId];
+        $node['mainEntity'] = ['@id' => $orgId];
+    }
+
+    /* Listing pages: name the collection so an answer engine can tell an index
+       from a leaf page rather than treating all 129 URLs as equivalent. */
+    if ($type === 'CollectionPage') {
+        $node['isPartOf'] = ['@id' => $siteId];
+        if (!empty($page['h1'])) {
+            $node['name'] = $page['h1'];
+        }
+    }
+
+    // Give voice assistants the same two elements every template renders first.
+    $node['speakable'] = [
+        '@type' => 'SpeakableSpecification',
+        'cssSelector' => ['h1', '.lede', '.answer-text'],
+    ];
+
+    return $node;
+}
+
 function jsonld_script(array $data): string
 {
     return '<script type="application/ld+json">'
