@@ -35,6 +35,7 @@
     },
     { "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$", "status": 403 },
     { "src": "^/index\\.php$", "status": 403 },
+    { "src": "^/presentations/.*\\.html$", "continue": true },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
