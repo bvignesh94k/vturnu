@@ -348,7 +348,7 @@ echo jsonld_script([
                     ];
                 }, $SERVICES),
             ],
-        ],
+        ] + org_entity_facts(),
         [
             '@type' => 'WebSite',
             '@id' => abs_url('/') . '#website',

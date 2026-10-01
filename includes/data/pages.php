@@ -754,6 +754,8 @@ foreach ($BLOG as $bslug => $b) {
         'template' => 'blog-post',
         'title' => $b['title'], 'meta' => $b['meta'], 'h1' => $b['h1'], 'lede' => $b['lede'],
         'parent' => 'blog', 'post' => $bslug,
+        // Read only by the XML sitemap, for an accurate lastmod.
+        'date' => $b['modified'] ?? $b['date'] ?? '',
     ];
 }
 

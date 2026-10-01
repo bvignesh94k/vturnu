@@ -82,10 +82,30 @@ define('BASE_PATH', dirname(__DIR__));
 // Social profiles
 define('SOCIAL_LINKS', [
     'LinkedIn'  => 'https://www.linkedin.com/company/vturnu',
-    'Facebook'  => 'https://www.facebook.com/vturnu',
-    'Twitter'   => 'https://twitter.com/vturnu',
+    'Facebook'  => 'https://www.facebook.com/VTurnUDigital',
+    'Twitter'   => 'https://x.com/VTurnU_Digital',
     'Instagram' => 'https://www.instagram.com/vturnu',
 ]);
+
+/* Third-party profiles of the business. Not shown in the footer; they go into
+   the Organization schema's sameAs so search and AI engines can tie every
+   directory listing back to this one entity. Add a profile here as soon as a
+   new listing goes live. */
+define('ENTITY_PROFILES', [
+    'https://www.crunchbase.com/organization/vturnu',
+    'https://clutch.co/profile/vturnu-digital-solutions',
+    'https://www.goodfirms.co/company/vturnu',
+    'https://selectedfirms.co/agency/vturnu',
+    'https://techreviewer.co/companies/vturnu',
+    'https://www.trustpilot.com/review/vturnu.com',
+    'https://medium.com/@vturnu',
+]);
+
+// Business facts, used by the Organization schema.
+define('LEGAL_NAME', 'VTurnU Digital Solutions LLP');
+define('FOUNDING_YEAR', '2020');
+define('FOUNDER_NAME', 'Kalpana V');
+define('FOUNDER_TITLE', 'Founder');
 
 /* ------------------------------------------------------------------ */
 /* Security: CSRF signing key + reCAPTCHA v3 credentials              */
