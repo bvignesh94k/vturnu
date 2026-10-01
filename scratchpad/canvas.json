@@ -1,0 +1,20 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1400, "h": 788, "title": "Title Slide" },
+    { "file": "Slide2-Problem.dc.html", "x": 1520, "y": 0, "w": 1400, "h": 788, "title": "The Problem" },
+    { "file": "Slide3-Opportunity.dc.html", "x": 3040, "y": 0, "w": 1400, "h": 788, "title": "The Opportunity" },
+    { "file": "Slide4-About.dc.html", "x": 4560, "y": 0, "w": 1400, "h": 788, "title": "About VTurnU" },
+    { "file": "Slide5-Approach.dc.html", "x": 6080, "y": 0, "w": 1400, "h": 788, "title": "Our Approach" },
+    { "file": "Slide6-Service1.dc.html", "x": 7600, "y": 0, "w": 1400, "h": 788, "title": "Service 1: AI-Powered SEO" },
+    { "file": "Slide7-Service2.dc.html", "x": 9120, "y": 0, "w": 1400, "h": 788, "title": "Service 2: Paid Ads" },
+    { "file": "Slide8-Service3.dc.html", "x": 10640, "y": 0, "w": 1400, "h": 788, "title": "Service 3: Lead Generation" },
+    { "file": "Slide9-Service4.dc.html", "x": 12160, "y": 0, "w": 1400, "h": 788, "title": "Service 4: CRO" },
+    { "file": "Slide10-CaseStudy1.dc.html", "x": 13680, "y": 0, "w": 1400, "h": 788, "title": "Case Study 1" },
+    { "file": "Slide11-CaseStudy2.dc.html", "x": 15200, "y": 0, "w": 1400, "h": 788, "title": "Case Study 2" },
+    { "file": "Slide12-WhyVTurnU.dc.html", "x": 16720, "y": 0, "w": 1400, "h": 788, "title": "Why VTurnU" },
+    { "file": "Slide13-SocialProof.dc.html", "x": 18240, "y": 0, "w": 1400, "h": 788, "title": "Social Proof" },
+    { "file": "Slide14-Pricing.dc.html", "x": 19760, "y": 0, "w": 1400, "h": 788, "title": "Pricing & Packages" },
+    { "file": "Slide15-CTA.dc.html", "x": 21280, "y": 0, "w": 1400, "h": 788, "title": "Call to Action" }
+  ],
+  "launch": { "view": "focused", "file": "Main.dc.html" }
+}

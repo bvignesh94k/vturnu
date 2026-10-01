@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Poppins', sans-serif; }
+  </style>
+</helmet>
+<div style="width: 1400px; height: 788px; background: white; padding: 60px 60px; display: flex; flex-direction: column; justify-content: center;">
+  <div style="text-align: center; margin-bottom: 50px;">
+    <div style="font-size: 14px; color: #F7B500; font-weight: 600; letter-spacing: 1px;">INVESTMENT</div>
+    <h1 style="font-size: 52px; font-weight: 800; color: #17181C; margin: 12px 0;">
+      Packages for Every Business
+    </h1>
+    <p style="font-size: 18px; color: #666; margin-top: 12px;">
+      Flexible plans that scale with your growth
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+    <!-- Starter -->
+    <div style="background: white; border: 2px solid #E0E0E0; border-radius: 12px; padding: 30px; text-align: center; transition: all 0.3s;">
+      <div style="font-size: 24px; font-weight: 700; color: #17181C; margin-bottom: 8px;">Starter</div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 20px;">Perfect for SMEs</div>
+      <div style="font-size: 48px; font-weight: 800; color: #F7B500; margin-bottom: 8px;">₹15K</div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 30px;">/ month</div>
+      <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left; font-size: 14px; color: #666; line-height: 2;">
+        <li>✓ SEO & content</li>
+        <li>✓ Basic analytics</li>
+        <li>✓ Monthly reporting</li>
+        <li>✓ Email support</li>
+      </ul>
+      <div style="background: #F5F5F5; color: #17181C; padding: 12px 20px; border-radius: 6px; font-weight: 600; margin-top: 20px; cursor: pointer;">Get Started</div>
+    </div>
+
+    <!-- Growth (Featured) -->
+    <div style="background: linear-gradient(135deg, #F7B500, #FF9800); border-radius: 12px; padding: 30px; text-align: center; color: white; transform: scale(1.05); box-shadow: 0 10px 30px rgba(247, 181, 0, 0.3);">
+      <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: inline-block; margin-bottom: 16px; font-size: 12px; font-weight: 600;">MOST POPULAR</div>
+      <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Growth</div>
+      <div style="font-size: 14px; opacity: 0.9; margin-bottom: 20px;">Best for growing companies</div>
+      <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">₹45K</div>
+      <div style="font-size: 14px; opacity: 0.9; margin-bottom: 30px;">/ month</div>
+      <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left; font-size: 14px; line-height: 2; opacity: 0.95;">
+        <li>✓ All Starter features</li>
+        <li>✓ Paid ads management</li>
+        <li>✓ Lead generation</li>
+        <li>✓ CRO optimization</li>
+        <li>✓ Dedicated manager</li>
+      </ul>
+      <div style="background: white; color: #F7B500; padding: 12px 20px; border-radius: 6px; font-weight: 600; margin-top: 20px; cursor: pointer;">Book Demo</div>
+    </div>
+
+    <!-- Enterprise -->
+    <div style="background: white; border: 2px solid #E0E0E0; border-radius: 12px; padding: 30px; text-align: center;">
+      <div style="font-size: 24px; font-weight: 700; color: #17181C; margin-bottom: 8px;">Enterprise</div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 20px;">For large organizations</div>
+      <div style="font-size: 36px; font-weight: 800; color: #17181C; margin-bottom: 8px;">Custom</div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 30px;">Let's talk</div>
+      <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left; font-size: 14px; color: #666; line-height: 2;">
+        <li>✓ All Growth features</li>
+        <li>✓ Custom integrations</li>
+        <li>✓ Advanced analytics</li>
+        <li>✓ Priority support</li>
+      </ul>
+      <div style="background: #17181C; color: white; padding: 12px 20px; border-radius: 6px; font-weight: 600; margin-top: 20px; cursor: pointer;">Contact Sales</div>
+    </div>
+  </div>
+
+  <div style="position: absolute; bottom: 20px; right: 60px; font-size: 12px; color: #999;">Slide 14</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

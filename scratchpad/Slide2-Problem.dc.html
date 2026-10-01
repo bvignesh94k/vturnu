@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Poppins', sans-serif; }
+    .pain-point { text-align: center; padding: 30px; background: #F5F5F5; border-radius: 12px; }
+    .pain-number { font-size: 48px; font-weight: 800; color: #FF6B9D; margin-bottom: 12px; }
+    .pain-title { font-size: 20px; font-weight: 700; color: #17181C; margin-bottom: 10px; }
+    .pain-desc { font-size: 16px; color: #666; line-height: 1.5; }
+  </style>
+</helmet>
+<div style="width: 1400px; height: 788px; background: white; padding: 60px 60px; display: flex; flex-direction: column; justify-content: space-between;">
+  <!-- Header -->
+  <div style="margin-bottom: 30px;">
+    <div style="font-size: 14px; color: #F7B500; font-weight: 600; letter-spacing: 1px;">THE REALITY</div>
+    <h1 style="font-size: 52px; font-weight: 800; color: #17181C; margin: 12px 0; line-height: 1.2;">
+      Traditional Digital Marketing is Broken
+    </h1>
+    <p style="font-size: 20px; color: #666; margin: 20px 0 0 0; font-weight: 400;">
+      Most businesses waste 60-70% of their marketing budget without seeing real results
+    </p>
+  </div>
+
+  <!-- Three Pain Points -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px;">
+    <div class="pain-point">
+      <div class="pain-number">📉</div>
+      <div class="pain-title">Low ROI</div>
+      <div class="pain-desc">No visibility into what's actually working or where money is going</div>
+    </div>
+    <div class="pain-point">
+      <div class="pain-number">📊</div>
+      <div class="pain-title">Lack of Data</div>
+      <div class="pain-desc">Campaign decisions based on guesswork, not real insights</div>
+    </div>
+    <div class="pain-point">
+      <div class="pain-number">⏰</div>
+      <div class="pain-title">No Clear Results</div>
+      <div class="pain-desc">Months pass without measurable growth in leads or revenue</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px; background: linear-gradient(135deg, rgba(247, 181, 0, 0.1), rgba(0, 188, 212, 0.1)); border-radius: 12px;">
+    <div style="text-align: center; border-right: 2px solid #F7B500;">
+      <div style="font-size: 42px; font-weight: 800; color: #F7B500;">68%</div>
+      <div style="font-size: 16px; color: #666; margin-top: 8px;">of SMEs see no ROI from ads</div>
+    </div>
+    <div style="text-align: center; border-right: 2px solid #F7B500;">
+      <div style="font-size: 42px; font-weight: 800; color: #F7B500;">72%</div>
+      <div style="font-size: 16px; color: #666; margin-top: 8px;">switch agencies yearly</div>
+    </div>
+    <div style="text-align: center;">
+      <div style="font-size: 42px; font-weight: 800; color: #F7B500;">$2.1T</div>
+      <div style="font-size: 16px; color: #666; margin-top: 8px;">wasted annually on bad campaigns</div>
+    </div>
+  </div>
+
+  <div style="font-size: 12px; color: #999; text-align: right; margin-top: 20px;">Slide 2</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
