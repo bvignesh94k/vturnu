@@ -25,8 +25,8 @@ define('BASE_PATH', dirname(__DIR__));
 // Social profiles
 define('SOCIAL_LINKS', [
     'LinkedIn'  => 'https://www.linkedin.com/company/vturnu',
-    'Facebook'  => 'https://www.facebook.com/vturnu',
-    'Twitter'   => 'https://twitter.com/vturnu',
+    'Facebook'  => 'https://www.facebook.com/VTurnUDigital',
+    'Twitter'   => 'https://x.com/VTurnU_Digital',
     'Instagram' => 'https://www.instagram.com/vturnu',
 ]);
 
