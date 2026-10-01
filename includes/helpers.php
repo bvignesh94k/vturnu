@@ -35,6 +35,25 @@ function breadcrumbs(array $pages, string $slug): array
     return array_reverse($trail);
 }
 
+/**
+ * Entity facts shared by both Organization nodes (this one and the homepage's
+ * richer graph in templates/home.php), so the two can never drift apart.
+ * sameAs joins the social accounts and the directory profiles: that list is
+ * what lets search and AI engines treat every listing as the same business.
+ */
+function org_entity_facts(): array
+{
+    return [
+        'legalName' => LEGAL_NAME,
+        'alternateName' => 'VTurnU Digital Solutions',
+        'foundingDate' => FOUNDING_YEAR,
+        'founder' => ['@type' => 'Person', 'name' => FOUNDER_NAME, 'jobTitle' => FOUNDER_TITLE],
+        'numberOfEmployees' => ['@type' => 'QuantitativeValue', 'minValue' => 10, 'maxValue' => 49],
+        'knowsAbout' => ['Search Engine Optimization', 'Answer Engine Optimization', 'Generative Engine Optimization', 'Google Ads', 'Meta Ads', 'Content Marketing', 'Social Media Marketing', 'Web Development'],
+        'sameAs' => array_values(array_unique(array_merge(array_values(SOCIAL_LINKS), ENTITY_PROFILES))),
+    ];
+}
+
 /** JSON-LD for the whole site (Organization + WebSite). */
 function jsonld_site(): array
 {
@@ -64,8 +83,7 @@ function jsonld_site(): array
                     'telephone' => CONTACT_PHONE,
                     'availableLanguage' => ['English', 'Tamil', 'Hindi'],
                 ]],
-                'sameAs' => array_values(SOCIAL_LINKS),
-            ],
+            ] + org_entity_facts(),
             [
                 '@type' => 'WebSite',
                 '@id' => SITE_URL . '/#website',

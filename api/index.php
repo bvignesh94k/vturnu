@@ -35,7 +35,8 @@ $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $slug = trim(is_string($uri) ? $uri : '/', '/');
 
 /* XML sitemap. lastmod comes from the post date where we have one, so
-   crawlers can tell what actually changed instead of refetching everything. */
+   crawlers can tell what actually changed instead of refetching everything;
+   pages without a date carry no lastmod at all. */
 if ($slug === 'sitemap.xml') {
     header('Content-Type: application/xml; charset=UTF-8');
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -50,8 +51,11 @@ if ($slug === 'sitemap.xml') {
         $tpl = $p['template'] ?? 'service';
         $priority = $s === '' ? '1.0' : ($tpl === 'hub' ? '0.8' : ($tpl === 'blog-post' ? '0.7' : '0.6'));
         $freq = $s === '' ? 'daily' : ($tpl === 'blog-post' ? 'monthly' : 'weekly');
-        $lastmod = !empty($p['date']) ? date('Y-m-d', strtotime((string) $p['date'])) : date('Y-m-d');
-        echo "  <url><loc>{$loc}</loc><lastmod>{$lastmod}</lastmod><changefreq>{$freq}</changefreq><priority>{$priority}</priority></url>\n";
+        // Only a real date goes out. Stamping undated pages with today's date
+        // made every URL look changed on every crawl, and Google stops
+        // trusting a sitemap's lastmod once it proves inaccurate.
+        $lastmod = !empty($p['date']) ? '<lastmod>' . date('Y-m-d', strtotime((string) $p['date'])) . '</lastmod>' : '';
+        echo "  <url><loc>{$loc}</loc>{$lastmod}<changefreq>{$freq}</changefreq><priority>{$priority}</priority></url>\n";
     }
     echo '</urlset>';
     exit;
