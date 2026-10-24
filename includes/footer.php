@@ -175,8 +175,8 @@
     </div>
 </dialog>
 
-<script src="/assets/js/main.js" defer></script>
-<?php if ($slug === ""): $home_js_v = @filemtime(BASE_PATH . "/assets/js/home.js") ?: time(); ?>
+<script src="/assets/js/main.js?v=<?= asset_v('/assets/js/main.js') ?>" defer></script>
+<?php if ($slug === ""): $home_js_v = asset_v('/assets/js/home.js'); ?>
 <script src="/assets/js/home.js?v=<?= $home_js_v ?>" defer></script>
 <?php endif; ?>
 

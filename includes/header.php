@@ -75,7 +75,7 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <?php /* The stylesheet is render-blocking by design, so tell the browser to
          start fetching it before the parser reaches the <link>. */ ?>
-<link rel="preload" as="style" href="/assets/css/style.css?v=<?= @filemtime(BASE_PATH . '/assets/css/style.css') ?: time() ?>">
+<link rel="preload" as="style" href="/assets/css/style.css?v=<?= asset_v('/assets/css/style.css') ?>">
 <?php /* One family for the whole site (Poppins) plus Caprasimo for the logo
          wordmark. Loaded in a single request; display=swap so text paints
          immediately in the fallback rather than blocking first render. */ ?>
@@ -87,12 +87,12 @@ $font_url = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;7
 <noscript><link rel="stylesheet" href="<?= e($font_url) ?>"></noscript>
 <?php /* External + versioned so the browser caches it once instead of re-downloading
          the whole sheet inside every page's HTML. ?v= busts the cache on edit. */
-$css_v = @filemtime(BASE_PATH . '/assets/css/style.css') ?: time(); ?>
+$css_v = asset_v('/assets/css/style.css'); ?>
 <link rel="stylesheet" href="/assets/css/style.css?v=<?= $css_v ?>">
 <?php /* Homepage-only sheet. Every rule inside is scoped under .hp, so it
          cannot reach any other template. */
 if ($slug === ""):
-    $home_css_v = @filemtime(BASE_PATH . "/assets/css/home.css") ?: time(); ?>
+    $home_css_v = asset_v('/assets/css/home.css'); ?>
 <link rel="stylesheet" href="/assets/css/home.css?v=<?= $home_css_v ?>">
 <?php endif; ?>
 <?php /* The homepage emits its own richer Organization graph (ProfessionalService,

@@ -391,6 +391,23 @@ function service_faqs(array $page): array
  * no longer silent: it goes to error_log(), visible in Vercel's function logs,
  * so a real outage is not indistinguishable from a page that just worked.
  */
+/**
+ * Cache-busting version for a static asset: a short hash of its contents.
+ *
+ * filemtime() cannot be used: on Vercel every deployed file carries the same
+ * fixed timestamp, so ?v= never changed between deploys, and browsers holding
+ * the year-long immutable copy of the CSS and JS kept serving stale files.
+ */
+function asset_v(string $path): string
+{
+    static $memo = [];
+    if (!isset($memo[$path])) {
+        $hash = @md5_file(BASE_PATH . $path);
+        $memo[$path] = $hash ? substr($hash, 0, 10) : (string) time();
+    }
+    return $memo[$path];
+}
+
 /** Free webmail domains. A B2B enquiry from one of these is flagged, not refused. */
 const FREE_EMAIL_DOMAINS = [
     'gmail.com', 'googlemail.com', 'yahoo.com', 'yahoo.co.in', 'yahoo.co.uk', 'ymail.com',

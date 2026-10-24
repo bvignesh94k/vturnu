@@ -176,7 +176,7 @@ $cta_label = 'Start my growth plan';
       <span class="hp3-orb hp3-orb--v"></span>
       <span class="hp3-orb hp3-orb--u"></span>
     </div>
-    <div class="hp3-gl" id="hp3-gl" aria-hidden="true" data-src="/assets/js/hero3d.min.js?v=<?= @filemtime(BASE_PATH . '/assets/js/hero3d.min.js') ?: 1 ?>"></div>
+    <div class="hp3-gl" id="hp3-gl" aria-hidden="true" data-src="/assets/js/hero3d.min.js?v=<?= asset_v('/assets/js/hero3d.min.js') ?>"></div>
 
     <div class="hp3-scenes">
       <?php /* Scene 1. The H1 paints immediately: it is the LCP element. */ ?>
