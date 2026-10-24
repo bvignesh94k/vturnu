@@ -1,19 +1,20 @@
 <?php
 /**
- * VTurnU homepage: an immersive, B2B lead-generation page.
+ * VTurnU homepage: an immersive B2B lead-generation page.
  *
  * Expects: $page, $slug, $PAGES, $form_status, $visitor_dial_code
  *
- * Structure
- *   1. Pinned 3D hero. The section holds the viewport while scrolling plays
- *      four scenes inside it (positioning, buyer journey, markets, proof).
- *      Every scene is real HTML in source order, so crawlers, screen readers
- *      and visitors without JavaScript get the whole story as normal content.
- *   2. Client logos, the B2B problem, services, process, markets, proof,
- *      facts, the qualifying lead form, FAQ and a closing call to action.
+ * The hero is a pinned WebGL stage (bin/hero3d/hero3d.js, built to
+ * assets/js/hero3d.min.js). Scroll plays four scenes while the section holds
+ * the viewport: the glass VU logo, a lead funnel, an interactive opportunity
+ * globe and a portal ring. Every scene, funnel stage and market insight is
+ * real HTML in source order, so crawlers, screen readers and visitors without
+ * WebGL or JavaScript get the full content as ordinary sections.
  *
  * Nothing here is invented: service links render only when the page exists,
- * and every result is read live from includes/data/cases.php.
+ * results are read live from includes/data/cases.php, and the market cards
+ * state time zones, languages and our recommended starting channels, not
+ * statistics we cannot source.
  */
 
 require_once BASE_PATH . '/includes/data/cases.php';
@@ -34,7 +35,6 @@ $hp_result = static function (string $cslug, int $i = 0) use ($CASES): ?array {
     return [$c['results'][$i][0], $c['results'][$i][1], $c['client'] ?? '', $c['industry'] ?? '', $cslug];
 };
 
-/* Client logos, single animated row. */
 $LOGOS = array_values(array_filter([
     ['shineprints.png',            'Shineprints'],
     ['masaami.webp',               'Masaami'],
@@ -49,93 +49,85 @@ $LOGOS = array_values(array_filter([
     return is_file(BASE_PATH . '/assets/img/clients/' . $l[0]);
 }));
 
-/* Hero proof: the three B2B outcomes, read from the case studies. */
 $HERO_PROOF = array_values(array_filter([
     $hp_result('saas-ppc-demo-pipeline'),
     $hp_result('manufacturer-rfq-seo-program'),
     $hp_result('law-firm-lead-gen-website'),
 ]));
 
-/* Three service pillars. Each link renders only if its page exists. */
-$PILLARS = [
+/* Funnel stages, anchored to heights on the 3D funnel (1 = rim, 0 = tip). */
+$FUNNEL = [
+    ['0.92', 'l', 'Search',             'Rank for the queries that carry budget'],
+    ['0.68', 'r', 'AI answers',         'Get named when buyers ask for a shortlist'],
+    ['0.45', 'l', 'Paid demand',        'Reach decision makers who are in market now'],
+    ['0.22', 'r', 'Website',            'Turn the visit into a booked call'],
+    ['0.02', 'r', 'Qualified pipeline', 'Tracked in your CRM, reported in revenue'],
+];
+
+/* Opportunity map. [code, country, city, lat, lon, label side, time vs India,
+   languages, the opening, where we would start]. Time differences are
+   against IST (UTC+5:30); ranges cover daylight saving. */
+$MARKETS = [
+    ['IND', 'India',          'Chennai HQ',   13.08,   80.27, 'r', 'Home base, UTC+5:30', 'English, Hindi, Tamil and regional languages', 'Our home market, with deep work across manufacturing, SaaS, healthcare, real estate and services.', 'Full growth program'],
+    ['UAE', 'United Arab Emirates', 'Dubai', 25.20,  55.27, 'r', '1.5 hours behind India', 'Arabic, English', 'High-value B2B categories where search results are still thin and mostly English-only.', 'Google Ads and bilingual SEO'],
+    ['KSA', 'Saudi Arabia',   'Riyadh',       24.71,   46.68, 'l', '2.5 hours behind India', 'Arabic, English', 'Fast-growing B2B demand with few vendors optimizing seriously for Arabic search.', 'Arabic and English SEO, then paid search'],
+    ['QAT', 'Qatar',          'Doha',         25.29,   51.53, 't', '2.5 hours behind India', 'Arabic, English', 'A compact, high-value market where a handful of strong pages can lead a category.', 'SEO and targeted outbound'],
+    ['SGP', 'Singapore',      'Singapore',     1.35,  103.82, 'r', '2.5 hours ahead of India', 'English, Mandarin, Malay, Tamil', 'Regional headquarters that buy for the whole of Asia Pacific.', 'SEO, AI visibility and paid social'],
+    ['MYS', 'Malaysia',       'Kuala Lumpur',  3.14,  101.69, 't', '2.5 hours ahead of India', 'Malay, English', 'Manufacturing and services buyers who research in both English and Malay.', 'SEO and Google Ads'],
+    ['IDN', 'Indonesia',      'Jakarta',      -6.20,  106.85, 'b', '1.5 hours ahead of India', 'Bahasa Indonesia, English', 'Southeast Asia\'s largest economy, where local-language B2B search is still under-served.', 'Local-language SEO and Google Ads'],
+    ['AUS', 'Australia',      'Sydney',      -33.87,  151.21, 'r', '4.5 to 5.5 hours ahead of India', 'English', 'Mature buyers who expect proof, and reward the brands that show it.', 'SEO, AI visibility and conversion'],
+    ['UK',  'United Kingdom', 'London',       51.51,   -0.13, 'l', '4.5 to 5.5 hours behind India', 'English', 'Careful buyers who compare vendors in depth before they ever book a call.', 'Content, SEO and AI visibility'],
+    ['USA', 'United States',  'New York',     40.71,  -74.00, 'r', '9.5 to 10.5 hours behind India', 'English, Spanish', 'The most competitive search market. We win on technical SEO, AI visibility and conversion.', 'SEO, Google Ads and CRO'],
+    ['CAN', 'Canada',         'Toronto',      43.65,  -79.38, 't', '9.5 to 10.5 hours behind India', 'English, French', 'Bilingual buyers and, in many B2B niches, lighter competition than the US.', 'Bilingual SEO and Google Ads'],
+    ['ZAF', 'South Africa',   'Johannesburg', -26.20,  28.05, 'r', '3.5 hours behind India', 'English and ten other official languages', 'Africa\'s most developed B2B market, still light on AI visibility work.', 'SEO and Google Ads'],
+    ['NGA', 'Nigeria',        'Lagos',         6.52,    3.38, 'l', '4.5 hours behind India', 'English', 'Fast-growing digital adoption, with few B2B brands investing in search yet.', 'SEO and content'],
+    ['KEN', 'Kenya',          'Nairobi',      -1.29,   36.82, 'r', '2.5 hours behind India', 'English, Swahili', 'East Africa\'s technology and services hub, early in search competition.', 'SEO and paid social'],
+];
+
+$FLIPS = [
+    ['Traffic that never buys', 'Broad keywords bring students, job seekers and competitors to your site. The graphs go up. Revenue does not.',
+     'Buyers who book calls', 'We target the searches and audiences that carry budget and intent, then measure success in meetings, not sessions.'],
+    ['Missing from AI shortlists', 'Buyers now ask ChatGPT and Perplexity who to hire. If the answer names three competitors, you were never in the running.',
+     'Named in the answer', 'Entity signals, structured data, third-party citations and content written the way buyers ask, so assistants recommend you.'],
+    ['Leads sales ignores', 'Form fills with no budget, no fit and no timeline. Sales stops trusting marketing, and marketing stops getting budget.',
+     'Leads sales fights over', 'Qualified at the source, graded on arrival and tracked to revenue in your CRM. Quality becomes visible, and fundable.'],
+];
+
+$ENGINES = [
     [
-        'key' => 'search', 'accent' => 'v',
-        'title' => 'Search & AI visibility',
-        'desc' => 'Rank for the searches that carry buying intent, and get named when buyers ask ChatGPT, Perplexity or Google AI for a shortlist.',
+        'key' => 'search', 'title' => 'Search & AI visibility', 'tag' => 'Be the answer',
+        'desc' => 'Technical SEO, content and entity work that earn rankings on Google and citations inside ChatGPT, Perplexity, Gemini and Google AI Overviews.',
         'links' => $hp_existing([
-            ['seo-services', 'SEO services'],
-            ['ai-seo', 'AI search optimization'],
-            ['google-ai-overviews-seo', 'Google AI Overviews SEO'],
-            ['chatgpt-seo', 'ChatGPT SEO'],
-            ['lead-generation-seo', 'Lead generation SEO'],
-            ['enterprise-seo', 'Enterprise SEO'],
+            ['seo-services', 'SEO services'], ['ai-seo', 'AI search optimization'], ['google-ai-overviews-seo', 'AI Overviews SEO'],
+            ['chatgpt-seo', 'ChatGPT SEO'], ['lead-generation-seo', 'Lead generation SEO'], ['enterprise-seo', 'Enterprise SEO'],
         ]),
-        'hub' => 'seo',
     ],
     [
-        'key' => 'demand', 'accent' => 'u',
-        'title' => 'Demand generation',
-        'desc' => 'Paid search, paid social, outbound, email and content, built around your ideal customer profile and tracked to qualified pipeline.',
+        'key' => 'demand', 'title' => 'Demand generation', 'tag' => 'Be in front of buyers',
+        'desc' => 'Paid search, paid social, outbound and email built around your ideal customer profile, with every rupee and dollar traced to qualified pipeline.',
         'links' => $hp_existing([
-            ['google-ads', 'Google Ads management'],
-            ['enterprise-ppc', 'Enterprise PPC'],
-            ['outbound-marketing', 'Outbound marketing'],
-            ['email-marketing', 'Email marketing'],
-            ['content-marketing', 'B2B content marketing'],
-            ['social-media-marketing', 'Social media marketing'],
+            ['google-ads', 'Google Ads management'], ['enterprise-ppc', 'Enterprise PPC'], ['outbound-marketing', 'Outbound marketing'],
+            ['email-marketing', 'Email marketing'], ['content-marketing', 'B2B content marketing'], ['social-media-marketing', 'Social media marketing'],
         ]),
-        'hub' => 'digital-marketing',
     ],
     [
-        'key' => 'web', 'accent' => 'mix',
-        'title' => 'Web development & CRO',
-        'desc' => 'Fast, secure, search-ready websites and landing pages engineered to turn the right visitors into sales conversations.',
+        'key' => 'web', 'title' => 'Web development & CRO', 'tag' => 'Be the obvious choice',
+        'desc' => 'Fast, secure, search-ready websites and landing pages engineered to convert a buying committee, not just a casual visitor.',
         'links' => $hp_existing([
-            ['web-design', 'Website design'],
-            ['lead-gen-web-design', 'Lead generation websites'],
-            ['custom-design-and-development', 'Custom development'],
-            ['headless-web-design', 'Headless websites'],
-            ['ecommerce-web-design', 'Ecommerce websites'],
-            ['ai-development', 'AI development & automation'],
+            ['web-design', 'Website design'], ['lead-gen-web-design', 'Lead generation websites'], ['custom-design-and-development', 'Custom development'],
+            ['headless-web-design', 'Headless websites'], ['ecommerce-web-design', 'Ecommerce websites'], ['ai-development', 'AI development & automation'],
         ]),
-        'hub' => 'web-services',
     ],
 ];
 
-/* The five-stage engine. */
-$STAGES = [
-    ['Diagnose', 'Audit your search, AI and paid presence against the competitors winning your deals, and define the ideal customer profile we will target.'],
-    ['Position', 'Sharpen the offer and messaging for each market, then build landing pages that speak to a buying committee, not a casual browser.'],
-    ['Get visible', 'Technical SEO, content and entity work that earn rankings on Google and citations inside AI answers for the questions your buyers ask.'],
-    ['Create demand', 'Paid search, paid social, outbound and email that reach decision makers who are in market now, at a cost per lead that makes sense.'],
-    ['Convert & attribute', 'Conversion optimization, CRM integration and reporting that tie every channel to qualified leads, pipeline and revenue.'],
+$MOVES = [
+    ['Decode', 'We map who actually buys, how they search and which competitors are winning your deals, in search results and in AI answers.'],
+    ['Position', 'We sharpen the offer for each market and build pages that answer a buying committee\'s objections before sales has to.'],
+    ['Surface', 'Technical SEO, content and entity work put you on page one and inside the AI shortlist for the questions that matter.'],
+    ['Ignite', 'Paid search, paid social, outbound and email reach decision makers in market now, at a cost per lead that makes sense.'],
+    ['Compound', 'Conversion work, CRM attribution and monthly reviews move budget to what produces pipeline, so results stack every quarter.'],
 ];
 
-/* Markets. Region cards plus the country list used by the hero globe. */
-$REGIONS = [
-    ['Middle East', 'UAE · Saudi Arabia · Qatar', 'High-value B2B categories where search competition is still thin. Multilingual SEO, localized landing pages and Google Ads built for GCC buyers.'],
-    ['Southeast Asia', 'Singapore · Malaysia · Indonesia', 'Regional headquarters markets with research-heavy, mobile-first buyers. English-first search with local-language reach where it pays.'],
-    ['India', 'Pan-India, HQ in Chennai', 'Our home market. Deep experience across manufacturing, SaaS, healthcare, real estate and professional services.'],
-    ['North America', 'United States · Canada', 'Mature, crowded search results. We win on technical SEO, AI visibility, sharper offers and conversion rate, not on bigger budgets alone.'],
-    ['UK & Europe', 'United Kingdom · EU', 'Compliance-aware campaigns and content for buyers who compare vendors carefully before they ever book a call.'],
-    ['Africa & Oceania', 'South Africa · Nigeria · Kenya · Australia', 'Fast-growing digital adoption in Africa with few B2B competitors investing in search yet, plus established Australian markets.'],
-];
-
-/* Hero globe markers: [label, latitude, longitude]. Decorative only; the same
-   markets are listed as text in the hero and in the regions section. */
-$GLOBE = [
-    /* Fourth value: label placement. 'l' puts it on the left, 'n' hides it
-       where neighbouring cities would overlap. */
-    ['Chennai', 13.08, 80.27, ''], ['Dubai', 25.2, 55.27, ''], ['Riyadh', 24.71, 46.68, 'l'],
-    ['Doha', 25.29, 51.53, 'n'], ['Singapore', 1.35, 103.82, ''], ['Kuala Lumpur', 3.14, 101.69, 'n'],
-    ['Jakarta', -6.2, 106.85, ''], ['Sydney', -33.87, 151.21, ''], ['London', 51.51, -0.13, ''],
-    ['New York', 40.71, -74.0, ''], ['Toronto', 43.65, -79.38, 'n'], ['San Francisco', 37.77, -122.42, ''],
-    ['Johannesburg', -26.2, 28.05, ''], ['Lagos', 6.52, 3.38, ''], ['Nairobi', -1.29, 36.82, ''],
-];
-
-$HERO_MARKETS = ['UAE', 'Saudi Arabia', 'Qatar', 'Singapore', 'Malaysia', 'Indonesia', 'India', 'Australia', 'United Kingdom', 'United States', 'Canada', 'South Africa', 'Nigeria', 'Kenya'];
-
-/* Case studies shown in the proof grid, B2B-leaning first. */
 $CASE_CARDS = array_values(array_filter([
     $hp_result('saas-ppc-demo-pipeline'),
     $hp_result('manufacturer-rfq-seo-program'),
@@ -145,7 +137,6 @@ $CASE_CARDS = array_values(array_filter([
     $hp_result('edutech-content-engine-signups'),
 ]));
 
-/* Lead form options. Values are what reaches the CRM, so keep them readable. */
 $FORM_SERVICES = ['SEO', 'AI search visibility', 'Google Ads / PPC', 'Paid social', 'Outbound & email', 'Content marketing', 'Website / landing pages', 'Full growth program'];
 $FORM_MARKETS  = ['India', 'UAE & GCC', 'Southeast Asia', 'United States', 'Canada', 'UK & Europe', 'Australia', 'Africa', 'Global'];
 $FORM_SIZE     = ['1 to 10 people', '11 to 50 people', '51 to 200 people', '201 to 1,000 people', '1,000+ people'];
@@ -175,7 +166,7 @@ $FAQS = [
      'No. After an initial ninety day window, which is the minimum honest time to judge a search program, we work month to month. You keep ownership of every account, asset and piece of content.'],
 ];
 
-$cta_label = 'Get my B2B growth plan';
+$cta_label = 'Start my growth plan';
 ?>
 
 <?php /* ================================================================ HERO */ ?>
@@ -184,93 +175,76 @@ $cta_label = 'Get my B2B growth plan';
     <div class="hp3-bg" aria-hidden="true">
       <span class="hp3-orb hp3-orb--v"></span>
       <span class="hp3-orb hp3-orb--u"></span>
-      <span class="hp3-grid"></span>
     </div>
-    <canvas class="hp3-globe" id="hp3-globe" aria-hidden="true"
-            data-markers="<?= e(json_encode($GLOBE, JSON_UNESCAPED_UNICODE)) ?>"></canvas>
+    <div class="hp3-gl" id="hp3-gl" aria-hidden="true" data-src="/assets/js/hero3d.min.js?v=<?= @filemtime(BASE_PATH . '/assets/js/hero3d.min.js') ?: 1 ?>"></div>
 
     <div class="hp3-scenes">
-      <?php /* Scene 1: positioning. The H1 paints immediately: it is the LCP
-               element, so it is never hidden waiting for JavaScript. */ ?>
+      <?php /* Scene 1. The H1 paints immediately: it is the LCP element. */ ?>
       <div class="hp3-scene hp3-scene--1 is-active" data-scene="0">
         <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> B2B digital marketing &amp; web development</p>
+          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Chennai built. Globally deployed.</p>
           <h1 class="hp3-h1" id="hp-h1"><span class="hp3-h1-k">B2B digital marketing agency</span> Get found. Get chosen. Get <span class="hp3-grad">pipeline</span>.</h1>
           <p class="hp3-lead">VTurnU makes B2B companies visible on Google and inside AI answers, then turns that attention into <strong>qualified enquiries your sales team wants</strong>. For growing firms in India, the UAE, Singapore, the US, Canada and beyond.</p>
           <div class="hp3-actions">
             <a class="hp3-btn hp3-btn--primary" href="#start"><?= e($cta_label) ?> <span aria-hidden="true">&rarr;</span></a>
             <?php if (isset($PAGES['case-studies'])): ?>
-            <a class="hp3-btn hp3-btn--ghost" href="/case-studies/">See client results</a>
+            <a class="hp3-btn hp3-btn--ghost" href="/case-studies/">See the results</a>
             <?php endif; ?>
           </div>
           <ul class="hp3-ticks">
-            <li>Senior strategists, never handed to juniors</li>
-            <li>Reported on pipeline, not rankings</li>
+            <li>Senior strategists on every account</li>
+            <li>Reported in pipeline, not rankings</li>
             <li>Reply within 24 hours</li>
           </ul>
         </div>
+        <img class="hp3-mark" src="/assets/img/vturnu-icon-mark.svg" alt="" width="420" height="420" aria-hidden="true">
       </div>
 
-      <?php /* Scene 2: how B2B buying works now, with the 3D journey cards. */ ?>
+      <?php /* Scene 2. The 3D funnel; the stages below are anchored to it. */ ?>
       <div class="hp3-scene hp3-scene--2" data-scene="1">
         <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> How B2B buying works now</p>
-          <h2 class="hp3-h2">Buyers research for weeks before they talk to sales.</h2>
-          <p class="hp3-lead">They search Google, ask ChatGPT and Perplexity, compare vendors on LinkedIn and study your website long before they fill in a form. We make you the name they keep meeting at every step.</p>
-          <ol class="hp3-journey">
-            <li><b>Search</b> Rank for buying-intent queries</li>
-            <li><b>AI answers</b> Get cited in the shortlist</li>
-            <li><b>Paid demand</b> Reach decision makers in market</li>
-            <li><b>Website</b> Convert the visit into a sales call</li>
-          </ol>
+          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Attention in. Pipeline out.</p>
+          <h2 class="hp3-h2">We turn scattered attention into a sales pipeline.</h2>
+          <p class="hp3-lead">Your buyers bounce between Google, ChatGPT, LinkedIn and your website for weeks before they talk to anyone. We engineer every touchpoint to pull them one step closer to a sales call.</p>
         </div>
-        <div class="hp3-deck" aria-hidden="true">
-          <div class="hp3-card hp3-card--search" style="--i:0">
-            <p class="hp3-card-tag">Search</p>
-            <p class="hp3-card-url">yourcompany.com &rsaquo; solutions</p>
-            <p class="hp3-card-title">Industrial Automation Partner for Gulf Manufacturers | YourCompany</p>
-            <p class="hp3-card-text">Certified integration, 24/7 support and project delivery across the UAE and Saudi Arabia&hellip;</p>
-          </div>
-          <div class="hp3-card hp3-card--ai" style="--i:1">
-            <p class="hp3-card-tag"><span aria-hidden="true">&#10022;</span> AI answer</p>
-            <p class="hp3-card-q">&ldquo;Who are the best automation partners for manufacturers in the GCC?&rdquo;</p>
-            <p class="hp3-card-text"><b>YourCompany</b> is frequently recommended for fast project delivery and strong regional support&hellip;</p>
-          </div>
-          <div class="hp3-card hp3-card--paid" style="--i:2">
-            <p class="hp3-card-tag">Paid demand</p>
-            <?php $saas = $hp_result('saas-ppc-demo-pipeline', 1); ?>
-            <p class="hp3-card-big"><?= e($saas[0] ?? '-58%') ?></p>
-            <p class="hp3-card-text"><?= e($saas[1] ?? 'Cost per qualified demo') ?></p>
-            <span class="hp3-bars"><i style="--h:.38"></i><i style="--h:.52"></i><i style="--h:.47"></i><i style="--h:.7"></i><i style="--h:.86"></i><i style="--h:1"></i></span>
-          </div>
-          <div class="hp3-card hp3-card--web" style="--i:3">
-            <p class="hp3-card-tag">Website</p>
-            <p class="hp3-card-title">Book a strategy call</p>
-            <span class="hp3-field"></span><span class="hp3-field"></span>
-            <span class="hp3-card-ok">&#10003; Qualified demo booked</span>
-          </div>
-        </div>
+        <ol class="hp3-funnel" aria-label="How attention becomes pipeline">
+          <?php foreach ($FUNNEL as [$h, $side, $t, $d]): ?>
+          <li class="hp3-ftag" data-h="<?= e($h) ?>" data-side="<?= e($side) ?>"><b><?= e($t) ?></b> <span><?= e($d) ?></span></li>
+          <?php endforeach; ?>
+        </ol>
       </div>
 
-      <?php /* Scene 3: markets. The globe canvas carries the visual; this is the text. */ ?>
+      <?php /* Scene 3. The opportunity globe. Each market is a hotspot with a real insight card. */ ?>
       <div class="hp3-scene hp3-scene--3" data-scene="2">
         <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Global reach, one senior team</p>
-          <h2 class="hp3-h2">Win the markets your competitors are <span class="hp3-grad">ignoring</span>.</h2>
-          <p class="hp3-lead">Across the Gulf, Southeast Asia and Africa, many B2B categories still have weak search competition and almost no AI visibility work. That is a window. We help you take it first, while running the same proven playbook in the US, Canada, the UK and Australia.</p>
-          <ul class="hp3-chips" aria-label="Markets we serve">
-            <?php foreach ($HERO_MARKETS as $m): ?>
-            <li><?= e($m) ?></li>
-            <?php endforeach; ?>
-          </ul>
+          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Opportunity map</p>
+          <h2 class="hp3-h2">Your next big client is not in your city.</h2>
+          <p class="hp3-lead">Across the Gulf, Southeast Asia and Africa, many B2B categories still have thin search results and almost no AI visibility work. <span class="hp3-hint-gl">Select a market on the globe, or drag to spin it.</span></p>
         </div>
+        <ul class="hp3-mkts" aria-label="Markets we grow B2B companies in">
+          <?php foreach ($MARKETS as [$code, $country, $city, $lat, $lon, $side, $tz, $langs, $opening, $start]): ?>
+          <li class="hp3-mkt hp3-mkt--<?= e($side) ?>" data-lat="<?= e((string) $lat) ?>" data-lon="<?= e((string) $lon) ?>">
+            <button type="button" class="hp3-mpin" aria-label="<?= e($country) ?>: show market insight"><i aria-hidden="true"></i><span><?= e($code) ?></span></button>
+            <div class="hp3-mcard">
+              <p class="hp3-mcard-h"><b><?= e($country) ?></b> <span><?= e($city) ?></span></p>
+              <p class="hp3-mcard-o"><?= e($opening) ?></p>
+              <dl>
+                <div><dt>Where we start</dt><dd><?= e($start) ?></dd></div>
+                <div><dt>Search languages</dt><dd><?= e($langs) ?></dd></div>
+                <div><dt>Working hours</dt><dd><?= e($tz) ?></dd></div>
+              </dl>
+            </div>
+          </li>
+          <?php endforeach; ?>
+        </ul>
+        <div class="hp3-mpanel" aria-live="polite"></div>
       </div>
 
-      <?php /* Scene 4: proof and the ask. */ ?>
+      <?php /* Scene 4. The portal ring, proof and the ask. */ ?>
       <div class="hp3-scene hp3-scene--4" data-scene="3">
         <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Proof, not promises</p>
-          <h2 class="hp3-h2">What the work produced for B2B clients.</h2>
+          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> The turn, in numbers</p>
+          <h2 class="hp3-h2">Results our clients took to the board.</h2>
           <div class="hp3-proof">
             <?php foreach ($HERO_PROOF as [$metric, $label, $client, $industry, $cslug]): ?>
             <a class="hp3-proof-i" href="<?= e(page_url('case-studies/' . $cslug)) ?>">
@@ -282,20 +256,19 @@ $cta_label = 'Get my B2B growth plan';
           </div>
           <div class="hp3-actions">
             <a class="hp3-btn hp3-btn--primary" href="#start"><?= e($cta_label) ?> <span aria-hidden="true">&rarr;</span></a>
-            <a class="hp3-btn hp3-btn--ghost" href="#services">Explore services</a>
+            <a class="hp3-btn hp3-btn--ghost" href="#stack">Explore the stack</a>
           </div>
         </div>
       </div>
     </div>
 
-    <?php /* Scene navigation: only shown while the hero is pinned. */ ?>
-    <nav class="hp3-rail" aria-label="Hero sections" hidden>
-      <button type="button" class="hp3-rail-dot" data-go="0" aria-label="Get found, get chosen"></button>
-      <button type="button" class="hp3-rail-dot" data-go="1" aria-label="How B2B buying works"></button>
-      <button type="button" class="hp3-rail-dot" data-go="2" aria-label="Markets we serve"></button>
-      <button type="button" class="hp3-rail-dot" data-go="3" aria-label="Client results"></button>
+    <nav class="hp3-rail" aria-label="Hero chapters" hidden>
+      <button type="button" class="hp3-rail-dot" data-go="0"><span>Get found</span></button>
+      <button type="button" class="hp3-rail-dot" data-go="1"><span>The funnel</span></button>
+      <button type="button" class="hp3-rail-dot" data-go="2"><span>Opportunity map</span></button>
+      <button type="button" class="hp3-rail-dot" data-go="3"><span>Results</span></button>
     </nav>
-    <p class="hp3-cue" aria-hidden="true" hidden><span></span> Scroll to explore</p>
+    <p class="hp3-cue" aria-hidden="true" hidden><span></span> Scroll to turn</p>
     <span class="hp3-progress" aria-hidden="true" hidden><i></i></span>
   </div>
 </section>
@@ -303,9 +276,8 @@ $cta_label = 'Get my B2B growth plan';
 <?php /* ============================================================ LOGOS */ ?>
 <?php if ($LOGOS): ?>
 <section class="hp3-logos" aria-label="Clients we work with">
-  <p class="hp3-logos-h">Trusted by growing brands</p>
+  <p class="hp3-logos-h">Growing brands that turned with us</p>
   <div class="hp3-marquee">
-    <?php /* Printed twice so the loop meets itself; the copy is hidden from assistive tech. */ ?>
     <div class="hp3-marquee-track">
       <?php for ($pass = 0; $pass < 2; $pass++): ?>
         <?php foreach ($LOGOS as [$file, $name]): ?>
@@ -319,87 +291,87 @@ $cta_label = 'Get my B2B growth plan';
 </section>
 <?php endif; ?>
 
-<?php /* ========================================================== PROBLEM */ ?>
-<section class="hp3-sec" aria-labelledby="hp3-why-h">
+<?php /* ================================================== SIGNAL OVER NOISE */ ?>
+<section class="hp3-sec hp3-signal" aria-labelledby="hp3-sig-h">
   <div class="hp3-wrap">
     <div class="hp3-head" data-rise>
-      <p class="hp3-kicker">Why B2B marketing stalls</p>
-      <h2 class="hp3-title" id="hp3-why-h">More traffic is not the problem. <span class="hp3-grad">The wrong traffic is.</span></h2>
-      <p class="hp3-sub">Most B2B companies we audit are not short of activity. They are short of a system that connects what marketing does to the conversations sales needs.</p>
+      <p class="hp3-kicker">Signal over noise</p>
+      <h2 class="hp3-title" id="hp3-sig-h">Most B2B brands are loud in <span class="hp3-grad">the wrong rooms.</span></h2>
+      <p class="hp3-sub">Three habits quietly drain B2B budgets. Flip each card to see the turn we make.</p>
     </div>
-    <div class="hp3-pains" data-rise>
-      <article class="hp3-pain" data-tilt>
-        <span class="hp3-pain-n" aria-hidden="true">01</span>
-        <h3>Visible to the wrong people</h3>
-        <p>Rankings for broad keywords that bring students, job seekers and competitors. We target the searches and audiences that carry buying intent.</p>
-      </article>
-      <article class="hp3-pain" data-tilt>
-        <span class="hp3-pain-n" aria-hidden="true">02</span>
-        <h3>Invisible inside AI answers</h3>
-        <p>Buyers ask AI assistants for shortlists now. If ChatGPT, Perplexity and Google AI do not mention you, you are not on the list being compared.</p>
-      </article>
-      <article class="hp3-pain" data-tilt>
-        <span class="hp3-pain-n" aria-hidden="true">03</span>
-        <h3>Leads sales will not touch</h3>
-        <p>Form fills with no budget, no fit and no timeline. We qualify at the source and connect every enquiry to your CRM, so quality is visible.</p>
-      </article>
+    <div class="hp3-flips" data-rise>
+      <?php foreach ($FLIPS as $i => [$ft, $fd, $bt, $bd]): ?>
+      <div class="hp3-flip" style="--i:<?= $i ?>">
+        <button type="button" class="hp3-flip-in" aria-pressed="false">
+          <span class="hp3-face hp3-face--front">
+            <span class="hp3-face-n" aria-hidden="true">0<?= $i + 1 ?></span>
+            <span class="hp3-face-k">The leak</span>
+            <span class="hp3-face-t"><?= e($ft) ?></span>
+            <span class="hp3-face-d"><?= e($fd) ?></span>
+            <span class="hp3-face-go" aria-hidden="true">Flip &#8635;</span>
+          </span>
+          <span class="hp3-face hp3-face--back">
+            <span class="hp3-face-k">The turn</span>
+            <span class="hp3-face-t"><?= e($bt) ?></span>
+            <span class="hp3-face-d"><?= e($bd) ?></span>
+          </span>
+        </button>
+      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
 
-<?php /* ========================================================= SERVICES */ ?>
-<section class="hp3-sec hp3-sec--tint" id="services" aria-labelledby="hp3-svc-h">
+<?php /* ===================================================== GROWTH STACK */ ?>
+<section class="hp3-sec hp3-sec--ink hp3-stack-sec" id="stack" aria-labelledby="hp3-stack-h">
   <div class="hp3-wrap">
     <div class="hp3-head" data-rise>
-      <p class="hp3-kicker">What we do</p>
-      <h2 class="hp3-title" id="hp3-svc-h">One team for the whole B2B growth engine</h2>
-      <p class="hp3-sub">Digital marketing services and web development planned as one strategy, so every channel feeds the next instead of competing for budget.</p>
+      <p class="hp3-kicker">The growth stack</p>
+      <h2 class="hp3-title" id="hp3-stack-h">Three engines. One pipeline.</h2>
+      <p class="hp3-sub">Search, demand and the website, run by one team on one plan, so every layer feeds the next instead of fighting for budget.</p>
     </div>
-    <div class="hp3-pillars" data-rise>
-      <?php foreach ($PILLARS as $p): ?>
-      <article class="hp3-pillar hp3-pillar--<?= e($p['accent']) ?>" data-tilt>
-        <div class="hp3-pillar-in">
-          <span class="hp3-pillar-ico hp3-ico--<?= e($p['key']) ?>" aria-hidden="true"></span>
-          <h3 class="hp3-pillar-t">
-            <?php if (isset($PAGES[$p['hub']])): ?>
-            <a href="<?= e(page_url($p['hub'])) ?>"><?= e($p['title']) ?></a>
-            <?php else: ?>
-            <?= e($p['title']) ?>
-            <?php endif; ?>
-          </h3>
-          <p class="hp3-pillar-d"><?= e($p['desc']) ?></p>
-          <?php if ($p['links']): ?>
-          <ul class="hp3-pillar-l">
-            <?php foreach ($p['links'] as [$lslug, $label]): ?>
+    <div class="hp3-stack">
+      <div class="hp3-iso" aria-hidden="true">
+        <div class="hp3-iso-in">
+          <?php foreach (array_reverse($ENGINES, true) as $i => $en): ?>
+          <div class="hp3-slab hp3-slab--<?= e($en['key']) ?>" data-slab="<?= e($en['key']) ?>" style="--k:<?= $i ?>">
+            <span><?= e($en['tag']) ?></span>
+          </div>
+          <?php endforeach; ?>
+          <div class="hp3-slab-core"></div>
+        </div>
+      </div>
+      <div class="hp3-engines">
+        <?php foreach ($ENGINES as $i => $en): ?>
+        <article class="hp3-engine" data-engine="<?= e($en['key']) ?>" data-rise>
+          <p class="hp3-engine-k">Layer 0<?= $i + 1 ?> &middot; <?= e($en['tag']) ?></p>
+          <h3><?= e($en['title']) ?></h3>
+          <p><?= e($en['desc']) ?></p>
+          <?php if ($en['links']): ?>
+          <ul>
+            <?php foreach ($en['links'] as [$lslug, $label]): ?>
             <li><a href="<?= e(page_url($lslug)) ?>"><?= e($label) ?></a></li>
             <?php endforeach; ?>
           </ul>
           <?php endif; ?>
-        </div>
-      </article>
-      <?php endforeach; ?>
+        </article>
+        <?php endforeach; ?>
+      </div>
     </div>
-    <?php if (isset($PAGES['ai-visibility-tool'])): ?>
-    <div class="hp3-band" data-rise>
-      <p><b>Does ChatGPT recommend you, or your competitor?</b> Run the free AI visibility check and see which answer engines name your brand today.</p>
-      <a class="hp3-btn hp3-btn--dark" href="/ai-visibility-tool/">Check my AI visibility</a>
-    </div>
-    <?php endif; ?>
   </div>
 </section>
 
-<?php /* ========================================================== PROCESS */ ?>
-<section class="hp3-sec hp3-sec--ink" aria-labelledby="hp3-eng-h">
+<?php /* ===================================================== TURN METHOD */ ?>
+<section class="hp3-sec hp3-method" aria-labelledby="hp3-method-h">
   <div class="hp3-wrap">
     <div class="hp3-head" data-rise>
-      <p class="hp3-kicker">How we work</p>
-      <h2 class="hp3-title" id="hp3-eng-h">The pipeline engine: five stages, one accountable team</h2>
-      <p class="hp3-sub">A repeatable system for B2B growth. You always know what is being done, why, and what it is worth.</p>
+      <p class="hp3-kicker">The Turn Method</p>
+      <h2 class="hp3-title" id="hp3-method-h">Five moves from invisible to <span class="hp3-grad">inevitable.</span></h2>
     </div>
-    <ol class="hp3-stages">
-      <?php foreach ($STAGES as $i => [$t, $d]): ?>
-      <li class="hp3-stage-i" data-depth style="--k:<?= $i ?>">
-        <span class="hp3-stage-n" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span>
+    <ol class="hp3-moves">
+      <?php foreach ($MOVES as $i => [$t, $d]): ?>
+      <li class="hp3-move" style="--k:<?= $i ?>">
+        <span class="hp3-move-n" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span>
         <h3><?= e($t) ?></h3>
         <p><?= e($d) ?></p>
       </li>
@@ -408,34 +380,14 @@ $cta_label = 'Get my B2B growth plan';
   </div>
 </section>
 
-<?php /* ========================================================== MARKETS */ ?>
-<section class="hp3-sec" id="markets" aria-labelledby="hp3-mkt-h">
-  <div class="hp3-wrap">
-    <div class="hp3-head" data-rise>
-      <p class="hp3-kicker">Where we grow B2B companies</p>
-      <h2 class="hp3-title" id="hp3-mkt-h">Local strategy for every market, <span class="hp3-grad">one senior team</span></h2>
-      <p class="hp3-sub">Search behaviour, competition and buying committees differ by country. Each program is planned for the market it has to win.</p>
-    </div>
-    <div class="hp3-regions" data-rise>
-      <?php foreach ($REGIONS as [$name, $countries, $desc]): ?>
-      <article class="hp3-region" data-tilt>
-        <h3><?= e($name) ?></h3>
-        <p class="hp3-region-c"><?= e($countries) ?></p>
-        <p><?= e($desc) ?></p>
-      </article>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-
-<?php /* ============================================================ PROOF */ ?>
+<?php /* ========================================================= RECEIPTS */ ?>
 <?php if ($CASE_CARDS): ?>
 <section class="hp3-sec hp3-sec--tint" aria-labelledby="hp3-res-h">
   <div class="hp3-wrap">
     <div class="hp3-head" data-rise>
-      <p class="hp3-kicker">Results</p>
-      <h2 class="hp3-title" id="hp3-res-h">Outcomes our clients can take to the board</h2>
-      <p class="hp3-sub">Different industries, different channels, the same discipline: measure what reaches the pipeline. Full write-ups, including what did not work, are on each case study.</p>
+      <p class="hp3-kicker">Receipts</p>
+      <h2 class="hp3-title" id="hp3-res-h">Numbers we would happily show your CFO.</h2>
+      <p class="hp3-sub">Six programs, six industries, one discipline: measure what reaches the pipeline. Every case study includes what did not work.</p>
     </div>
     <div class="hp3-cases" data-rise>
       <?php foreach ($CASE_CARDS as [$metric, $label, $client, $industry, $cslug]): ?>
@@ -452,18 +404,18 @@ $cta_label = 'Get my B2B growth plan';
 </section>
 <?php endif; ?>
 
-<?php /* ======================================================= WHY + FACTS */ ?>
+<?php /* ===================================================== SHORT VERSION */ ?>
 <section class="hp3-sec" aria-labelledby="hp3-fit-h">
   <div class="hp3-wrap hp3-fit">
     <div data-rise>
-      <p class="hp3-kicker">Why VTurnU</p>
-      <h2 class="hp3-title" id="hp3-fit-h">Built for B2B teams that are measured on revenue</h2>
+      <p class="hp3-kicker">The short version</p>
+      <h2 class="hp3-title" id="hp3-fit-h">Senior people. Real pipeline. No lock-in.</h2>
       <ul class="hp3-why">
-        <li><b>Senior people on your account.</b> The strategists who pitch are the ones who do the work.</li>
-        <li><b>AI search, native.</b> We optimize for ChatGPT, Perplexity, Gemini and Google AI Overviews alongside classic SEO.</li>
-        <li><b>Pipeline reporting.</b> Live dashboards and monthly reviews tied to qualified leads and revenue.</li>
-        <li><b>Marketing and web in one team.</b> No hand-offs between an agency and a separate developer.</li>
-        <li><b>No lock-in.</b> Month to month after ninety days, and you own every account and asset.</li>
+        <li><b>The people who pitch do the work.</b> No hand-off to a junior team after the contract is signed.</li>
+        <li><b>AI search is native, not an add-on.</b> ChatGPT, Perplexity, Gemini and AI Overviews are planned alongside classic SEO.</li>
+        <li><b>Marketing and web, one team.</b> No finger-pointing between an agency and a separate developer.</li>
+        <li><b>Live dashboards, monthly reviews.</b> Reported in qualified leads and revenue, not vanity metrics.</li>
+        <li><b>Month to month after ninety days.</b> You own every account, asset and piece of content.</li>
       </ul>
     </div>
     <aside class="hp3-facts" data-rise data-tilt aria-labelledby="hp3-facts-h">
@@ -486,9 +438,9 @@ $cta_label = 'Get my B2B growth plan';
 <section class="hp3-sec hp3-sec--ink hp3-lead-sec" id="start" aria-labelledby="hp-form-h">
   <div class="hp3-wrap hp3-formwrap">
     <div class="hp3-form-intro" data-rise>
-      <p class="hp3-kicker">Free B2B growth plan</p>
-      <h2 class="hp3-title" id="hp-form-h">Tell us where you want to grow. We will show you how.</h2>
-      <p class="hp3-sub">Answer a few questions, about two minutes. Within one working day a senior strategist sends you a specific read on your visibility, your competitors and the fastest route to qualified pipeline.</p>
+      <p class="hp3-kicker">Start the turn</p>
+      <h2 class="hp3-title" id="hp-form-h">Get a growth plan built for your market.</h2>
+      <p class="hp3-sub">Two minutes, three steps. Within one working day a senior strategist sends a specific read on your visibility, your competitors and the fastest route to qualified pipeline.</p>
     </div>
     <div class="hp3-form-aside" data-rise>
       <ul class="hp3-get">
@@ -506,10 +458,10 @@ $cta_label = 'Get my B2B growth plan';
       </div>
       <?php else: ?>
       <form class="hp3-form" id="hp-form" method="post" action="/#start" novalidate
-            data-recaptcha="<?= e(RECAPTCHA_SITE_KEY) ?>">
+            data-recaptcha="<?= e(RECAPTCHA_SITE_KEY) ?>" data-inbox="<?= e(ENQUIRY_TO) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="recaptcha_token" class="js-recaptcha-token">
-        <input type="hidden" name="form_variant" value="b2b-qualifier-v1">
+        <input type="hidden" name="form_variant" value="b2b-qualifier-v2">
         <div class="hp3-hp" aria-hidden="true">
           <label for="f-website">Website</label>
           <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
@@ -521,13 +473,13 @@ $cta_label = 'Get my B2B growth plan';
         </div>
 
         <?php if ($form_status === 'error'): ?>
-        <p class="hp3-form-bad" role="alert">Something did not go through. Check your name and work email, then send it again, or email <?= e(CONTACT_EMAIL) ?>.</p>
+        <p class="hp3-form-bad" role="alert">Something did not go through. Check your name and work email, then send it again, or email <?= e(ENQUIRY_TO) ?>.</p>
         <?php endif; ?>
 
         <fieldset class="hp3-step" data-step="1">
           <legend>What do you need?</legend>
           <div class="hp3-chipset" role="group" aria-label="Services you are interested in">
-            <?php foreach ($FORM_SERVICES as $i => $s): ?>
+            <?php foreach ($FORM_SERVICES as $s): ?>
             <label class="hp3-chip"><input type="checkbox" name="services[]" value="<?= e($s) ?>"><span><?= e($s) ?></span></label>
             <?php endforeach; ?>
           </div>
@@ -635,12 +587,12 @@ $cta_label = 'Get my B2B growth plan';
   </div>
 </section>
 
-<?php /* ============================================================== FAQ */ ?>
+<?php /* ================================================= STRAIGHT ANSWERS */ ?>
 <section class="hp3-sec" aria-labelledby="hp3-faq-h">
   <div class="hp3-wrap hp3-faqwrap">
     <div class="hp3-head" data-rise>
-      <p class="hp3-kicker">Questions</p>
-      <h2 class="hp3-title" id="hp3-faq-h">What B2B teams ask before they start</h2>
+      <p class="hp3-kicker">Straight answers</p>
+      <h2 class="hp3-title" id="hp3-faq-h">What founders and CMOs ask us first</h2>
     </div>
     <div class="hp3-faq" data-rise>
       <?php foreach ($FAQS as $k => [$q, $a]): ?>
@@ -669,11 +621,11 @@ $cta_label = 'Get my B2B growth plan';
    slug is empty, so Organization is defined exactly once, here. */
 $org_id = abs_url('/') . '#organization';
 $service_offers = [];
-foreach ($PILLARS as $p) {
-    foreach ($p['links'] as [$lslug, $label]) {
+foreach ($ENGINES as $en) {
+    foreach ($en['links'] as [$lslug, $label]) {
         $service_offers[] = [
             '@type' => 'Offer',
-            'itemOffered' => ['@type' => 'Service', 'name' => $label, 'url' => abs_url(page_url($lslug)), 'category' => $p['title']],
+            'itemOffered' => ['@type' => 'Service', 'name' => $label, 'url' => abs_url(page_url($lslug)), 'category' => $en['title']],
         ];
     }
 }
@@ -692,9 +644,9 @@ echo jsonld_script([
             'email' => CONTACT_EMAIL,
             'telephone' => CONTACT_PHONE,
             'priceRange' => '₹35,000+ per month',
-            'areaServed' => array_map(static function (string $c): array {
-                return ['@type' => 'Country', 'name' => $c];
-            }, ['India', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Singapore', 'Malaysia', 'Indonesia', 'Australia', 'United Kingdom', 'United States', 'Canada', 'South Africa', 'Nigeria', 'Kenya']),
+            'areaServed' => array_map(static function (array $m): array {
+                return ['@type' => 'Country', 'name' => $m[1]];
+            }, $MARKETS),
             'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Chennai', 'addressRegion' => 'Tamil Nadu', 'addressCountry' => 'IN'],
             'contactPoint' => [[
                 '@type' => 'ContactPoint',

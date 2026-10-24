@@ -55,7 +55,7 @@ define('CONTACT_EMAIL', 'sales@vturnu.com');
 // Single source of truth: everything that shows a number uses CONTACT_PHONE.
 define('FORM_PHONE', CONTACT_PHONE);
 // Where every form submission is delivered.
-define('ENQUIRY_TO', 'sales@vturnu.com');
+define('ENQUIRY_TO', 'connect@vturnu.com');
 define('COPYRIGHT', 'Copyright © 2025 VTurnU. All rights reserved.');
 
 /* VTurnAI: our own SaaS product, sold from this site but hosted on its own
