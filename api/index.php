@@ -216,7 +216,9 @@ $form_status = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''], true)) {
     $check = security_check_submission($_POST);
     $source = $slug === '' ? 'home-quote' : 'contact-page';
-    if ($check['ok'] && save_enquiry($_POST, $source)) {
+    // The homepage form is the B2B qualifier: fold its extra answers and grade into the lead.
+    $lead = $slug === '' ? enquiry_qualify($_POST) : $_POST;
+    if ($check['ok'] && save_enquiry($lead, $source)) {
         header('Location: /thank-you/?s=' . rawurlencode($source), true, 303);
         exit;
     }

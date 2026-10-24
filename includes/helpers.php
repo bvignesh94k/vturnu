@@ -391,6 +391,69 @@ function service_faqs(array $page): array
  * no longer silent: it goes to error_log(), visible in Vercel's function logs,
  * so a real outage is not indistinguishable from a page that just worked.
  */
+/** Free webmail domains. A B2B enquiry from one of these is flagged, not refused. */
+const FREE_EMAIL_DOMAINS = [
+    'gmail.com', 'googlemail.com', 'yahoo.com', 'yahoo.co.in', 'yahoo.co.uk', 'ymail.com',
+    'hotmail.com', 'outlook.com', 'live.com', 'msn.com', 'icloud.com', 'me.com', 'mac.com',
+    'aol.com', 'proton.me', 'protonmail.com', 'zoho.com', 'zohomail.in', 'gmx.com', 'mail.com',
+    'yandex.com', 'rediffmail.com', 'qq.com', '163.com',
+];
+
+/**
+ * Fold the homepage B2B qualifier into the fields the enquiries table already
+ * has, and grade the lead so sales can see at a glance who to call first.
+ *
+ * The table has no columns for markets, size, timeline or website, and a
+ * schema change is not worth it for a summary a person reads, so those go to
+ * the top of the message. The grade weighs budget, company size, timeline,
+ * a company website and a business (non-webmail) email.
+ */
+function enquiry_qualify(array $post): array
+{
+    $list = static function ($v): string {
+        $items = array_filter(array_map('trim', is_array($v) ? $v : [(string) $v]), 'strlen');
+        return implode(', ', array_slice($items, 0, 12));
+    };
+    $services = $list($post['services'] ?? '');
+    $markets  = $list($post['markets'] ?? '');
+    $site     = trim((string) ($post['company_website'] ?? ''));
+    $hq       = trim((string) ($post['hq_country'] ?? ''));
+    $size     = trim((string) ($post['company_size'] ?? ''));
+    $budget   = trim((string) ($post['budget'] ?? ''));
+    $timeline = trim((string) ($post['timeline'] ?? ''));
+    $email    = strtolower(trim((string) ($post['email'] ?? '')));
+    $domain   = substr((string) strrchr($email, '@'), 1);
+    $business = $domain !== '' && !in_array($domain, FREE_EMAIL_DOMAINS, true);
+
+    $points = 0;
+    $points += ['Under USD 1,000 / month' => 0, 'USD 1,000 to 3,000 / month' => 2, 'USD 3,000 to 10,000 / month' => 3,
+                'USD 10,000 to 25,000 / month' => 4, 'USD 25,000+ / month' => 4, 'Not decided yet' => 1][$budget] ?? 0;
+    $points += ['1 to 10 people' => 0, '11 to 50 people' => 1, '51 to 200 people' => 2,
+                '201 to 1,000 people' => 2, '1,000+ people' => 2][$size] ?? 0;
+    $points += ['As soon as possible' => 2, 'Within 1 to 3 months' => 2, 'In 3 to 6 months' => 1, 'Just researching' => 0][$timeline] ?? 0;
+    $points += $business ? 1 : 0;
+    $points += preg_match('/^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)+/i', $site) ? 1 : 0;
+    $grade = $points >= 7 ? 'A' : ($points >= 4 ? 'B' : 'C');
+
+    $summary = [
+        'Lead grade: ' . $grade . ' (' . $points . '/10)',
+        'Services: ' . ($services !== '' ? $services : 'Not specified'),
+        'Target markets: ' . ($markets !== '' ? $markets : 'Not specified'),
+        'Website: ' . ($site !== '' ? $site : 'Not given'),
+        'Headquarters: ' . ($hq !== '' ? $hq : 'Not given'),
+        'Company size: ' . ($size !== '' ? $size : 'Not given'),
+        'Budget: ' . ($budget !== '' ? $budget : 'Not given'),
+        'Timeline: ' . ($timeline !== '' ? $timeline : 'Not given'),
+        'Email: ' . ($business ? 'Business domain' : 'Free webmail, verify fit'),
+    ];
+    $note = trim((string) ($post['message'] ?? ''));
+
+    $post['service'] = $services !== '' ? $services : trim((string) ($post['service'] ?? ''));
+    $post['company'] = trim((string) ($post['company'] ?? '')) . ($site !== '' ? ' (' . $site . ')' : '');
+    $post['message'] = implode("\n", $summary) . ($note !== '' ? "\n\n" . $note : '');
+    return $post;
+}
+
 function save_enquiry(array $post, string $source): bool
 {
     $honeypot = trim($post['website'] ?? '');

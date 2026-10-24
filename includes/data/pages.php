@@ -15,14 +15,14 @@ $PAGES = [
 
     '' => [
         'template' => 'home',
-        'title'    => 'Digital Marketing Agency in Chennai for Search & AI | VTurnU',
-        'meta'     => 'Chennai digital growth company for B2B firms and SMEs. We make you visible in Google and in AI answers, then turn that into qualified enquiries.',
-        /* Social cards get their own pair: the title tag carries the local
-           commercial intent, while a shared link should lead with the idea. */
-        'og_title' => 'Turn visibility into qualified demand | VTurnU',
-        'og_meta'  => 'Your buyers search Google, ask ChatGPT and read AI summaries before they ever reach your site. VTurnU makes growing businesses discoverable across all of it.',
-        'h1'       => 'Turn visibility into qualified demand.',
-        'lede'     => 'VTurnU makes growing businesses discoverable across search engines and AI answer engines, then turns that attention into enquiries your sales team can close.',
+        /* Global B2B intent leads the title; Chennai stays in the description,
+           the on-page facts and the Organization address. */
+        'title'    => 'B2B Digital Marketing Agency: SEO, AI Search & Web | VTurnU',
+        'meta'     => 'Chennai-based B2B digital marketing agency for India, the UAE, Singapore, the US and Canada. SEO, AI search, paid media and websites that win qualified leads.',
+        'og_title' => 'Get found. Get chosen. Get pipeline. | VTurnU',
+        'og_meta'  => 'Your buyers search Google, ask ChatGPT and compare vendors before they ever talk to sales. VTurnU makes B2B companies the name they keep meeting, and turns it into qualified pipeline.',
+        'h1'       => 'B2B digital marketing agency: get found, get chosen, get pipeline.',
+        'lede'     => 'VTurnU is a B2B digital marketing and web development agency headquartered in Chennai, India, helping companies in India, the Middle East, Southeast Asia, North America, Europe, Africa and Australia win qualified leads through SEO, AI search optimization, paid media and conversion-focused websites.',
     ],
 
     'about-us' => [
