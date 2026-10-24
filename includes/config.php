@@ -94,9 +94,14 @@ define('SOCIAL_LINKS', [
 define('ENTITY_PROFILES', [
     'https://www.crunchbase.com/organization/vturnu',
     'https://clutch.co/profile/vturnu-digital-solutions',
+    'https://themanifest.com/company/vturnu-digital-solutions',
     'https://www.goodfirms.co/company/vturnu',
     'https://selectedfirms.co/agency/vturnu',
+    'https://superbcompanies.com/organizations/vturnu/',
     'https://techreviewer.co/companies/vturnu',
+    'https://www.g2.com/products/vturnu/',
+    'https://www.producthunt.com/products/vturnu',
+    'https://www.ambitionbox.com/overview/vturnu-overview',
     'https://www.trustpilot.com/review/vturnu.com',
     'https://medium.com/@vturnu',
 ]);
