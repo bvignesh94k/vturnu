@@ -33,7 +33,9 @@
     --hp3-on:      #F4F2FF;
     --hp3-on-70:   rgba(244, 242, 255, .74);
     --hp3-on-12:   rgba(244, 242, 255, .14);
-    --hp3-grad:    linear-gradient(100deg, #22E3FF 0%, #818CF8 34%, #FF5EA0 68%, #FFB020 100%);
+    /* On dark grounds the logo's indigo is swapped for its tagline periwinkle
+       (#5B56C9) so the gradient keeps contrast; every stop is a logo colour. */
+    --hp3-grad:    linear-gradient(100deg, #00B8D9 0%, #5B56C9 34%, #FF3D8A 68%, #FF9100 100%);
     --hp3-grad-dk: linear-gradient(100deg, #00A5C4 0%, #4338CA 38%, #E5306E 72%, #E07600 100%);
     --hp3-grad-v:  linear-gradient(160deg, #00B8D9, #4338CA);
     --hp3-grad-u:  linear-gradient(160deg, #FF3D8A, #FF9100);

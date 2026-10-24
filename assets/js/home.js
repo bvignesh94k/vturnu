@@ -112,7 +112,7 @@
 
         var RAD = Math.PI / 180;
         var N = 1100;
-        var STOPS = [[34, 227, 255], [129, 140, 248], [255, 94, 160], [255, 176, 32]];
+        var STOPS = [[0, 184, 217], [91, 86, 201], [255, 61, 138], [255, 145, 0]]; // logo colours
         var pts = new Float32Array(N * 3);
         var cols = [];
         var golden = Math.PI * (3 - Math.sqrt(5));
@@ -241,7 +241,7 @@
                     if (vis && prev) { ctx.lineTo(X, Y); } else if (vis) { ctx.moveTo(X, Y); }
                     prev = vis;
                 }
-                ctx.strokeStyle = 'rgba(255,94,160,' + (0.5 * A) + ')';
+                ctx.strokeStyle = 'rgba(255,61,138,' + (0.55 * A) + ')';
                 ctx.stroke();
                 if (!reduce) {
                     var ph = ((time * 0.00035) + a * 0.137) % 1;
@@ -249,7 +249,7 @@
                     if (pt[2] > 0) {
                         ctx.beginPath();
                         ctx.arc(cx + pt[0] * R, cy - pt[1] * R, 2.4, 0, Math.PI * 2);
-                        ctx.fillStyle = 'rgba(255,176,32,' + A + ')';
+                        ctx.fillStyle = 'rgba(255,145,0,' + A + ')';
                         ctx.fill();
                     }
                 }
@@ -265,11 +265,11 @@
                 var pulse = reduce ? 0.5 : (Math.sin(time * 0.004 + m) + 1) / 2;
                 ctx.beginPath();
                 ctx.arc(mx, my, 4 + pulse * 5, 0, Math.PI * 2);
-                ctx.fillStyle = (m === 0 ? 'rgba(34,227,255,' : 'rgba(255,94,160,') + (0.22 * A * (1 - pulse * 0.6)) + ')';
+                ctx.fillStyle = (m === 0 ? 'rgba(0,184,217,' : 'rgba(255,61,138,') + (0.22 * A * (1 - pulse * 0.6)) + ')';
                 ctx.fill();
                 ctx.beginPath();
                 ctx.arc(mx, my, m === 0 ? 4 : 3, 0, Math.PI * 2);
-                ctx.fillStyle = m === 0 ? '#22E3FF' : '#FFFFFF';
+                ctx.fillStyle = m === 0 ? '#00B8D9' : '#FFFFFF';
                 ctx.globalAlpha = A;
                 ctx.fill();
                 if (state.labels > 0.05 && v[2] > 0.25 && mk[m].pos !== 'n') {
