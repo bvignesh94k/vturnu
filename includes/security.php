@@ -268,14 +268,28 @@ function security_check_submission(array $post): array
 }
 
 /* ------------------------------------------------------------------ */
-/* Geo-IP dial code (Cloudflare's CF-IPCountry header, no external API) */
+/* Geo-IP country (edge header, no external API)                      */
 /* ------------------------------------------------------------------ */
 
-/** Two-letter country code from Cloudflare's edge, or 'IN' off-Cloudflare (local dev). */
+/**
+ * Two-letter country code of the visitor, or 'IN' when no edge header is
+ * present (local dev). The site is served by Vercel, which sends
+ * X-Vercel-IP-Country; CF-IPCountry is kept for a Cloudflare proxy in front.
+ * Reading only the Cloudflare header made every visitor look Indian.
+ */
 function security_visitor_country(): string
 {
-    $cc = strtoupper($_SERVER['HTTP_CF_IPCOUNTRY'] ?? '');
-    return ($cc !== '' && $cc !== 'XX' && $cc !== 'T1') ? $cc : 'IN';
+    static $cc = null;
+    if ($cc !== null) {
+        return $cc;
+    }
+    foreach (['HTTP_X_VERCEL_IP_COUNTRY', 'HTTP_CF_IPCOUNTRY'] as $h) {
+        $v = strtoupper(trim((string) ($_SERVER[$h] ?? '')));
+        if (preg_match('/^[A-Z]{2}$/', $v) && $v !== 'XX' && $v !== 'T1') {
+            return $cc = $v;
+        }
+    }
+    return $cc = 'IN';
 }
 
 /** Dial code for the visitor's detected country, defaulting to +91 (business HQ). */

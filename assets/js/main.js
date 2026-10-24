@@ -377,6 +377,16 @@
         });
     }
 
+    // Currency switcher: apply on change, so the Set button is only the
+    // no-JavaScript fallback.
+    document.querySelectorAll('.cur-switch').forEach(function (f) {
+        var sel = f.querySelector('.js-cur-select');
+        var go = f.querySelector('.js-cur-go');
+        if (!sel) return;
+        if (go) go.hidden = true;
+        sel.addEventListener('change', function () { f.submit(); });
+    });
+
     // Service worker: offline support + faster repeat visits.
     // Registered after load so it never competes with first paint.
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

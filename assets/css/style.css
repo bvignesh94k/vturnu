@@ -1998,3 +1998,22 @@ h1, h2, .section-title { text-wrap: balance; }
     border-top: 1px solid var(--line, #E5E3F5);
     color: var(--muted, #6F6992); font-size: .92rem;
 }
+
+/* Currency switcher (includes/currency.php). Light by default; --dark sits on
+   the footer and dark homepage sections. */
+.cur-switch { display: inline-flex; align-items: center; gap: .5rem; margin: 0; font-size: .85rem; }
+.cur-switch label { font-weight: 600; color: var(--muted); }
+.cur-switch select {
+    min-height: 36px; padding: .35rem 2rem .35rem .75rem; border-radius: 999px; border: 1.5px solid var(--line);
+    font: 600 .85rem/1.2 var(--font); color: var(--ink); background: #fff; cursor: pointer;
+}
+.cur-switch select:focus-visible { outline: 3px solid var(--v-cyan); outline-offset: 2px; }
+.cur-switch button { min-height: 36px; padding: .35rem .9rem; border-radius: 999px; border: 0; font: 700 .85rem/1 var(--font); color: #fff; background: var(--brand); cursor: pointer; }
+.cur-switch button[hidden] { display: none; }
+.cur-switch--dark label { color: rgba(244, 242, 255, .7); }
+.cur-switch--dark select { color: #F4F2FF; background: rgba(255, 255, 255, .06); border-color: rgba(244, 242, 255, .22); }
+.cur-switch--dark select option { color: #1D1936; background: #fff; }
+.hp3-form-aside .cur-switch { margin-top: 1rem; }
+.pricing-section .cur-switch, .center > .cur-switch { margin-bottom: 1.25rem; }
+/* Desktop: keep the footer bar clear of the fixed "Get a Free Quote" button. */
+@media (min-width: 1024px) { .footer-bottom { padding-right: 220px; } }

@@ -22,6 +22,7 @@ require dirname(__DIR__) . '/includes/config.php';
 require dirname(__DIR__) . '/includes/db.php';
 require dirname(__DIR__) . '/includes/helpers.php';
 require dirname(__DIR__) . '/includes/security.php';
+require dirname(__DIR__) . '/includes/currency.php';
 require dirname(__DIR__) . '/includes/data/menu.php';
 require dirname(__DIR__) . '/includes/data/pages.php';
 
@@ -37,6 +38,11 @@ $slug = trim(is_string($uri) ? $uri : '/', '/');
 /* XML sitemap. lastmod comes from the post date where we have one, so
    crawlers can tell what actually changed instead of refetching everything;
    pages without a date carry no lastmod at all. */
+/* Currency switcher: stores the visitor's choice and returns to the page. */
+if ($slug === 'currency') {
+    currency_route();
+}
+
 if ($slug === 'sitemap.xml') {
     header('Content-Type: application/xml; charset=UTF-8');
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";

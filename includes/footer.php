@@ -79,6 +79,7 @@
                          hand a visitor. */ ?>
                 <li><a href="/sitemap/">Sitemap</a></li>
             </ul>
+            <?= currency_switcher('cur-footer', 'cur-switch--dark') ?>
         </div>
     </div>
 </footer>
@@ -151,11 +152,7 @@
                 <div class="form-row">
                     <label for="qm-budget">Monthly budget range</label>
                     <select id="qm-budget" name="budget">
-                        <option>Under ₹50k / $600</option>
-                        <option>₹50k–₹1.5L / $600–$1,800</option>
-                        <option>₹1.5L–₹5L / $1,800–$6,000</option>
-                        <option>₹5L+ / $6,000+</option>
-                        <option>One-time project, need a quote</option>
+                        <?= budget_options(['One-time project, need a quote']) ?>
                     </select>
                 </div>
             </div>

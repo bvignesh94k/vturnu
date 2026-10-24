@@ -443,8 +443,10 @@ function enquiry_qualify(array $post): array
     $business = $domain !== '' && !in_array($domain, FREE_EMAIL_DOMAINS, true);
 
     $points = 0;
-    $points += ['Under USD 1,000 / month' => 0, 'USD 1,000 to 3,000 / month' => 2, 'USD 3,000 to 10,000 / month' => 3,
-                'USD 10,000 to 25,000 / month' => 4, 'USD 25,000+ / month' => 4, 'Not decided yet' => 1][$budget] ?? 0;
+    /* Budget arrives as a band key (b0 to b4) so the grade means the same in
+       every currency; see BUDGET_BANDS in includes/currency.php. */
+    $points += ['b0' => 0, 'b1' => 2, 'b2' => 3, 'b3' => 4, 'b4' => 4, 'Not decided yet' => 1][$budget] ?? 0;
+    $budget = budget_label($budget);
     $points += ['1 to 10 people' => 0, '11 to 50 people' => 1, '51 to 200 people' => 2,
                 '201 to 1,000 people' => 2, '1,000+ people' => 2][$size] ?? 0;
     $points += ['As soon as possible' => 2, 'Within 1 to 3 months' => 2, 'In 3 to 6 months' => 1, 'Just researching' => 0][$timeline] ?? 0;
@@ -468,6 +470,7 @@ function enquiry_qualify(array $post): array
     $post['service'] = $services !== '' ? $services : trim((string) ($post['service'] ?? ''));
     $post['company'] = trim((string) ($post['company'] ?? '')) . ($site !== '' ? ' (' . $site . ')' : '');
     $post['message'] = implode("\n", $summary) . ($note !== '' ? "\n\n" . $note : '');
+    $post['budget'] = $budget;
     return $post;
 }
 
@@ -497,7 +500,7 @@ function save_enquiry(array $post, string $source): bool
         'company' => trim($post['company'] ?? ''),
         'designation' => trim($post['designation'] ?? ''),
         'service' => trim($post['service'] ?? ''),
-        'budget' => trim($post['budget'] ?? ''),
+        'budget' => budget_label(trim((string) ($post['budget'] ?? ''))),
         'message' => trim($post['message'] ?? ''),
     ];
 

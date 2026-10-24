@@ -15,11 +15,12 @@
 <section class="section">
     <div class="container">
         <h2 class="section-title center">1 · Monthly Growth Marketing <span class="price-tag-recurring">Recurring</span></h2>
+        <div class="center"><?= currency_switcher('cur-pricing') ?></div>
         <p class="center pricing-intro">SEO, AEO, social media (SMO) and Google &amp; Meta ads run as a monthly program. The budget is based on your needs, tell us your goal and we'll size the plan around it. Ad spend stays in your own accounts.</p>
         <div class="card-grid cols-3 pricing-grid">
             <div class="card price-card ac-cyan" data-reveal="card">
                 <h3>Starter</h3>
-                <p class="price"><span>₹35,000</span>/month</p>
+                <p class="price"><span><?= e(price('starter')) ?></span>/month</p>
                 <p class="price-note">For small businesses building their first serious digital presence.</p>
                 <ul class="check-list">
                     <li>SEO + AEO foundations</li>
@@ -33,7 +34,7 @@
             <div class="card price-card price-featured ac-yellow" data-reveal="card">
                 <p class="price-badge">Most popular</p>
                 <h3>Growth</h3>
-                <p class="price"><span>₹90,000</span>/month</p>
+                <p class="price"><span><?= e(price('growth')) ?></span>/month</p>
                 <p class="price-note">For businesses ready to make digital their main growth channel.</p>
                 <ul class="check-list">
                     <li>SEO + AI SEO (AEO) + SMO</li>
@@ -70,7 +71,7 @@
         <div class="card-grid cols-3 pricing-grid">
             <div class="card price-card ac-olive" data-reveal="card">
                 <h3>Business Website</h3>
-                <p class="price"><span>₹45,000</span> one-time</p>
+                <p class="price"><span><?= e(price('website')) ?></span> one-time</p>
                 <p class="price-note">A fast, SEO-ready website that presents your business and captures enquiries.</p>
                 <ul class="check-list">
                     <li>Up to 10 custom-designed pages</li>
@@ -84,7 +85,7 @@
             <div class="card price-card price-featured ac-terra" data-reveal="card">
                 <p class="price-badge">Best value</p>
                 <h3>Ecommerce Store</h3>
-                <p class="price"><span>₹95,000</span> one-time</p>
+                <p class="price"><span><?= e(price('store')) ?></span> one-time</p>
                 <p class="price-note">A conversion-first online store on Shopify, WooCommerce or custom build.</p>
                 <ul class="check-list">
                     <li>Custom storefront design</li>
@@ -145,7 +146,7 @@
             <details class="faq"><summary>Are there long-term contracts?</summary><p>No lock-ins. Retainers run month to month after an initial three-month ramp period: long enough for results to show, short enough to keep us accountable.</p></details>
             <details class="faq"><summary>Can I mix services?</summary><p>Yes, most clients do. A common combination is a one-time website build plus a Growth marketing plan. Tell us your goal and budget and we'll propose the highest-impact mix.</p></details>
             <details class="faq"><summary>How do I know it's working?</summary><p>You get a live dashboard and a monthly report tied to leads and revenue. If a channel isn't performing, we'll tell you and reallocate.</p></details>
-            <details class="faq"><summary>Do you work with businesses outside India?</summary><p>Yes: we serve clients across India, the US, Canada and beyond. Pricing is quoted in INR or USD, and calls are scheduled in your time zone.</p></details>
+            <details class="faq"><summary>Do you work with businesses outside India?</summary><p>Yes: we serve clients across India, the US, Canada and beyond. Prices are shown in your local currency (change it with the selector above the plans) and every proposal is quoted as a fixed fee in that currency. Calls are scheduled in your time zone.</p></details>
         </div>
     </div>
 </section>

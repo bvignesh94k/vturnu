@@ -140,7 +140,6 @@ $CASE_CARDS = array_values(array_filter([
 $FORM_SERVICES = ['SEO', 'AI search visibility', 'Google Ads / PPC', 'Paid social', 'Outbound & email', 'Content marketing', 'Website / landing pages', 'Full growth program'];
 $FORM_MARKETS  = ['India', 'UAE & GCC', 'Southeast Asia', 'United States', 'Canada', 'UK & Europe', 'Australia', 'Africa', 'Global'];
 $FORM_SIZE     = ['1 to 10 people', '11 to 50 people', '51 to 200 people', '201 to 1,000 people', '1,000+ people'];
-$FORM_BUDGET   = ['Under USD 1,000 / month', 'USD 1,000 to 3,000 / month', 'USD 3,000 to 10,000 / month', 'USD 10,000 to 25,000 / month', 'USD 25,000+ / month', 'Not decided yet'];
 $FORM_WHEN     = ['As soon as possible', 'Within 1 to 3 months', 'In 3 to 6 months', 'Just researching'];
 
 $hq_names = country_names();
@@ -157,7 +156,7 @@ $FAQS = [
     ['How soon will we see results?',
      'Paid campaigns can produce qualified enquiries in the first month. SEO usually shows movement by week eight and compounds from there. AI search visibility often moves fastest, because far fewer competitors are working on it yet.'],
     ['What does it cost?',
-     'Growth programs start from ₹35,000 a month (about USD 420), and most B2B engagements sit higher depending on markets and channels. We scope it after one call and quote a fixed monthly fee. No setup fees and no surprise line items. Ad spend is paid directly to the platforms and stays in your accounts.'],
+     'Growth programs start from ' . price('starter') . ' a month, and most B2B engagements sit higher depending on markets and channels. We scope it after one call and quote a fixed monthly fee. No setup fees and no surprise line items. Ad spend is paid directly to the platforms and stays in your accounts.'],
     ['What is AI search optimization, and why does it matter for B2B?',
      'Buyers now ask ChatGPT, Perplexity, Gemini and Google AI Overviews for vendor shortlists. AI search optimization makes your company one of the names those answers cite, using clean entity signals, structured data, third-party mentions and content written the way people ask questions.'],
     ['Can you build or rebuild our website as well?',
@@ -427,7 +426,7 @@ $cta_label = 'Start my growth plan';
         <div><dt>Team</dt><dd>25+ specialists</dd></div>
         <div><dt>Delivered</dt><dd>150+ projects in 10+ industries</dd></div>
         <div><dt>Markets</dt><dd>India, UAE, Saudi Arabia, Qatar, Singapore, Malaysia, Indonesia, Australia, UK, US, Canada, Africa</dd></div>
-        <div><dt>Engagements</dt><dd>From ₹35,000 / month, no setup fees</dd></div>
+        <div><dt>Engagements</dt><dd>From <?= e(price('starter')) ?> / month, no setup fees</dd></div>
         <div><dt>Response time</dt><dd>Within 24 hours</dd></div>
       </dl>
     </aside>
@@ -448,7 +447,8 @@ $cta_label = 'Start my growth plan';
         <li>Which channels and markets will produce qualified leads fastest</li>
         <li>The first three moves we would make, and what each is worth</li>
       </ul>
-      <p class="hp3-fitnote"><b>Best fit:</b> B2B companies with a clear offer and the ability to invest from ₹35,000 (about USD 420) a month in growth.</p>
+      <p class="hp3-fitnote"><b>Best fit:</b> B2B companies with a clear offer and the ability to invest from <?= e(price('starter')) ?> a month in growth.</p>
+      <?= currency_switcher('cur-home', 'cur-switch--dark') ?>
     </div>
 
     <div class="hp3-form-card" data-rise>
@@ -529,7 +529,7 @@ $cta_label = 'Start my growth plan';
               <label for="f-budget">Monthly marketing budget</label>
               <select id="f-budget" name="budget" required>
                 <option value="">Select</option>
-                <?php foreach ($FORM_BUDGET as $o): ?><option><?= e($o) ?></option><?php endforeach; ?>
+                <?= budget_options(['Not decided yet']) ?>
               </select>
               <span class="hp3-err" data-err-for="f-budget"></span>
             </div>

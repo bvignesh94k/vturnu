@@ -88,11 +88,7 @@
                         <label for="f-budget">Your Budget</label>
                         <select id="f-budget" name="budget">
                             <option value="">Select your budget</option>
-                            <option>Under ₹50,000 / month</option>
-                            <option>₹50,000 – ₹1,50,000 / month</option>
-                            <option>₹1,50,000 – ₹5,00,000 / month</option>
-                            <option>₹5,00,000+ / month</option>
-                            <option>One-time project</option>
+                            <?= budget_options(['One-time project']) ?>
                         </select>
                     </div>
                 </div>
