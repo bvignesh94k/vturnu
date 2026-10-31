@@ -111,6 +111,7 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-800.woff2" crossorigin>
 <?php if ($slug === ''): ?>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/figtree.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caprasimo.woff2" crossorigin>
 <?php endif; ?>
 <style>
 @font-face{font-family:Poppins;font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/poppins-400.woff2) format("woff2")}

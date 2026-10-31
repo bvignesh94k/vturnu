@@ -8,8 +8,8 @@
  */
 (function () {
     'use strict';
-    var host = document.querySelector('.page-hero') || document.getElementById('hp3-stage');
-    var kind = document.body.getAttribute('data-scene') || (host && host.id === 'hp3-stage' ? 'globe' : '');
+    var host = document.querySelector('.page-hero');
+    var kind = document.body.getAttribute('data-scene');
     if (!host || !kind) { return; }
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

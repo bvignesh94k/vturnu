@@ -22,7 +22,7 @@ $PAGES = [
         'og_title' => 'Get found. Get chosen. Get pipeline. | VTurnU',
         'og_meta'  => 'Your buyers search Google, ask ChatGPT and compare vendors before they ever talk to sales. VTurnU makes B2B companies the name they keep meeting, and turns it into qualified pipeline.',
         'h1'       => 'B2B digital marketing agency: get found, get chosen, get pipeline.',
-        'lede'     => 'VTurnU is a B2B digital marketing and web development agency headquartered in Chennai, India, helping companies in India, the Middle East, Southeast Asia, North America, Europe, Africa and Australia win qualified leads through SEO, AI search optimization, paid media and conversion-focused websites.',
+        'lede'     => 'VTurnU is a B2B digital marketing and web development agency headquartered in Chennai, India, helping B2B companies win qualified leads through SEO, AI search optimization, paid media and conversion-focused websites.',
     ],
 
     'about-us' => [
@@ -34,7 +34,7 @@ $PAGES = [
         'parent' => null,
         'faqs' => [
             ['What does VTurnU do?', 'VTurnU is a digital marketing and branding company based in Chennai, India. We run SEO, AI search optimization, paid advertising, content and social media, and we also build websites and deliver enterprise IT projects.'],
-            ['Where is VTurnU based?', 'We are based in Chennai, Tamil Nadu, and work with clients across India, the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa.'],
+            ['Where is VTurnU based?', 'We are based in Chennai, Tamil Nadu, and work with clients around the world.'],
             ['What kind of companies do you work with?', 'Growing businesses with a clear offer, from SMEs and founders to established B2B firms, including manufacturers, ecommerce brands, software companies and professional services.'],
             ['Who will work on my account?', 'Experienced specialists. The people you meet in the pitch are the people who do the work.'],
             ['How do I start?', 'Send an enquiry through the contact page. We reply within one working day and begin with an honest audit.'],
@@ -108,7 +108,7 @@ $PAGES = [
             ['How quickly will you reply?', 'Within one working day, and usually sooner. A real person reads every enquiry.'],
             ['Is the first conversation free?', 'Yes. The first call and the initial audit carry no cost and no obligation.'],
             ['What should I include in my message?', 'Your goal, your website, your market and any deadline. The more specific you are, the more useful our reply will be.'],
-            ['Do you work with clients outside India?', 'Yes, across the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa, and we schedule calls in your time zone.'],
+            ['Do you work with clients outside India?', 'Yes. We work with clients worldwide and schedule calls in your time zone.'],
         ],
     ],
 

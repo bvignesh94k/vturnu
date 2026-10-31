@@ -9,7 +9,7 @@ $why = why_choose($page);
 ?>
 <section class="page-hero">
     <div class="container">
-        <p class="eyebrow eyebrow-line">Chennai · India · US · Canada</p>
+        <p class="eyebrow eyebrow-line"><?= e(['ai' => 'AI search', 'web' => 'Web development', 'ppc' => 'Paid advertising', 'content' => 'Brand and content', 'social' => 'Social media'][$page['cat'] ?? ''] ?? 'Digital marketing') ?></p>
         <h1><?= e($page['h1']) ?></h1>
         <p class="lede"><?= e($page['lede']) ?></p>
         <div class="hero-actions">

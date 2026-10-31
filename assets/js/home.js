@@ -2,12 +2,11 @@
    VTurnU homepage behaviour. Loaded only on "/".
 
    Everything here is an enhancement. With this file blocked, or with
-   reduced motion, the page renders every scene as normal content and the
-   lead form submits as one long form.
+   reduced motion, the page is complete and the lead form submits as one
+   long form.
 
-   1. Pinned hero: scroll inside the hero plays four scenes while the
-      section holds the viewport, and drives the WebGL scene
-      (assets/js/hero3d.min.js, loaded after first paint).
+   1. Hero: starts the 3D crowd (assets/js/hero-crowd.js) once a visitor
+      engages. A poster of the same scene is on screen until then.
    2. Depth: scroll reveals, pointer tilt, count-up numbers, flip cards,
       the isometric growth stack and the Turn Method timeline.
    3. Lead form: a three-step B2B qualifier with inline validation.
@@ -103,193 +102,32 @@
         });
     })();
 
-    /* ---------------------------------------------------------- hero pin */
+    /* --------------------------------------------------------------- hero */
 
+    /* The crowd script waits for the first sign of a visitor, then the next idle
+       moment, so it never competes with the page loading. With a mouse it also
+       starts by itself after a few seconds. */
     (function hero() {
-        var heroEl = document.getElementById('hp3-hero');
-        var stage = document.getElementById('hp3-stage');
-        if (!heroEl || !stage) { return; }
-        var scenes = Array.prototype.slice.call(stage.querySelectorAll('.hp3-scene'));
-        var rail = stage.querySelector('.hp3-rail');
-        var dots = rail ? Array.prototype.slice.call(rail.querySelectorAll('.hp3-rail-dot')) : [];
-        var cue = stage.querySelector('.hp3-cue');
-        var bar = stage.querySelector('.hp3-progress');
-        var mount = document.getElementById('hp3-gl');
-
-        var pinned = false, top = 0, total = 1, current = -1, ticking = false;
-        var state = { p: 0, scene: 0, visible: true, pinned: false };
-        var gl = null, glTried = false, proofDone = false, seen = {};
-
-        function canPin() {
-            return !reduce && window.innerHeight >= 520 && window.CSS && CSS.supports && CSS.supports('position', 'sticky');
-        }
-        function webglOk() {
-            try {
-                var c = document.createElement('canvas');
-                return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
-            } catch (e) { return false; }
-        }
-
-        function setScene(i) {
-            if (i === current) { return; }
-            current = i;
-            state.scene = i;
-            scenes.forEach(function (s, k) {
-                s.classList.toggle('is-active', k === i);
-                s.classList.toggle('is-past', k < i);
-            });
-            dots.forEach(function (d, k) {
-                if (k === i) { d.setAttribute('aria-current', 'step'); } else { d.removeAttribute('aria-current'); }
-            });
-            if (i === 3 && !proofDone) {
-                proofDone = true;
-                Array.prototype.forEach.call(stage.querySelectorAll('[data-count]'), countUp);
-            }
-            if (!seen[i]) { seen[i] = true; track('hero_scene', { hero_scene: i + 1 }); }
-        }
-
-        function measure() {
-            headerHeight();
-            var r = heroEl.getBoundingClientRect();
-            top = r.top + window.pageYOffset;
-            total = Math.max(1, heroEl.offsetHeight - stage.offsetHeight);
-        }
-
-        function update() {
-            ticking = false;
-            if (!pinned) { return; }
-            state.p = clamp((window.pageYOffset - top) / total, 0, 1);
-            stage.style.setProperty('--p', state.p.toFixed(4));
-            setScene(Math.min(3, Math.floor(state.p * 4 + 1e-4)));
-            if (cue) { cue.classList.toggle('is-gone', state.p > 0.015); }
-        }
-        function onScroll() { if (!ticking) { ticking = true; raf(update); } }
-
-        /* The WebGL module weighs 590 KB, so nothing fetches it until a visitor
-           actually starts using the page, and only on a device that can run it
-           well. Parsing it during load froze a mid-range phone for six seconds.
-           Other devices get the light canvas scene from scene3d.js. Until then,
-           and if either fails, the hero shows the CSS backdrop and the logo. */
-        function capable() {
-            var cores = navigator.hardwareConcurrency || 4;
-            var memory = navigator.deviceMemory || 8;
-            return cores >= 6 && memory >= 4 && !(navigator.connection && navigator.connection.saveData);
-        }
-        function lightScene() {
-            if (document.getElementById('vt-scene3d')) { return; }
+        var canvas = document.getElementById('tt-crowd');
+        if (!canvas || reduce) { return; }
+        var started = false, EVENTS = ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'];
+        function load() {
+            if (started) { return; }
+            started = true;
+            EVENTS.forEach(function (e) { window.removeEventListener(e, soon); });
             var s = document.createElement('script');
-            s.id = 'vt-scene3d';
-            s.src = '/assets/js/scene3d.js';
+            s.src = canvas.getAttribute('data-src');
             s.async = true;
             document.head.appendChild(s);
+            track('hero_crowd', { hero_crowd: 'on' });
         }
-        function loadGL() {
-            if (glTried || !mount || !pinned || reduce) { return; }
-            if (!capable() || !webglOk()) { glTried = true; lightScene(); return; }
-            glTried = true;
-            var src = mount.getAttribute('data-src');
-            if (!src) { return; }
-            import(src).then(function (mod) {
-                gl = mod.start({
-                    mount: mount,
-                    stage: stage,
-                    markets: stage.querySelectorAll('.hp3-mkt'),
-                    funnel: stage.querySelectorAll('.hp3-ftag'),
-                    panel: stage.querySelector('.hp3-mpanel'),
-                    getState: function () { return state; }
-                });
-                heroEl.classList.add('hp3-gl-on');
-                track('hero_3d', { hero_3d: 'on' });
-            }).catch(function () {
-                heroEl.classList.remove('hp3-gl-on');
-            });
+        function soon() {
+            if ('requestIdleCallback' in window) { window.requestIdleCallback(load, { timeout: 600 }); } else { setTimeout(load, 200); }
         }
-        function whenIdle(fn) {
-            if ('requestIdleCallback' in window) { window.requestIdleCallback(fn, { timeout: 1500 }); } else { setTimeout(fn, 400); }
+        EVENTS.forEach(function (e) { window.addEventListener(e, soon, { passive: true }); });
+        if (finePointer) {
+            window.addEventListener('load', function () { setTimeout(soon, 3500); });
         }
-
-        /* First sign of a real visitor, then the next idle moment. */
-        var armed = false;
-        function armGL() {
-            if (armed) { return; }
-            armed = true;
-            var go = function () {
-                ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'].forEach(function (e) { window.removeEventListener(e, go); });
-                whenIdle(loadGL);
-            };
-            ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'].forEach(function (e) { window.addEventListener(e, go, { passive: true }); });
-        }
-
-        function setup() {
-            pinned = canPin();
-            state.pinned = pinned;
-            heroEl.classList.toggle('hp3-pin', pinned);
-            [rail, cue, bar].forEach(function (el) { if (el) { el.hidden = !pinned; } });
-            if (!pinned) {
-                heroEl.classList.remove('hp3-gl-on');
-                if (gl) { gl.stop(); }
-                scenes.forEach(function (s) { s.classList.add('is-active'); s.classList.remove('is-past'); });
-                current = -1;
-            } else if (gl) {
-                heroEl.classList.add('hp3-gl-on');
-                gl.resume();
-            }
-            measure();
-            update();
-        }
-
-        function goTo(i, smooth) {
-            var y = i === 0 ? top : top + total * ((i + 0.15) / 4);
-            window.scrollTo({ top: Math.round(y), behavior: smooth && !reduce ? 'smooth' : 'auto' });
-        }
-        dots.forEach(function (d) {
-            d.addEventListener('click', function () { goTo(parseInt(d.getAttribute('data-go'), 10) || 0, true); });
-        });
-
-        /* Keyboard users tabbing into a later scene are scrolled to it. */
-        stage.addEventListener('focusin', function (e) {
-            if (!pinned) { return; }
-            var sc = e.target.closest ? e.target.closest('.hp3-scene') : null;
-            var i = sc ? scenes.indexOf(sc) : -1;
-            if (i > -1 && i !== current) { goTo(i, false); }
-        });
-
-        /* Without WebGL, market pins open their card in place. */
-        Array.prototype.forEach.call(stage.querySelectorAll('.hp3-mkt .hp3-mpin'), function (btn) {
-            btn.addEventListener('click', function () {
-                if (heroEl.classList.contains('hp3-gl-on')) { return; }
-                var li = btn.parentNode;
-                var on = !li.classList.contains('is-active');
-                Array.prototype.forEach.call(stage.querySelectorAll('.hp3-mkt.is-active'), function (x) { x.classList.remove('is-active'); });
-                li.classList.toggle('is-active', on);
-            });
-        });
-
-        if (supportsIO) {
-            new IntersectionObserver(function (entries) {
-                state.visible = entries[0].isIntersecting;
-                if (!gl) { return; }
-                if (state.visible && pinned) { gl.resume(); } else { gl.stop(); }
-            }).observe(heroEl);
-        }
-        document.addEventListener('visibilitychange', function () {
-            if (!gl) { return; }
-            if (document.hidden) { gl.stop(); } else if (state.visible && pinned) { gl.resume(); }
-        });
-
-        var resizeTimer;
-        window.addEventListener('resize', function () {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function () {
-                if (canPin() !== pinned) { setup(); if (pinned) { armGL(); } } else { measure(); update(); }
-            }, 150);
-        });
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('load', function () { measure(); update(); armGL(); });
-        if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { measure(); update(); }); }
-        if (document.readyState === 'complete') { armGL(); }
-
-        setup();
     })();
 
     /* ------------------------------------------------------- flip cards */

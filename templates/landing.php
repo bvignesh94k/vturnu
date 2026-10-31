@@ -14,7 +14,7 @@ echo jsonld_script([
     'description' => $page['meta'],
     'url' => abs_url(page_url($slug)),
     'provider' => ['@id' => SITE_URL . '/#organization'],
-    'areaServed' => 'Worldwide',
+    'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
     'hasOfferCatalog' => ['@type' => 'OfferCatalog', 'name' => $l['service'] . ' services', 'itemListElement' => $offers],
 ]);
 echo jsonld_script([

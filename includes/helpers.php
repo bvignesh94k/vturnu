@@ -75,7 +75,7 @@ function jsonld_site(): array
                 'image' => abs_url('/assets/img/vturnu-logo-dark.png'),
                 'email' => CONTACT_EMAIL,
                 'telephone' => CONTACT_PHONE,
-                'areaServed' => ['India', 'United States', 'United Kingdom', 'Australia', 'Canada'],
+                'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
                 'contactPoint' => [[
                     '@type' => 'ContactPoint',
                     'contactType' => 'sales',
@@ -121,7 +121,7 @@ function jsonld_service(array $page, string $slug): array
         'description' => $page['meta'],
         'url' => abs_url(page_url($slug)),
         'provider' => ['@id' => SITE_URL . '/#organization'],
-        'areaServed' => 'Worldwide',
+        'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
     ];
 }
 

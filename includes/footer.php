@@ -24,7 +24,7 @@
                         <span class="brand-tag"><?= e(strtoupper(SITE_TAGLINE)) ?></span>
                     </span>
                 </a>
-                <p class="footer-blurb">Digital marketing and branding from Chennai for growth-serious businesses across India, the Gulf, Southeast Asia, the UK, the US and Australia. Every engagement maps to a revenue metric.</p>
+                <p class="footer-blurb">Digital marketing and branding from Chennai for growth-serious businesses worldwide. Every engagement maps to a revenue metric.</p>
                 <div class="footer-ratings" aria-label="Ratings">
                     <span><span class="stars" aria-hidden="true">★★★★★</span> 5.0 on Google</span>
                     <span>Clutch · GoodFirms listed</span>

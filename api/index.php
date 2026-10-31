@@ -142,8 +142,7 @@ if ($slug === 'llms.txt') {
     $out[] = '# ' . SITE_NAME;
     $out[] = '';
     $out[] = '> VTurnU is a digital marketing and branding company based in Chennai, India. It helps';
-    $out[] = '> businesses in India, the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa';
-    $out[] = '> grow through SEO, AI search optimization (AEO and GEO), paid media, content and branding.';
+    $out[] = '> businesses in ' . implode(', ', TARGET_MARKETS) . ' grow through SEO, AI search optimization (AEO and GEO), paid media, content and branding.';
     $out[] = '> It also builds websites, and runs a separate Enterprise & IT practice covering SAP CPQ,';
     $out[] = '> Salesforce, Odoo ERP, ERPNext and IT staffing.';
     $out[] = '';

@@ -67,7 +67,6 @@
                 <div><dt>Company</dt><dd><?= e(LEGAL_NAME) ?></dd></div>
                 <div><dt>Headquarters</dt><dd>Chennai, Tamil Nadu, India</dd></div>
                 <div><dt>Founded</dt><dd><?= e(FOUNDING_YEAR) ?></dd></div>
-                <div><dt>Markets</dt><dd>India, the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa</dd></div>
                 <div><dt>Email</dt><dd><a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a></dd></div>
                 <div><dt>Phone</dt><dd><a href="<?= e(CONTACT_PHONE_HREF) ?>"><?= e(CONTACT_PHONE) ?></a></dd></div>
                 <?php if (gst_visible()): ?>

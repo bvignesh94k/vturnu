@@ -4,17 +4,12 @@
  *
  * Expects: $page, $slug, $PAGES, $form_status, $visitor_dial_code
  *
- * The hero is a pinned WebGL stage (bin/hero3d/hero3d.js, built to
- * assets/js/hero3d.min.js). Scroll plays four scenes while the section holds
- * the viewport: the glass VU logo, a lead funnel, an interactive opportunity
- * globe and a portal ring. Every scene, funnel stage and market insight is
- * real HTML in source order, so crawlers, screen readers and visitors without
- * WebGL or JavaScript get the full content as ordinary sections.
+ * The hero is the tagline made literal: a crowd of 3D busts that turn toward the
+ * visitor (assets/js/hero-crowd.js). A prerendered poster of the same scene shows
+ * first, so the page is complete with or without JavaScript or WebGL.
  *
- * Nothing here is invented: service links render only when the page exists,
- * results are read live from includes/data/cases.php, and the market cards
- * state time zones, languages and our recommended starting channels, not
- * statistics we cannot source.
+ * Nothing here is invented: service links render only when the page exists, and
+ * results are read live from includes/data/cases.php.
  */
 
 require_once BASE_PATH . '/includes/data/cases.php';
@@ -48,41 +43,6 @@ $LOGOS = array_values(array_filter([
 ], static function (array $l): bool {
     return is_file(BASE_PATH . '/assets/img/clients/' . $l[0]);
 }));
-
-$HERO_PROOF = array_values(array_filter([
-    $hp_result('firstchoice-used-auto-parts'),
-    $hp_result('sai-impression-label-manufacturer'),
-    $hp_result('cafy-careers-uk-job-platform'),
-]));
-
-/* Funnel stages, anchored to heights on the 3D funnel (1 = rim, 0 = tip). */
-$FUNNEL = [
-    ['0.92', 'l', 'Search',             'Rank for the queries that carry budget'],
-    ['0.68', 'r', 'AI answers',         'Get named when buyers ask for a shortlist'],
-    ['0.45', 'l', 'Paid demand',        'Reach decision makers who are in market now'],
-    ['0.22', 'r', 'Website',            'Turn the visit into a booked call'],
-    ['0.02', 'r', 'Qualified pipeline', 'Tracked in your CRM, reported in revenue'],
-];
-
-/* Opportunity map. [code, country, city, lat, lon, label side, time vs India,
-   languages, the opening, where we would start]. Time differences are
-   against IST (UTC+5:30); ranges cover daylight saving. */
-$MARKETS = [
-    ['IND', 'India',          'Chennai HQ',   13.08,   80.27, 'r', 'Home base, UTC+5:30', 'English, Hindi, Tamil and regional languages', 'Our home market, with deep work across manufacturing, SaaS, healthcare, real estate and services.', 'Full growth program'],
-    ['UAE', 'United Arab Emirates', 'Dubai', 25.20,  55.27, 'r', '1.5 hours behind India', 'Arabic, English', 'High-value B2B categories where search results are still thin and mostly English-only.', 'Google Ads and bilingual SEO'],
-    ['KSA', 'Saudi Arabia',   'Riyadh',       24.71,   46.68, 'l', '2.5 hours behind India', 'Arabic, English', 'Fast-growing B2B demand with few vendors optimizing seriously for Arabic search.', 'Arabic and English SEO, then paid search'],
-    ['QAT', 'Qatar',          'Doha',         25.29,   51.53, 't', '2.5 hours behind India', 'Arabic, English', 'A compact, high-value market where a handful of strong pages can lead a category.', 'SEO and targeted outbound'],
-    ['SGP', 'Singapore',      'Singapore',     1.35,  103.82, 'r', '2.5 hours ahead of India', 'English, Mandarin, Malay, Tamil', 'Regional headquarters that buy for the whole of Asia Pacific.', 'SEO, AI visibility and paid social'],
-    ['MYS', 'Malaysia',       'Kuala Lumpur',  3.14,  101.69, 't', '2.5 hours ahead of India', 'Malay, English', 'Manufacturing and services buyers who research in both English and Malay.', 'SEO and Google Ads'],
-    ['IDN', 'Indonesia',      'Jakarta',      -6.20,  106.85, 'b', '1.5 hours ahead of India', 'Bahasa Indonesia, English', 'Southeast Asia\'s largest economy, where local-language B2B search is still under-served.', 'Local-language SEO and Google Ads'],
-    ['AUS', 'Australia',      'Sydney',      -33.87,  151.21, 'r', '4.5 to 5.5 hours ahead of India', 'English', 'Mature buyers who expect proof, and reward the brands that show it.', 'SEO, AI visibility and conversion'],
-    ['UK',  'United Kingdom', 'London',       51.51,   -0.13, 'l', '4.5 to 5.5 hours behind India', 'English', 'Careful buyers who compare vendors in depth before they ever book a call.', 'Content, SEO and AI visibility'],
-    ['USA', 'United States',  'New York',     40.71,  -74.00, 'r', '9.5 to 10.5 hours behind India', 'English, Spanish', 'The most competitive search market. We win on technical SEO, AI visibility and conversion.', 'SEO, Google Ads and CRO'],
-    ['CAN', 'Canada',         'Toronto',      43.65,  -79.38, 't', '9.5 to 10.5 hours behind India', 'English, French', 'Bilingual buyers and, in many B2B niches, lighter competition than the US.', 'Bilingual SEO and Google Ads'],
-    ['ZAF', 'South Africa',   'Johannesburg', -26.20,  28.05, 'r', '3.5 hours behind India', 'English and ten other official languages', 'Africa\'s most developed B2B market, still light on AI visibility work.', 'SEO and Google Ads'],
-    ['NGA', 'Nigeria',        'Lagos',         6.52,    3.38, 'l', '4.5 hours behind India', 'English', 'Fast-growing digital adoption, with few B2B brands investing in search yet.', 'SEO and content'],
-    ['KEN', 'Kenya',          'Nairobi',      -1.29,   36.82, 'r', '2.5 hours behind India', 'English, Swahili', 'East Africa\'s technology and services hub, early in search competition.', 'SEO and paid social'],
-];
 
 $FLIPS = [
     ['Traffic that never buys', 'Broad keywords bring students, job seekers and competitors to your site. The graphs go up. Revenue does not.',
@@ -136,7 +96,6 @@ $CASE_CARDS = array_values(array_filter([
 ]));
 
 $FORM_SERVICES = ['SEO', 'AI search visibility', 'Google Ads / PPC', 'Paid social', 'Outbound & email', 'Content marketing', 'Website / landing pages', 'Full growth program'];
-$FORM_MARKETS  = ['India', 'UAE & GCC', 'Southeast Asia', 'United States', 'Canada', 'UK & Europe', 'Australia', 'Africa', 'Global'];
 $FORM_SIZE     = ['1 to 10 people', '11 to 50 people', '51 to 200 people', '201 to 1,000 people', '1,000+ people'];
 $FORM_WHEN     = ['As soon as possible', 'Within 1 to 3 months', 'In 3 to 6 months', 'Just researching'];
 
@@ -146,7 +105,7 @@ asort($hq_names);
 
 $FAQS = [
     ['Do you work with companies outside India?',
-     'Yes. We are headquartered in Chennai and work with B2B companies across the UAE, Saudi Arabia, Qatar, Singapore, Malaysia, Indonesia, Australia, the UK, the US, Canada and Africa. Strategy, reporting and calls run in English, and our working hours overlap with the Gulf, Southeast Asia and Australia, with early or late calls for Europe and North America.'],
+     'Yes. We are headquartered in Chennai and work with B2B companies around the world. Strategy, reporting and calls run in English, and we schedule calls in your time zone.'],
     ['What kind of companies do you work best with?',
      'B2B companies with a clear offer and a sales team that needs better conversations: manufacturers and exporters, SaaS and technology firms, professional services, healthcare groups and real estate developers, typically between 10 and 1,000 people.'],
     ['How do you make sure the leads are good quality?',
@@ -167,117 +126,29 @@ $cta_label = 'Start my growth plan';
 ?>
 
 <?php /* ================================================================ HERO */ ?>
-<section class="hp3-hero" id="hp3-hero" aria-labelledby="hp-h1">
-<?php /* Set before the first paint. Switching this on later changed the hero's
-         height after load, which pushed the whole page down (layout shift). */ ?>
-<script>
-(function (h) {
-    if (window.innerHeight >= 520 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        h.classList.add('hp3-pin');
-        h.style.setProperty('--hp3-len', (window.innerWidth < 900 ? 380 : 440) + 'svh');
-    }
-})(document.getElementById('hp3-hero'));
-</script>
-  <div class="hp3-stage" id="hp3-stage">
-    <div class="hp3-bg" aria-hidden="true">
-      <span class="hp3-orb hp3-orb--v"></span>
-      <span class="hp3-orb hp3-orb--u"></span>
+<section class="tt-hero" id="tt-hero" aria-labelledby="hp-h1">
+  <picture class="tt-poster" aria-hidden="true">
+    <source media="(max-width: 760px)" srcset="/assets/img/hero-crowd-m.webp" width="780" height="1374">
+    <img src="/assets/img/hero-crowd.webp" alt="" width="1800" height="965" fetchpriority="high">
+  </picture>
+  <canvas class="tt-crowd" id="tt-crowd" aria-hidden="true" data-src="/assets/js/hero-crowd.js?v=<?= asset_v('/assets/js/hero-crowd.js') ?>"></canvas>
+
+  <div class="tt-copy">
+    <h1 class="tt-h1" id="hp-h1"><span class="tt-k">B2B digital marketing agency</span> Make your market <span class="tt-turn">turn its head.</span></h1>
+    <p class="tt-lead">VTurnU makes B2B companies visible on Google and inside AI answers, then turns that attention into <strong>qualified enquiries your sales team wants</strong>.</p>
+    <div class="tt-actions">
+      <a class="tt-cta hp3-btn--primary" href="#start" data-crowd-look><?= e($cta_label) ?> <span aria-hidden="true">&rarr;</span></a>
+      <?php if (isset($PAGES['case-studies'])): ?>
+      <a class="tt-link" href="/case-studies/">See the results</a>
+      <?php endif; ?>
     </div>
-    <div class="hp3-gl" id="hp3-gl" aria-hidden="true" data-src="/assets/js/hero3d.min.js?v=<?= asset_v('/assets/js/hero3d.min.js') ?>"></div>
-
-    <div class="hp3-scenes">
-      <?php /* Scene 1. The H1 paints immediately: it is the LCP element. */ ?>
-      <div class="hp3-scene hp3-scene--1 is-active" data-scene="0">
-        <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Chennai built. Globally deployed.</p>
-          <h1 class="hp3-h1" id="hp-h1"><span class="hp3-h1-k">B2B digital marketing agency</span> Get found. Get chosen. Get <span class="hp3-grad">pipeline</span>.</h1>
-          <p class="hp3-lead">VTurnU makes B2B companies visible on Google and inside AI answers, then turns that attention into <strong>qualified enquiries your sales team wants</strong>. For growing firms in India, the UAE, Singapore, the US, Canada and beyond.</p>
-          <div class="hp3-actions">
-            <a class="hp3-btn hp3-btn--primary" href="#start"><?= e($cta_label) ?> <span aria-hidden="true">&rarr;</span></a>
-            <?php if (isset($PAGES['case-studies'])): ?>
-            <a class="hp3-btn hp3-btn--ghost" href="/case-studies/">See the results</a>
-            <?php endif; ?>
-          </div>
-          <ul class="hp3-ticks">
-            <li>Senior strategists on every account</li>
-            <li>Reported in pipeline, not rankings</li>
-            <li>Reply within 24 hours</li>
-          </ul>
-        </div>
-        <img class="hp3-mark" src="/assets/img/vturnu-icon-mark.svg" alt="" width="420" height="420" aria-hidden="true">
-      </div>
-
-      <?php /* Scene 2. The 3D funnel; the stages below are anchored to it. */ ?>
-      <div class="hp3-scene hp3-scene--2" data-scene="1">
-        <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Attention in. Pipeline out.</p>
-          <h2 class="hp3-h2">We turn scattered attention into a sales pipeline.</h2>
-          <p class="hp3-lead">Your buyers bounce between Google, ChatGPT, LinkedIn and your website for weeks before they talk to anyone. We engineer every touchpoint to pull them one step closer to a sales call.</p>
-        </div>
-        <ol class="hp3-funnel" aria-label="How attention becomes pipeline">
-          <?php foreach ($FUNNEL as [$h, $side, $t, $d]): ?>
-          <li class="hp3-ftag" data-h="<?= e($h) ?>" data-side="<?= e($side) ?>"><b><?= e($t) ?></b> <span><?= e($d) ?></span></li>
-          <?php endforeach; ?>
-        </ol>
-      </div>
-
-      <?php /* Scene 3. The opportunity globe. Each market is a hotspot with a real insight card. */ ?>
-      <div class="hp3-scene hp3-scene--3" data-scene="2">
-        <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> Opportunity map</p>
-          <h2 class="hp3-h2">Your next big client is not in your city.</h2>
-          <p class="hp3-lead">Across the Gulf, Southeast Asia and Africa, many B2B categories still have thin search results and almost no AI visibility work. <span class="hp3-hint-gl">Select a market on the globe, or drag to spin it.</span></p>
-        </div>
-        <ul class="hp3-mkts" aria-label="Markets we grow B2B companies in">
-          <?php foreach ($MARKETS as [$code, $country, $city, $lat, $lon, $side, $tz, $langs, $opening, $start]): ?>
-          <li class="hp3-mkt hp3-mkt--<?= e($side) ?>" data-lat="<?= e((string) $lat) ?>" data-lon="<?= e((string) $lon) ?>">
-            <button type="button" class="hp3-mpin" aria-label="<?= e($country) ?>: show market insight"><i aria-hidden="true"></i><span><?= e($code) ?></span></button>
-            <div class="hp3-mcard">
-              <p class="hp3-mcard-h"><b><?= e($country) ?></b> <span><?= e($city) ?></span></p>
-              <p class="hp3-mcard-o"><?= e($opening) ?></p>
-              <dl>
-                <div><dt>Where we start</dt><dd><?= e($start) ?></dd></div>
-                <div><dt>Search languages</dt><dd><?= e($langs) ?></dd></div>
-                <div><dt>Working hours</dt><dd><?= e($tz) ?></dd></div>
-              </dl>
-            </div>
-          </li>
-          <?php endforeach; ?>
-        </ul>
-        <div class="hp3-mpanel" aria-live="polite"></div>
-      </div>
-
-      <?php /* Scene 4. The portal ring, proof and the ask. */ ?>
-      <div class="hp3-scene hp3-scene--4" data-scene="3">
-        <div class="hp3-copy">
-          <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> The turn, in numbers</p>
-          <h2 class="hp3-h2">Real clients. Measured results.</h2>
-          <div class="hp3-proof">
-            <?php foreach ($HERO_PROOF as [$metric, $label, $client, $industry, $cslug]): ?>
-            <a class="hp3-proof-i" href="<?= e(page_url('case-studies/' . $cslug)) ?>">
-              <span class="hp3-proof-n" data-count="<?= e($metric) ?>"><?= e($metric) ?></span>
-              <span class="hp3-proof-l"><?= e($label) ?></span>
-              <span class="hp3-proof-w"><?= e($client) ?></span>
-            </a>
-            <?php endforeach; ?>
-          </div>
-          <div class="hp3-actions">
-            <a class="hp3-btn hp3-btn--primary" href="#start"><?= e($cta_label) ?> <span aria-hidden="true">&rarr;</span></a>
-            <a class="hp3-btn hp3-btn--ghost" href="#stack">Explore the stack</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="hp3-rail" aria-label="Hero chapters" hidden>
-      <button type="button" class="hp3-rail-dot" data-go="0"><span>Get found</span></button>
-      <button type="button" class="hp3-rail-dot" data-go="1"><span>The funnel</span></button>
-      <button type="button" class="hp3-rail-dot" data-go="2"><span>Opportunity map</span></button>
-      <button type="button" class="hp3-rail-dot" data-go="3"><span>Results</span></button>
-    </nav>
-    <p class="hp3-cue" aria-hidden="true" hidden><span></span> Scroll to turn</p>
-    <span class="hp3-progress" aria-hidden="true" hidden><i></i></span>
   </div>
+
+  <p class="tt-score" aria-hidden="true">
+    <span class="tt-tally"><b id="tt-n">0</b> of <span id="tt-total">0</span> heads turned</span>
+    <span class="tt-hint tt-hint-pointer">Move your cursor</span>
+    <span class="tt-hint tt-hint-touch">Tap or scroll</span>
+  </p>
 </section>
 
 <?php /* ============================================================ LOGOS */ ?>
@@ -433,7 +304,6 @@ $cta_label = 'Start my growth plan';
         <div><dt>Headquarters</dt><dd>Chennai, India</dd></div>
         <div><dt>Team</dt><dd>25+ specialists</dd></div>
         <div><dt>Delivered</dt><dd>150+ projects in 10+ industries</dd></div>
-        <div><dt>Markets</dt><dd>India, UAE, Saudi Arabia, Qatar, Singapore, Malaysia, Indonesia, Australia, UK, US, Canada, Africa</dd></div>
         <div><dt>Engagements</dt><dd>From <?= e(price('starter')) ?> / month, no setup fees</dd></div>
         <div><dt>Response time</dt><dd>Within 24 hours</dd></div>
       </dl>
@@ -492,11 +362,9 @@ $cta_label = 'Start my growth plan';
             <?php endforeach; ?>
           </div>
           <span class="hp3-err" data-err-for="services"></span>
-          <p class="hp3-q">Which markets do you want to win?</p>
-          <div class="hp3-chipset" role="group" aria-label="Target markets">
-            <?php foreach ($FORM_MARKETS as $m): ?>
-            <label class="hp3-chip"><input type="checkbox" name="markets[]" value="<?= e($m) ?>"><span><?= e($m) ?></span></label>
-            <?php endforeach; ?>
+          <div class="hp3-f">
+            <label for="f-market">Where do you want to grow? <span class="hp3-opt">Optional</span></label>
+            <input id="f-market" name="markets" type="text" autocomplete="off" placeholder="Country, region or city">
           </div>
         </fieldset>
 
@@ -647,14 +515,12 @@ echo jsonld_script([
             'url' => abs_url('/'),
             'logo' => abs_url('/assets/img/vturnu-logo-dark.png'),
             'image' => abs_url('/assets/img/vturnu-logo-dark.png'),
-            'description' => 'VTurnU is a B2B digital marketing and web development agency headquartered in Chennai, India. It provides SEO, AI search optimization, Google Ads, demand generation and conversion-focused websites for B2B companies in India, the Middle East, Southeast Asia, North America, Europe, Africa and Australia.',
+            'description' => 'VTurnU is a B2B digital marketing and web development agency headquartered in Chennai, India. It provides SEO, AI search optimization, Google Ads, demand generation and conversion-focused websites for B2B companies worldwide.',
             'slogan' => SITE_TAGLINE,
             'email' => CONTACT_EMAIL,
             'telephone' => CONTACT_PHONE,
             'priceRange' => '₹35,000+ per month',
-            'areaServed' => array_map(static function (array $m): array {
-                return ['@type' => 'Country', 'name' => $m[1]];
-            }, $MARKETS),
+            'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
             'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Chennai', 'addressRegion' => 'Tamil Nadu', 'addressCountry' => 'IN'],
             'contactPoint' => [[
                 '@type' => 'ContactPoint',
@@ -688,7 +554,7 @@ echo jsonld_script([
             'isPartOf' => ['@id' => abs_url('/') . '#website'],
             'about' => ['@id' => $org_id],
             'primaryImageOfPage' => abs_url('/assets/img/vturnu-logo-dark.png'),
-            'speakable' => ['@type' => 'SpeakableSpecification', 'cssSelector' => ['.hp3-h1', '.hp3-scene--1 .hp3-lead', '.hp3-facts']],
+            'speakable' => ['@type' => 'SpeakableSpecification', 'cssSelector' => ['.tt-h1', '.tt-lead', '.hp3-facts']],
         ],
         [
             '@type' => 'FAQPage',

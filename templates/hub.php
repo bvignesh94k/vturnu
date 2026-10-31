@@ -8,7 +8,7 @@ $accents = ['ac-yellow', 'ac-terra', 'ac-purple', 'ac-olive', 'ac-cyan', 'ac-pin
 ?>
 <section class="page-hero hub-hero">
     <div class="container">
-        <p class="eyebrow eyebrow-line">Chennai · India · US · Canada</p>
+        <p class="eyebrow eyebrow-line"><?= e($slug === 'enterprise-it-services' ? 'A separate practice' : 'VTurnU services') ?></p>
         <h1><?= e($page['h1']) ?></h1>
         <p class="lede"><?= e($page['lede']) ?></p>
         <div class="hero-actions">

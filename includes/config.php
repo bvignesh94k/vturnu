@@ -87,6 +87,13 @@ define('ENTITY_PROFILES', [
     'https://medium.com/@vturnu',
 ]);
 
+/* Countries the business targets. These drive areaServed in the structured data
+   that search and AI engines read. They are deliberately not listed on any page. */
+define('TARGET_MARKETS', [
+    'India', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Singapore', 'Malaysia', 'Indonesia',
+    'Australia', 'United Kingdom', 'United States', 'Canada', 'South Africa', 'Nigeria', 'Kenya',
+]);
+
 // Business facts, used by the Organization schema.
 /* Shown only to visitors in India: see gst_visible() in includes/security.php.
    Deliberately absent from JSON-LD, which every country and crawler reads. */
