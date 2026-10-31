@@ -24,8 +24,13 @@
       "continue": true
     },
     {
-      "src": "^/assets/.*\\.(jpg|jpeg|png|webp|avif|svg|ico|gif|woff2|woff|epub)$",
+      "src": "^/assets/.*\\.(jpg|jpeg|png|webp|avif|svg|ico|gif|woff2|woff)$",
       "headers": { "Cache-Control": "public, max-age=2592000" },
+      "continue": true
+    },
+    {
+      "src": "^/presentations/.*$",
+      "headers": { "X-Robots-Tag": "noindex" },
       "continue": true
     },
     {
@@ -35,7 +40,6 @@
     },
     { "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$", "status": 403 },
     { "src": "^/index\\.php$", "status": 403 },
-    { "src": "^/presentations/.*\\.html$", "continue": true },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]

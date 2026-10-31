@@ -11,8 +11,15 @@ declare(strict_types=1);
 function db(): PDO
 {
     static $pdo = null;
+    static $failure = null;
     if ($pdo !== null) {
         return $pdo;
+    }
+    /* A form post touches the database several times. If the first connection
+       fails, fail the rest instantly instead of making the visitor wait for
+       each attempt to time out. */
+    if ($failure !== null) {
+        throw $failure;
     }
 
     /* Neon (via the Vercel integration) creates several of these. Try the
@@ -67,10 +74,15 @@ function db(): PDO
     $user = isset($parts['user']) ? rawurldecode($parts['user']) : '';
     $pass = isset($parts['pass']) ? rawurldecode($parts['pass']) : '';
 
-    $pdo = new PDO($pdoDsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_TIMEOUT => 8,
-    ]);
+    try {
+        $pdo = new PDO($pdoDsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_TIMEOUT => 8,
+        ]);
+    } catch (Throwable $e) {
+        $failure = $e;
+        throw $e;
+    }
     return $pdo;
 }

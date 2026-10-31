@@ -357,28 +357,84 @@ function service_process(array $page): array
     ];
 }
 
-/** FAQs varied by category & service name. */
+/**
+ * FAQs for a service page. Each category answers the questions buyers of that
+ * service really ask, so sixty pages do not repeat one generic list. Industry
+ * pages add the industry to the question, which is how people search for it.
+ */
 function service_faqs(array $page): array
 {
     if (!empty($page['faqs'])) {
         return $page['faqs'];
     }
-    $name = strtolower($page['h1']);
+    $h1 = preg_replace('/\s+Services$/i', '', $page['h1']);
+    $name = strtolower($h1);
     $cat = $page['cat'] ?? 'seo';
+    $ind = $page['industry'] ?? '';
 
-    $timing = match ($cat) {
-        'ppc' => 'Paid campaigns start producing data immediately; expect meaningful optimization gains within the first 4–6 weeks.',
-        'web' => 'A typical project runs 4–10 weeks depending on scope, we\'ll give you a fixed timeline after discovery.',
-        default => 'You\'ll usually see early movement in 6–8 weeks, with compounding results from month three onward.',
-    };
-
-    return [
-        ["How much do {$name} cost?", 'Pricing depends on scope and competitiveness. After a free consultation we\'ll send a fixed, transparent proposal: no hidden fees, no long lock-ins. See our pricing page for typical ranges.'],
-        ['How soon will I see results?', $timing],
-        ['How do you report progress?', 'You get a live dashboard plus a monthly report that ties activity to outcomes: leads, sales and revenue, not just vanity metrics.'],
-        ['Do you work with businesses like mine?', 'We work with startups, SMEs and enterprises across SaaS, ecommerce, healthcare, real estate, education and manufacturing. Ask us for a relevant case study on our first call.'],
-        ['How do we get started?', 'Book a free consultation via our contact page. We\'ll review your goals, audit your current position and come back with a clear plan within a few days.'],
+    $sets = [
+        'seo' => [
+            ["How much does {$name} cost?", 'Our Starter and Growth plans on the pricing page cover most businesses. Larger or more competitive programs are quoted after a free audit, because the work depends on your market and starting point.'],
+            ["How long does {$name} take to work?", 'You will usually see early movement within six to eight weeks, and results compound from month three onward. Very competitive terms can take longer.'],
+            ['What do you do in the first month?', 'We audit the site, fix tracking, map keywords to buying intent, and start on the technical issues that hold everything else back.'],
+            ['Do you guarantee a number one ranking?', 'No, and nobody honest can, because no one controls Google. We commit to the work, clear reporting and a plan based on evidence.'],
+            ['Does this also help with AI search?', 'Yes. AI engines read the same web, so clear structure, schema and trusted content help you in both places.'],
+            ['How do you report progress?', 'A monthly report ties rankings and traffic to enquiries and revenue, followed by a review call.'],
+        ],
+        'seo-industry' => [
+            ["Why does {$ind} need specialist SEO?", "Buyers in {$ind} search in their own way and need specific reassurance. Generic SEO misses that language and the proof they look for."],
+            ["How long does SEO take for {$ind}?", 'Most businesses see movement within six to eight weeks. Competitive markets take longer, and we forecast this after an audit.'],
+            ['What makes content rank in this field?', 'Real expertise. Named experts, accurate claims, specific examples and pages that answer buyers\' real questions.'],
+            ['Do you work with businesses of my size?', 'Yes. We work with single-location businesses as well as larger brands, and the Starter plan suits smaller budgets.'],
+            ['How do you measure success?', 'In enquiries and revenue, with rankings and traffic as supporting signals.'],
+        ],
+        'ai' => [
+            ["What is {$name}?", 'It is the work of making your brand visible and recommended inside AI-generated answers, through clear content, structured data, consistent entity facts and mentions on trusted sources.'],
+            ['Can you guarantee AI engines will mention us?', 'No one can, because AI answers vary. We improve the signals engines rely on, and we track how often you are named across a set of buyer prompts.'],
+            ['How do you measure results?', 'We sample buyer prompts across engines each month and record whether you are named, along with citation data from Bing Webmaster Tools where available.'],
+            ['Do we still need regular SEO?', 'Yes. AI engines draw on the same web, and sites that are crawlable and well structured have a head start.'],
+            ['How long does it take?', 'Technical and entity fixes can show within weeks. Earning corroboration on independent sites usually takes a few months.'],
+            ['Is my industry a good fit?', 'If your buyers research before they buy, yes. B2B services, software and considered purchases benefit the most.'],
+        ],
+        'ppc' => [
+            ["How much does {$name} cost?", 'Management is covered by our monthly plans, and ad spend is paid directly to the platform. We recommend a budget after looking at your market and target cost per lead.'],
+            ['How soon will campaigns produce results?', 'Campaigns collect data immediately. Expect meaningful optimization in the first four to six weeks.'],
+            ['Who owns the ad account?', 'You do. Accounts stay in your name, so you keep all data and history if we ever part ways.'],
+            ['What do you track?', 'Real conversions such as qualified leads, calls and sales, set up before we spend your budget.'],
+            ['How do you stop wasted spend?', 'Tight targeting, negative keywords, regular search term reviews and landing pages built for each campaign.'],
+            ['What is a good cost per lead?', 'It depends on what a customer is worth to you. We calculate an affordable target from your margins first.'],
+        ],
+        'social' => [
+            ["How much does {$name} cost?", 'It is part of our Growth plan, and standalone scopes are quoted after a free review of your profiles.'],
+            ['Which platforms should we use?', 'The ones your buyers use. LinkedIn usually leads for B2B, and Instagram and Facebook for consumer brands.'],
+            ['Do you create the content?', 'Yes. We plan, design and write posts, and we use your real people and work wherever we can.'],
+            ['How do you measure social media?', 'Against leads, sales and reach among your target audience, not likes alone.'],
+            ['Should we run paid social too?', 'Usually yes. Organic content shows what works, and paid puts it in front of more of the right people.'],
+        ],
+        'content' => [
+            ["How much does {$name} cost?", 'Content is included in our monthly plans, and larger programs are quoted after a free strategy session.'],
+            ['Who writes the content?', 'Specialist writers who interview your experts, with an editor reviewing every piece. AI may help with research, but people write, check and approve.'],
+            ['How long until content brings results?', 'Usually three to six months, and well-chosen content keeps working for years.'],
+            ['Will you match our brand voice?', 'Yes. We document your tone first, and you approve early pieces before we scale.'],
+            ['How do you measure content performance?', 'By the rankings, leads and pipeline it influences, not pageviews alone.'],
+        ],
+        'web' => [
+            ["How much does {$name} cost?", 'Our website packages are on the pricing page, and custom builds are quoted after a scoping call. Design and development are billed once.'],
+            ['How long does a website project take?', 'A business website takes around three to four weeks and an online store five to eight, once content is ready.'],
+            ['Will the site be fast?', 'We target 90+ on PageSpeed and test Core Web Vitals on real pages before launch.'],
+            ['Will I be able to edit it myself?', 'Yes. We build on a platform that suits your team and show you how to manage it.'],
+            ['Can you migrate my existing site without losing rankings?', 'Yes. We map old URLs, set redirects and watch Search Console after launch.'],
+            ['Who owns the website?', 'You do, including the code, content and design.'],
+        ],
+        'consulting' => [
+            ['What does a consulting engagement include?', 'An evidence-based audit, a prioritized roadmap, measurement setup and regular reviews with your team.'],
+            ['Do you do the work, or only advise?', 'Either. Many clients want a roadmap for their own team, while others ask us to deliver it too.'],
+            ['How long does an audit take?', 'Usually two to three weeks, depending on how many channels and accounts are involved.'],
+            ['What access do you need?', 'Read access to analytics, ad accounts and Search Console, plus a conversation with whoever owns sales.'],
+        ],
     ];
+
+    return $sets[$cat] ?? $sets['seo'];
 }
 
 /**
@@ -466,6 +522,7 @@ function enquiry_qualify(array $post): array
         'Email: ' . ($business ? 'Business domain' : 'Free webmail, verify fit'),
     ];
     $note = trim((string) ($post['message'] ?? ''));
+    $post['raw_message'] = $note;
 
     $post['service'] = $services !== '' ? $services : trim((string) ($post['service'] ?? ''));
     $post['company'] = trim((string) ($post['company'] ?? '')) . ($site !== '' ? ' (' . $site . ')' : '');
@@ -499,26 +556,48 @@ function save_enquiry(array $post, string $source): bool
         'mobile' => $local,
         'company' => trim($post['company'] ?? ''),
         'designation' => trim($post['designation'] ?? ''),
-        'service' => trim($post['service'] ?? ''),
+        'service' => html_entity_decode(trim($post['service'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
         'budget' => budget_label(trim((string) ($post['budget'] ?? ''))),
         'message' => trim($post['message'] ?? ''),
     ];
 
+    /* Quality screen. Everything is stored; only what passes reaches the sales
+       inbox. Junk keeps status 'junk' so the admin Junk view can restore it. */
+    $screen = lead_screen($entry + ['raw_message' => $post['raw_message'] ?? null], $source, true, [
+        'hx' => (string) ($post['_hx'] ?? ''),
+        'captcha' => $GLOBALS['recaptcha_signal'] ?? null,
+    ]);
+    $status = $screen['verdict'] === 'junk' ? 'junk' : 'new';
+    $tags = $screen['verdict'] === 'ok' ? '' : ($screen['verdict'] === 'junk' ? 'auto-junk' : 'check-first');
+    $activity = json_encode([[
+        'date' => date('Y-m-d H:i'),
+        'text' => 'Quality check: ' . $screen['verdict'] . ' (' . $screen['score'] . ')'
+            . ($screen['reasons'] ? ': ' . implode('; ', $screen['reasons']) : ''),
+    ]], JSON_UNESCAPED_UNICODE);
+
     $stored = false;
     try {
         db()->prepare(
-            'INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message)
-             VALUES (:source, :name, :email, :mobile, :company, :designation, :service, :budget, :message)'
+            'INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message, status, tags, activity)
+             VALUES (:source, :name, :email, :mobile, :company, :designation, :service, :budget, :message, :status, :tags, CAST(:activity AS jsonb))'
         )->execute([
             ':source' => $entry['source'], ':name' => $entry['name'], ':email' => $entry['email'],
             ':mobile' => $entry['mobile'], ':company' => $entry['company'], ':designation' => $entry['designation'],
             ':service' => $entry['service'], ':budget' => $entry['budget'], ':message' => $entry['message'],
+            ':status' => $status, ':tags' => $tags, ':activity' => $activity,
         ]);
         $stored = true;
     } catch (Throwable $e) {
         error_log('save_enquiry: DB insert failed: ' . $e->getMessage());
     }
 
+    /* A junk verdict skips the inbox, unless the database failed too: then the
+       email is the only copy, and a false positive must not vanish. */
+    if ($screen['verdict'] === 'junk' && $stored) {
+        return true;
+    }
+    $entry['quality'] = $screen;
+    $entry['not_stored'] = !$stored;
     $emailed = mail_enquiry($entry);
 
     /* A lead survives if it reached the database or the sales inbox. If
@@ -552,7 +631,16 @@ function mail_enquiry(array $entry): bool
         'budget' => 'Budget', 'message' => 'Message',
     ];
 
+    $quality = $entry['quality'] ?? ['verdict' => 'ok', 'reasons' => []];
     $lines = ['New enquiry from the ' . SITE_NAME . ' website', str_repeat('=', 46), ''];
+    if (!empty($entry['not_stored'])) {
+        $lines[] = 'NOT SAVED TO THE ADMIN PANEL: the database was unavailable. This email is the only copy.';
+        $lines[] = '';
+    }
+    if ($quality['verdict'] !== 'ok') {
+        $lines[] = ($quality['verdict'] === 'junk' ? 'LIKELY JUNK' : 'CHECK BEFORE REPLYING') . ': ' . implode('; ', $quality['reasons']);
+        $lines[] = '';
+    }
     foreach ($labels as $key => $label) {
         $val = trim((string) ($entry[$key] ?? ''));
         if ($val !== '') {
@@ -565,7 +653,8 @@ function mail_enquiry(array $entry): bool
     $lines[] = '';
     $lines[] = 'Reply directly to this email to respond to the enquirer.';
 
-    $subject = sprintf('New enquiry: %s%s', $entry['name'], $entry['service'] !== '' ? ' (' . $entry['service'] . ')' : '');
+    $prefix = ['ok' => '', 'review' => '[Check first] ', 'junk' => '[Likely junk] '][$quality['verdict']] ?? '';
+    $subject = $prefix . sprintf('New enquiry: %s%s', $entry['name'], $entry['service'] !== '' ? ' (' . $entry['service'] . ')' : '');
 
     return send_email(ENQUIRY_TO, $subject, implode("\n", $lines), [
         'reply_to' => $entry['name'] . ' <' . $entry['email'] . '>',
@@ -659,7 +748,7 @@ function answer_box(array $page): array
         ],
         'ppc' => [
             "What does $name include?",
-            "VTurnU's $lname covers strategy, campaign build, creative, conversion tracking and continuous optimization: managed by certified specialists and reported against CPA and ROAS, not vanity metrics. Most accounts see measurable efficiency gains within the first 4–6 weeks.",
+            "VTurnU's $lname covers strategy, campaign build, creative, conversion tracking and continuous optimization: managed by certified specialists and reported against CPA and ROAS, not vanity metrics. Most accounts see measurable efficiency gains within the first 4 to 6 weeks.",
         ],
         'web' => [
             "What makes VTurnU's $lname different?",
@@ -675,7 +764,7 @@ function answer_box(array $page): array
         ],
         'consulting' => [
             "When do you need $lname?",
-            "If you're spending on marketing but can't say which channel is profitable, you need $lname. VTurnU audits your funnel, fixes measurement and gives you a prioritized roadmap, typically finding 20–40% of budget that can work harder within the first month.",
+            "If you're spending on marketing but can't say which channel is profitable, you need $lname. VTurnU audits your funnel, fixes measurement and gives you a prioritized roadmap, typically finding 20 to 40% of budget that can work harder within the first month.",
         ],
         'seo-industry' => [
             "Why does " . ($page['industry'] ?? 'your industry') . " need specialist SEO?",
@@ -683,7 +772,7 @@ function answer_box(array $page): array
         ],
         default => [
             "What is $name?",
-            "$name is the process of earning higher rankings and qualified organic traffic through technical excellence, intent-matched content and authority building. VTurnU delivers it as a measurable growth program: audited, prioritized and reported against leads and revenue, with early movement typically visible in 6–8 weeks.",
+            "$name is the process of earning higher rankings and qualified organic traffic through technical excellence, intent-matched content and authority building. VTurnU delivers it as a measurable growth program: audited, prioritized and reported against leads and revenue, with early movement typically visible in 6 to 8 weeks.",
         ],
     };
 }
@@ -692,10 +781,10 @@ function answer_box(array $page): array
 function why_choose(array $page): array
 {
     return $page['why'] ?? [
-        'Free audit and fixed-price proposal before you commit',
-        'Senior specialists on your account: no junior handoffs',
-        'Reporting tied to leads and revenue, updated live',
-        'Month-to-month engagement: we earn renewal with results',
+        'Free audit and a clear proposal before you commit',
+        'Senior specialists on your account, with no junior handoffs',
+        'Reporting tied to leads and revenue',
+        'Month to month after 90 days: we earn renewal with results',
     ];
 }
 
@@ -728,7 +817,7 @@ function render_trust_badges(): void
     $badges = [
         ['M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1 13-3-3 1.4-1.4L11 12.2l4.6-4.6L17 9l-6 6Z', 'No lock-in contracts'],
         ['M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.3 0-8 1.7-8 5v3h16v-3c0-3.3-4.7-5-8-5Z', 'Senior specialists only'],
-        ['M4 20V10h3v10H4Zm6.5 0V4h3v16h-3ZM17 20v-7h3v7h-3Z', 'Revenue-first reporting'],
+        ['M4 20V10h3v10H4Zm6.5 0V4h3v16h-3ZM17 20v-7h3v7h-3Z', 'Reported in revenue'],
         ['M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm4.2 14.2L11 13V7h1.5v5.3l4.5 2.7-.8 1.2Z', '24-hour reply guarantee'],
     ];
     echo '<ul class="badge-row" aria-label="Our guarantees">';
@@ -774,39 +863,6 @@ function render_compare(): void
         </div>
     </div>
 </section>
-    <?php
-}
-
-/**
- * VTurnAI upsell block.
- *
- * The free audit answers "do I have a problem" once. This is the offer to
- * answer "is it fixed yet" every month, and it is placed where that question
- * is most alive: directly under a finished report. $campaign only tags the
- * outbound link so product analytics can tell the placements apart.
- */
-function render_product_upsell(string $campaign, ?string $heading = null, ?string $intro = null): void
-{
-    $heading ??= 'This was one page, once. What about every engine, every month?';
-    $intro   ??= 'The check above reads the HTML your homepage serves today. ' . PRODUCT_NAME
-        . ', our own platform, keeps watching: it crawls your whole site and tracks what ChatGPT, Gemini, '
-        . 'Claude, Perplexity, Grok and Copilot actually say about you when a customer asks.';
-    ?>
-<div class="product-upsell" data-reveal="card">
-    <p class="eyebrow">Go further with <?= e(PRODUCT_NAME) ?></p>
-    <h3><?= e($heading) ?></h3>
-    <p><?= e($intro) ?></p>
-    <ul class="check-list">
-        <li>Brand mentions and citations tracked across 8 engines</li>
-        <li>25 buying-intent prompts watched, with competitor share of voice</li>
-        <li>One V Score across SEO, AEO, GEO and HEO, trended month over month</li>
-        <li>A fix list ordered by visibility impact, not by what is easy to detect</li>
-    </ul>
-    <div class="product-upsell-actions">
-        <a class="btn btn-grad" href="<?= e(product_url($campaign)) ?>" target="_blank" rel="noopener">Start <?= e(PRODUCT_TRIAL_DAYS) ?>-Day Free Trial</a>
-        <a class="cta-phone" href="<?= e(PRODUCT_PAGE) ?>">or see what it tracks →</a>
-    </div>
-</div>
     <?php
 }
 
@@ -912,65 +968,4 @@ function related_pages(array $pages, string $slug): array
         }
     }
     return related_ring($siblings, $slug, 4);
-}
-
-/** Demo case-study cards per list type. */
-function case_cards(string $type): array
-{
-    $sets = [
-        'seo' => [
-            ['SaaS platform', '+312% organic traffic in 9 months', 'A technical SEO overhaul and topic-cluster content engine took a B2B SaaS from page 3 to owning its category terms.', ['312%', 'Organic traffic growth'], ['48', 'Keywords in top 3']],
-            ['Fashion retailer', '2.4× organic revenue year over year', 'Category-page strategy and faceted-navigation fixes unlocked rankings the store had been sitting on for years.', ['2.4×', 'Organic revenue'], ['-38%', 'Reliance on paid traffic']],
-            ['Dental group', '#1 in the map pack across 12 locations', 'Location page system, review velocity program and local links put every clinic at the top of its neighborhood.', ['12/12', 'Locations ranking top 3'], ['+167%', 'Appointment requests']],
-        ],
-        'ppc' => [
-            ['D2C brand', 'ROAS from 1.8 to 4.6 in one quarter', 'Feed restructuring, creative testing and budget reallocation turned a break-even account into a growth engine.', ['4.6×', 'ROAS'], ['-52%', 'Cost per acquisition']],
-            ['B2B services firm', '3× demo bookings at the same spend', 'Intent-tiered search campaigns and rebuilt landing pages tripled conversions without a budget increase.', ['3×', 'Demo bookings'], ['+89%', 'Conversion rate']],
-            ['EdTech platform', '41% cheaper enrollments at 2× scale', 'Full-funnel Meta + Google structure let the brand double spend while CPAs fell.', ['-41%', 'Cost per enrollment'], ['2×', 'Monthly ad spend scaled']],
-        ],
-        'social' => [
-            ['Wellness brand', '0 to 120K engaged followers in a year', 'A reels-first content system plus creator collabs built an audience that now drives 30% of revenue.', ['120K', 'Followers gained'], ['30%', 'Revenue from social']],
-            ['Real estate developer', '4.2M reach for a single launch', 'A coordinated launch campaign across Instagram and Facebook sold out phase one in six weeks.', ['4.2M', 'Campaign reach'], ['6 wks', 'Phase one sold out']],
-            ['B2B manufacturer', 'LinkedIn pipeline worth ₹3.8Cr', 'Executive thought-leadership and targeted campaigns turned a dormant page into a lead source.', ['₹3.8Cr', 'Pipeline generated'], ['+540%', 'Engagement rate']],
-        ],
-        'content' => [
-            ['Fintech startup', '210 keywords ranked with 24 articles', 'A tightly clustered content strategy earned rankings, links and a steady flow of qualified signups.', ['210', 'Ranking keywords'], ['+178%', 'Organic signups']],
-            ['Healthcare provider', 'Authority content that doubled bookings', 'Medically reviewed articles and treatment guides built trust, and doubled appointment requests.', ['2×', 'Appointment requests'], ['96', 'Featured snippets won']],
-            ['Logistics company', 'From zero blog to 60K monthly readers', 'An editorial engine focused on operator questions made the brand the industry\'s reference point.', ['60K', 'Monthly readers'], ['+130%', 'Inbound enquiries']],
-        ],
-        'design' => [
-            ['SaaS rebrand', 'Conversion rate up 74% post-redesign', 'A repositioned brand and rebuilt marketing site turned the same traffic into far more demos.', ['+74%', 'Conversion rate'], ['-1.9s', 'Load time improvement']],
-            ['Retail chain', 'A brand system that unified 40 stores', 'New identity, guidelines and web presence brought consistency, and measurable recall, across regions.', ['40', 'Stores unified'], ['+22%', 'Brand recall']],
-            ['Manufacturer', 'RFQs doubled after UX overhaul', 'Restructured product architecture and spec-first pages made it easy for engineers to buy.', ['2×', 'RFQ submissions'], ['-35%', 'Bounce rate']],
-        ],
-        'saas' => [
-            ['DevTools startup', 'From 800 to 14K organic visits/month', 'Product-led SEO and comparison content captured buyers at the moment of evaluation.', ['17×', 'Organic traffic'], ['+320%', 'Free trial starts']],
-            ['HR platform', 'CAC down 44% by rebalancing channels', 'Consulting engagement that shifted budget from saturated paid channels into content and lifecycle email.', ['-44%', 'Customer acquisition cost'], ['+61%', 'MQL-to-SQL rate']],
-        ],
-        'ecom' => [
-            ['Jewelry store', 'Organic revenue up 190% in 8 months', 'Buying-guide content and product schema turned informational traffic into transactions.', ['+190%', 'Organic revenue'], ['+85%', 'Assisted conversions']],
-            ['Beauty brand', 'Marketplace-beating rankings', 'Ingredient-led SEO outranked Amazon and Nykaa for the brand\'s hero categories.', ['Top 3', 'For 60+ category terms'], ['3.1×', 'ROAS on paid retargeting']],
-        ],
-        'health' => [
-            ['Multi-specialty clinic', '+167% appointment requests', 'Local SEO, treatment pages and a review program made the clinic the obvious local choice.', ['+167%', 'Appointments'], ['4.8★', 'Average rating maintained']],
-            ['Wellness D2C', 'Compliant content that ranks', 'E-E-A-T-first editorial and expert review workflows won YMYL rankings competitors couldn\'t hold.', ['+240%', 'Organic traffic'], ['0', 'Compliance issues']],
-        ],
-        'realestate' => [
-            ['Property developer', '2,300 qualified leads in 6 months', 'Hyperlocal SEO and paid campaigns for three launches filled the CRM with verified buyers.', ['2,300', 'Qualified leads'], ['-33%', 'Cost per lead']],
-            ['Brokerage', 'Map-pack dominance in 8 suburbs', 'Location landing pages and review velocity put the brand first for every neighborhood search.', ['8/8', 'Suburbs ranked #1'], ['+92%', 'Call volume']],
-        ],
-        'education' => [
-            ['University', 'Enrollment enquiries up 145%', 'Program-page SEO and scholarship content captured students at every research stage.', ['+145%', 'Enquiries'], ['52', 'Programs ranking top 5']],
-            ['Training institute', 'Paid CPL cut by half', 'Restructured Google Ads and localized landing pages halved cost per lead in one term.', ['-50%', 'Cost per lead'], ['+2.1×', 'Enrollment rate']],
-        ],
-        'manufacturing' => [
-            ['Industrial equipment maker', 'RFQs from organic up 210%', 'Spec-first product pages and technical content reached engineers mid-research.', ['+210%', 'RFQ volume'], ['1,400', 'Product pages optimized']],
-            ['Components exporter', 'Global visibility in 6 markets', 'Multilingual SEO and localized content opened inbound pipelines across three continents.', ['6', 'Markets ranking'], ['+75%', 'Export enquiries']],
-        ],
-        'edutech' => [
-            ['Learning app', 'Organic installs up 4× in a year', 'App-store-aligned SEO content and tutorial hubs became the platform\'s cheapest acquisition channel.', ['4×', 'Organic installs'], ['-58%', 'Blended CAC']],
-            ['Upskilling platform', 'Course pages that convert', 'Comparison and syllabus content plus CRO lifted paid-course conversions dramatically.', ['+96%', 'Course enrollments'], ['38%', 'Traffic from AI answers']],
-        ],
-    ];
-    return $sets[$type] ?? $sets['seo'];
 }

@@ -29,7 +29,7 @@ $why = why_choose($page);
     <div class="container trust-strip-inner">
         <span><strong>150+</strong> projects delivered</span>
         <span><strong>10+</strong> industries served</span>
-        <span><strong>3.2×</strong> average ROI improvement</span>
+        <span><strong>No</strong> long-term lock-ins</span>
         <span><strong>24h</strong> guaranteed response</span>
     </div>
 </div>
@@ -92,38 +92,7 @@ $why = why_choose($page);
 
 <?php render_compare(); ?>
 
-<?php /* AI-search service pages only. A visitor reading about AI SEO is the
-         single best-qualified audience on the site for our own tracking
-         product, and the block is written so it reads as the measurement
-         layer under the service rather than a competing offer. */
-$AI_SLUGS = ['ai-seo', 'chatgpt-seo', 'perplexity-seo', 'google-ai-overviews-seo', 'selling-on-chatgpt', 'ai-search'];
-if (in_array($slug, $AI_SLUGS, true)): ?>
-<section class="section">
-    <div class="container narrow">
-        <?php render_product_upsell(
-            'service-' . $slug,
-            'You cannot improve what you cannot measure',
-            'Everything on this page starts with knowing where you stand today. ' . PRODUCT_NAME
-            . ' is the platform we built to measure it, and you can run it yourself: it tracks what the AI engines say about your brand and scores exactly what to fix first.'
-        ); ?>
-    </div>
-</section>
-<?php endif; ?>
-
-<section class="section section-tint">
-    <div class="container narrow">
-        <h2 class="section-title center"><?= e($page['h1']) ?>, Frequently Asked Questions</h2>
-        <div class="faq-list">
-            <?php foreach ($faqs as [$q, $a]): ?>
-            <details class="faq">
-                <summary><?= e($q) ?></summary>
-                <p><?= e($a) ?></p>
-            </details>
-            <?php endforeach; ?>
-        </div>
-        <p class="center faq-cta">Still have questions? <a href="/contact-us/">Ask a specialist</a>: free, no obligation.</p>
-    </div>
-</section>
+<?php render_faqs($faqs, 'Questions buyers ask about ' . $page['h1']); ?>
 
 <?php render_next_steps(); ?>
 

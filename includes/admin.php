@@ -3,11 +3,11 @@
  * VTurnU Admin: leads CRM + content manager with full editing.
  * Routed from index.php for any /admin/ URL. Stateless-cookie auth,
  * CSRF-protected POSTs. Storage: Postgres (admin_users, enquiries,
- * content_overrides — see db/schema.sql), not local files.
+ * content_overrides, see db/schema.sql), not local files.
  *
  * Vercel's filesystem is not writable between requests, so there is no PHP
  * session here: auth is a signed, expiring cookie instead (same HMAC pattern
- * as csrf_token() and ebook_token()), verified on every request rather than
+ * as csrf_token()), verified on every request rather than
  * looked up from server-side state.
  *
  * Default login: admin / vturnu@admin. Change it in Settings after first login.
@@ -97,7 +97,7 @@ function leads_in(array $leads, string $segment): array {
 }
 /* Statuses that take a deal out of the open pipeline. */
 const ADMIN_CLOSED = ['won', 'lost'];
-const BLOG_INTENTS = ['Informational', 'Commercial Investigation', 'How-to / Tutorial', 'Buying Guide', 'Comparison', 'Problem–Solution', 'Industry Trends', 'Use Cases', 'Benefits', 'FAQs', 'Best Practices', 'Case Study', 'Cost & Pricing', 'Trends & Innovations', 'Mistakes to Avoid'];
+const BLOG_INTENTS = ['Informational', 'Commercial Investigation', 'How-to / Tutorial', 'Buying Guide', 'Comparison', 'Problem and Solution', 'Industry Trends', 'Use Cases', 'Benefits', 'FAQs', 'Best Practices', 'Case Study', 'Cost & Pricing', 'Trends & Innovations', 'Mistakes to Avoid'];
 const BLOG_CATS = ['Strategy', 'SEO', 'AI Search', 'Paid Media', 'Content', 'Social', 'Web', 'Conversion', 'Innovation', 'Case Study'];
 const INDUSTRIES = ['Jewelry', 'SaaS & Tech', 'Healthcare', 'Real Estate', 'Ecommerce', 'Food & Hospitality', 'Legal Services', 'Fashion', 'Manufacturing', 'Education'];
 
@@ -149,13 +149,15 @@ $auth = admin_load_auth();
 
 /* ---------- Leads (Postgres enquiries table) ---------- */
 
-function admin_load_leads(): array {
+/** Real leads by default. Pass true for the leads the quality screen held back. */
+function admin_load_leads(bool $junk = false): array {
     try {
         $rows = db()->query(
             "SELECT id, created_at, source, name, email, mobile, company, designation, service, budget,
                     message, status, notes, value, priority, owner,
                     to_char(followup, 'YYYY-MM-DD') AS followup, tags, activity
-             FROM enquiries WHERE deleted_at IS NULL ORDER BY created_at DESC"
+             FROM enquiries WHERE deleted_at IS NULL AND status " . ($junk ? "= 'junk'" : "<> 'junk'") . "
+             ORDER BY created_at DESC"
         )->fetchAll();
     } catch (Throwable $e) {
         error_log('admin_load_leads: ' . $e->getMessage());
@@ -285,6 +287,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'logout':
                 admin_clear_session();
                 header('Location: /admin/'); exit;
+
+            /* A false positive: back into the pipeline, and on to the sales inbox
+               it never reached. */
+            case 'lead_restore':
+                $lid = $_POST['id'] ?? '';
+                foreach (admin_load_leads(true) as $l) {
+                    if ($l['id'] === $lid) {
+                        db()->prepare("UPDATE enquiries SET status = 'new', tags = '' WHERE id = ?")->execute([(int) $lid]);
+                        admin_log_activity($lid, 'Restored from Junk by ' . $auth['user']);
+                        mail_enquiry(['date' => $l['date']] + $l);
+                        $flash = 'Lead restored and sent to ' . ENQUIRY_TO . '.';
+                        break;
+                    }
+                }
+                break;
+
+            /* One pass over untouched older leads, for the junk that arrived before
+               the filter existed. Leads someone has already worked are left alone. */
+            case 'junk_recheck':
+                $moved = 0;
+                foreach (admin_load_leads() as $l) {
+                    if ($l['status'] !== 'new') {
+                        continue;
+                    }
+                    $check = lead_screen($l, (string) $l['source'], false);
+                    if ($check['verdict'] === 'junk') {
+                        db()->prepare("UPDATE enquiries SET status = 'junk', tags = 'auto-junk' WHERE id = ?")->execute([(int) $l['id']]);
+                        admin_log_activity($l['id'], 'Moved to Junk by re-check: ' . implode('; ', $check['reasons']));
+                        $moved++;
+                    }
+                }
+                $flash = $moved . ' older ' . ($moved === 1 ? 'lead' : 'leads') . ' moved to Junk.';
+                break;
 
             case 'lead_status':
                 $st = $_POST['status'] ?? 'new';
@@ -474,6 +509,7 @@ if ($logged_in && $view === 'export') {
 
 /* Data for views */
 $leads = $logged_in ? admin_load_leads() : [];
+$junk_leads = $logged_in ? admin_load_leads(true) : [];
 $custom_posts = admin_get_overrides('blog');
 $custom_cases = admin_get_overrides('case');
 $custom_resources = admin_get_overrides('resource');
@@ -646,6 +682,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         <div class="side-sub">CRM & Content</div>
         <a class="nav<?= $view === 'dashboard' ? ' on' : '' ?>" href="/admin/?view=dashboard">Dashboard</a>
         <a class="nav<?= in_array($view, ['leads', 'lead'], true) ? ' on' : '' ?>" href="/admin/?view=leads">Sales leads</a>
+        <a class="nav<?= $view === 'junk' ? ' on' : '' ?>" href="/admin/?view=junk">Junk filter<?= $junk_leads ? ' (' . count($junk_leads) . ')' : '' ?></a>
         <a class="nav<?= $view === 'audits' ? ' on' : '' ?>" href="/admin/?view=audits">Audit requests</a>
         <a class="nav<?= $view === 'downloads' ? ' on' : '' ?>" href="/admin/?view=downloads">E-book downloads</a>
         <?php /* Newsletter signups were being captured and segmented, and even
@@ -665,7 +702,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
 
     <main class="main">
     <?php if ($flash): ?><div class="flash"><?= e_a($flash) ?></div><?php endif; ?>
-    <?php if (!empty($_GET['saved'])): ?><div class="flash">✓ Saved. <a href="/blog/<?= e_a($_GET['saved']) ?>/" target="_blank" style="font-weight:800">view live ↗</a></div><?php endif; ?>
+    <?php if (!empty($_GET['saved'])): ?><div class="flash">✓ Saved. The public website picks up edits within about an hour. <a href="/blog/<?= e_a($_GET['saved']) ?>/" target="_blank" style="font-weight:800">view page ↗</a></div><?php endif; ?>
 
     <?php if ($view === 'dashboard'):
         $week_ago = date('c', strtotime('-7 days'));
@@ -761,7 +798,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                     <tr>
                         <td><strong><?= e_a($l['name'] ?? '') ?></strong><br><small style="color:var(--muted)"><?= e_a($l['email'] ?? '') ?></small></td>
                         <td><?= e_a(mb_substr($l['service'] ?? '', 0, 32)) ?></td>
-                        <td><?= $l['value'] !== '' ? '₹' . money_fmt($l['value']) : '<span style="color:var(--muted)">–</span>' ?></td>
+                        <td><?= $l['value'] !== '' ? '₹' . money_fmt($l['value']) : '<span style="color:var(--muted)">-</span>' ?></td>
                         <td><?= status_badge($l['status']) ?></td>
                         <td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a></td>
                     </tr>
@@ -871,15 +908,47 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                             <?php if ($l['tags'] !== ''): ?><br><small class="tag-list"><?= e_a($l['tags']) ?></small><?php endif; ?>
                         </td>
                         <td><?= e_a(mb_substr($l['service'] ?? '', 0, 34)) ?></td>
-                        <td style="white-space:nowrap"><?= $l['value'] !== '' ? '₹' . money_fmt($l['value']) : '<span style="color:var(--muted)">–</span>' ?></td>
-                        <td><?= $l['owner'] !== '' ? e_a($l['owner']) : '<span style="color:var(--muted)">–</span>' ?></td>
+                        <td style="white-space:nowrap"><?= $l['value'] !== '' ? '₹' . money_fmt($l['value']) : '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td><?= $l['owner'] !== '' ? e_a($l['owner']) : '<span style="color:var(--muted)">-</span>' ?></td>
                         <td style="white-space:nowrap"><?= $l['followup'] !== ''
                             ? '<span class="' . ($overdue ? 'due-flag' : '') . '">' . e_a(date('j M', strtotime($l['followup']))) . '</span>'
-                            : '<span style="color:var(--muted)">–</span>' ?></td>
+                            : '<span style="color:var(--muted)">-</span>' ?></td>
                         <td><?= status_badge($l['status']) ?></td>
                         <td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a></td>
                     </tr>
                 <?php endforeach; if (!$filtered): ?><tr><td colspan="8">No leads match.</td></tr><?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+    <?php elseif ($view === 'junk'): ?>
+        <h1>Junk filter</h1>
+        <p class="sub">Submissions the quality check held back. They never reached <?= e_a(ENQUIRY_TO) ?>. If a real lead lands here, restore it and it goes straight into your pipeline and inbox.</p>
+        <form method="post" style="margin-bottom:18px">
+            <input type="hidden" name="action" value="junk_recheck">
+            <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+            <button class="btn ghost" type="submit">Re-check older new leads</button>
+        </form>
+        <div class="card">
+            <table>
+                <thead><tr><th>When</th><th>Contact</th><th>Message</th><th>Why it was held</th><th></th></tr></thead>
+                <tbody>
+                <?php foreach ($junk_leads as $l): $why = end($l['activity']); ?>
+                    <tr>
+                        <td><?= e_a(date('j M, g:ia', strtotime($l['date']))) ?></td>
+                        <td><strong><?= e_a($l['name']) ?></strong><br><?= e_a($l['email']) ?><?= $l['mobile'] !== '' ? '<br>' . e_a($l['mobile']) : '' ?><?= $l['company'] !== '' ? '<br>' . e_a($l['company']) : '' ?></td>
+                        <td style="max-width:320px"><?= e_a(mb_substr((string) $l['message'], 0, 220)) ?></td>
+                        <td style="max-width:260px"><?= e_a(preg_replace('/^Quality check: junk \(\d+\): /', '', (string) ($why['text'] ?? ''))) ?></td>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" name="action" value="lead_restore">
+                                <input type="hidden" name="id" value="<?= e_a($l['id']) ?>">
+                                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                                <button class="btn ghost" type="submit">Restore</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; if (!$junk_leads): ?><tr><td colspan="5">Nothing held back. Junk will appear here when the filter catches it.</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -906,8 +975,8 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
 
         <div class="cards">
             <div class="kpi grad"><b><?= count($scope) ?></b><span>Total audit contacts</span></div>
-            <div class="kpi"><b><?= $avgScore ?: '–' ?></b><span>Average site score</span></div>
-            <div class="kpi"><b><?= $weakest ?: '–' ?></b><span>Lowest score seen</span></div>
+            <div class="kpi"><b><?= $avgScore ?: '-' ?></b><span>Average site score</span></div>
+            <div class="kpi"><b><?= $weakest ?: '-' ?></b><span>Lowest score seen</span></div>
             <div class="kpi"><b><?= count(array_filter($scope, fn($l) => $l['status'] === 'new')) ?></b><span>Not yet contacted</span></div>
         </div>
         <p class="note">A low score is a sales signal: that visitor has a problem you can name specifically on the first call.</p>
@@ -927,7 +996,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                     <tr>
                         <td style="white-space:nowrap"><?= e_a(date('j M', strtotime($l['date'] ?? 'now'))) ?><br><small style="color:var(--muted)"><?= e_a(date('H:i', strtotime($l['date'] ?? 'now'))) ?></small></td>
                         <td><strong><?= e_a($l['name'] ?? '') ?></strong><br><small style="color:var(--muted)"><?= e_a($l['email'] ?? '') ?></small></td>
-                        <td><?= e_a($l['company'] ?: '–') ?></td>
+                        <td><?= e_a($l['company'] ?: '-') ?></td>
                         <td><?= $sc !== null
                             ? '<span class="badge-st" style="--st:' . ($sc >= 85 ? '#12A150' : ($sc >= 65 ? '#5B56C9' : ($sc >= 45 ? '#FF9100' : '#FF3D8A'))) . '">' . $sc . '/100</span>'
                             : '<span style="color:var(--muted)">consultation</span>' ?></td>
@@ -1034,10 +1103,10 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <h2>Enquiry</h2>
                 <table><tbody>
                     <tr><td style="width:100px;color:var(--muted)">Email</td><td><a href="mailto:<?= e_a($lead['email'] ?? '') ?>" style="font-weight:700;color:var(--p)"><?= e_a($lead['email'] ?? '') ?></a></td></tr>
-                    <tr><td style="color:var(--muted)">Phone</td><td><?= $lead['mobile'] ? '<a href="tel:' . e_a($lead['mobile']) . '" style="font-weight:700">' . e_a($lead['mobile']) . '</a>' : '–' ?></td></tr>
-                    <tr><td style="color:var(--muted)">Company</td><td><?= e_a($lead['company'] ?: '–') ?></td></tr>
-                    <tr><td style="color:var(--muted)">Service</td><td><?= e_a($lead['service'] ?: '–') ?></td></tr>
-                    <tr><td style="color:var(--muted)">Message</td><td><?= nl2br(e_a($lead['message'] ?: '–')) ?></td></tr>
+                    <tr><td style="color:var(--muted)">Phone</td><td><?= $lead['mobile'] ? '<a href="tel:' . e_a($lead['mobile']) . '" style="font-weight:700">' . e_a($lead['mobile']) . '</a>' : '-' ?></td></tr>
+                    <tr><td style="color:var(--muted)">Company</td><td><?= e_a($lead['company'] ?: '-') ?></td></tr>
+                    <tr><td style="color:var(--muted)">Service</td><td><?= e_a($lead['service'] ?: '-') ?></td></tr>
+                    <tr><td style="color:var(--muted)">Message</td><td><?= nl2br(e_a($lead['message'] ?: '-')) ?></td></tr>
                 </tbody></table>
             </div>
             <div>
@@ -1555,7 +1624,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                         <td style="white-space:nowrap"><?= e_a(date('j M Y', strtotime($l['date'] ?? 'now'))) ?></td>
                         <td><strong><?= e_a($l['name'] ?? '') ?></strong></td>
                         <td><a href="mailto:<?= e_a($l['email'] ?? '') ?>"><?= e_a($l['email'] ?? '') ?></a></td>
-                        <td><?php if ($also): foreach (array_keys($also) as $s): ?><span class="tag-ro"><?= e_a($labels_seg[$s] ?? $s) ?></span> <?php endforeach; else: ?><span style="color:var(--muted)">–</span><?php endif; ?></td>
+                        <td><?php if ($also): foreach (array_keys($also) as $s): ?><span class="tag-ro"><?= e_a($labels_seg[$s] ?? $s) ?></span> <?php endforeach; else: ?><span style="color:var(--muted)">-</span><?php endif; ?></td>
                         <td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a></td>
                     </tr>
                 <?php endforeach; if (!$filtered): ?><tr><td colspan="5">No subscribers yet.</td></tr><?php endif; ?>
@@ -1646,8 +1715,8 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                         <td style="white-space:nowrap"><?= e_a(date('M Y', strtotime($m . '-01'))) ?></td>
                         <td style="font-weight:800"><?= $d['n'] ?></td>
                         <td><span class="barline"><i style="width:<?= (int) round($d['n'] / $peak_m * 100) ?>%;background:var(--grad-v)"></i></span></td>
-                        <td><?= $d['won'] ?: '<span style="color:var(--muted)">–</span>' ?></td>
-                        <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '<span style="color:var(--muted);font-weight:400">–</span>' ?></td>
+                        <td><?= $d['won'] ?: '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '<span style="color:var(--muted);font-weight:400">-</span>' ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -1668,7 +1737,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                         <td><?= $d['won'] ?></td>
                         <td><?= $d['lost'] ?></td>
                         <td><?= $wr === null ? '<span style="color:var(--muted)">no closes yet</span>' : $wr . '%' ?></td>
-                        <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '<span style="color:var(--muted);font-weight:400">–</span>' ?></td>
+                        <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '<span style="color:var(--muted);font-weight:400">-</span>' ?></td>
                     </tr>
                 <?php endforeach; if (!$src_stats): ?><tr><td colspan="6">No leads yet.</td></tr><?php endif; ?>
                 </tbody>
@@ -1685,8 +1754,8 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                         <tr>
                             <td><?= e_a($label) ?></td>
                             <td style="font-weight:800"><?= $d['n'] ?></td>
-                            <td><?= $d['won'] ?: '–' ?></td>
-                            <td style="text-align:right"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '–' ?></td>
+                            <td><?= $d['won'] ?: '-' ?></td>
+                            <td style="text-align:right"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -1702,7 +1771,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                             <td><?= e_a($o) ?></td>
                             <td><?= $d['open'] ?></td>
                             <td><?= $d['won'] ?></td>
-                            <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '–' ?></td>
+                            <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '-' ?></td>
                         </tr>
                     <?php endforeach; if (!$owner_stats): ?><tr><td colspan="4">No leads yet.</td></tr><?php endif; ?>
                     </tbody>

@@ -28,7 +28,7 @@ $accents = ['ac-yellow', 'ac-terra', 'ac-purple', 'ac-olive', 'ac-cyan', 'ac-pin
     <div class="container trust-strip-inner">
         <span><strong>150+</strong> projects delivered</span>
         <span><strong>10+</strong> industries served</span>
-        <span><strong>3.2×</strong> average ROI improvement</span>
+        <span><strong>No</strong> long-term lock-ins</span>
         <span><strong>24h</strong> guaranteed response</span>
     </div>
 </div>
@@ -107,6 +107,10 @@ $accents = ['ac-yellow', 'ac-terra', 'ac-purple', 'ac-olive', 'ac-cyan', 'ac-pin
     </div>
 </section>
 
+<?php if ($slug === 'web-services'): render_work_showcase(); endif; ?>
+
 <?php render_compare(); ?>
+
+<?php render_faqs(page_faqs($page, $slug), 'Questions about ' . $page['h1']); ?>
 
 <?php render_next_steps(); ?>

@@ -41,11 +41,15 @@ echo jsonld_script([
     ],
     'publisher' => ['@id' => SITE_URL . '/#organization'],
     'isPartOf' => ['@id' => SITE_URL . '/#website'],
-    'image' => abs_url('/assets/img/vturnu-logo-dark.png'),
+    'image' => [
+        '@type' => 'ImageObject',
+        'url' => abs_url(page_share_image($page, $slug)[0]),
+        'width' => 1200,
+        'height' => 630,
+    ],
     /* Tells voice assistants which parts are safe to read aloud. */
     'speakable' => ['@type' => 'SpeakableSpecification', 'cssSelector' => ['h1', '.answer-text']],
 ]);
-if (!empty($post['faqs'])) { echo jsonld_script(jsonld_faq($post['faqs'])); }
 ?>
 <article>
 <section class="page-hero post-hero">
@@ -61,6 +65,9 @@ if (!empty($post['faqs'])) { echo jsonld_script(jsonld_faq($post['faqs'])); }
 
 <section class="section post-body-wrap">
     <div class="container narrow">
+        <?php if (is_file(BASE_PATH . '/assets/img/blog/' . $page['post'] . '.webp')): ?>
+        <img class="post-banner" src="/assets/img/blog/<?= e($page['post']) ?>.webp" srcset="/assets/img/blog/<?= e($page['post']) ?>-sm.webp 640w, /assets/img/blog/<?= e($page['post']) ?>.webp 1200w" sizes="(max-width: 860px) 100vw, 820px" alt="<?= e($post['h1']) ?>" width="1200" height="630" fetchpriority="high" decoding="async">
+        <?php endif; ?>
         <!-- AEO answer box: the quotable summary -->
         <div class="answer-box post-answer">
             <p class="answer-text"><?= e($post['lede']) ?></p>
@@ -104,27 +111,14 @@ if (!empty($post['faqs'])) { echo jsonld_script(jsonld_faq($post['faqs'])); }
             <?php endif; ?>
 
             <?php if ($si === 2): ?>
-            <?php /* Mid-article CTA. A reader here is still learning, not buying,
-                     so the offer is a self-serve tool rather than a sales call.
-                     Which tool depends on what they are reading: someone in an
-                     AI Search piece wants to know what the engines say about
-                     them, which the free HTML checker cannot answer, so those
-                     posts point at VTurnAI instead. */
-                  $ai_post = ($post['category'] ?? '') === 'AI Search'; ?>
+            <?php /* Mid-article CTA. A reader here is still learning, not buying, so
+                     the offer is a self-serve tool rather than a sales call. */ ?>
             <aside class="post-cta-inline" aria-label="Check your own site">
-                <?php if ($ai_post): ?>
-                <div>
-                    <strong>Curious what AI engines say about your brand?</strong>
-                    <span><?= e(PRODUCT_NAME) ?> tracks your mentions across ChatGPT, Gemini, Perplexity and five more. Free for <?= e(PRODUCT_TRIAL_DAYS) ?> days.</span>
-                </div>
-                <a class="btn btn-grad" href="<?= e(PRODUCT_PAGE) ?>">Check My AI Visibility</a>
-                <?php else: ?>
                 <div>
                     <strong>Curious how your own site scores on this?</strong>
                     <span>Run the free checker. 22 checks, results in seconds, no call required.</span>
                 </div>
                 <a class="btn btn-grad" href="/free-seo-audit/">Check My Site</a>
-                <?php endif; ?>
             </aside>
             <?php endif; ?>
             <?php endforeach; ?>
@@ -139,18 +133,10 @@ if (!empty($post['faqs'])) { echo jsonld_script(jsonld_faq($post['faqs'])); }
         </div>
         <?php endif; ?>
 
-        <?php if (!empty($post['faqs'])): ?>
-        <div class="post-faqs">
-            <h2>Frequently asked questions</h2>
-            <div class="faq-list">
-                <?php foreach ($post['faqs'] as [$q, $a]): ?>
-                <details class="faq"><summary><?= e($q) ?></summary><p><?= e($a) ?></p></details>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
 </section>
+
+<?php render_faqs($post['faqs'] ?? [], 'Frequently asked questions'); ?>
 
 <!-- Post-specific conversion band -->
 <section class="cta-mid">

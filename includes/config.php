@@ -51,31 +51,12 @@ define('SITE_URL', 'https://vturnu.com'); // canonical production URL
 define('CONTACT_PHONE', '+91 93637 31498');
 define('CONTACT_PHONE_HREF', 'tel:+919363731498');
 define('CONTACT_WHATSAPP', '919363731498');
-define('CONTACT_EMAIL', 'sales@vturnu.com');
+define('CONTACT_EMAIL', 'connect@vturnu.com');
 // Single source of truth: everything that shows a number uses CONTACT_PHONE.
 define('FORM_PHONE', CONTACT_PHONE);
 // Where every form submission is delivered.
 define('ENQUIRY_TO', 'connect@vturnu.com');
 define('COPYRIGHT', 'Copyright © 2025 VTurnU. All rights reserved.');
-
-/* VTurnAI: our own SaaS product, sold from this site but hosted on its own
-   domain. Every outbound link carries UTM tags so the product analytics can
-   separate traffic this site sends from traffic vturnai.com earns directly.
-   Defined once here because the links appear on ~10 pages. */
-define('PRODUCT_NAME', 'VTurnAI');
-define('PRODUCT_URL', 'https://vturnai.com/');
-define('PRODUCT_PAGE', '/ai-visibility-tool/');   // the on-site landing page
-define('PRODUCT_PRICE', '₹499');
-/* String, not int: these are display values passed straight to e(), which is
-   typed ?string and lives in a strict_types file, so an int here is a fatal
-   rather than a coercion. Nothing does arithmetic on it. */
-define('PRODUCT_TRIAL_DAYS', '7');
-
-/** Outbound link to vturnai.com, tagged so we can attribute the signup. */
-function product_url(string $campaign = 'site', string $path = ''): string {
-    $base = rtrim(PRODUCT_URL, '/') . '/' . ltrim($path, '/');
-    return rtrim($base, '/') . '/?utm_source=vturnu.com&utm_medium=referral&utm_campaign=' . rawurlencode($campaign);
-}
 
 define('BASE_PATH', dirname(__DIR__));
 
@@ -107,6 +88,9 @@ define('ENTITY_PROFILES', [
 ]);
 
 // Business facts, used by the Organization schema.
+/* Shown only to visitors in India: see gst_visible() in includes/security.php.
+   Deliberately absent from JSON-LD, which every country and crawler reads. */
+define('GSTIN', '33ABAFV8139L2ZS');
 define('LEGAL_NAME', 'VTurnU Digital Solutions LLP');
 define('FOUNDING_YEAR', '2020');
 define('FOUNDER_NAME', 'Kalpana V');
@@ -117,8 +101,7 @@ define('FOUNDER_TITLE', 'Founder');
 /* ------------------------------------------------------------------ */
 
 // Signs the stateless CSRF token embedded in every form (no PHP session
-// needed for anonymous visitors), and the admin session cookie and ebook
-// download tokens. Generated once with random_bytes(32); changing it
+// needed for anonymous visitors) and the admin session cookie. Generated once with random_bytes(32); changing it
 // invalidates every token currently sitting in an open tab.
 //
 // On Vercel this comes from the SECURITY_SECRET environment variable. The

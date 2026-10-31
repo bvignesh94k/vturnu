@@ -279,3 +279,6 @@ $CASES = [
     'outcome' => 'Owned-audience launches now de-risk every new product, and the content system runs on six hours of founder time per month.',
 ],
 ];
+
+/* Named clients always lead. */
+$CASES = (require __DIR__ . '/cases-real.php') + $CASES;

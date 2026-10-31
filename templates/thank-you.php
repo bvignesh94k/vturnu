@@ -17,7 +17,6 @@ $source = preg_replace('/[^a-z0-9-]/', '', (string) ($_GET['s'] ?? ''));
    enquiry wording rather than claiming something that was never offered. */
 $promise = match ($source) {
     'seo-audit', 'audit-consultation' => 'Your audit report is on its way to your inbox. If it has not arrived in a few minutes, check your spam folder.',
-    'resource'   => 'Your download is on its way to your inbox, with a link that stays valid for 30 days.',
     'newsletter' => 'You are on the list. One useful email a month, and you can leave any time.',
     default      => 'We will review your details and reply with honest next steps, plus a free mini-audit of where you stand today.',
 };
@@ -68,7 +67,7 @@ $promise = match ($source) {
             $suggestions = array_values(array_filter([
                 ['case-studies',      'Read the case studies',   'What the work produced for businesses like yours, including the constraints.'],
                 ['blog',              'Latest insight',          'How search and AI discovery are actually changing, written plainly.'],
-                ['ai-visibility-tool','Check your AI visibility','See which answer engines name your brand today, and which name competitors.'],
+                ['free-seo-audit',    'Check your site',         'Run the free audit and see what is holding your rankings and AI visibility back.'],
                 ['pricing',           'How pricing works',       'What engagements typically cost and what sits inside each one.'],
             ], fn($s) => isset($PAGES[$s[0]])));
             foreach ($suggestions as [$slug, $title, $blurb]): ?>

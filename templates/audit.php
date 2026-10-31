@@ -43,7 +43,7 @@ $labels = [
                     </div>
                     <button class="btn btn-grad btn-block" type="submit">Run My Free Audit</button>
                     <p class="form-privacy">Results appear here instantly and a copy goes to your inbox. We never share your details.</p>
-                    <p class="recaptcha-disclosure">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.</p>
+                    <p class="recaptcha-disclosure">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener nofollow">Terms of Service</a> apply.</p>
                 </form>
             </div>
 
@@ -80,7 +80,7 @@ $labels = [
                     <div class="alert alert-error al-error" role="alert" hidden>Please fill in your name and a valid email address, then try again.</div>
                     <button class="btn btn-dark btn-block" type="submit">Get My Free Consultation</button>
                     <p class="form-privacy">We reply within 1 business day. Your details stay private.</p>
-                    <p class="recaptcha-disclosure">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.</p>
+                    <p class="recaptcha-disclosure">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener nofollow">Terms of Service</a> apply.</p>
                 </form>
                 <div class="quote-done al-success" hidden>
                     <span class="quote-done-icon" aria-hidden="true">✓</span>
@@ -103,11 +103,7 @@ $labels = [
                  arrive already knowing they need monitoring rather than a
                  one-off score, and should not have to run a check to find the
                  product. Softer framing than the post-report block. */ ?>
-        <?php render_product_upsell(
-            'audit-landing',
-            'Want this tracked continuously, not just today?',
-            PRODUCT_NAME . ' is our own platform. It runs the deeper version of this check every month, across your whole site, and tells you what ChatGPT, Gemini, Perplexity and five other engines say about your brand when a customer asks.'
-        ); ?>
+        
 
         <?php else: /* ---------- Report ---------- */
             $s = $audit_result;
@@ -162,7 +158,7 @@ $labels = [
                      own findings, so "what about every engine, every month" is
                      a question they are already asking. The managed-service CTA
                      follows it, giving a self-serve and a done-for-you door. */ ?>
-            <?php render_product_upsell('audit-report'); ?>
+            
         </div>
 
         <section class="cta-mid audit-cta">
@@ -182,3 +178,5 @@ $labels = [
         <?php endif; ?>
     </div>
 </section>
+
+<?php render_faqs(page_faqs($page, $slug), 'About the free audit'); ?>

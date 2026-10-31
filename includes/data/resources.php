@@ -1,6 +1,6 @@
 <?php
 /**
- * Downloadable resources: 10 e-books + 6 guides, each with a dedicated landing page.
+ * Resources: 10 e-books and 6 guides, each read in full on its own page.
  * Keyed by slug (lowercase + hyphens). Rendered by templates/resource.php
  * at /ebooks/<slug>/ or /guides/<slug>/ based on type.
  * Fields: type (ebook|guide), title, meta, h1, lede, size (pages/read),
@@ -14,7 +14,7 @@ $RESOURCES = [
 'ai-search-playbook' => [
     'type' => 'ebook', 'size' => '64 pages',
     'title' => 'The AI Search Playbook: Win ChatGPT & AI Overviews (Free)',
-    'meta'  => 'Free 64-page e-book: how AI engines pick sources, the AEO content system, entity building and measurement. The complete playbook for AI-era visibility.',
+    'meta'  => 'Free online e-book: how AI engines pick sources, the AEO content system, entity building and measurement. The complete playbook for AI-era visibility.',
     'h1'    => 'The AI Search Playbook',
     'lede'  => 'Everything a marketing leader needs to win visibility inside ChatGPT, Perplexity, Gemini and Google AI Overviews: how engines choose sources, the content system that earns citations, and how to measure it monthly.',
     'learn' => [
@@ -40,7 +40,7 @@ $RESOURCES = [
 'ecommerce-seo-from-crawl-to-cart' => [
     'type' => 'ebook', 'size' => '48 pages',
     'title' => 'Ecommerce SEO: From Crawl to Cart (Free E-book)',
-    'meta'  => 'Free 48-page e-book covering the complete ecommerce SEO system: architecture, faceted navigation, product schema, category content and content-to-cart funnels.',
+    'meta'  => 'Free online e-book covering the complete ecommerce SEO system: architecture, faceted navigation, product schema, category content and content-to-cart funnels.',
     'h1'    => 'Ecommerce SEO: From Crawl to Cart',
     'lede'  => 'The complete technical and content system for growing store revenue organically: architecture, crawl control, product data, category strategy and the content layer that feeds commerce.',
     'learn' => [
@@ -66,7 +66,7 @@ $RESOURCES = [
 'lead-gen-website-blueprint' => [
     'type' => 'ebook', 'size' => '36 pages',
     'title' => 'The Lead Gen Website Blueprint (Free E-book)',
-    'meta'  => 'Free 36-page e-book: how to structure, write and design a service-business website that turns visitors into enquiries: offers, trust, forms and speed.',
+    'meta'  => 'Free online e-book: how to structure, write and design a service-business website that turns visitors into enquiries: offers, trust, forms and speed.',
     'h1'    => 'The Lead Gen Website Blueprint',
     'lede'  => 'How to structure, write and design a website that turns visitors into enquiries, the page-by-page blueprint we use when building lead-generation sites for clients.',
     'learn' => [
@@ -116,7 +116,7 @@ $RESOURCES = [
 'local-seo-for-multi-location' => [
     'type' => 'ebook', 'size' => '40 pages',
     'title' => 'Local SEO for Multi-Location Businesses (Free E-book)',
-    'meta'  => 'Free 40-page e-book: profile systems, location pages, review engines and reporting for clinics, chains and franchises operating across multiple locations.',
+    'meta'  => 'Free online e-book: profile systems, location pages, review engines and reporting for clinics, chains and franchises operating across multiple locations.',
     'h1'    => 'Local SEO for Multi-Location Businesses',
     'lede'  => 'Clinics, chains, franchises: multi-location local SEO is a systems problem. This e-book covers the profile, page, review and reporting systems that win every neighborhood you operate in.',
     'learn' => [
@@ -141,7 +141,7 @@ $RESOURCES = [
 'business-content-engine' => [
     'type' => 'ebook', 'size' => '44 pages',
     'title' => 'The B2B Content Engine (Free E-book): Pipeline Playbook',
-    'meta'  => 'Free 44-page e-book: the B2B content system that creates pipeline: bottom-funnel first strategy, expert-interview production, distribution and attribution.',
+    'meta'  => 'Free online e-book: the B2B content system that creates pipeline: bottom-funnel first strategy, expert-interview production, distribution and attribution.',
     'h1'    => 'The B2B Content Engine',
     'lede'  => 'How B2B companies turn publishing into pipeline: the bottom-funnel-first strategy, an expert-interview production system, distribution that compounds and attribution you can defend.',
     'learn' => [
@@ -429,3 +429,11 @@ $RESOURCES = [
     ],
 ],
 ];
+
+/* Direct answers, takeaways and FAQs. Existing FAQ wording about "downloads"
+   is replaced by these, because the resources are now read on the page. */
+foreach ((require __DIR__ . '/resource-extras.php') as $rslug => $extra) {
+    if (isset($RESOURCES[$rslug])) {
+        $RESOURCES[$rslug] = $extra + $RESOURCES[$rslug];
+    }
+}

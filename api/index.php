@@ -1,7 +1,7 @@
 <?php
 /**
  * VTurnU, front controller. Runs here (under api/) because Vercel only
- * treats files inside api/ as executable functions — a file with this exact
+ * treats files inside api/ as executable functions, a file with this exact
  * name at the project root gets served as a plain static file instead
  * (that was the bug: vturnu.com downloading raw PHP source). The project
  * root's index.php is now just a one-line proxy to this file, kept only for
@@ -23,17 +23,58 @@ require dirname(__DIR__) . '/includes/db.php';
 require dirname(__DIR__) . '/includes/helpers.php';
 require dirname(__DIR__) . '/includes/security.php';
 require dirname(__DIR__) . '/includes/currency.php';
-require dirname(__DIR__) . '/includes/data/menu.php';
-require dirname(__DIR__) . '/includes/data/pages.php';
-
-// Detected once per request, used to prefill phone fields across every form.
-$visitor_dial_code = security_visitor_dial_code();
+require dirname(__DIR__) . '/includes/lead-guard.php';
+require dirname(__DIR__) . '/includes/page-kit.php';
 
 /* parse_url() returns false, not null, on a malformed URI, so ?? never caught
    it and trim(false) was a fatal under strict_types: a request to "//" or any
    junk path returned a 500 to the visitor and to crawlers instead of a 404. */
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $slug = trim(is_string($uri) ? $uri : '/', '/');
+
+/* Admin edits, served as one CDN-cached JSON document so public pages never
+   open a database connection themselves. See content_overrides_all() in
+   includes/data/pages.php for why. Handled before pages.php loads, because
+   pages.php is what reads it. */
+if ($slug === 'content-overrides.json') {
+    header('Content-Type: application/json; charset=UTF-8');
+    header('X-Robots-Tag: noindex');
+    try {
+        $rows = db()->query('SELECT content_type, slug, data FROM content_overrides')->fetchAll();
+        $out = ['ok' => true, 'rows' => []];
+        foreach ($rows as $r) {
+            $out['rows'][$r['content_type']][$r['slug']] = json_decode($r['data'], true);
+        }
+        header('Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400');
+        echo json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    } catch (Throwable $e) {
+        error_log('content-overrides.json: ' . $e->getMessage());
+        header('Cache-Control: public, s-maxage=300');
+        echo '{"ok":false}';
+    }
+    exit;
+}
+
+require dirname(__DIR__) . '/includes/data/menu.php';
+require dirname(__DIR__) . '/includes/data/pages.php';
+
+// Detected once per request, used to prefill phone fields across every form.
+$visitor_dial_code = security_visitor_dial_code();
+
+/* URLs that moved or were retired. Permanent, so ranking signals follow. */
+$REDIRECTS = [
+    'ai-visibility-tool' => '/ai-seo/',
+    'email-marketing-services' => '/email-marketing/',
+];
+if (isset($REDIRECTS[$slug])) {
+    header('Location: ' . $REDIRECTS[$slug], true, 301);
+    exit;
+}
+/* Old e-book delivery emails still link here. The content is now on the site. */
+if ($slug === 'download') {
+    header('Location: /ebooks/', true, 301);
+    exit;
+}
 
 /* XML sitemap. lastmod comes from the post date where we have one, so
    crawlers can tell what actually changed instead of refetching everything;
@@ -100,28 +141,40 @@ if ($slug === 'llms.txt') {
     $out = [];
     $out[] = '# ' . SITE_NAME;
     $out[] = '';
-    $out[] = '> Performance-driven digital marketing, web and AI development. We help businesses';
-    $out[] = '> in India, the US, UK, Canada and Australia grow measurable revenue through SEO,';
-    $out[] = '> answer engine optimization, paid media, content, web development and AI automation.';
+    $out[] = '> VTurnU is a digital marketing and branding company based in Chennai, India. It helps';
+    $out[] = '> businesses in India, the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa';
+    $out[] = '> grow through SEO, AI search optimization (AEO and GEO), paid media, content and branding.';
+    $out[] = '> It also builds websites, and runs a separate Enterprise & IT practice covering SAP CPQ,';
+    $out[] = '> Salesforce, Odoo ERP, ERPNext and IT staffing.';
     $out[] = '';
+    $out[] = 'Legal name: ' . LEGAL_NAME;
     $out[] = 'Contact: ' . CONTACT_EMAIL . ' | ' . CONTACT_PHONE;
+    $out[] = 'Pricing: ' . abs_url('/pricing/');
     $out[] = 'Sitemap: ' . abs_url('/sitemap.xml');
     $out[] = '';
 
     $groups = [
-        'Services' => [], 'Guides and Articles' => [], 'Case Studies' => [], 'Company' => [],
+        'Digital Marketing and AI Search' => [], 'Enterprise & IT' => [], 'Guides and E-books' => [],
+        'Articles' => [], 'Case Studies' => [], 'Company' => [],
     ];
     foreach ($PAGES as $s => $p) {
         $tpl = $p['template'] ?? 'service';
         $line = '- [' . ($p['h1'] ?? $s) . '](' . abs_url(page_url($s)) . '): ' . ($p['lede'] ?? '');
-        if (str_starts_with($s, 'blog/') || str_starts_with($s, 'ebooks/') || str_starts_with($s, 'guides/')) {
-            $groups['Guides and Articles'][] = $line;
-        } elseif (str_starts_with($s, 'case-studies/')) {
+        if (!empty($p['noindex'])) {
+            continue;
+        }
+        if ($tpl === 'landing' || $s === 'enterprise-it-services') {
+            $groups['Enterprise & IT'][] = $line;
+        } elseif (str_starts_with($s, 'blog/')) {
+            $groups['Articles'][] = $line;
+        } elseif (str_starts_with($s, 'ebooks/') || str_starts_with($s, 'guides/')) {
+            $groups['Guides and E-books'][] = $line;
+        } elseif ($tpl === 'case-detail') {
             $groups['Case Studies'][] = $line;
-        } elseif (in_array($s, ['about-us', 'contact-us', 'pricing', 'ai-policy'], true)) {
+        } elseif (in_array($s, ['about-us', 'how-we-work', 'our-clients', 'contact-us', 'pricing', 'ai-policy'], true)) {
             $groups['Company'][] = $line;
         } elseif (in_array($tpl, ['service', 'hub'], true)) {
-            $groups['Services'][] = $line;
+            $groups['Digital Marketing and AI Search'][] = $line;
         }
     }
     foreach ($groups as $heading => $lines) {
@@ -154,28 +207,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'enquiry') {
     }
     $svc = trim($_POST['service'] ?? '');
     $src = $svc === 'Newsletter signup' ? 'newsletter'
-        : (str_starts_with($svc, 'Resource: ') ? 'resource'
         : (str_starts_with($svc, 'Free SEO Audit Page') ? 'audit-consultation'
-        : 'popup'));
+        : (trim((string) ($_POST['lead_source'] ?? '')) === 'landing' ? 'landing-page' : 'popup'));
 
-    $saved = save_enquiry($_POST, $src);
-
-    /* Resource downloads: actually deliver the thing that was promised.
-       Sending happens after the response so the visitor is not left waiting
-       on a mail call, which is the slowest part of the request on most hosts. */
-    if ($saved && $src === 'resource') {
-        $rslug = preg_replace('/[^a-z0-9-]/', '', (string) ($_POST['resource'] ?? ''));
-        if ($rslug !== '' && isset($RESOURCES[$rslug])) {
-            $rname  = trim((string) ($_POST['name'] ?? ''));
-            $remail = trim((string) ($_POST['email'] ?? ''));
-            $rres   = $RESOURCES[$rslug];
-            register_shutdown_function(function () use ($rslug, $rres, $rname, $remail) {
-                if (function_exists('fastcgi_finish_request')) { fastcgi_finish_request(); }
-                require_once BASE_PATH . '/includes/ebook-build.php';
-                ebook_send($rslug, $rres, $rname, $remail);
-            });
-        }
+    $missing = lead_missing($_POST, $src);
+    if ($missing !== '') {
+        echo json_encode(['ok' => false, 'error' => $missing]);
+        exit;
     }
+    $saved = save_enquiry($_POST, $src);
 
     /* Hand back where to go next so the pop-up forms can send the visitor to
        the same thank-you page the non-JS flow uses, instead of swapping in a
@@ -185,33 +225,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'enquiry') {
         'redirect' => $saved ? '/thank-you/?s=' . rawurlencode($src) : null,
     ]);
     exit;
-}
-
-/* Tokenised resource download. The link in the delivery email lands here. */
-if ($slug === 'download') {
-    require_once dirname(__DIR__) . '/includes/ebook-build.php';
-    $check = ebook_token_verify((string) ($_GET['t'] ?? ''));
-    if (!$check['ok']) {
-        http_response_code(410);
-        $download_error = $check['error'];
-    } else {
-        $dslug = $check['slug'];
-        $res = $RESOURCES[$dslug] ?? null;
-        $file = $res ? ebook_file($dslug, $res) : null;
-        if ($file && is_file($file)) {
-            $name = ($res['h1'] ?? $dslug);
-            $safe = preg_replace('/[^A-Za-z0-9 ]/', '', $name);
-            header('Content-Type: application/epub+zip');
-            header('Content-Disposition: attachment; filename="' . $safe . '.epub"');
-            header('Content-Length: ' . filesize($file));
-            header('X-Content-Type-Options: nosniff');
-            header('Cache-Control: private, max-age=0, must-revalidate');
-            readfile($file);
-            exit;
-        }
-        http_response_code(404);
-        $download_error = 'That resource could not be found.';
-    }
 }
 
 /* Enquiry form submission (contact page + home quote form).
@@ -224,11 +237,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''],
     $source = $slug === '' ? 'home-quote' : 'contact-page';
     // The homepage form is the B2B qualifier: fold its extra answers and grade into the lead.
     $lead = $slug === '' ? enquiry_qualify($_POST) : $_POST;
+    $missing = $check['ok'] ? lead_missing($_POST, $source) : '';
+    if ($missing !== '') {
+        $check = ['ok' => false, 'error' => $missing];
+    }
     if ($check['ok'] && save_enquiry($lead, $source)) {
         header('Location: /thank-you/?s=' . rawurlencode($source), true, 303);
         exit;
     }
     $form_status = 'error';
+    $form_error = $check['error'] ?? '';
 }
 
 /* Free SEO audit: fetch the visitor's site, score it, show it and email a copy. */
@@ -295,18 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'free-seo-audit') {
 }
 
 /* Resolve page */
-if (!empty($download_error)) {
-    // An expired or invalid download link. Explain it and offer a way forward
-    // rather than dropping the visitor on a generic 404.
-    $page = [
-        'template' => '404',
-        'title' => 'Download link problem',
-        'meta' => 'This download link is no longer valid.',
-        'h1' => 'That link is no longer valid',
-        'lede' => $download_error . ' You can request a fresh copy from the resource page and we will send a new link straight away.',
-    ];
-    $slug = '__404__';
-} elseif (!isset($PAGES[$slug])) {
+if (!isset($PAGES[$slug])) {
     http_response_code(404);
     $page = [
         'template' => '404',

@@ -65,10 +65,14 @@ function csrf_age(string $token): int
 
 function security_client_ip(): string
 {
-    return $_SERVER['HTTP_CF_CONNECTING_IP']
+    /* Vercel overwrites these, so a client cannot spoof them. X-Forwarded-For
+       can hold a chain; only the first entry is the visitor. */
+    $raw = $_SERVER['HTTP_X_REAL_IP']
+        ?? $_SERVER['HTTP_CF_CONNECTING_IP']
         ?? $_SERVER['HTTP_X_FORWARDED_FOR']
         ?? $_SERVER['REMOTE_ADDR']
         ?? '0.0.0.0';
+    return trim(explode(',', (string) $raw)[0]);
 }
 
 /**
@@ -160,9 +164,10 @@ function security_recaptcha_ok(string $token): bool
     }
     if ($token === '') {
         // No token reached us: script blocked, ad-blocker, slow network, or
-        // the visitor submitted before it loaded. Not proof of a bot, and
-        // the other four layers already ran before this function is called.
+        // the visitor submitted before it loaded. Not proof of a bot, so it
+        // does not block, but lead_screen() counts it against the lead.
         security_recaptcha_log('empty token');
+        $GLOBALS['recaptcha_signal'] = 'missing';
         return true;
     }
 
@@ -210,6 +215,7 @@ function security_recaptcha_ok(string $token): bool
     // Genuine signal at this point: Google validated the token and returned
     // a score. 0.5 is Google's own suggested default cutoff.
     $score = (float) ($data['score'] ?? 0);
+    $GLOBALS['recaptcha_signal'] = $score;
     if ($score < 0.5) {
         security_recaptcha_log('low score: ' . $score);
         return false;
@@ -290,6 +296,22 @@ function security_visitor_country(): string
         }
     }
     return $cc = 'IN';
+}
+
+/**
+ * Whether to show the GST number. True only when the edge positively says the
+ * visitor is in India: unlike security_visitor_country(), a missing header
+ * means no here, so an unknown visitor or crawler never sees it. Local
+ * development has no edge header, so it is treated as India for testing.
+ */
+function gst_visible(): bool
+{
+    foreach (['HTTP_X_VERCEL_IP_COUNTRY', 'HTTP_CF_IPCOUNTRY'] as $h) {
+        if (!empty($_SERVER[$h])) {
+            return strtoupper(trim((string) $_SERVER[$h])) === 'IN';
+        }
+    }
+    return env_var('VERCEL') === null;
 }
 
 /** Dial code for the visitor's detected country, defaulting to +91 (business HQ). */

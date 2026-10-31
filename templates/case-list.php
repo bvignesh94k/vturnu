@@ -8,7 +8,6 @@ foreach ($CASES as $cslug => $c) {
 }
 if (!$featured) { $featured = array_slice($CASES, 0, 3, true); }
 
-$cards = case_cards($cs_type ?: 'seo');
 ?>
 <section class="page-hero">
     <div class="container">
@@ -32,25 +31,6 @@ $cards = case_cards($cs_type ?: 'seo');
                 </div>
                 <span class="post-card-foot"><span>Full story</span><em aria-hidden="true">Read →</em></span>
             </a>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-
-<section class="section section-tint">
-    <div class="container">
-        <h2 class="section-title">More results in this category</h2>
-        <div class="card-grid cols-3">
-            <?php foreach ($cards as [$client, $headline, $desc, $m1, $m2]): ?>
-            <article class="card case-card" data-reveal="card">
-                <p class="case-client"><?= e($client) ?></p>
-                <h3><?= e($headline) ?></h3>
-                <p><?= e($desc) ?></p>
-                <div class="case-metrics">
-                    <div><strong><?= e($m1[0]) ?></strong><span><?= e($m1[1]) ?></span></div>
-                    <div><strong><?= e($m2[0]) ?></strong><span><?= e($m2[1]) ?></span></div>
-                </div>
-            </article>
             <?php endforeach; ?>
         </div>
     </div>

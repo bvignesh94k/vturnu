@@ -9,6 +9,8 @@ Allow: /
 Disallow: /storage/
 Disallow: /admin/
 Disallow: /enquiry/
+Disallow: /content-overrides.json
+Disallow: /presentations/
 Disallow: /*?utm_
 Disallow: /*?fbclid
 

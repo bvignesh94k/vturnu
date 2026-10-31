@@ -165,11 +165,27 @@
         }
         function onScroll() { if (!ticking) { ticking = true; raf(update); } }
 
-        /* The WebGL module is fetched only after the page has painted, only
-           when the hero is pinned and only where WebGL works. Until then, and
-           if it fails, the hero shows the CSS backdrop and the SVG logo. */
+        /* The WebGL module weighs 590 KB, so nothing fetches it until a visitor
+           actually starts using the page, and only on a device that can run it
+           well. Parsing it during load froze a mid-range phone for six seconds.
+           Other devices get the light canvas scene from scene3d.js. Until then,
+           and if either fails, the hero shows the CSS backdrop and the logo. */
+        function capable() {
+            var cores = navigator.hardwareConcurrency || 4;
+            var memory = navigator.deviceMemory || 8;
+            return cores >= 6 && memory >= 4 && !(navigator.connection && navigator.connection.saveData);
+        }
+        function lightScene() {
+            if (document.getElementById('vt-scene3d')) { return; }
+            var s = document.createElement('script');
+            s.id = 'vt-scene3d';
+            s.src = '/assets/js/scene3d.js';
+            s.async = true;
+            document.head.appendChild(s);
+        }
         function loadGL() {
-            if (glTried || !mount || !pinned || reduce || !webglOk()) { return; }
+            if (glTried || !mount || !pinned || reduce) { return; }
+            if (!capable() || !webglOk()) { glTried = true; lightScene(); return; }
             glTried = true;
             var src = mount.getAttribute('data-src');
             if (!src) { return; }
@@ -192,11 +208,22 @@
             if ('requestIdleCallback' in window) { window.requestIdleCallback(fn, { timeout: 1500 }); } else { setTimeout(fn, 400); }
         }
 
+        /* First sign of a real visitor, then the next idle moment. */
+        var armed = false;
+        function armGL() {
+            if (armed) { return; }
+            armed = true;
+            var go = function () {
+                ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'].forEach(function (e) { window.removeEventListener(e, go); });
+                whenIdle(loadGL);
+            };
+            ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'].forEach(function (e) { window.addEventListener(e, go, { passive: true }); });
+        }
+
         function setup() {
             pinned = canPin();
             state.pinned = pinned;
             heroEl.classList.toggle('hp3-pin', pinned);
-            heroEl.style.setProperty('--hp3-len', (window.innerWidth < 900 ? 380 : 440) + 'svh');
             [rail, cue, bar].forEach(function (el) { if (el) { el.hidden = !pinned; } });
             if (!pinned) {
                 heroEl.classList.remove('hp3-gl-on');
@@ -254,13 +281,13 @@
         window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function () {
-                if (canPin() !== pinned) { setup(); if (pinned) { whenIdle(loadGL); } } else { measure(); update(); }
+                if (canPin() !== pinned) { setup(); if (pinned) { armGL(); } } else { measure(); update(); }
             }, 150);
         });
         window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('load', function () { measure(); update(); whenIdle(loadGL); });
+        window.addEventListener('load', function () { measure(); update(); armGL(); });
         if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { measure(); update(); }); }
-        if (document.readyState === 'complete') { whenIdle(loadGL); }
+        if (document.readyState === 'complete') { armGL(); }
 
         setup();
     })();
@@ -464,15 +491,8 @@
                 track('generate_lead', { form_id: 'b2b-qualifier', lead_budget: budget });
                 form.submit();
             }
-            var key = form.getAttribute('data-recaptcha') || '';
-            setTimeout(function () { send(''); }, 4000);
-            if (key && window.grecaptcha && grecaptcha.ready) {
-                grecaptcha.ready(function () {
-                    grecaptcha.execute(key, { action: 'submit' }).then(send, function () { send(''); });
-                });
-            } else {
-                send('');
-            }
+            setTimeout(function () { send(''); }, 4500);
+            if (window.vtRecaptcha) { window.vtRecaptcha('submit', send); } else { send(''); }
         });
     })();
 

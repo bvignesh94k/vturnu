@@ -50,9 +50,9 @@ $LOGOS = array_values(array_filter([
 }));
 
 $HERO_PROOF = array_values(array_filter([
-    $hp_result('saas-ppc-demo-pipeline'),
-    $hp_result('manufacturer-rfq-seo-program'),
-    $hp_result('law-firm-lead-gen-website'),
+    $hp_result('firstchoice-used-auto-parts'),
+    $hp_result('sai-impression-label-manufacturer'),
+    $hp_result('cafy-careers-uk-job-platform'),
 ]));
 
 /* Funnel stages, anchored to heights on the 3D funnel (1 = rim, 0 = tip). */
@@ -129,12 +129,10 @@ $MOVES = [
 ];
 
 $CASE_CARDS = array_values(array_filter([
-    $hp_result('saas-ppc-demo-pipeline'),
-    $hp_result('manufacturer-rfq-seo-program'),
-    $hp_result('law-firm-lead-gen-website'),
-    $hp_result('clinic-local-seo-patient-growth'),
-    $hp_result('real-estate-lead-generation-engine'),
-    $hp_result('edutech-content-engine-signups'),
+    $hp_result('firstchoice-used-auto-parts'),
+    $hp_result('sai-impression-label-manufacturer'),
+    $hp_result('floweazy-odoo-partner-website', 1),
+    $hp_result('cafy-careers-uk-job-platform'),
 ]));
 
 $FORM_SERVICES = ['SEO', 'AI search visibility', 'Google Ads / PPC', 'Paid social', 'Outbound & email', 'Content marketing', 'Website / landing pages', 'Full growth program'];
@@ -156,7 +154,7 @@ $FAQS = [
     ['How soon will we see results?',
      'Paid campaigns can produce qualified enquiries in the first month. SEO usually shows movement by week eight and compounds from there. AI search visibility often moves fastest, because far fewer competitors are working on it yet.'],
     ['What does it cost?',
-     'Growth programs start from ' . price('starter') . ' a month, and most B2B engagements sit higher depending on markets and channels. We scope it after one call and quote a fixed monthly fee. No setup fees and no surprise line items. Ad spend is paid directly to the platforms and stays in your accounts.'],
+     'Growth plans start from ' . price('starter') . ' a month, and the pricing page lists exactly what each plan includes. Larger programs are scoped after one call and quoted as a fixed monthly fee. There are no setup fees, and ad spend is paid directly to the platforms and stays in your accounts.'],
     ['What is AI search optimization, and why does it matter for B2B?',
      'Buyers now ask ChatGPT, Perplexity, Gemini and Google AI Overviews for vendor shortlists. AI search optimization makes your company one of the names those answers cite, using clean entity signals, structured data, third-party mentions and content written the way people ask questions.'],
     ['Can you build or rebuild our website as well?',
@@ -170,6 +168,16 @@ $cta_label = 'Start my growth plan';
 
 <?php /* ================================================================ HERO */ ?>
 <section class="hp3-hero" id="hp3-hero" aria-labelledby="hp-h1">
+<?php /* Set before the first paint. Switching this on later changed the hero's
+         height after load, which pushed the whole page down (layout shift). */ ?>
+<script>
+(function (h) {
+    if (window.innerHeight >= 520 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        h.classList.add('hp3-pin');
+        h.style.setProperty('--hp3-len', (window.innerWidth < 900 ? 380 : 440) + 'svh');
+    }
+})(document.getElementById('hp3-hero'));
+</script>
   <div class="hp3-stage" id="hp3-stage">
     <div class="hp3-bg" aria-hidden="true">
       <span class="hp3-orb hp3-orb--v"></span>
@@ -243,7 +251,7 @@ $cta_label = 'Start my growth plan';
       <div class="hp3-scene hp3-scene--4" data-scene="3">
         <div class="hp3-copy">
           <p class="hp3-eyebrow"><span class="hp3-dot" aria-hidden="true"></span> The turn, in numbers</p>
-          <h2 class="hp3-h2">Results our clients took to the board.</h2>
+          <h2 class="hp3-h2">Real clients. Measured results.</h2>
           <div class="hp3-proof">
             <?php foreach ($HERO_PROOF as [$metric, $label, $client, $industry, $cslug]): ?>
             <a class="hp3-proof-i" href="<?= e(page_url('case-studies/' . $cslug)) ?>">
@@ -386,7 +394,7 @@ $cta_label = 'Start my growth plan';
     <div class="hp3-head" data-rise>
       <p class="hp3-kicker">Receipts</p>
       <h2 class="hp3-title" id="hp3-res-h">Numbers we would happily show your CFO.</h2>
-      <p class="hp3-sub">Six programs, six industries, one discipline: measure what reaches the pipeline. Every case study includes what did not work.</p>
+      <p class="hp3-sub">Named clients and live websites. Each case study shows where the number comes from and what it does not prove.</p>
     </div>
     <div class="hp3-cases" data-rise>
       <?php foreach ($CASE_CARDS as [$metric, $label, $client, $industry, $cslug]): ?>
@@ -611,7 +619,7 @@ $cta_label = 'Start my growth plan';
     <h2 id="hp3-final-h">Your competitors are one good quarter away from owning your market's search results. <span class="hp3-grad">Make it you.</span></h2>
     <div class="hp3-actions">
       <a class="hp3-btn hp3-btn--primary" href="#start"><?= e($cta_label) ?> <span aria-hidden="true">&rarr;</span></a>
-      <a class="hp3-btn hp3-btn--ghost" href="https://wa.me/<?= e(CONTACT_WHATSAPP) ?>?text=<?= rawurlencode('Hi VTurnU, I would like to discuss B2B growth.') ?>" target="_blank" rel="noopener">Talk on WhatsApp</a>
+      <a class="hp3-btn hp3-btn--ghost" href="https://wa.me/<?= e(CONTACT_WHATSAPP) ?>?text=<?= rawurlencode('Hi VTurnU, I would like to discuss B2B growth.') ?>" target="_blank" rel="noopener nofollow">Talk on WhatsApp</a>
     </div>
   </div>
 </section>

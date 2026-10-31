@@ -2,7 +2,8 @@
 $case = $CASES[$page['case']] ?? null;
 if (!$case) { http_response_code(404); echo '<section class="section"><div class="container"><h1>Case study not found</h1></div></section>'; return; }
 
-$related = related_ring($CASES, $page['case'], 3);
+$real_pool = array_filter($CASES, static fn($c) => !empty($c['real']));
+$related = related_ring(!empty($case['real']) ? $real_pool : $CASES, $page['case'], 3);
 
 /* The Article node for this page is emitted by jsonld_page() from
    includes/header.php. It used to be duplicated here: a second, thinner
@@ -17,6 +18,9 @@ $related = related_ring($CASES, $page['case'], 3);
         <div class="case-facts">
             <span><strong>Client</strong><?= e($case['client']) ?></span>
             <span><strong>Location</strong><?= e($case['location']) ?></span>
+            <?php if (!empty($case['site'])): ?>
+            <span><strong>Website</strong><?= ext_link($case['site'], $case['site_label'], true) ?></span>
+            <?php endif; ?>
             <span><strong>Services</strong>
                 <?php foreach ($case['services'] as $i => [$sl, $su]): ?><a href="<?= e($su) ?>"><?= e($sl) ?></a><?= $i < count($case['services']) - 1 ? ', ' : '' ?><?php endforeach; ?>
             </span>
@@ -59,25 +63,51 @@ $related = related_ring($CASES, $page['case'], 3);
     </div>
 </section>
 
+<?php if (!empty($case['outcomes'])): ?>
+<section class="section">
+    <div class="container">
+        <div class="center-text" data-reveal="head">
+            <p class="eyebrow">What the client actually got</p>
+            <h2 class="section-title">Results by area</h2>
+        </div>
+        <div class="outcome-grid">
+            <?php foreach ($case['outcomes'] as [$area, $text]): ?>
+            <div class="outcome tilt" data-reveal="card">
+                <h3><?= e($area) ?></h3>
+                <p><?= e($text) ?></p>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
 <section class="section">
     <div class="container narrow">
+        <?php if (!empty($case['quote'])): ?>
         <figure class="case-quote" data-reveal="quote">
             <blockquote>"<?= e($case['quote'][0]) ?>"</blockquote>
             <figcaption><?= e($case['quote'][1]) ?></figcaption>
         </figure>
+        <?php endif; ?>
         <h2 class="section-title">The outcome</h2>
         <p class="case-para"><?= e($case['outcome']) ?></p>
+        <?php if (!empty($case['source'])): ?>
+        <p class="case-source"><strong>Where these numbers come from:</strong> <?= e($case['source']) ?></p>
+        <?php endif; ?>
     </div>
 </section>
+
+<?php render_faqs($case['faqs'] ?? [], 'Questions about this project'); ?>
 
 <section class="cta-mid">
     <div class="container cta-mid-inner">
         <div>
-            <h2>Want your version of these numbers?</h2>
+            <h2>Want results you can measure?</h2>
             <p>Every engagement starts the same way: a free audit and an honest conversation about whether we can move your needle.</p>
         </div>
         <div class="cta-mid-actions">
-            <a class="btn btn-dark" href="/free-seo-audit/">Check My Site Free</a>
+            <a class="btn btn-dark" href="/contact-us/">Get My Growth Plan</a>
             <a class="cta-phone" href="<?= e(CONTACT_PHONE_HREF) ?>">or call <?= e(CONTACT_PHONE) ?></a>
         </div>
     </div>

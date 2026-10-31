@@ -341,7 +341,7 @@ $BLOG = [
         'Guaranteed rankings, long lock-ins and one-size recommendations are the classic red flags.',
     ],
     'faqs' => [
-        ['How much should I budget for an agency?', 'Serious retainers for SMBs typically start around ₹50,000–₹1.5L / $600–$1,800 per month depending on channels and market competitiveness. Below that, senior attention is mathematically impossible.'],
+        ['How much should I budget for an agency?', 'Serious retainers for SMBs typically start around ₹50,000-₹1.5L / $600-$1,800 per month depending on channels and market competitiveness. Below that, senior attention is mathematically impossible.'],
         ['Agency vs freelancer vs in-house?', 'Freelancers suit single-channel execution; in-house suits mature programs needing daily ownership; agencies suit multi-channel growth where you need senior strategy across disciplines without four salaries.'],
         ['How fast should I expect results?', 'Paid media: meaningful signal in four to six weeks. SEO: material movement in three to six months, compounding after. Anyone promising faster on organic is guessing or lying.'],
     ],
@@ -356,11 +356,11 @@ $BLOG = [
     'category' => 'Strategy', 'intent' => 'Cost & Pricing', 'date' => '2026-05-28', 'read' => '9 min',
     'sections' => [
         ['Typical price ranges by service', [], [
-            'SEO retainers: ₹50k–₹2L+ / $600–$2,500+ monthly, driven by market competitiveness and content volume',
-            'PPC management: ₹35k–₹1.5L / $450–$1,800 monthly, or 10–15% of ad spend at scale (spend itself is separate)',
-            'Social media management: ₹40k–₹1.2L / $500–$1,500 monthly depending on content production load',
-            'Websites: ₹1.5L–₹10L+ / $2k–$12k+ per project by complexity; ecommerce and custom builds at the top',
-            'Full-funnel retainers combining channels: ₹1L–₹5L / $1,200–$6,000 monthly for SMB-to-mid-market',
+            'SEO retainers: ₹50k-₹2L+ / $600-$2,500+ monthly, driven by market competitiveness and content volume',
+            'PPC management: ₹35k-₹1.5L / $450-$1,800 monthly, or 10 to 15% of ad spend at scale (spend itself is separate)',
+            'Social media management: ₹40k-₹1.2L / $500-$1,500 monthly depending on content production load',
+            'Websites: ₹1.5L-₹10L+ / $2k-$12k+ per project by complexity; ecommerce and custom builds at the top',
+            'Full-funnel retainers combining channels: ₹1L-₹5L / $1,200-$6,000 monthly for SMB-to-mid-market',
         ]],
         ['What actually drives the number', [
             'Three variables explain most price differences: seniority of the people on your account (a senior strategist\'s hour costs four times a junior\'s and is usually worth ten), competitiveness of your keywords and market (ranking a dentist in a small city and a fintech nationally are different projects), and production volume: content, creatives and landing pages are the labor centers.',
@@ -392,7 +392,7 @@ $BLOG = [
     'meta'  => 'Traffic without leads is a conversion problem with five usual causes: wrong visitors, weak offer, unclear next step, slow pages or broken trust. Fix each one.',
     'h1'    => 'Why Your Website Gets Traffic but No Leads',
     'lede'  => 'Traffic without enquiries almost always traces to one of five causes: the wrong visitors, a weak offer, an unclear next step, page friction, or missing trust signals. Here is how to diagnose which one is bleeding you, and the fix for each.',
-    'category' => 'Conversion', 'intent' => 'Problem–Solution', 'date' => '2026-05-15', 'read' => '9 min',
+    'category' => 'Conversion', 'intent' => 'Problem and Solution', 'date' => '2026-05-15', 'read' => '9 min',
     'sections' => [
         ['First, confirm it is really a conversion problem', [
             'Divide monthly enquiries by unique visitors. Service sites converting under one percent, or ecommerce under half a percent on non-branded traffic, have a conversion problem worth fixing before buying more traffic. Pouring budget into a leaking funnel is the most common waste we audit.',
@@ -603,7 +603,7 @@ $BLOG = [
         'Segment brand vs non-brand or your ROAS is fiction.',
     ],
     'faqs' => [
-        ['How much should I spend to test Google Ads properly?', 'Enough for statistical signal: typically fifty-plus clicks per ad group decision. In most Indian service markets that means at least ₹30k–₹50k monthly for a meaningful test; less just buys noise.'],
+        ['How much should I spend to test Google Ads properly?', 'Enough for statistical signal: typically fifty-plus clicks per ad group decision. In most Indian service markets that means at least ₹30k-₹50k monthly for a meaningful test; less just buys noise.'],
         ['Should I fire my agency if these mistakes exist in my account?', 'Ask them to walk you through search terms, negatives and conversion setup first, competence shows fast. Silence or dashboards-instead-of-answers tells you what you need to know.'],
         ['Is Performance Max a mistake?', 'It is a tool: powerful with strong conversion data and assets, a black-hole budget drain without. We typically run it alongside, never instead of, well-structured search.'],
     ],
@@ -730,7 +730,7 @@ $BLOG = [
     'meta'  => 'A website redesign SEO checklist: crawl benchmarks, URL mapping, redirects, content parity and launch monitoring, so the new site keeps your rankings.',
     'h1'    => 'How to Redesign a Website Without Losing SEO',
     'lede'  => 'Redesigns lose rankings when URLs, content or internal links change without a migration plan. Protect the equity with four disciplines: benchmark, map, redirect, monitor. Here is the checklist we run on every rebuild.',
-    'category' => 'Web', 'intent' => 'How-to / Problem–Solution', 'date' => '2026-01-15', 'read' => '9 min',
+    'category' => 'Web', 'intent' => 'How-to / Problem and Solution', 'date' => '2026-01-15', 'read' => '9 min',
     'sections' => [
         ['Before anything: benchmark what you are protecting', [], [
             'Full crawl of the current site, every URL, title, meta and status',
@@ -993,7 +993,7 @@ $BLOG = [
     'meta'  => 'Ecommerce CRO priorities that move revenue: product page trust, checkout friction, mobile experience, recovery flows and the metrics that find the leaks.',
     'h1'    => 'Ecommerce Conversion Rate Optimization',
     'lede'  => 'Store growth has two levers: more visitors, or more buyers per visitor. The second is cheaper. Here is where ecommerce conversion actually leaks, product pages, checkout, mobile, recovery, and the fixes ranked by payback.',
-    'category' => 'Conversion', 'intent' => 'Best Practices / Problem–Solution', 'date' => '2025-09-24', 'read' => '9 min',
+    'category' => 'Conversion', 'intent' => 'Best Practices / Problem and Solution', 'date' => '2025-09-24', 'read' => '9 min',
     'sections' => [
         ['Find the leak before fixing pipes', [
             'Funnel analytics first: what share of visitors view a product, add to cart, reach checkout, complete? Each step has a benchmark, and the biggest gap is your cheapest win. Stores guessing at fixes repaint rooms while the basement floods; thirty minutes in analytics ends the guessing.',
@@ -1074,3 +1074,6 @@ $BLOG = [
     'cta' => ['Get a growth mix, not a channel pitch', 'Our strategy sessions model your CAC trends, brand signals and stage, and return a budget split with reasoning you can defend to a board. Free to start.', 'Model My Growth Mix'],
 ],
 ];
+
+/* Newest first, so the feed and the blog index lead with current work. */
+$BLOG = (require __DIR__ . '/blog-new.php') + $BLOG;

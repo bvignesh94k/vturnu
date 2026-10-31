@@ -32,6 +32,9 @@ $base_url = '/' . ($slug === 'ai-blog-posts' ? 'ai-blog-posts' : 'blog') . '/';
         <div class="card-grid cols-3 blog-grid">
             <?php $i = 0; foreach ($posts as $bslug => $b): $i++; ?>
             <a class="card post-card" href="/blog/<?= e($bslug) ?>/" data-reveal="card">
+                <?php if (is_file(BASE_PATH . '/assets/img/blog/' . $bslug . '-sm.webp')): ?>
+                <img class="card-img" src="/assets/img/blog/<?= e($bslug) ?>-sm.webp" alt="" width="640" height="336" loading="<?= $i <= 3 ? 'eager' : 'lazy' ?>" decoding="async">
+                <?php endif; ?>
                 <div class="post-card-meta">
                     <span class="card-tag"><?= e($b['category']) ?></span>
                     <span class="post-intent"><?= e($b['intent']) ?></span>

@@ -2,10 +2,7 @@
    VTurnU homepage: immersive B2B page.
 
    SCOPING RULE, do not break it: never style a bare element under .hp.
-   .hp is on <body>, so `.hp a {}` repaints the shared header and footer too.
-   Style .hp3-* classes (and elements inside them) only.
-
-   Colours are the logo's own: V stroke #00B8D9 to #4338CA, U stroke #FF3D8A
+   .hp is on <body>, so `.hp a {}U stroke #FF3D8A
    to #FF9100, wordmark ink #1D1936, tagline periwinkle #5B56C9.
 
    The hero is a pinned stage. home.js maps scroll inside it to four scenes
@@ -33,8 +30,8 @@
     --hp3-grad-dk: linear-gradient(100deg, #00A5C4 0%, #4338CA 38%, #E5306E 72%, #E07600 100%);
     --hp3-grad-v:  linear-gradient(160deg, #00B8D9, #4338CA);
     --hp3-grad-u:  linear-gradient(160deg, #FF3D8A, #FF9100);
-    --hp3-sans:    Figtree, Poppins, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --hp3-head:    Poppins, Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --hp3-sans:    Figtree, Poppins, "Poppins Fallback", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --hp3-head:    Poppins, "Poppins Fallback", Figtree, system-ui, -apple-system, "Segoe UI", sans-serif;
     --hp3-ease:    cubic-bezier(.2, .7, .2, 1);
     --hp3-hdr:     64px;
     --hp3-gut:     clamp(1.25rem, 4vw, 3rem);

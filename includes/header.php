@@ -2,14 +2,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?php /* Tawk.to is injected by Google Tag Manager, not by this codebase (the
-         embed in footer.php is commented out and still holds placeholder IDs),
-         so its own green launcher bubble appeared alongside our black Live Chat
-         button: two chat launchers stacked in the same corner.
-
-         Tawk_API has to exist before GTM loads Tawk, because Tawk reads this
-         object on init. hideWidget() suppresses only the launcher bubble; the
-         black button's Tawk_API.toggle() still opens the chat window normally. */ ?>
+<?php /* Tawk.to is injected by Google Tag Manager, not by this codebase, so its
+         own launcher bubble appeared alongside our Live Chat button. Tawk_API has
+         to exist before GTM loads Tawk, because Tawk reads this object on init.
+         hideWidget() suppresses only the bubble; Tawk_API.toggle() still opens
+         the chat window normally. */ ?>
 <script>
 window.Tawk_API = window.Tawk_API || {};
 (function () {
@@ -21,14 +18,36 @@ window.Tawk_API = window.Tawk_API || {};
 })();
 </script>
 <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-K68BCJ69');</script>
+<?php /* Tag Manager carries analytics, ads and chat, and was the heaviest thing on
+         every page. It now starts on the first interaction, or after ten
+         seconds for a visitor who only reads, so it no longer competes with the
+         first paint and first tap (Core Web Vitals). A shorter wait landed inside
+         the page-load window and cost more than it gained. Sessions that end
+         within ten seconds with no interaction are the only ones not counted. */ ?>
+<script>
+(function(w,d){
+    var done=false,id='GTM-K68BCJ69';
+    function go(){
+        if(done){return;}done=true;
+        w.dataLayer=w.dataLayer||[];w.dataLayer.push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName('script')[0],j=d.createElement('script');
+        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+id;f.parentNode.insertBefore(j,f);
+    }
+    ['pointerdown','keydown','scroll','touchstart'].forEach(function(e){w.addEventListener(e,go,{once:true,passive:true});});
+    w.addEventListener('load',function(){setTimeout(go,10000);});
+})(window,document);
+</script>
 <!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php /* Set before anything paints. Adding these from main.js forced a full style
+         recalculation after the page had rendered, about half a second on a phone. */ ?>
+<script>
+(function (d) {
+    d.classList.add('js-nav');
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) { d.classList.add('js'); }
+})(document.documentElement);
+</script>
 <title><?= e($page['title']) ?></title>
 <meta name="description" content="<?= e($page['meta']) ?>">
 <link rel="canonical" href="<?= e($canonical) ?>">
@@ -38,22 +57,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
          never submitted anything. */
 $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <meta name="robots" content="<?= $noindex ? 'noindex, follow' : 'index, follow' ?>">
-<meta property="og:type" content="<?= ($page['template'] ?? '') === 'blog-post' ? 'article' : 'website' ?>">
+<?php [$og_img, $og_w, $og_h] = page_share_image($page, $slug); $is_article = in_array($page['template'] ?? '', ['blog-post', 'resource', 'case-detail'], true); ?>
+<meta property="og:type" content="<?= $is_article ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
 <meta property="og:title" content="<?= e($page['og_title'] ?? $page['title']) ?>">
 <meta property="og:description" content="<?= e($page['og_meta'] ?? $page['meta']) ?>">
 <meta property="og:url" content="<?= e($canonical) ?>">
-<meta property="og:image" content="<?= e(abs_url('/assets/img/vturnu-logo-dark.png')) ?>">
-<meta property="og:image:width" content="1584">
-<meta property="og:image:height" content="392">
-<meta property="og:image:alt" content="<?= e(SITE_NAME) ?>, <?= e(SITE_TAGLINE) ?>">
+<meta property="og:image" content="<?= e(abs_url($og_img)) ?>">
+<meta property="og:image:secure_url" content="<?= e(abs_url($og_img)) ?>">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="<?= $og_w ?>">
+<meta property="og:image:height" content="<?= $og_h ?>">
+<meta property="og:image:alt" content="<?= e($page['og_title'] ?? $page['h1'] ?? SITE_NAME) ?>">
+<?php if (($page['template'] ?? '') === 'blog-post' && !empty($BLOG[$page['post']]['date'])): $bp = $BLOG[$page['post']]; ?>
+<meta property="article:published_time" content="<?= e(date('c', strtotime($bp['date']))) ?>">
+<meta property="article:modified_time" content="<?= e(date('c', strtotime($bp['modified'] ?? $bp['date']))) ?>">
+<meta property="article:section" content="<?= e($bp['category'] ?? 'Strategy') ?>">
+<?php endif; ?>
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="en_IN">
 <meta property="og:locale:alternate" content="en_CA">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?= e($page['og_title'] ?? $page['title']) ?>">
 <meta name="twitter:description" content="<?= e($page['og_meta'] ?? $page['meta']) ?>">
-<meta name="twitter:image" content="<?= e(abs_url('/assets/img/vturnu-logo-dark.png')) ?>">
+<meta name="twitter:image" content="<?= e(abs_url($og_img)) ?>">
+<meta name="twitter:image:alt" content="<?= e($page['og_title'] ?? $page['h1'] ?? SITE_NAME) ?>">
+<meta name="twitter:site" content="@VTurnU_Digital">
 <meta name="geo.region" content="IN-TN">
 <meta name="geo.placename" content="Chennai">
 <meta name="format-detection" content="telephone=no">
@@ -71,20 +100,30 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <link rel="apple-touch-icon" href="/assets/img/vturnu-icon-mark.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" title="<?= e(SITE_NAME) ?> Blog" href="/feed.xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <?php /* The stylesheet is render-blocking by design, so tell the browser to
          start fetching it before the parser reaches the <link>. */ ?>
 <link rel="preload" as="style" href="/assets/css/style.css?v=<?= asset_v('/assets/css/style.css') ?>">
-<?php /* One family for the whole site (Poppins) plus Caprasimo for the logo
-         wordmark. Loaded in a single request; display=swap so text paints
-         immediately in the fallback rather than blocking first render. */ ?>
-<?php /* The homepage adds Figtree, its body face, to the same request. */
-$font_url = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800"
-    . ($slug === "" ? "&family=Figtree:wght@400;500;600;700" : "")
-    . "&family=Caprasimo&display=swap"; ?>
-<link rel="stylesheet" href="<?= e($font_url) ?>" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="<?= e($font_url) ?>"></noscript>
+<?php /* Fonts are served from this site. Coming from Google they arrived late,
+         which reflowed the page (layout shift) and delayed the largest text.
+         The two most used files are preloaded, and the fallback is scaled to
+         Poppins' metrics so the swap moves nothing. */ ?>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-400.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-800.woff2" crossorigin>
+<?php if ($slug === ''): ?>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/figtree.woff2" crossorigin>
+<?php endif; ?>
+<style>
+@font-face{font-family:Poppins;font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/poppins-400.woff2) format("woff2")}
+@font-face{font-family:Poppins;font-style:normal;font-weight:500;font-display:swap;src:url(/assets/fonts/poppins-500.woff2) format("woff2")}
+@font-face{font-family:Poppins;font-style:normal;font-weight:600;font-display:swap;src:url(/assets/fonts/poppins-600.woff2) format("woff2")}
+@font-face{font-family:Poppins;font-style:normal;font-weight:700;font-display:swap;src:url(/assets/fonts/poppins-700.woff2) format("woff2")}
+@font-face{font-family:Poppins;font-style:normal;font-weight:800;font-display:swap;src:url(/assets/fonts/poppins-800.woff2) format("woff2")}
+@font-face{font-family:Caprasimo;font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/caprasimo.woff2) format("woff2")}
+<?php if ($slug === ''): ?>
+@font-face{font-family:Figtree;font-style:normal;font-weight:300 900;font-display:swap;src:url(/assets/fonts/figtree.woff2) format("woff2")}
+<?php endif; ?>
+@font-face{font-family:"Poppins Fallback";src:local("Arial"),local("Helvetica"),local("Roboto"),local("Liberation Sans");size-adjust:112.2%;ascent-override:93.6%;descent-override:31.2%;line-gap-override:8.9%}
+</style>
 <?php /* External + versioned so the browser caches it once instead of re-downloading
          the whole sheet inside every page's HTML. ?v= busts the cache on edit. */
 $css_v = asset_v('/assets/css/style.css'); ?>
@@ -95,6 +134,9 @@ if ($slug === ""):
     $home_css_v = asset_v('/assets/css/home.css'); ?>
 <link rel="stylesheet" href="/assets/css/home.css?v=<?= $home_css_v ?>">
 <?php endif; ?>
+<?php if (($page['template'] ?? '') === 'blog-post' && is_file(BASE_PATH . '/assets/img/blog/' . $page['post'] . '.webp')): ?>
+<link rel="preload" as="image" type="image/webp" imagesrcset="/assets/img/blog/<?= e($page['post']) ?>-sm.webp 640w, /assets/img/blog/<?= e($page['post']) ?>.webp 1200w" imagesizes="(max-width: 860px) 100vw, 820px">
+<?php endif; ?>
 <?php /* The homepage emits its own richer Organization graph (ProfessionalService,
          a service catalogue and the FAQ), so the shared one is skipped there
          rather than defining the same @id twice. Every other page keeps it. */
@@ -104,9 +146,12 @@ if ($slug !== ''): ?>
 <?php if ($slug !== '__404__' && count($trail) > 1): ?>
 <?= jsonld_script(jsonld_breadcrumbs($trail)) . "\n" ?>
 <?php endif; ?>
+<?php $faq_page = $slug === '__404__' ? [] : page_faqs($page, $slug);
+if ($faq_page && $slug !== ''): ?>
+<?= jsonld_script(jsonld_faq($faq_page)) . "\n" ?>
+<?php endif; ?>
 <?php if (($page['template'] ?? 'service') === 'service'): ?>
 <?= jsonld_script(jsonld_service($page, $slug)) . "\n" ?>
-<?= jsonld_script(jsonld_faq(service_faqs($page))) . "\n" ?>
 <?= jsonld_script([
     '@context' => 'https://schema.org',
     '@type' => 'WebPage',
@@ -120,12 +165,11 @@ if ($slug !== ''): ?>
 elseif ($slug !== '__404__' && ($node = jsonld_page($page, $slug, $canonical, $page['template'] ?? 'service')) !== null): ?>
 <?= jsonld_script($node) . "\n" ?>
 <?php endif; ?>
-<script src="https://www.google.com/recaptcha/api.js?render=6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg" async defer></script>
 </head>
-<body<?= $slug === "" ? " class=\"hp\"" : "" ?>>
+<body<?= $slug === "" ? " class=\"hp\"" : "" ?> data-scene="<?= e(page_scene($page, $slug)) ?>">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K68BCJ69"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+height="0" width="0" style="display:none;visibility:hidden" title="Tag Manager"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -134,7 +178,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header class="site-header" id="site-header">
     <div class="container header-inner">
         <a class="brand" href="/" aria-label="<?= e(SITE_NAME) ?>, <?= e(SITE_TAGLINE) ?>, Home">
-            <img src="/assets/img/vturnu-icon-mark.svg" alt="" width="44" height="42" class="brand-mark" fetchpriority="high">
+            <img src="/assets/img/vturnu-icon-mark.svg?v=<?= asset_v('/assets/img/vturnu-icon-mark.svg') ?>" alt="" width="50" height="44" class="brand-mark">
             <span class="brand-lock" aria-hidden="true">
                 <span class="brand-word"><span class="bw-v">V</span>Turn<span class="bw-u">U</span></span>
                 <span class="brand-tag"><?= e(strtoupper(SITE_TAGLINE)) ?></span>
@@ -150,15 +194,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <ul class="nav-list">
                 <?php foreach ($NAV as $item): ?>
                     <?php $hasMenu = !empty($item['columns']); $hasPromo = !empty($item['promo']); ?>
-                    <li class="nav-item<?= $hasMenu ? ' has-mega' : '' ?>">
+                    <li class="nav-item<?= $hasMenu ? ' has-mega' : '' ?><?= $item['label'] === 'Enterprise & IT' ? ' nav-enterprise' : '' ?>">
                         <a class="nav-link" href="<?= e($item['url']) ?>"><?= e($item['label']) ?><?php if ($hasMenu): ?><span class="caret" aria-hidden="true"></span><?php endif; ?></a>
                         <?php if ($hasMenu): ?>
-                        <button class="submenu-toggle" aria-expanded="false" aria-label="Open <?= e($item['label']) ?> menu">▾</button>
-                        <div class="mega" role="menu">
+                        <button class="submenu-toggle" type="button" aria-expanded="false" aria-label="Open <?= e($item['label']) ?> menu"><span aria-hidden="true">▾</span></button>
+                        <div class="mega">
                             <?php if (!empty($item['desc'])): ?>
                             <p class="mega-tagline"><?= e($item['desc']) ?></p>
                             <?php endif; ?>
-                            <div class="mega-grid cols-<?= count($item['columns']) + ($hasPromo ? 1 : 0) ?>">
+                            <div class="mega-grid cols-<?= count($item['columns']) + ($hasPromo ? 1 : 0) ?><?= $hasPromo ? ' has-promo' : '' ?>">
                                 <?php foreach ($item['columns'] as $col): ?>
                                 <div class="mega-col">
                                     <?php if (!empty($col['url'])): ?>

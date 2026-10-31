@@ -1,152 +1,277 @@
-<?php /** Pricing page. Expects: $page */ ?>
+<?php
+/**
+ * Pricing page. Expects: $page, $slug.
+ *
+ * Prices come from PRICE_BOOK in includes/currency.php, so each visitor sees a
+ * fixed figure in their own currency. Plan contents live here as data: the
+ * comparison tables and the cards read the same lists, so they cannot disagree.
+ */
+
+$growth_plans = [
+    [
+        'name' => 'Starter', 'key' => 'starter', 'accent' => 'ac-cyan',
+        'for' => 'For small businesses that need one channel working properly before adding more.',
+        'best' => 'Local businesses and early-stage firms',
+        'gets' => ['SEO for up to 10 priority pages', 'Google Business Profile management', 'One paid channel: Google or Meta', '4 content pieces a month', 'Monthly report and review call'],
+    ],
+    [
+        'name' => 'Growth', 'key' => 'growth', 'accent' => 'ac-yellow', 'featured' => 'Most popular',
+        'for' => 'For businesses making digital their main source of qualified enquiries.',
+        'best' => 'Established SMEs and B2B firms',
+        'gets' => ['SEO for up to 30 pages, plus AI search visibility', 'Google and Meta ads managed together', '10 content pieces a month', '12 social posts a month', '1 landing page improved each month', 'Live dashboard and a dedicated strategist'],
+    ],
+    [
+        'name' => 'Enterprise', 'key' => null, 'accent' => 'ac-purple',
+        'for' => 'For multi-location brands, multiple markets and larger media budgets.',
+        'best' => 'Large sites and multi-market brands',
+        'gets' => ['Full-funnel, multi-channel program', 'Enterprise SEO and PPC governance', 'Multi-language and multi-market rollouts', 'CRM and analytics integration', 'Quarterly executive reviews', 'Agreed service levels'],
+    ],
+];
+
+/* [row, Starter, Growth, Enterprise]. true and false render as a tick or a dash. */
+$growth_compare = [
+    'Search' => [
+        ['Pages optimized', 'Up to 10', 'Up to 30', 'Agreed per site'],
+        ['Technical SEO audit', 'Once, then quarterly', 'Monthly', 'Continuous'],
+        ['Google Business Profile', '1 location', 'Up to 3 locations', 'All locations'],
+        ['AI search visibility (AEO and GEO)', 'Foundations', true, true],
+        ['Buyer prompts tracked in AI answers', false, '25 a month', 'Custom set'],
+    ],
+    'Paid media' => [
+        ['Ad platforms managed', '1', '2', 'Multi-channel'],
+        ['Conversion tracking setup', true, true, true],
+        ['Ad creative refresh', 'Quarterly', 'Monthly', 'Continuous'],
+        ['Landing page improvements', false, '1 a month', 'Agreed plan'],
+    ],
+    'Content and brand' => [
+        ['Content pieces a month', '4', '10', 'Agreed plan'],
+        ['Social media posts a month', false, '12', 'Agreed plan'],
+        ['Email campaigns', false, '2 a month', 'Agreed plan'],
+    ],
+    'Service' => [
+        ['Reporting', 'Monthly report', 'Live dashboard and report', 'Executive dashboards'],
+        ['Review calls', 'Monthly', 'Fortnightly', 'Weekly, plus quarterly reviews'],
+        ['Your contact', 'Shared specialist', 'Dedicated strategist', 'Named team'],
+        ['Reply time', 'Within 1 working day', 'Within 1 working day', 'Agreed service level'],
+    ],
+];
+
+$web_plans = [
+    [
+        'name' => 'Business Website', 'key' => 'website', 'accent' => 'ac-olive',
+        'for' => 'A fast, search-ready website that presents your business and captures enquiries.',
+        'best' => 'Service businesses and SMEs',
+        'gets' => ['Up to 10 custom-designed pages', 'Mobile-first responsive design', 'On-page SEO and schema built in', 'Enquiry forms and WhatsApp', '30 days of support after launch'],
+    ],
+    [
+        'name' => 'Ecommerce Store', 'key' => 'store', 'accent' => 'ac-terra', 'featured' => 'Best value',
+        'for' => 'A conversion-first store on Shopify, WooCommerce or a custom build.',
+        'best' => 'Brands selling online',
+        'gets' => ['Custom storefront design', 'Up to 50 products loaded', 'Payments, shipping and tax setup', 'Product schema and ecommerce SEO base', 'Analytics and conversion tracking', '30 days of support after launch'],
+    ],
+    [
+        'name' => 'Custom Web App', 'key' => null, 'accent' => 'ac-pink',
+        'for' => 'Portals, platforms, headless builds and AI-powered products.',
+        'best' => 'Products and complex workflows',
+        'gets' => ['Discovery and UX architecture', 'Custom design system', 'Modern, scalable stack', 'Integrations and automation', 'Support plan after launch'],
+    ],
+];
+
+$web_compare = [
+    ['Pages or products', 'Up to 10 pages', 'Up to 50 products', 'Scoped'],
+    ['Design', 'Custom, 2 rounds of changes', 'Custom, 2 rounds of changes', 'Full design system'],
+    ['Content management', true, true, 'Where needed'],
+    ['SEO setup and schema', true, true, true],
+    ['PageSpeed target', '90+', '90+', '90+ on key journeys'],
+    ['Typical timeline', '3 to 4 weeks', '5 to 8 weeks', 'Agreed after discovery'],
+    ['Support after launch', '30 days', '30 days', 'Support plan'],
+];
+
+$pill = static function ($v): string {
+    if ($v === true) { return '<span class="cmp-yes" aria-label="Included">✓</span>'; }
+    if ($v === false) { return '<span class="cmp-no" aria-label="Not included">-</span>'; }
+    return e((string) $v);
+};
+
+$priced = array_filter(array_merge($growth_plans, $web_plans), static fn($p) => $p['key'] !== null);
+echo jsonld_script([
+    '@context' => 'https://schema.org',
+    '@type' => 'OfferCatalog',
+    'name' => 'VTurnU marketing and website packages',
+    'url' => abs_url('/pricing/'),
+    'itemListElement' => array_values(array_map(static fn($p) => [
+        '@type' => 'Offer',
+        'name' => $p['name'],
+        'description' => $p['for'],
+        'price' => (string) (PRICE_BOOK[visitor_currency()][$p['key']] ?? PRICE_BOOK['USD'][$p['key']]),
+        'priceCurrency' => isset(PRICE_BOOK[visitor_currency()]) ? visitor_currency() : 'USD',
+        'seller' => ['@id' => SITE_URL . '/#organization'],
+    ], $priced)),
+]);
+?>
 <section class="page-hero">
     <div class="container">
-        <p class="eyebrow eyebrow-line">Chennai · India · US · Canada</p>
+        <p class="eyebrow eyebrow-line">Pricing</p>
         <h1><?= e($page['h1']) ?></h1>
         <p class="lede"><?= e($page['lede']) ?></p>
         <ul class="hero-chips">
-            <li>Web build billed once</li>
-            <li>Marketing runs monthly</li>
-            <li>Budgets sized to your goals</li>
+            <li>Clear prices, in your currency</li>
+            <li>Websites billed once</li>
+            <li>No lock-in after 90 days</li>
         </ul>
+        <div class="hero-cur"><?= currency_switcher('cur-pricing') ?></div>
     </div>
 </section>
 
-<section class="section">
+<section class="section" id="marketing">
     <div class="container">
-        <h2 class="section-title center">1 · Monthly Growth Marketing <span class="price-tag-recurring">Recurring</span></h2>
-        <div class="center"><?= currency_switcher('cur-pricing') ?></div>
-        <p class="center pricing-intro">SEO, AEO, social media (SMO) and Google &amp; Meta ads run as a monthly program. The budget is based on your needs, tell us your goal and we'll size the plan around it. Ad spend stays in your own accounts.</p>
-        <div class="card-grid cols-3 pricing-grid">
-            <div class="card price-card ac-cyan" data-reveal="card">
-                <h3>Starter</h3>
-                <p class="price"><span><?= e(price('starter')) ?></span>/month</p>
-                <p class="price-note">For small businesses building their first serious digital presence.</p>
-                <ul class="check-list">
-                    <li>SEO + AEO foundations</li>
-                    <li>One paid channel (Google or Meta)</li>
-                    <li>4 content pieces / month</li>
-                    <li>Google Business Profile management</li>
-                    <li>Monthly reporting &amp; review call</li>
-                </ul>
-                <a class="btn btn-ghost btn-block" href="/contact-us/">Get Started</a>
-            </div>
-            <div class="card price-card price-featured ac-yellow" data-reveal="card">
-                <p class="price-badge">Most popular</p>
-                <h3>Growth</h3>
-                <p class="price"><span><?= e(price('growth')) ?></span>/month</p>
-                <p class="price-note">For businesses ready to make digital their main growth channel.</p>
-                <ul class="check-list">
-                    <li>SEO + AI SEO (AEO) + SMO</li>
-                    <li>Google &amp; Meta ads management</li>
-                    <li>10 content pieces / month</li>
-                    <li>Landing page CRO</li>
-                    <li>Live dashboard + monthly strategy call</li>
-                    <li>Dedicated account strategist</li>
-                </ul>
-                <a class="btn btn-primary btn-block" href="/contact-us/">Get Started</a>
-            </div>
-            <div class="card price-card ac-purple" data-reveal="card">
-                <h3>Enterprise</h3>
-                <p class="price"><span>Custom</span></p>
-                <p class="price-note">For large sites, multi-location brands and complex requirements.</p>
-                <ul class="check-list">
-                    <li>Full-funnel, multi-channel programs</li>
-                    <li>Enterprise SEO &amp; PPC governance</li>
-                    <li>AI development projects</li>
-                    <li>Quarterly executive reviews</li>
-                    <li>SLA-backed support</li>
-                </ul>
-                <a class="btn btn-ghost btn-block" href="/contact-us/">Request a Quote</a>
-            </div>
+        <div class="center-text" data-reveal="head">
+            <p class="eyebrow">Digital marketing</p>
+            <h2 class="section-title">Monthly growth plans <span class="price-tag-recurring">Recurring</span></h2>
+            <p class="pricing-intro center">You pay for the team and the work. Ad spend is separate, paid directly to Google or Meta, and stays in your own accounts.</p>
         </div>
-        <p class="center price-disclaimer">Indicative retainers, every proposal is scoped to your goals after a free consultation. Ad budgets are paid directly to Google &amp; Meta and stay in your accounts.</p>
+        <div class="card-grid cols-3 pricing-grid">
+            <?php foreach ($growth_plans as $p): ?>
+            <div class="card price-card <?= e($p['accent']) ?><?= !empty($p['featured']) ? ' price-featured' : '' ?>" data-reveal="card">
+                <?php if (!empty($p['featured'])): ?><p class="price-badge"><?= e($p['featured']) ?></p><?php endif; ?>
+                <h3><?= e($p['name']) ?></h3>
+                <p class="price"><span><?= $p['key'] ? e(price($p['key'])) : 'Custom' ?></span><?= $p['key'] ? '/month' : '' ?></p>
+                <p class="price-note"><?= e($p['for']) ?></p>
+                <p class="price-best"><strong>Best for:</strong> <?= e($p['best']) ?></p>
+                <ul class="check-list">
+                    <?php foreach ($p['gets'] as $g): ?><li><?= e($g) ?></li><?php endforeach; ?>
+                </ul>
+                <a class="btn <?= !empty($p['featured']) ? 'btn-primary' : 'btn-ghost' ?> btn-block" href="/contact-us/"><?= $p['key'] ? 'Get Started' : 'Request a Quote' ?></a>
+            </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </section>
 
 <section class="section section-tint">
     <div class="container">
-        <h2 class="section-title center">2 · Web Design &amp; Development <span class="price-tag-onetime">One-time · first month only</span></h2>
-        <p class="center pricing-intro">Website design and development is a one-time build cost, charged in your first month only. After launch you own the site outright, no recurring development fees. Add a marketing plan above whenever you're ready to grow.</p>
-        <div class="card-grid cols-3 pricing-grid">
-            <div class="card price-card ac-olive" data-reveal="card">
-                <h3>Business Website</h3>
-                <p class="price"><span><?= e(price('website')) ?></span> one-time</p>
-                <p class="price-note">A fast, SEO-ready website that presents your business and captures enquiries.</p>
-                <ul class="check-list">
-                    <li>Up to 10 custom-designed pages</li>
-                    <li>Mobile-first, responsive design</li>
-                    <li>On-page SEO &amp; schema built in</li>
-                    <li>Contact / enquiry forms + WhatsApp</li>
-                    <li>95+ PageSpeed target</li>
-                </ul>
-                <a class="btn btn-ghost btn-block" href="/contact-us/">Get a Build Quote</a>
-            </div>
-            <div class="card price-card price-featured ac-terra" data-reveal="card">
-                <p class="price-badge">Best value</p>
-                <h3>Ecommerce Store</h3>
-                <p class="price"><span><?= e(price('store')) ?></span> one-time</p>
-                <p class="price-note">A conversion-first online store on Shopify, WooCommerce or custom build.</p>
-                <ul class="check-list">
-                    <li>Custom storefront design</li>
-                    <li>Product, category &amp; checkout setup</li>
-                    <li>Payments, shipping &amp; GST config</li>
-                    <li>Product schema &amp; ecommerce SEO base</li>
-                    <li>Analytics &amp; conversion tracking</li>
-                </ul>
-                <a class="btn btn-primary btn-block" href="/contact-us/">Get a Build Quote</a>
-            </div>
-            <div class="card price-card ac-pink" data-reveal="card">
-                <h3>Custom Web App</h3>
-                <p class="price"><span>Custom</span></p>
-                <p class="price-note">Bespoke platforms, portals, headless builds and AI-powered products.</p>
-                <ul class="check-list">
-                    <li>Discovery &amp; UX architecture</li>
-                    <li>Custom design system</li>
-                    <li>Modern, scalable stack</li>
-                    <li>Integrations &amp; automation</li>
-                    <li>Post-launch support options</li>
-                </ul>
-                <a class="btn btn-ghost btn-block" href="/contact-us/">Scope My Project</a>
-            </div>
+        <h2 class="section-title center">Compare the plans</h2>
+        <div class="cmp-wrap" tabindex="0" role="region" aria-label="Plan comparison table">
+            <table class="cmp-table">
+                <thead>
+                    <tr>
+                        <th scope="col">What you get</th>
+                        <?php foreach ($growth_plans as $p): ?>
+                        <th scope="col"<?= !empty($p['featured']) ? ' class="cmp-feat"' : '' ?>><?= e($p['name']) ?><small><?= $p['key'] ? e(price($p['key'])) . '/mo' : 'Custom' ?></small></th>
+                        <?php endforeach; ?>
+                    </tr>
+                </thead>
+                <?php foreach ($growth_compare as $group => $rows): ?>
+                <tbody>
+                    <tr class="cmp-group"><th colspan="4" scope="colgroup"><?= e($group) ?></th></tr>
+                    <?php foreach ($rows as [$label, $a, $b, $c]): ?>
+                    <tr>
+                        <th scope="row"><?= e($label) ?></th>
+                        <td><?= $pill($a) ?></td>
+                        <td class="cmp-feat"><?= $pill($b) ?></td>
+                        <td><?= $pill($c) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <?php endforeach; ?>
+            </table>
         </div>
-        <p class="center price-disclaimer">Build prices are indicative and confirmed after a free scoping call. Hosting and third-party licenses (if any) are billed at cost.</p>
+    </div>
+</section>
+
+<section class="section" id="websites">
+    <div class="container">
+        <div class="center-text" data-reveal="head">
+            <p class="eyebrow">Web development</p>
+            <h2 class="section-title">Website packages <span class="price-tag-onetime">One-time payment</span></h2>
+            <p class="pricing-intro center">Design and development are billed once. After launch the site is yours, with no recurring development fee.</p>
+        </div>
+        <div class="card-grid cols-3 pricing-grid">
+            <?php foreach ($web_plans as $p): ?>
+            <div class="card price-card <?= e($p['accent']) ?><?= !empty($p['featured']) ? ' price-featured' : '' ?>" data-reveal="card">
+                <?php if (!empty($p['featured'])): ?><p class="price-badge"><?= e($p['featured']) ?></p><?php endif; ?>
+                <h3><?= e($p['name']) ?></h3>
+                <p class="price"><span><?= $p['key'] ? e(price($p['key'])) : 'Custom' ?></span><?= $p['key'] ? ' one-time' : '' ?></p>
+                <p class="price-note"><?= e($p['for']) ?></p>
+                <p class="price-best"><strong>Best for:</strong> <?= e($p['best']) ?></p>
+                <ul class="check-list">
+                    <?php foreach ($p['gets'] as $g): ?><li><?= e($g) ?></li><?php endforeach; ?>
+                </ul>
+                <a class="btn <?= !empty($p['featured']) ? 'btn-primary' : 'btn-ghost' ?> btn-block" href="/contact-us/"><?= $p['key'] ? 'Get a Build Quote' : 'Scope My Project' ?></a>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="cmp-wrap cmp-web" tabindex="0" role="region" aria-label="Website package comparison table">
+            <table class="cmp-table">
+                <thead>
+                    <tr>
+                        <th scope="col">What you get</th>
+                        <?php foreach ($web_plans as $p): ?><th scope="col"<?= !empty($p['featured']) ? ' class="cmp-feat"' : '' ?>><?= e($p['name']) ?></th><?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($web_compare as [$label, $a, $b, $c]): ?>
+                    <tr><th scope="row"><?= e($label) ?></th><td><?= $pill($a) ?></td><td class="cmp-feat"><?= $pill($b) ?></td><td><?= $pill($c) ?></td></tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <p class="center price-disclaimer">Hosting, domains, paid themes and third-party licenses are billed at cost, so you always see what you are paying for.</p>
+    </div>
+</section>
+
+<section class="section section-tint" id="enterprise">
+    <div class="container">
+        <div class="center-text" data-reveal="head">
+            <p class="eyebrow">Enterprise &amp; IT</p>
+            <h2 class="section-title">Enterprise projects are scoped, not packaged</h2>
+            <p class="pricing-intro center">SAP CPQ, Salesforce, Odoo, ERPNext and IT staffing depend on scope, so a fixed list price would be a guess. Here is how each one is priced.</p>
+        </div>
+        <div class="card-grid cols-3">
+            <div class="card" data-reveal="card"><h3>Fixed-scope project</h3><p>A fixed fee for an agreed phase, such as a first rollout. Best when the requirements are clear.</p></div>
+            <div class="card" data-reveal="card"><h3>Time and materials</h3><p>Agreed rates for evolving work, with weekly reporting of hours and progress.</p></div>
+            <div class="card" data-reveal="card"><h3>Staffing</h3><p>An agreed rate for contract roles, and a percentage of annual salary for direct hires.</p></div>
+        </div>
+        <p class="center pricing-cta"><a class="btn btn-grad" href="/enterprise-it-services/">Explore Enterprise &amp; IT</a></p>
     </div>
 </section>
 
 <section class="section">
     <div class="container">
-        <h2 class="section-title center">How Billing Works, No Surprises</h2>
+        <h2 class="section-title center">What moves a price up or down</h2>
+        <div class="card-grid cols-4">
+            <div class="card" data-reveal="card"><h3>Competition</h3><p>A national keyword costs more to win than a local one.</p></div>
+            <div class="card" data-reveal="card"><h3>Starting point</h3><p>A site with no technical debt needs less work to begin.</p></div>
+            <div class="card" data-reveal="card"><h3>Markets</h3><p>Each extra country or language adds work and reporting.</p></div>
+            <div class="card" data-reveal="card"><h3>Speed</h3><p>Faster results mean more hours each month.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="section section-tint">
+    <div class="container">
+        <h2 class="section-title center">How billing works</h2>
         <div class="steps-line billing-line">
             <div class="step-card">
                 <span class="step-time">Month 1</span>
-                <h3>Build + setup</h3>
-                <p>Your website build is charged once. Marketing setup (audits, tracking, campaign builds) happens in parallel under your monthly plan.</p>
+                <h3>Build and setup</h3>
+                <p>A website build is charged once. Audits, tracking and campaign builds happen under your monthly plan, with no setup fee.</p>
             </div>
             <div class="step-card">
-                <span class="step-time">Month 2+</span>
+                <span class="step-time">Month 2 onward</span>
                 <h3>Marketing only</h3>
-                <p>Only the monthly marketing retainer continues: SEO, AEO, SMO and ads management. No further development charges.</p>
+                <p>Only the monthly plan continues. There are no further development charges.</p>
             </div>
             <div class="step-card">
-                <span class="step-time">Anytime</span>
-                <h3>Scale up or down</h3>
-                <p>Budgets are based on your needs. Grow spend when it's working, pause a channel when priorities change, month to month.</p>
+                <span class="step-time">After 90 days</span>
+                <h3>Month to month</h3>
+                <p>Scale up, scale down or pause a channel. Ninety days is the minimum honest window to judge a search program.</p>
             </div>
         </div>
+        <?php if (gst_visible()): ?>
+        <p class="center price-gst">Prices exclude GST at 18%. <?= e(LEGAL_NAME) ?>, GSTIN <?= e(GSTIN) ?>. A proper tax invoice is issued for every payment.</p>
+        <?php endif; ?>
     </div>
 </section>
 
-<section class="section section-tint">
-    <div class="container narrow">
-        <h2 class="section-title center">Pricing FAQs</h2>
-        <div class="faq-list">
-            <details class="faq"><summary>Is web development really a one-time cost?</summary><p>Yes. Design and development are charged once, in your first month. After launch the site is yours, no recurring development fees. Optional care plans (updates, backups, tweaks) are available if you want ongoing support.</p></details>
-            <details class="faq"><summary>How are marketing budgets decided?</summary><p>Based on your needs. We look at your goals, market and competition, then recommend a retainer and ad budget to match. SEO, AEO, SMO and Google &amp; Meta ads run monthly; ad spend is paid directly to the platforms and stays in your accounts.</p></details>
-            <details class="faq"><summary>Are there long-term contracts?</summary><p>No lock-ins. Retainers run month to month after an initial three-month ramp period: long enough for results to show, short enough to keep us accountable.</p></details>
-            <details class="faq"><summary>Can I mix services?</summary><p>Yes, most clients do. A common combination is a one-time website build plus a Growth marketing plan. Tell us your goal and budget and we'll propose the highest-impact mix.</p></details>
-            <details class="faq"><summary>How do I know it's working?</summary><p>You get a live dashboard and a monthly report tied to leads and revenue. If a channel isn't performing, we'll tell you and reallocate.</p></details>
-            <details class="faq"><summary>Do you work with businesses outside India?</summary><p>Yes: we serve clients across India, the US, Canada and beyond. Prices are shown in your local currency (change it with the selector above the plans) and every proposal is quoted as a fixed fee in that currency. Calls are scheduled in your time zone.</p></details>
-        </div>
-    </div>
-</section>
+<?php render_faqs(page_faqs($page, $slug), 'Pricing questions, answered'); ?>

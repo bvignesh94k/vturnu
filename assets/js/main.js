@@ -35,7 +35,6 @@
     // Scroll-reveal with per-batch stagger. Content stays visible without JS.
     var reveals = document.querySelectorAll('[data-reveal]');
     if (reveals.length && !reduceMotion && 'IntersectionObserver' in window) {
-        document.documentElement.classList.add('js');
         var io = new IntersectionObserver(function (entries) {
             var i = 0;
             entries.forEach(function (e) {
@@ -124,6 +123,69 @@
         });
     });
 
+    /* Desktop mega menu. CSS :hover alone closed the panel the moment the
+       pointer crossed the gap under the header, or drifted past the panel edge
+       on its way to a link. Opening and closing now run through a short grace
+       period, so the panel stays put while the visitor moves to it, and only
+       one panel is ever open. */
+    (function megaMenu() {
+        var items = document.querySelectorAll('.nav-item.has-mega');
+        if (!items.length) { return; }
+        var desktop = window.matchMedia('(min-width: 921px)');
+        var openItem = null, closeTimer = null, openTimer = null;
+
+        function shut(item) {
+            item.classList.remove('is-open');
+            if (openItem === item) { openItem = null; }
+        }
+        function show(item) {
+            clearTimeout(closeTimer);
+            if (openItem && openItem !== item) { shut(openItem); }
+            item.classList.add('is-open');
+            openItem = item;
+        }
+        function queueClose() {
+            clearTimeout(closeTimer);
+            clearTimeout(openTimer);
+            closeTimer = setTimeout(function () { if (openItem) { shut(openItem); } }, 320);
+        }
+
+        items.forEach(function (item) {
+            item.addEventListener('pointerenter', function (e) {
+                if (!desktop.matches || e.pointerType === 'touch') { return; }
+                clearTimeout(closeTimer);
+                clearTimeout(openTimer);
+                // Already open somewhere: switch at once. Otherwise pause briefly,
+                // so a pointer just passing over the bar opens nothing.
+                if (openItem) { show(item); } else { openTimer = setTimeout(function () { show(item); }, 90); }
+            });
+            item.addEventListener('pointerleave', function (e) {
+                if (!desktop.matches || e.pointerType === 'touch') { return; }
+                queueClose();
+            });
+            // Touch on a tablet at desktop width: first tap opens, second follows the link.
+            var link = item.querySelector('.nav-link');
+            link.addEventListener('click', function (e) {
+                if (!desktop.matches || !('ontouchstart' in window)) { return; }
+                if (openItem !== item) { e.preventDefault(); show(item); }
+            });
+            item.addEventListener('focusin', function () { if (desktop.matches) { show(item); } });
+            item.addEventListener('focusout', function (e) {
+                if (desktop.matches && !item.contains(e.relatedTarget)) { queueClose(); }
+            });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && openItem) {
+                var link = openItem.querySelector('.nav-link');
+                shut(openItem);
+                if (link) { link.focus(); }
+            }
+        });
+        document.addEventListener('pointerdown', function (e) {
+            if (openItem && !openItem.contains(e.target)) { shut(openItem); }
+        });
+    })();
+
     // Close mobile nav when resizing to desktop
     window.addEventListener('resize', function () {
         if (window.innerWidth > 920 && nav) {
@@ -132,21 +194,59 @@
         }
     });
 
-    // reCAPTCHA v3: fetches a fresh token before any form actually submits.
-    // Inert (calls back with an empty token) until a real site key replaces
-    // the placeholder and the script tag in header.php is uncommented, so
-    // forms keep working normally while CAPTCHA is still being set up.
+    /* reCAPTCHA v3, loaded only once a visitor starts a form. On every page view
+       it cost 400 KB of script that most visitors never needed. */
     var RECAPTCHA_SITE_KEY = '6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg';
-    var recaptchaReady = RECAPTCHA_SITE_KEY.indexOf('YOUR_') !== 0;
-    var withRecaptcha = function (action, cb) {
-        if (recaptchaReady && window.grecaptcha && grecaptcha.execute) {
-            grecaptcha.ready(function () {
-                grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: action }).then(cb).catch(function () { cb(''); });
-            });
-        } else {
-            cb('');
-        }
+    var recaptchaLoading = false;
+    var loadRecaptcha = function () {
+        if (recaptchaLoading || window.grecaptcha) { return; }
+        recaptchaLoading = true;
+        var s = document.createElement('script');
+        s.src = 'https://www.google.com/recaptcha/api.js?render=' + RECAPTCHA_SITE_KEY;
+        s.async = true;
+        document.head.appendChild(s);
     };
+    var withRecaptcha = function (action, cb) {
+        var done = false;
+        var finish = function (token) { if (!done) { done = true; cb(token || ''); } };
+        loadRecaptcha();
+        setTimeout(function () { finish(''); }, 4000);
+        (function wait(tries) {
+            if (window.grecaptcha && grecaptcha.execute) {
+                grecaptcha.ready(function () {
+                    grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: action }).then(finish, function () { finish(''); });
+                });
+            } else if (tries > 0) {
+                setTimeout(function () { wait(tries - 1); }, 100);
+            }
+        })(35);
+    };
+    window.vtRecaptcha = withRecaptcha;
+
+    /* What a person does and a script does not: time spent, keys pressed, points
+       clicked. Sent with every lead as "ms.keys.points" and read by lead_screen()
+       on the server. A bot posting straight to the endpoint sends nothing. */
+    var armForm = function (form) {
+        if (form.dataset.armed) { return; }
+        form.dataset.armed = '1';
+        var field = document.createElement('input');
+        field.type = 'hidden';
+        field.name = '_hx';
+        form.appendChild(field);
+        var t0 = 0, keys = 0, points = 0;
+        var mark = function () {
+            if (!t0) { t0 = Date.now(); loadRecaptcha(); }
+            field.value = (Date.now() - t0) + '.' + keys + '.' + points;
+        };
+        form.addEventListener('focusin', mark);
+        form.addEventListener('keydown', function () { keys++; mark(); });
+        form.addEventListener('pointerdown', function () { points++; mark(); });
+        form.addEventListener('input', mark);
+        form.addEventListener('submit', mark, true);
+    };
+    document.querySelectorAll('form').forEach(function (f) {
+        if (f.querySelector('input[name="csrf_token"]')) { armForm(f); }
+    });
 
     // Quote pop-up: every CTA opens the modal instead of navigating/scrolling.
     // Without JS (or without <dialog> support) links fall back to normal navigation.
@@ -184,6 +284,7 @@
         qmForm.addEventListener('submit', function (e) {
             e.preventDefault();
             qmError.hidden = true;
+            if (!qmForm.reportValidity()) { return; }
             var btn = qmForm.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = 'Sending…';
@@ -200,6 +301,7 @@
                                read as though nothing had happened. */
                             window.location.href = data.redirect || '/thank-you/';
                         } else {
+                            if (data.error) { qmError.textContent = data.error; }
                             qmError.hidden = false;
                         }
                     })
@@ -211,6 +313,19 @@
             });
         });
     }
+
+    /* Tawk arrives through Tag Manager and may finish loading after its own
+       onLoad hook has run, so check until the launcher is confirmed hidden. */
+    var tawkTries = 0;
+    var tawkHide = setInterval(function () {
+        var api = window.Tawk_API;
+        if (api && api.isChatHidden && api.hideWidget) {
+            if (!api.isChatHidden()) { api.hideWidget(); }
+            clearInterval(tawkHide);
+        } else if (++tawkTries > 40) {
+            clearInterval(tawkHide);
+        }
+    }, 500);
 
     // Live chat: every trigger (desktop buttons + mobile bar) opens the real
     // Tawk.to widget. If Tawk hasn't finished loading yet, queue the toggle
@@ -259,30 +374,35 @@
         });
     }
 
-    // Resource (e-book / guide) lead capture: background submit, success state
-    var resForm = document.querySelector('.resource-form');
-    if (resForm && window.fetch) {
-        resForm.addEventListener('submit', function (e) {
+    // Enterprise landing page form: background submit, same thank-you page.
+    var lpForm = document.querySelector('.lp-form');
+    if (lpForm && window.fetch) {
+        lpForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            var rErr = document.querySelector('.r-error');
-            var btn = resForm.querySelector('button[type="submit"]');
-            var btnLabel = btn.textContent;
-            if (rErr) rErr.hidden = true;
+            var box = lpForm.querySelector('.lp-error');
+            var btn = lpForm.querySelector('button[type="submit"]');
+            var label = btn.textContent;
+            box.hidden = true;
             btn.disabled = true;
             btn.textContent = 'Sending…';
             withRecaptcha('submit', function (token) {
-                var tokenField = resForm.querySelector('.js-recaptcha-token');
+                var tokenField = lpForm.querySelector('.js-recaptcha-token');
                 if (tokenField) tokenField.value = token;
-                fetch('/enquiry/', { method: 'POST', body: new FormData(resForm) })
+                fetch('/enquiry/', { method: 'POST', body: new FormData(lpForm) })
                     .then(readJsonTolerantly)
                     .then(function (data) {
                         if (data.ok) {
-                            // Thank-you page confirms the download is on its way.
-                            window.location.href = data.redirect || '/thank-you/?s=resource';
-                        } else if (rErr) { rErr.hidden = false; }
+                            window.location.href = data.redirect || '/thank-you/';
+                        } else {
+                            box.textContent = data.error || 'Please check the form and try again, or email connect@vturnu.com.';
+                            box.hidden = false;
+                        }
                     })
-                    .catch(function () { if (rErr) rErr.hidden = false; })
-                    .finally(function () { btn.disabled = false; btn.textContent = btnLabel; });
+                    .catch(function () {
+                        box.textContent = 'That did not go through. Please try again, or email connect@vturnu.com.';
+                        box.hidden = false;
+                    })
+                    .finally(function () { btn.disabled = false; btn.textContent = label; });
             });
         });
     }
@@ -293,18 +413,7 @@
     document.querySelectorAll('.raw-lead-form').forEach(function (rform) {
         rform.addEventListener('submit', function (e) {
             e.preventDefault();
-            var name = rform.querySelector('[name="name"]');
-            var email = rform.querySelector('[name="email"]');
-            var valid = true;
-            [name, email].forEach(function (field) {
-                if (!field) return;
-                field.style.borderColor = '';
-                if (!field.value.trim() || (field.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(field.value))) {
-                    field.style.borderColor = '#E8365D';
-                    valid = false;
-                }
-            });
-            if (!valid) return;
+            if (!rform.reportValidity()) { return; }
             var btn = rform.querySelector('button[type="submit"]');
             if (btn) btn.disabled = true;
             withRecaptcha('submit', function (token) {
@@ -386,6 +495,63 @@
         if (go) go.hidden = true;
         sel.addEventListener('change', function () { f.submit(); });
     });
+
+    // Pointer tilt on cards: a little physical depth, desktop only.
+    if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.querySelectorAll('.card, .tilt, .price-card, .client-card').forEach(function (card) {
+            if (card.closest('.hp')) { return; }
+            var raf = 0;
+            card.addEventListener('pointermove', function (e) {
+                if (raf) { return; }
+                raf = requestAnimationFrame(function () {
+                    raf = 0;
+                    var r = card.getBoundingClientRect();
+                    var x = (e.clientX - r.left) / r.width - 0.5;
+                    var y = (e.clientY - r.top) / r.height - 0.5;
+                    card.style.setProperty('--ry', (x * 6).toFixed(2) + 'deg');
+                    card.style.setProperty('--rx', (y * -5).toFixed(2) + 'deg');
+                });
+            });
+            card.addEventListener('pointerleave', function () {
+                card.style.removeProperty('--ry');
+                card.style.removeProperty('--rx');
+            });
+        });
+    }
+
+    /* Hero 3D scene. Added after load and idle, as decoration: the heading is
+       already painted, so it cannot affect LCP or block the first tap. */
+    var sceneName = document.body.getAttribute('data-scene');
+    var sceneHost = document.querySelector('.page-hero');
+    if (sceneName && sceneHost) {
+        var startScene = function () {
+            var s = document.createElement('script');
+            s.src = document.body.getAttribute('data-scene-src') || '/assets/js/scene3d.js';
+            s.async = true;
+            document.head.appendChild(s);
+        };
+        window.addEventListener('load', function () {
+            if ('requestIdleCallback' in window) { requestIdleCallback(startScene, { timeout: 1800 }); } else { setTimeout(startScene, 900); }
+        });
+    }
+
+    // Reading progress and chapter highlight on e-book and guide pages.
+    var toc = document.querySelector('.reader-toc');
+    if (toc && 'IntersectionObserver' in window) {
+        var links = {};
+        toc.querySelectorAll('a[href^="#"]').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+        var tocIo = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (!en.isIntersecting || !links[en.target.id]) { return; }
+                Object.keys(links).forEach(function (k) { links[k].classList.remove('is-here'); });
+                links[en.target.id].classList.add('is-here');
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+        Object.keys(links).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { tocIo.observe(el); }
+        });
+    }
 
     // Service worker: offline support + faster repeat visits.
     // Registered after load so it never competes with first paint.

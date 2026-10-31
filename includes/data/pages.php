@@ -27,11 +27,50 @@ $PAGES = [
 
     'about-us' => [
         'template' => 'about',
-        'title' => 'About Us | The Team Behind Chennai\'s Results-First Agency',
-        'meta'  => 'We\'re a Chennai-born digital marketing team helping brands across India, the US & Canada grow with SEO, AI search, paid media and web. See our story and values.',
+        'title' => 'About VTurnU | Digital Marketing & Branding Team in Chennai',
+        'meta'  => 'VTurnU is a Chennai digital marketing and branding team helping businesses in India and worldwide grow with SEO, AI search, paid media and fast websites.',
         'h1'    => 'About VTurnU',
-        'lede'  => 'We help you grow your brand, your website, and your ideas, with strategy, creativity and technology working together.',
+        'lede'  => 'We help you grow your brand, your website and your ideas, with strategy, creativity and technology working together.',
         'parent' => null,
+        'faqs' => [
+            ['What does VTurnU do?', 'VTurnU is a digital marketing and branding company based in Chennai, India. We run SEO, AI search optimization, paid advertising, content and social media, and we also build websites and deliver enterprise IT projects.'],
+            ['Where is VTurnU based?', 'We are based in Chennai, Tamil Nadu, and work with clients across India, the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa.'],
+            ['What kind of companies do you work with?', 'Growing businesses with a clear offer, from SMEs and founders to established B2B firms, including manufacturers, ecommerce brands, software companies and professional services.'],
+            ['Who will work on my account?', 'Experienced specialists. The people you meet in the pitch are the people who do the work.'],
+            ['How do I start?', 'Send an enquiry through the contact page. We reply within one working day and begin with an honest audit.'],
+        ],
+    ],
+
+    'how-we-work' => [
+        'template' => 'how-we-work',
+        'title' => 'How We Work | From First Call to Measured Growth',
+        'meta'  => 'See how VTurnU works: a senior reply within a day, an honest audit, a prioritized plan, tracked execution and plain reporting, with no lock-in after 90 days.',
+        'h1'    => 'How We Work With You',
+        'lede'  => 'No black box and no long handover to juniors. Here is exactly what happens from your first message to the monthly report.',
+        'parent' => 'about-us',
+        'faqs' => [
+            ['What happens after I enquire?', 'A senior strategist reviews your website and replies within one working day. If it looks like a fit, we arrange a short call and prepare a free audit.'],
+            ['How long is the minimum commitment?', 'Ninety days, because that is the minimum honest window to judge a search program. After that we work month to month.'],
+            ['Who owns the accounts and content?', 'You do. Ad accounts, analytics, content and code stay in your name.'],
+            ['How will you report progress?', 'With a plain-language report on leads, cost per lead and revenue, plus regular review calls.'],
+            ['Do you use AI in client work?', 'Yes, as a tool under human review. Our AI policy explains how, and your data stays protected.'],
+            ['Can you work with our in-house team?', 'Yes. Many clients keep an in-house marketer or developer, and we plug into the way they already work.'],
+        ],
+    ],
+
+    'our-clients' => [
+        'template' => 'our-clients',
+        'title' => 'Our Clients | Brands Growing With VTurnU',
+        'meta'  => 'Meet the brands that work with VTurnU, from B2B manufacturers to ecommerce and SaaS companies, with live websites and measured results you can check.',
+        'h1'    => 'Our Clients',
+        'lede'  => 'Manufacturers, ecommerce brands, software companies and service businesses that turned to us for growth.',
+        'parent' => 'about-us',
+        'faqs' => [
+            ['Which industries does VTurnU work with?', 'Manufacturing, ecommerce, software and SaaS, professional services, healthcare, real estate and education, among others.'],
+            ['Can I speak to a client?', 'Yes, where a relevant client is happy to talk. Ask us on your first call.'],
+            ['Do you work with competitors in the same market?', 'We tell you up front if we work with a direct competitor, so you can decide.'],
+            ['Do you take on small businesses?', 'Yes. Our Starter plan exists for small businesses that want one channel working properly first.'],
+        ],
     ],
 
     /* Every lead form lands here after a successful submission. A real page,
@@ -54,47 +93,55 @@ $PAGES = [
     'sitemap' => [
         'template' => 'sitemap',
         'title' => 'Sitemap | Every Page on VTurnU',
-        'meta'  => 'Browse every page on vturnu.com: services, AI search, case studies, guides, e-books, articles and company information, grouped by section.',
+        'meta'  => 'Browse every page on vturnu.com: services, AI search, web development, enterprise IT, case studies, guides, e-books and articles, grouped by section.',
         'h1'    => 'Sitemap',
-        'lede'  => 'Every page on this site, grouped by section. Looking for the machine-readable version? That lives at /sitemap.xml.',
+        'lede'  => 'Everything on this site in one place, organized the way our services are.',
     ],
 
     'contact-us' => [
         'template' => 'contact',
-        'title' => 'Contact Us | Get a Free Digital Marketing Quote in 24 Hours',
-        'meta'  => 'Talk to a digital marketing specialist today. Free audit, honest advice and a custom quote within 24 hours: for businesses in Chennai, India, the US & Canada.',
+        'title' => 'Contact VTurnU | Get a Growth Plan Within One Working Day',
+        'meta'  => 'Talk to a VTurnU specialist about digital marketing, websites or enterprise IT. Honest advice and a clear next step within one working day. Based in Chennai.',
         'h1'    => 'Let\'s Talk Possibilities.',
-        'lede'  => 'Whether you\'re scaling your brand, launching a new product, or reimagining your digital presence: we\'re here to listen, think, and build with you.',
+        'lede'  => 'Whether you are scaling your brand, launching a product or rethinking your digital presence, we are here to listen, think and build with you.',
+        'faqs' => [
+            ['How quickly will you reply?', 'Within one working day, and usually sooner. A real person reads every enquiry.'],
+            ['Is the first conversation free?', 'Yes. The first call and the initial audit carry no cost and no obligation.'],
+            ['What should I include in my message?', 'Your goal, your website, your market and any deadline. The more specific you are, the more useful our reply will be.'],
+            ['Do you work with clients outside India?', 'Yes, across the Gulf, Southeast Asia, the UK, the US, Canada, Australia and Africa, and we schedule calls in your time zone.'],
+        ],
     ],
 
     'free-seo-audit' => [
         'template' => 'audit',
         'title' => 'Free SEO Audit Tool | Instant Website & AI Search Check',
         'meta'  => 'Run a free instant SEO audit of your website. Check indexing, speed, on-page tags and whether ChatGPT, Perplexity and Google AI can even read your site.',
+        'faqs' => [
+            ['Is the audit really free?', 'Yes. It runs instantly and there is no charge and no sales call required.'],
+            ['What does the audit check?', 'Twenty-two checks across indexing, on-page tags, speed signals, structured data and whether AI crawlers can read your site.'],
+            ['How accurate is it?', 'It reads what your homepage serves right now, so it is a reliable snapshot of that page. A full audit covers the whole site.'],
+            ['What should I do with the results?', 'Fix the critical items first. If you would like help, send us the report and we will suggest the next steps.'],
+        ],
         'h1'    => 'Free SEO & AI Search Audit',
         'lede'  => 'Enter your website and get an instant report on what is holding your rankings back, including whether AI search engines can read your site at all. No signup, results in seconds.',
     ],
 
-    /* VTurnU's own SaaS product. This page sells VTurnAI on our domain rather
-       than bouncing visitors straight off-site, so the search intent
-       ("AI visibility tool", "track brand in ChatGPT") lands on a page we
-       rank, and only converted intent leaves for vturnai.com. */
-    'ai-visibility-tool' => [
-        'template' => 'product',
-        'title' => 'AI Visibility Tool | Track Your Brand in ChatGPT & Gemini',
-        // Trimmed to 159 chars: at 166 it was the one description on the site
-        // at risk of truncation in the SERP.
-        'meta'  => 'See how often ChatGPT, Gemini, Perplexity and AI Overviews mention your brand. VTurnAI scores your SEO, AEO, GEO and HEO visibility. 7-day free trial.',
-        'h1'    => 'Track Your Brand Across AI Search',
-        'lede'  => 'VTurnAI is our own monitoring platform. It watches ChatGPT, Gemini, Claude, Perplexity, Grok and Copilot, tells you how often each one mentions or recommends you, and scores exactly what to fix first.',
-    ],
-
     'pricing' => [
         'template' => 'pricing',
-        'title' => 'Digital Marketing Pricing & Packages | Clear, Flexible Plans',
-        'meta'  => 'Transparent pricing: web design & development billed once in month one; SEO, AEO, SMO and Google & Meta ads run monthly with budgets built around your goals.',
-        'h1'    => 'Transparent Pricing, Measurable Outcomes',
-        'lede'  => 'No hidden fees, no lock-ins. Web development is a one-time build cost: marketing runs monthly, sized to your goals and budget.',
+        'title' => 'Digital Marketing Pricing & Website Packages | Clear Plans',
+        'meta'  => 'See exactly what each VTurnU plan includes: monthly SEO, ads and content plans, one-time website packages, and how enterprise projects are priced.',
+        'h1'    => 'Clear Pricing, and Exactly What You Get',
+        'lede'  => 'Real prices, in your currency, with every plan spelled out. No setup fees, no surprise line items and no lock-in after 90 days.',
+        'faqs' => [
+            ['Is ad spend included in the monthly price?', 'No. The plan covers our team and the work. Ad spend is paid directly to Google or Meta and stays in your own accounts, so you always see where it goes.'],
+            ['How much ad budget do I need?', 'It depends on your market and goal. We recommend a budget after looking at cost per click and your target cost per lead, and we will tell you if a budget is too small to test properly.'],
+            ['Is the website really a one-time cost?', 'Yes. Design and development are charged once. After launch the site is yours, and hosting, domains and any paid licenses are billed at cost.'],
+            ['Are there long-term contracts?', 'There is an initial 90-day window, the minimum honest time to judge a search program. After that you work month to month.'],
+            ['Can I change plans?', 'Yes. You can move up or down between plans, or pause a channel, from one month to the next once the first 90 days are complete.'],
+            ['Can I mix services?', 'Yes, and most clients do. A common combination is a website build alongside a Growth plan.'],
+            ['Why do you show prices when other agencies do not?', 'Because a buyer deserves to know whether a conversation is worthwhile before having it. Larger or unusual scopes are quoted after a call.'],
+            ['Do you work with businesses outside India?', 'Yes. Prices appear in your local currency, and you can change it with the selector at the top of this page.'],
+        ],
     ],
 
     'privacy-policy' => [
@@ -117,11 +164,19 @@ $PAGES = [
 
     'digital-marketing' => [
         'template' => 'hub',
-        'title' => 'Digital Marketing Services in Chennai | SEO, Ads & Growth',
-        'meta'  => 'Full-funnel digital marketing from Chennai for brands across India, the US & Canada: SEO, paid ads, social, email and consulting. Book a free strategy call.',
+        'title' => 'Digital Marketing Services in Chennai | SEO, Ads & Branding',
+        'meta'  => 'Full-funnel digital marketing and branding from Chennai for businesses worldwide: SEO, paid ads, social, content and consulting. Get a free growth plan.',
         'h1'    => 'Digital Marketing Services',
-        'lede'  => 'One partner for search, paid media and online marketing: strategy, execution and reporting under one roof.',
-        'children' => ['seo', 'seo-services', 'ai-seo', 'ecommerce-seo', 'lead-generation-seo', 'local-seo', 'enterprise-seo', 'franchise-seo', 'paid-advertising', 'google-ads', 'facebook-ads', 'instagram-ads', 'enterprise-ppc', 'online-marketing', 'social-media-marketing', 'email-marketing', 'reputation-management', 'digital-marketing-consulting'],
+        'lede'  => 'One partner for search, paid media, content and brand: strategy, execution and reporting under one roof.',
+        'children' => ['seo', 'paid-advertising', 'content-marketing', 'branding-services', 'online-marketing', 'digital-marketing-consulting'],
+        'faqs' => [
+            ['What is included in digital marketing services?', 'Typically SEO, paid advertising, content, social media, email and conversion work. We plan them together, so each channel supports the others.'],
+            ['Which channel should I start with?', 'If people already search for what you sell, start with search. If they do not know it exists yet, paid social creates the demand. We recommend a mix after an audit.'],
+            ['How much does digital marketing cost?', 'Plans start from the Starter price on our pricing page. Ad spend is separate and is paid directly to the platforms.'],
+            ['How soon will I see results?', 'Paid campaigns can produce enquiries in the first month. SEO usually shows movement by week eight and compounds from there.'],
+            ['How do you measure success?', 'In qualified leads, cost per lead and revenue, not in impressions or follower counts.'],
+            ['Is branding part of digital marketing?', 'Yes. A clear brand lowers the cost of every other channel, because people recognize and trust you sooner.'],
+        ],
     ],
 
     'seo' => [
@@ -131,16 +186,31 @@ $PAGES = [
         'h1'    => 'SEO That Ranks, and Converts',
         'lede'  => 'Pick your SEO by type or by industry. Every program is built on technical excellence, quality content and clean link acquisition.',
         'parent' => 'digital-marketing',
+        'faqs' => [
+            ['What is SEO?', 'SEO is the practice of earning visibility in search engines through a sound website, useful content and trusted references, so people find you without paying per click.'],
+            ['How long does SEO take?', 'Early movement usually shows by week eight. Competitive terms take months, and results compound over time.'],
+            ['Which type of SEO do I need?', 'Local SEO for customers nearby, ecommerce SEO for stores, lead generation SEO for B2B and service firms, and enterprise SEO for large sites.'],
+            ['Is SEO still worth it with AI search?', 'Yes. AI engines read the same web, and they favor the clear, well-structured sites that good SEO produces.'],
+            ['Do you guarantee rankings?', 'No, and you should be wary of anyone who does. We commit to the work, the reporting and honest results.'],
+        ],
         'children' => ['seo-services', 'ai-seo', 'ecommerce-seo', 'lead-generation-seo', 'local-seo', 'enterprise-seo', 'franchise-seo', 'ecommerce-seo-for-fashion', 'ecommerce-seo-for-beauty', 'ecommerce-seo-for-jewelry', 'ecommerce-seo-for-health-and-wellness', 'ecommerce-seo-for-cannabis', 'ecommerce-seo-for-hemp-and-cbd', 'lead-gen-seo-for-business-industrial', 'lead-gen-seo-for-artists', 'lead-gen-seo-for-lawyers', 'lead-gen-seo-for-dentists', 'lead-gen-seo-for-finance'],
     ],
 
     'ai' => [
         'template' => 'hub',
-        'title' => 'AI Marketing Services | AI SEO, ChatGPT & AI Development',
-        'meta'  => 'Win visibility in AI search: AI SEO, ChatGPT SEO, Perplexity SEO, Google AI Overviews optimization and custom AI development. Get found where buyers now search.',
-        'h1'    => 'AI Services for the New Search Era',
-        'lede'  => 'Search is changing. We help your brand get found, and chosen: inside ChatGPT, Perplexity, Google AI Overviews and beyond.',
-        'children' => ['ai-seo', 'ai-development', 'google-ai-overviews-seo', 'chatgpt-seo', 'perplexity-seo', 'selling-on-chatgpt', 'ai-policy', 'ai-blog-posts'],
+        'title' => 'AI Search Optimization Services | AEO, GEO & AI SEO Agency',
+        'meta'  => 'Get your brand named in ChatGPT, Gemini, Perplexity and Google AI Overviews. AEO and GEO services from VTurnU, with real AI citation results to show.',
+        'h1'    => 'AI Search: Be the Brand AI Recommends',
+        'lede'  => 'Search is changing. We help your brand get found, and chosen, inside ChatGPT, Gemini, Perplexity, Copilot and Google AI Overviews.',
+        'children' => ['ai-seo', 'google-ai-overviews-seo', 'chatgpt-seo', 'perplexity-seo', 'selling-on-chatgpt', 'ai-blog-posts'],
+        'faqs' => [
+            ['What is AEO?', 'Answer engine optimization, or AEO, is the practice of making your content the source AI assistants and search features quote when they answer a question.'],
+            ['What is GEO?', 'Generative engine optimization, or GEO, means earning visibility inside AI-generated answers. In practice it overlaps almost entirely with AEO.'],
+            ['Can I really influence what ChatGPT says about my brand?', 'You cannot control it, but you can influence it, by making your site readable, your facts consistent and your brand mentioned on sources AI engines trust.'],
+            ['How do you measure AI visibility?', 'We track a set of buyer prompts across AI engines, and use Bing Webmaster Tools citation data where it is available.'],
+            ['How is this different from SEO?', 'It builds on SEO, then puts more weight on direct answers, entity clarity and independent corroboration.'],
+            ['How long does it take?', 'Technical and entity fixes can show within weeks. Building trusted third-party mentions takes months.'],
+        ],
     ],
 
     'content-marketing' => [
@@ -149,25 +219,82 @@ $PAGES = [
         'meta'  => 'Partner with a trusted content marketing team: SEO content writing, copywriting, translation, email and outbound, ROI-driven content that attracts and converts.',
         'h1'    => 'Content Marketing That Earns Attention',
         'lede'  => 'Strategy, writing, distribution and measurement: content programs built to attract, nurture and convert your audience.',
-        'children' => ['seo-content-writing', 'copywriting-services', 'translation-services', 'email-marketing-services', 'outbound-marketing'],
+        'children' => ['branding-services', 'seo-content-writing', 'copywriting-services', 'translation-services', 'email-marketing', 'outbound-marketing'],
     ],
 
     'web-services' => [
         'template' => 'hub',
         'title' => 'Web Design & Development Services | Fast, SEO-Ready Sites',
-        'meta'  => 'Fast, SEO-ready websites built to convert: ecommerce, lead gen and headless builds on Shopify, WordPress, Magento and more. Get a free build quote.',
+        'meta'  => 'Fast, SEO-ready websites built to convert: ecommerce, lead gen and custom builds on Shopify, WordPress and more. See live client sites and get a quote.',
         'h1'    => 'Websites Built to Grow Your Business',
         'lede'  => 'Design and development by goal or by platform: fast, secure, SEO-ready websites that turn visitors into customers.',
+        'faqs' => [
+            ['How much does a website cost?', 'Our Business Website and Ecommerce Store packages are listed on the pricing page, and custom builds are quoted after a scoping call.'],
+            ['How long does a website take?', 'A business website usually takes three to four weeks, and an online store five to eight, once content is ready.'],
+            ['Will I own my website?', 'Yes. Design and development are billed once, and the site, code and content are yours.'],
+            ['Which platform should I choose?', 'Shopify suits most online stores, WordPress suits content-led sites, and a custom build suits unusual requirements. We recommend based on your needs, not our preference.'],
+            ['Is SEO included?', 'Yes. Clean structure, schema, speed and mobile layout are built into every project.'],
+            ['Can you rebuild my site without losing rankings?', 'Yes. We map every URL and set redirects, so ranking signals carry over.'],
+        ],
         'children' => ['web-design', 'ecommerce-web-design', 'lead-gen-web-design', 'headless-web-design', 'ai-development', 'bigcommerce-web-design', 'shopify-web-design', 'woocommerce-web-design', 'magento-web-design', 'wordpress-web-design', 'magento-development', 'custom-design-and-development'],
     ],
 
     'case-studies' => [
+        'template' => 'case-hub',
+        'title' => 'Case Studies | Real Clients, Measured SEO & AI Search Results',
+        'meta'  => 'Named VTurnU case studies with measured results: 10.7K AI citations, 178K Google impressions and mobile speed from 26 to the 90s, with sources shown.',
+        'h1'    => 'Results We Can Show You',
+        'lede'  => 'Named clients, live websites and measured numbers, with the source of each one.',
+        'faqs' => [
+            ['Are these real clients?', 'Yes. Each named case study links to the live website, and states where every number comes from.'],
+            ['Where do the numbers come from?', 'From each client\'s Google Search Console, Bing Webmaster Tools and PageSpeed data, with dates on each case study.'],
+            ['Do you publish lead numbers?', 'Lead and revenue figures are the client\'s private business data, so we do not publish them without permission.'],
+            ['Can you get the same results for me?', 'Results depend on your market and starting point. We share a realistic forecast after an audit, not a promise.'],
+        ],
+    ],
+
+    'enterprise-it-services' => [
         'template' => 'hub',
-        'title' => 'Case Studies | Real Results From SEO, PPC & Web Projects',
-        'meta'  => 'Real results from real engagements: SEO success stories, PPC growth campaigns, social wins and content results across SaaS, ecommerce, healthcare and more.',
-        'h1'    => 'Results We\'re Proud Of',
-        'lede'  => 'Browse our work by service or by industry, the numbers speak for themselves.',
-        'children' => ['case-studies/jewelry-brand-organic-revenue-growth', 'case-studies/saas-ppc-demo-pipeline', 'case-studies/clinic-local-seo-patient-growth', 'case-studies/fashion-brand-roas-turnaround', 'case-studies/real-estate-lead-generation-engine', 'case-studies/law-firm-lead-gen-website', 'case-studies/edutech-content-engine-signups', 'case-studies/manufacturer-rfq-seo-program', 'case-studies/restaurant-chain-local-domination', 'case-studies/fitness-brand-social-community', 'case-studies/seo-success-stories', 'case-studies/ppc-growth-campaigns', 'case-studies/social-media-marketing-wins', 'case-studies/content-marketing-results', 'case-studies/branding-and-design-impact', 'case-studies/saas-and-tech', 'case-studies/ecommerce', 'case-studies/healthcare', 'case-studies/real-estate', 'case-studies/education', 'case-studies/manufacturing', 'case-studies/edutech'],
+        'title' => 'Enterprise IT Services | SAP CPQ, Salesforce, ERP & Staffing',
+        'meta'  => 'VTurnU Enterprise & IT: SAP CPQ, Salesforce, Odoo ERP, ERPNext and IT staffing, delivered by specialists as a separate practice. Talk to a consultant.',
+        'h1'    => 'Enterprise & IT Services',
+        'lede'  => 'A separate practice from our marketing work: enterprise applications and technology talent, delivered by specialists who speak the language of your systems.',
+        'cat' => 'web',
+        'scene' => 'orbit',
+        'answer' => ['What does the VTurnU Enterprise & IT practice do?', 'It implements and improves business systems, namely SAP CPQ, Salesforce, Odoo ERP and ERPNext, and places technology professionals through IT staffing. It runs as its own practice, with consultants focused on systems, processes and delivery rather than marketing.'],
+        'offer' => ['Tell us about your project', 'Share your systems, scope and timeline. A consultant replies within one working day.', 'Talk to a Consultant'],
+        'why' => ['Consultants who have done this before', 'Discovery first, then a fixed plan', 'Documented work your team can maintain', 'Clear weekly progress reporting'],
+        'children' => ['sap-cpq-services', 'salesforce-services', 'odoo-erp-services', 'erpnext-services', 'it-staffing-services'],
+        'faqs' => [
+            ['Is this separate from your digital marketing work?', 'Yes. Enterprise & IT is its own practice, with its own consultants. You can use it alone, or alongside our marketing services.'],
+            ['Which ERP should we choose?', 'It depends on your processes, team and budget. Odoo has a wide app ecosystem, ERPNext is fully open source, and SAP suits larger, complex organizations.'],
+            ['How are enterprise projects priced?', 'As a fixed fee for an agreed phase, or on time and materials for evolving work. Staffing is an agreed rate or a percentage of salary.'],
+            ['Do you support systems after go-live?', 'Yes. Training, documentation and ongoing support are part of how we plan every project.'],
+        ],
+    ],
+
+    'branding-services' => [
+        'title' => 'Branding Services | Positioning, Identity & Brand Strategy',
+        'meta'  => 'Branding services from VTurnU: positioning, naming, logo and visual identity, messaging and brand guidelines that make every marketing rupee work harder.',
+        'h1'    => 'Branding Services',
+        'lede'  => 'A brand people recognize and trust lowers the cost of every other channel. We define who you are, then make it unmistakable everywhere.',
+        'cat' => 'content', 'parent' => 'digital-marketing',
+        'answer' => ['What do branding services include?', 'Branding services define how a business is seen. They cover positioning, messaging, naming, logo and visual identity, tone of voice and brand guidelines, then apply them across the website, sales material and marketing, so every touchpoint feels like the same company.'],
+        'features' => [
+            ['Brand Strategy', 'Research into your market, buyers and competitors, leading to a clear position only you can own.'],
+            ['Messaging', 'What you say and how you say it: value proposition, proof points and tone of voice.'],
+            ['Visual Identity', 'Logo, color, typography and imagery built as a system, not a one-off mark.'],
+            ['Brand Guidelines', 'A practical guide your team and vendors can follow, with real examples.'],
+            ['Website and Collateral', 'Your new brand applied to the website, presentations and sales material.'],
+            ['Launch', 'A rollout plan for customers, staff and search engines, including entity updates.'],
+        ],
+        'faqs' => [
+            ['What is the difference between branding and marketing?', 'Branding defines who you are and why you are different. Marketing gets that message to the right people. Strong branding makes marketing cheaper.'],
+            ['How long does a branding project take?', 'A focused identity project usually takes four to eight weeks. A full strategy and rollout takes longer.'],
+            ['Do we need a new logo?', 'Not always. Often the position and messaging need the work, and the existing logo can stay or be refined.'],
+            ['Will a rebrand hurt our SEO?', 'It does not have to. If your name or domain changes, we plan redirects and update your entity data across the web.'],
+            ['What do we receive at the end?', 'Logo files in every format, a brand guideline document, and templates your team can use straight away.'],
+        ],
     ],
 
     /* ---------- Resources ---------- */
@@ -181,19 +308,32 @@ $PAGES = [
     ],
     'ebooks' => [
         'template' => 'resource-list',
-        'title' => 'Free Digital Marketing E-books | Practical Growth Playbooks',
-        'meta'  => 'Download free e-books on AI search, ecommerce SEO, lead gen websites, paid media budgeting and more. Practical, in-depth and written by practitioners.',
+        'title' => 'Free Digital Marketing E-books | Read Online, No Sign-Up',
+        'meta'  => 'Read free e-books on AI search, ecommerce SEO, lead gen websites, paid media budgeting and more, right here with no form. Written by working practitioners.',
         'h1'    => 'Free E-books, Written by Practitioners',
-        'lede'  => 'Deep-dive playbooks you can download and share with your team, each one distilled from real client engagements.',
+        'lede'  => 'Deep-dive playbooks you can read right here, with no form and no email. Share any chapter with your team.',
         'rtype' => 'ebook',
+        'parent' => null,
+        'faqs' => [
+            ['Are these e-books really free?', 'Yes. Every e-book is free to read in full on this site, with no sign-up and no email.'],
+            ['Can I share a chapter with my team?', 'Yes. Every chapter has its own link, so you can send people straight to it.'],
+            ['Who writes them?', 'The VTurnU strategy team, drawing on the work we do for clients.'],
+            ['Can you apply this to my business?', 'Yes. If you would rather have it done for you, send us an enquiry and we will reply within one working day.'],
+        ],
     ],
     'guides' => [
         'template' => 'resource-list',
         'title' => 'Complete Digital Marketing Guides | Free Evergreen Resources',
-        'meta'  => 'Complete guides to local SEO, AI SEO, content strategy, ecommerce platforms, B2B lead gen and Google Ads: maintained, evergreen and free to read.',
+        'meta'  => 'Complete guides to local SEO, AI SEO, content strategy, ecommerce platforms, B2B lead gen and Google Ads, free to read in full with no form to fill.',
         'h1'    => 'The Complete Guides',
-        'lede'  => 'Evergreen, comprehensive resources maintained by our strategists: bookmark them, they keep getting better.',
+        'lede'  => 'Evergreen, in-depth references maintained by our strategists. Bookmark them and come back when you need them.',
         'rtype' => 'guide',
+        'faqs' => [
+            ['What is the difference between a guide and an e-book?', 'Guides are broad references on a whole subject. E-books go deep on one playbook or problem.'],
+            ['Are the guides kept up to date?', 'Yes. We revisit them as search, platforms and AI engines change.'],
+            ['Do I need to sign up to read them?', 'No. Every guide is free and fully open.'],
+            ['Which guide should I start with?', 'Start with the channel closest to your goal: local SEO for nearby customers, B2B lead gen for sales teams, or AI SEO for visibility in AI answers.'],
+        ],
     ],
     'ai-blog-posts' => [
         'template' => 'blog-list',
@@ -489,13 +629,6 @@ $PAGES = [
         'lede'  => 'Go global without losing your voice, localized content and multilingual SEO done right.',
         'cat' => 'content', 'parent' => 'content-marketing',
     ],
-    'email-marketing-services' => [
-        'title' => 'Email Marketing Services | Nurture, Convert & Retain',
-        'meta'  => 'Boost ROI with expert email marketing services: strategy, automation flows, campaign copy and deliverability. Get a free email marketing plan today.',
-        'h1'    => 'Email Marketing Services',
-        'lede'  => 'Nurture leads, increase sales and keep customers coming back, full-service email from strategy to send.',
-        'cat' => 'content', 'parent' => 'content-marketing',
-    ],
     'outbound-marketing' => [
         'title' => 'Outbound Marketing Services | Outreach That Books Meetings',
         'meta'  => 'Outbound marketing that books meetings: targeted lists, personalized cold email and LinkedIn sequences, and follow-up systems that respect the inbox.',
@@ -666,7 +799,7 @@ $PAGES = [
         'title' => 'Education Marketing Case Studies | Enrollment Growth Wins',
         'meta'  => 'Education marketing case studies: enrollment growth for institutes and universities through SEO, paid media and content marketing programs.',
         'h1'    => 'Education Case Studies',
-        'lede'  => 'From prospectus downloads to enrollments, growth stories from education brands.',
+        'lede'  => 'From first enquiry to enrollment, growth stories from education brands.',
         'parent' => 'case-studies', 'cs_type' => 'education',
     ],
     'case-studies/manufacturing' => [
@@ -692,6 +825,7 @@ $PAGES = [
 require __DIR__ . '/blog.php';
 require __DIR__ . '/cases.php';
 require __DIR__ . '/resources.php';
+require __DIR__ . '/landings.php';
 
 /* Slugs that ship with the site. Admin uses these to tell an edited built-in
    (which can be reverted) apart from a post created from scratch. */
@@ -700,30 +834,71 @@ $CASES_BUILTIN     = array_keys($CASES);
 $RESOURCES_BUILTIN = array_keys($RESOURCES);
 
 /**
+ * Every admin edit, without touching the database on a public page view.
+ *
+ * Reading content_overrides here used to run three queries on every request,
+ * crawlers included. The database never got to sleep, used up its monthly
+ * compute allowance, and then refused all connections: the admin panel stopped
+ * loading and new leads stopped being stored.
+ *
+ * Instead the overrides are read once an hour through the CDN-cached
+ * /content-overrides.json (see api/index.php) and kept for ten minutes in the
+ * function's /tmp. The admin panel still reads the database directly, so it
+ * always shows the true state. An admin edit reaches the public site within
+ * about an hour.
+ */
+function content_overrides_all(): array
+{
+    static $all = null;
+    if ($all !== null) {
+        return $all;
+    }
+    if (str_starts_with((string) ($GLOBALS['slug'] ?? ''), 'admin')) {
+        try {
+            $all = [];
+            foreach (db()->query('SELECT content_type, slug, data FROM content_overrides')->fetchAll() as $r) {
+                $all[$r['content_type']][$r['slug']] = json_decode($r['data'], true);
+            }
+            return $all;
+        } catch (Throwable $e) {
+            error_log('content_overrides_all: ' . $e->getMessage());
+            return $all = [];
+        }
+    }
+    if (env_var('VERCEL') === null) {
+        return $all = [];   // Local development has no database.
+    }
+
+    $cache = sys_get_temp_dir() . '/vt-content-overrides.json';
+    $age = is_file($cache) ? time() - (int) filemtime($cache) : PHP_INT_MAX;
+    if ($age < 600) {
+        return $all = (json_decode((string) @file_get_contents($cache), true) ?: []);
+    }
+
+    $ch = curl_init(SITE_URL . '/content-overrides.json');
+    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 2, CURLOPT_CONNECTTIMEOUT => 1]);
+    $data = json_decode((string) curl_exec($ch), true);
+    if (is_array($data) && !empty($data['ok'])) {
+        $all = $data['rows'] ?? [];
+        @file_put_contents($cache, json_encode($all, JSON_UNESCAPED_UNICODE));
+        return $all;
+    }
+    // Keep serving the last good copy rather than dropping every admin edit.
+    @touch($cache);
+    return $all = (json_decode((string) @file_get_contents($cache), true) ?: []);
+}
+
+/**
  * Layer admin edits over the shipped content.
  *
  * Saved fields win; anything the admin form does not cover (article sections,
  * takeaways, FAQs) falls back to the original post, so editing only the SEO
  * fields of a built-in article never blanks its body.
- *
- * Reads the content_overrides table (see db/schema.sql) instead of a local
- * *-custom.json file, since Vercel's filesystem cannot hold admin edits
- * between requests. Fails soft to $base on any database error: a DB hiccup
- * should degrade to "no overrides applied" rather than a broken page.
  */
 function apply_content_overrides(array $base, string $contentType, array $defaults): array
 {
-    try {
-        $stmt = db()->prepare('SELECT slug, data FROM content_overrides WHERE content_type = ?');
-        $stmt->execute([$contentType]);
-        $rows = $stmt->fetchAll();
-    } catch (Throwable $e) {
-        error_log('apply_content_overrides(' . $contentType . '): ' . $e->getMessage());
-        return $base;
-    }
-    foreach ($rows as $row) {
-        $slug = $row['slug'];
-        $item = json_decode($row['data'], true);
+    foreach ((content_overrides_all()[$contentType] ?? []) as $slug => $item) {
+        $slug = (string) $slug;
         if (!is_string($slug) || !preg_match('/^[a-z][a-z0-9-]*$/', $slug) || !is_array($item)) {
             continue;
         }
@@ -753,7 +928,7 @@ foreach ($BLOG as $bslug => $b) {
     $PAGES['blog/' . $bslug] = [
         'template' => 'blog-post',
         'title' => $b['title'], 'meta' => $b['meta'], 'h1' => $b['h1'], 'lede' => $b['lede'],
-        'parent' => 'blog', 'post' => $bslug,
+        'parent' => 'blog', 'post' => $bslug, 'date' => $b['modified'] ?? $b['date'],
         // Read only by the XML sitemap, for an accurate lastmod.
         'date' => $b['modified'] ?? $b['date'] ?? '',
     ];
