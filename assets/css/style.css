@@ -2120,3 +2120,10 @@ h1, h2, .section-title { text-wrap: balance; }
         contain-intrinsic-size: auto 620px;
     }
 }
+
+/* The mark has no built-in padding now, so it needs less height to look the same. */
+.brand-mark { height: 40px; }
+@media (max-width: 600px) {
+    .brand img, .brand-mark { height: 36px; width: auto; }
+}
+.footer-brand-col .brand--dark img { height: 52px; }
