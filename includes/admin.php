@@ -10,7 +10,6 @@
  * as csrf_token()), verified on every request rather than
  * looked up from server-side state.
  *
- * Default login: admin / vturnu@admin. Change it in Settings after first login.
  */
 
 declare(strict_types=1);
@@ -134,7 +133,10 @@ function admin_load_auth(): array {
             return ['user' => $row['username'], 'hash' => $row['password_hash']];
         }
     } catch (Throwable $e) {
+        /* Database unreachable: refuse every login. Falling through to the seed
+           below would accept the default password during an outage. */
         error_log('admin_load_auth: ' . $e->getMessage());
+        return ['user' => '', 'hash' => '!'];
     }
     $seed = ['user' => 'admin', 'hash' => password_hash('vturnu@admin', PASSWORD_DEFAULT)];
     try {
@@ -671,7 +673,6 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             <input id="a-pass" name="pass" type="password" required autocomplete="current-password">
             <br><br><button class="btn grad" type="submit" style="width:100%">Sign In</button>
         </form>
-        <p class="hint">First login: <span class="mono">admin / vturnu@admin</span>. Change credentials in Settings.</p>
     </div>
 </div>
 

@@ -104,17 +104,15 @@ define('FOUNDER_TITLE', 'Founder');
 // needed for anonymous visitors) and the admin session cookie. Generated once with random_bytes(32); changing it
 // invalidates every token currently sitting in an open tab.
 //
-// On Vercel this comes from the SECURITY_SECRET environment variable. The
-// hardcoded value stays as a local-dev fallback (XAMPP has no env var to
-// read), so nothing here is a real secret leak: whichever value is live in
-// production is the one set in the Vercel dashboard, never this file.
-define('SECURITY_SECRET', env_var('SECURITY_SECRET', '8207431fffc74e211ad0a0102b7862fc33d383260ddcd835590833521f488afe'));
+// Set SECURITY_SECRET in the Vercel dashboard. No real value belongs in this
+// file: the fallback below only keeps local development running.
+define('SECURITY_SECRET', env_var('SECURITY_SECRET', 'local-development-only'));
 
 // From https://www.google.com/recaptcha/admin (reCAPTCHA v3). Until real
 // keys are set, security_recaptcha_ok() passes every submission through
 // rather than blocking real customers on a misconfigured site key.
 define('RECAPTCHA_SITE_KEY', '6LfgqIMtAAAAAOM2_Z4QgkIqg6JPWG3sJ9QpWhhg');
-define('RECAPTCHA_SECRET_KEY', env_var('RECAPTCHA_SECRET_KEY', '6LfgqIMtAAAAAKk3SHntnhRQaVcBdagHuaVNajkH'));
+define('RECAPTCHA_SECRET_KEY', env_var('RECAPTCHA_SECRET_KEY', ''));
 
 /**
  * ISO 3166-1 alpha-2 country code -> E.164 calling code, for prefilling

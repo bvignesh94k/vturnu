@@ -38,7 +38,7 @@
       "headers": { "Cache-Control": "no-cache, must-revalidate" },
       "continue": true
     },
-    { "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$", "status": 403 },
+    { "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$", "status": 404, "dest": "/api/index.php" },
     { "src": "^/index\\.php$", "status": 403 },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/api/index.php" }
