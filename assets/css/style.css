@@ -1926,7 +1926,7 @@ h1, h2, .section-title { text-wrap: balance; }
 /* Skips layout for sections far below the fold until they are near the screen.
    On a long page this removes most of the first layout's cost on a phone. */
 @supports (content-visibility: auto) {
-    main > .section:not(:first-of-type), main > .cta-mid, main > .faq-sec, .site-footer {
+    main > .section:not(:first-of-type), main > .cta-mid, main > .faq-sec {
         content-visibility: auto;
         contain-intrinsic-size: auto 620px;
     }
