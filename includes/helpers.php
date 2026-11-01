@@ -68,7 +68,7 @@ function jsonld_site(): array
                 'slogan' => SITE_TAGLINE,
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => abs_url('/assets/img/vturnu-icon-mark.png'),
+                    'url' => abs_url('/assets/img/vturnu-icon-512.png'),
                     'width' => 464,
                     'height' => 440,
                 ],

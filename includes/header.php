@@ -96,8 +96,8 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <meta name="rating" content="general">
 <meta name="revisit-after" content="7 days">
 <link rel="icon" type="image/svg+xml" href="/assets/img/vturnu-icon-mark.svg">
-<link rel="icon" type="image/png" href="/assets/img/vturnu-icon-mark.png">
-<link rel="apple-touch-icon" href="/assets/img/vturnu-icon-mark.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/img/vturnu-icon-48.png">
+<link rel="apple-touch-icon" href="/assets/img/vturnu-icon-180.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" title="<?= e(SITE_NAME) ?> Blog" href="/feed.xml">
 <?php /* The stylesheet is render-blocking by design, so tell the browser to

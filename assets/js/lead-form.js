@@ -119,15 +119,14 @@
         select.setAttribute('aria-hidden', 'true');
         var list = null, search = null, items = [], active = -1;
 
-        var rows = Array.prototype.map.call(select.options, function (o) {
-            return { dial: o.value, iso: o.getAttribute('data-iso'), name: o.text.replace(/^\+\d+\s*/, '') };
+        var rows = Array.prototype.map.call(select.options, function (o, i) {
+            return { index: i, dial: o.value, iso: o.getAttribute('data-iso'), name: o.text.replace(/^\+\d+\s*/, '') };
         });
 
         function choose(iso, silent) {
             var row = rows.filter(function (r) { return r.iso === iso; })[0];
             if (!row) { return; }
-            select.value = row.dial;
-            Array.prototype.forEach.call(select.options, function (o) { o.selected = o.getAttribute('data-iso') === iso; });
+            select.selectedIndex = row.index;
             isoField.value = iso;
             flag.src = '/assets/img/flags/' + iso.toLowerCase() + '.svg';
             dialEl.textContent = row.dial;
@@ -241,7 +240,6 @@
             });
             if (best && best.dial !== select.value) { choose(best.iso, true); }
         });
-        choose(isoField.value || 'IN', true);
     }
 
     /* --------------------------------- the form --------------------------------- */
@@ -342,8 +340,15 @@
         });
     }
 
-    window.vtLeadInit = function () {
-        document.querySelectorAll('form[data-lf]').forEach(init);
-    };
-    window.vtLeadInit();
+    function initAll() { document.querySelectorAll('form[data-lf]').forEach(init); }
+    window.vtLeadInit = initAll;
+
+    /* A form is set up the moment someone touches it, so nothing waits on idle time. */
+    ['pointerdown', 'focusin', 'touchstart', 'keydown'].forEach(function (name) {
+        document.addEventListener(name, function (e) {
+            var f = e.target && e.target.closest && e.target.closest('form[data-lf]');
+            if (f) { init(f); }
+        }, true);
+    });
+    (window.requestIdleCallback || function (fn) { return setTimeout(fn, 2500); })(initAll, { timeout: 5000 });
 })();

@@ -4,7 +4,7 @@
  *   static assets → stale-while-revalidate (instant, refreshed in background)
  * Never touches admin, form posts, or stored lead data.
  */
-const VERSION = 'vturnu-v8';
+const VERSION = 'vturnu-v9';
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -13,7 +13,7 @@ const PRECACHE_URLS = [
     OFFLINE_URL,
     '/assets/js/main.js',
     '/assets/img/vturnu-icon-mark.svg',
-    '/assets/img/vturnu-icon-mark.png',
+    '/assets/img/vturnu-icon-48.png',
 ];
 
 self.addEventListener('install', (event) => {
