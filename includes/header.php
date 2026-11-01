@@ -19,14 +19,13 @@ window.Tawk_API = window.Tawk_API || {};
 </script>
 <!-- Google Tag Manager -->
 <?php /* Tag Manager carries analytics, ads and chat, and was the heaviest thing on
-         every page. It now starts on the first interaction, or after ten
-         seconds for a visitor who only reads, so it no longer competes with the
-         first paint and first tap (Core Web Vitals). A shorter wait landed inside
-         the page-load window and cost more than it gained. Sessions that end
-         within ten seconds with no interaction are the only ones not counted. */ ?>
+         every page. It starts on the first real interaction, so it never competes
+         with the first paint, and bots that load a page and do nothing stay out of
+         analytics. Automated browsers are skipped outright. */ ?>
 <script>
 (function(w,d){
     var done=false,id='GTM-K68BCJ69';
+    if(navigator.webdriver||/HeadlessChrome|PhantomJS|bot|crawl|spider/i.test(navigator.userAgent)){return;}
     function go(){
         if(done){return;}done=true;
         w.dataLayer=w.dataLayer||[];w.dataLayer.push({'gtm.start':new Date().getTime(),event:'gtm.js'});
@@ -34,7 +33,6 @@ window.Tawk_API = window.Tawk_API || {};
         j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+id;f.parentNode.insertBefore(j,f);
     }
     ['pointerdown','keydown','scroll','touchstart'].forEach(function(e){w.addEventListener(e,go,{once:true,passive:true});});
-    w.addEventListener('load',function(){setTimeout(go,10000);});
 })(window,document);
 </script>
 <!-- End Google Tag Manager -->

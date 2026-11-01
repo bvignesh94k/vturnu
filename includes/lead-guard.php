@@ -128,7 +128,11 @@ function lead_screen(array $entry, string $source, bool $network = true, array $
         $flag(25, 'Several links in the message');
     }
     if (preg_match('/\b(guest post|backlinks?|link[- ]building (service|package)|rank (your|on) (website|site|google)|page one of google|domain authority|da \d{2}\+|we (offer|provide) (seo|web|app|digital marketing)|outsourc\w+ (your|to)|white[- ]label (partner|service)|dedicated developers? at|our pricing starts|seo proposal|lead list|email list|contact database)\b/', $hay)) {
-        $flag(45, 'Vendor sales pitch, not a buyer');
+        $flag(60, 'Vendor sales pitch, not a buyer');
+    }
+
+    if (preg_match('/\b(we can (help|improve|increase|boost) your (website|ranking|traffic|sales)|i (was|am) (on|browsing|looking at) your (website|site)|your website (is|has) (not|some|many|several)|our (agency|company|team) (offers?|provides?|specializes?)|outsourc\w+ (partner|your)|virtual assistants?|email (list|database) of|buy (leads|traffic|followers)|white[- ]label (seo|partner))\b/', $hay)) {
+        $flag(60, 'Cold sales outreach, not a buyer');
     }
 
     /* ---- Brand impersonation ---- */

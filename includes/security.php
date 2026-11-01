@@ -295,7 +295,7 @@ function security_check_submission(array $post): array
         return ['ok' => false, 'error' => 'Something went wrong. Please try again.'];
     }
 
-    if (!security_rate_ok('forms', 10, 3600)) {
+    if (!security_rate_ok('forms', 5, 3600)) {
         return ['ok' => false, 'error' => 'Too many submissions from your network. Please try again in an hour, or email ' . CONTACT_EMAIL . '.'];
     }
 

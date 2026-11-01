@@ -4,7 +4,7 @@
  *   static assets → stale-while-revalidate (instant, refreshed in background)
  * Never touches admin, form posts, or stored lead data.
  */
-const VERSION = 'vturnu-v9';
+const VERSION = 'vturnu-v10';
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';

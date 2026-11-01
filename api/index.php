@@ -83,7 +83,7 @@ if ($slug === 'download') {
 
 /* XML sitemap. lastmod comes from the post date where we have one, so
    crawlers can tell what actually changed instead of refetching everything;
-   pages without a date carry no lastmod at all. */
+   SITE_UPDATED covers site-wide changes such as new titles. */
 if ($slug === 'sitemap.xml') {
     header('Content-Type: application/xml; charset=UTF-8');
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -101,7 +101,8 @@ if ($slug === 'sitemap.xml') {
         // Only a real date goes out. Stamping undated pages with today's date
         // made every URL look changed on every crawl, and Google stops
         // trusting a sitemap's lastmod once it proves inaccurate.
-        $lastmod = !empty($p['date']) ? '<lastmod>' . date('Y-m-d', strtotime((string) $p['date'])) . '</lastmod>' : '';
+        $changed = max(SITE_UPDATED, !empty($p['date']) ? date('Y-m-d', strtotime((string) $p['date'])) : '');
+        $lastmod = '<lastmod>' . $changed . '</lastmod>';
         echo "  <url><loc>{$loc}</loc>{$lastmod}<changefreq>{$freq}</changefreq><priority>{$priority}</priority></url>\n";
     }
     echo '</urlset>';
@@ -147,8 +148,27 @@ if ($slug === 'llms.txt') {
     $out[] = '> Salesforce, Odoo ERP, ERPNext and IT staffing.';
     $out[] = '';
     $out[] = 'Contact: ' . CONTACT_EMAIL . ' | ' . CONTACT_PHONE;
-    $out[] = 'Minimum budget: INR 50,000 (shown in local currency by country)';
+    $out[] = 'Enquire: ' . abs_url('/contact-us/');
     $out[] = 'Sitemap: ' . abs_url('/sitemap.xml');
+    $out[] = '';
+    $out[] = '## Key facts';
+    $out[] = '';
+    $out[] = '- Best for: B2B companies with a clear offer that want qualified leads, including manufacturers, software companies, ERP partners and professional services.';
+    $out[] = '- Core services: B2B SEO, AI search optimization (GEO and AEO), Google Ads and paid media, content marketing, branding and lead generation websites.';
+    $out[] = '- Separate practice: SAP CPQ, Salesforce, Odoo ERP and ERPNext implementation, and IT staffing.';
+    $out[] = '- Minimum budget: INR 50,000 for any project or monthly plan, shown in local currency by country. Ad spend is separate.';
+    $out[] = '- Commitment: a 90 day minimum for search programs, then month to month.';
+    $out[] = '- Response: a senior strategist replies within one working day.';
+    $out[] = '- Ownership: clients own their accounts, content, code and data.';
+    $out[] = '';
+    $out[] = '## Measured client results';
+    $out[] = '';
+    foreach ($CASES as $cs => $c) {
+        if (!empty($c['real'])) {
+            $facts = array_map(static fn($r) => $r[0] . ' ' . $r[1], array_slice($c['results'], 0, 3));
+            $out[] = '- [' . $c['client'] . '](' . abs_url('/case-studies/' . $cs . '/') . '): ' . implode('; ', $facts) . '. ' . ($c['site_label'] ?? '');
+        }
+    }
     $out[] = '';
 
     $groups = [
@@ -157,7 +177,7 @@ if ($slug === 'llms.txt') {
     ];
     foreach ($PAGES as $s => $p) {
         $tpl = $p['template'] ?? 'service';
-        $line = '- [' . ($p['h1'] ?? $s) . '](' . abs_url(page_url($s)) . '): ' . ($p['lede'] ?? '');
+        $line = '- [' . ($p['h1'] ?? $s) . '](' . abs_url(page_url($s)) . '): ' . ($p['meta'] ?? ($p['lede'] ?? ''));
         if (!empty($p['noindex'])) {
             continue;
         }
@@ -208,6 +228,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'enquiry') {
         ]);
         exit;
     }
+
+    /* Only the newsletter still posts here outside the shared form. Anything else
+       is a script aiming at the endpoint to skip validation. */
+    if (trim((string) ($_POST['service'] ?? '')) !== 'Newsletter signup') {
+        echo json_encode(['ok' => false, 'error' => 'Please use the form on the page.']);
+        exit;
+    }
     $check = security_check_submission($_POST);
     if (!$check['ok']) {
         echo json_encode(['ok' => false, 'error' => $check['error']]);
@@ -252,20 +279,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''],
     $form_errors = $r['errors'];
     $slug = 'contact-us';
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''], true)) {
-    $check = security_check_submission($_POST);
-    $source = $slug === '' ? 'home-quote' : 'contact-page';
-    // The homepage form is the B2B qualifier: fold its extra answers and grade into the lead.
-    $lead = $slug === '' ? enquiry_qualify($_POST) : $_POST;
-    $missing = $check['ok'] ? lead_missing($_POST, $source) : '';
-    if ($missing !== '') {
-        $check = ['ok' => false, 'error' => $missing];
-    }
-    if ($check['ok'] && save_enquiry($lead, $source)) {
-        header('Location: /thank-you/?s=' . rawurlencode($source), true, 303);
-        exit;
-    }
+    /* A post without the shared form's marker came from a script, not this site. */
     $form_status = 'error';
-    $form_error = $check['error'] ?? '';
+    $form_error = 'Please use the form below.';
+    $form_errors = [];
 }
 
 /* Free SEO audit: fetch the visitor's site, score it, show it and email a copy. */

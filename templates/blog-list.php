@@ -45,14 +45,14 @@ render_hero([
                     <span class="card-tag"><?= e($b['category']) ?></span>
                     <span class="post-intent"><?= e($b['intent']) ?></span>
                 </div>
-                <h3><?= e($b['h1']) ?></h3>
+                <h2 class="card-h"><?= e($b['h1']) ?></h2>
                 <p><?= e(mb_substr($b['lede'], 0, 150)) ?>…</p>
                 <span class="post-card-foot"><span><?= e(date('j M Y', strtotime($b['date']))) ?> · <?= e($b['read']) ?></span><em aria-hidden="true">Read →</em></span>
             </a>
             <?php if ($i === 6): ?>
             <div class="card blog-cta-card" data-reveal="card">
                 <p class="eyebrow">Skip the reading list</p>
-                <h3>Want this thinking applied to your business?</h3>
+                <h2 class="card-h">Want this thinking applied to your business?</h2>
                 <p>Every article here comes from real client work. Get the same strategists looking at your growth, starting with a free audit.</p>
                 <a class="btn btn-grad" href="/free-seo-audit/">Run My Free Site Audit</a>
             </div>

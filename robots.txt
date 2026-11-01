@@ -22,6 +22,7 @@ User-agent: Googlebot
 Allow: /
 Disallow: /storage/
 Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Googlebot-Image
 Allow: /
@@ -30,6 +31,7 @@ User-agent: Bingbot
 Allow: /
 Disallow: /storage/
 Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Slurp
 Allow: /
@@ -138,14 +140,28 @@ Allow: /
 User-agent: YouBot
 Allow: /
 
-User-agent: Bytespider
-Allow: /
-
 User-agent: Diffbot
 Allow: /
 
+# ---------------------------------------------------------------
+# Scrapers that bring no search or AI visibility. The edge also
+# refuses these, because the worst of them ignore this file.
+# ---------------------------------------------------------------
+
+User-agent: Bytespider
 User-agent: omgili
-Allow: /
+User-agent: omgilibot
+User-agent: MJ12bot
+User-agent: DotBot
+User-agent: BLEXBot
+User-agent: PetalBot
+User-agent: Barkrowler
+User-agent: DataForSeoBot
+User-agent: serpstatbot
+User-agent: MegaIndex
+User-agent: SeekportBot
+User-agent: ZoominfoBot
+Disallow: /
 
 Sitemap: https://vturnu.com/sitemap.xml
 

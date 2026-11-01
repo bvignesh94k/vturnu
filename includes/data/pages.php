@@ -891,6 +891,31 @@ function apply_content_overrides(array $base, string $contentType, array $defaul
     return $base;
 }
 
+/* Search titles and descriptions. Laid over the shipped content before admin
+   edits, so anything saved in the admin panel still wins. */
+$SEO_META = require __DIR__ . '/seo-meta.php';
+foreach ($BLOG as $k => $v) {
+    if (isset($SEO_META['blog/' . $k])) {
+        [$BLOG[$k]['title'], $BLOG[$k]['meta']] = $SEO_META['blog/' . $k];
+    }
+}
+foreach ($CASES as $k => $v) {
+    if (isset($SEO_META['case-studies/' . $k])) {
+        [$CASES[$k]['title'], $CASES[$k]['meta']] = $SEO_META['case-studies/' . $k];
+    }
+}
+foreach ($RESOURCES as $k => $v) {
+    $key = ($v['type'] === 'guide' ? 'guides/' : 'ebooks/') . $k;
+    if (isset($SEO_META[$key])) {
+        [$RESOURCES[$k]['title'], $RESOURCES[$k]['meta']] = $SEO_META[$key];
+    }
+}
+foreach ($PAGES as $k => $p) {
+    if (isset($SEO_META[$k])) {
+        [$PAGES[$k]['title'], $PAGES[$k]['meta']] = $SEO_META[$k];
+    }
+}
+
 $BLOG = apply_content_overrides($BLOG, 'blog', [
     'category' => 'Strategy', 'intent' => 'Informational',
     'sections' => [], 'takeaways' => [], 'faqs' => [],

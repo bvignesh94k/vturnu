@@ -122,6 +122,11 @@ function jsonld_service(array $page, string $slug): array
         'url' => abs_url(page_url($slug)),
         'provider' => ['@id' => SITE_URL . '/#organization'],
         'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
+        'audience' => ['@type' => 'BusinessAudience', 'audienceType' => 'B2B companies'],
+        'offers' => [
+            '@type' => 'Offer', 'url' => abs_url(page_url($slug)) . '#enquire',
+            'priceSpecification' => ['@type' => 'PriceSpecification', 'minPrice' => 50000, 'priceCurrency' => 'INR'],
+        ],
     ];
 }
 
@@ -226,6 +231,8 @@ function jsonld_page(array $page, string $slug, string $canonical, string $templ
             $node['name'] = $page['h1'];
         }
     }
+
+    $node['dateModified'] = $node['dateModified'] ?? SITE_UPDATED;
 
     // Give voice assistants the same two elements every template renders first.
     $node['speakable'] = [

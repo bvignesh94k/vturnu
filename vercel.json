@@ -8,6 +8,48 @@
   "routes": [
     {
       "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.vturnu.com"
+        }
+      ],
+      "status": 308,
+      "headers": {
+        "Location": "https://vturnu.com/$1"
+      }
+    },
+    {
+      "src": "^/(wp-admin|wp-login\\.php|wp-content|wp-includes|xmlrpc\\.php|\\.env|\\.git|phpmyadmin|administrator|vendor/phpunit|cgi-bin|\\.aws|\\.ssh)(/.*)?$",
+      "status": 404,
+      "dest": "/assets/blocked.txt"
+    },
+    {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(mj12bot|dotbot|blexbot|petalbot|bytespider|barkrowler|dataforseobot|serpstatbot|megaindex|seekportbot|zoominfobot|omgili|masscan|nikto|sqlmap|zgrab|nmap|wpscan|python-requests|python-urllib|scrapy|go-http-client|libwww-perl|aiohttp|httpx|curl/|wget/).*"
+        }
+      ],
+      "status": 403,
+      "dest": "/assets/blocked.txt"
+    },
+    {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "referer",
+          "value": "(?i).*(semalt|buttons-for-website|darodar|ilovevitaly|best-seo-offer|free-share-buttons|get-free-traffic|traffic2money|seoexperimenta).*"
+        }
+      ],
+      "status": 403,
+      "dest": "/assets/blocked.txt"
+    },
+    {
+      "src": "/(.*)",
       "headers": {
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "SAMEORIGIN",
@@ -20,27 +62,47 @@
     },
     {
       "src": "^/assets/.*\\.(css|js)$",
-      "headers": { "Cache-Control": "public, max-age=31536000, immutable" },
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      },
       "continue": true
     },
     {
       "src": "^/assets/.*\\.(jpg|jpeg|png|webp|avif|svg|ico|gif|woff2|woff)$",
-      "headers": { "Cache-Control": "public, max-age=2592000" },
+      "headers": {
+        "Cache-Control": "public, max-age=2592000"
+      },
       "continue": true
     },
     {
       "src": "^/presentations/.*$",
-      "headers": { "X-Robots-Tag": "noindex" },
+      "headers": {
+        "X-Robots-Tag": "noindex"
+      },
       "continue": true
     },
     {
       "src": "^/sw\\.js$",
-      "headers": { "Cache-Control": "no-cache, must-revalidate" },
+      "headers": {
+        "Cache-Control": "no-cache, must-revalidate"
+      },
       "continue": true
     },
-    { "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$", "status": 404, "dest": "/api/index.php" },
-    { "src": "^/index\\.php$", "status": 403 },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/api/index.php" }
+    {
+      "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$",
+      "status": 404,
+      "dest": "/api/index.php"
+    },
+    {
+      "src": "^/index\\.php$",
+      "status": 403
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
   ]
 }
