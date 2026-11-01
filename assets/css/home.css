@@ -199,28 +199,16 @@ html:not(.js) .tt-score, .tt-hero.no-crowd .tt-score { display: none; }
 
 .hp3-signal { background: radial-gradient(70% 60% at 100% 0%, rgba(91, 86, 201, .08), transparent 70%), #fff; }
 .hp3-flips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
-.hp3-flip { perspective: 1400px; }
-.hp3-flip-in {
-    display: grid; width: 100%; min-height: 330px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left;
-    transform-style: preserve-3d; transition: transform .9s var(--hp3-ease); font: inherit; color: inherit;
-}
-.hp3-flip.is-flipped .hp3-flip-in { transform: rotateY(180deg); }
-@media (hover: hover) and (pointer: fine) { .hp3-flip:hover .hp3-flip-in { transform: rotateY(180deg); } }
-.hp3-flip-in:focus-visible { outline: 3px solid var(--hp3-cyan); outline-offset: 4px; border-radius: 26px; }
-.hp3-face {
-    grid-area: 1 / 1; display: flex; flex-direction: column; gap: .7rem; padding: 2rem 1.8rem; border-radius: 26px;
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
-}
-.hp3-face--front { background: #fff; border: 1px solid var(--hp3-line); box-shadow: 0 24px 50px -32px rgba(29, 25, 54, .35); }
-.hp3-face--back { transform: rotateY(180deg); color: #fff; background: radial-gradient(90% 70% at 100% 0%, rgba(255, 145, 0, .5), transparent 60%), linear-gradient(150deg, #4338CA, #E5306E); box-shadow: 0 30px 60px -28px rgba(229, 48, 110, .6); }
-.hp3-face-n { font: 800 3.4rem/1 var(--hp3-head); background: var(--hp3-grad-dk); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
-.hp3-face-k { font: 700 .72rem/1 var(--hp3-head); letter-spacing: .16em; text-transform: uppercase; color: var(--hp3-muted); }
-.hp3-face--back .hp3-face-k { color: rgba(255, 255, 255, .8); margin-top: auto; }
-.hp3-face-t { font: 800 1.4rem/1.2 var(--hp3-head); color: var(--hp3-ink); }
-.hp3-face--back .hp3-face-t { color: #fff; font-size: 1.6rem; }
-.hp3-face-d { line-height: 1.6; color: var(--hp3-muted); }
-.hp3-face--back .hp3-face-d { color: rgba(255, 255, 255, .88); margin-bottom: auto; }
-.hp3-face-go { margin-top: auto; font: 700 .85rem/1 var(--hp3-head); color: var(--hp3-peri); }
+.hp3-leak { display: flex; flex-direction: column; gap: .6rem; padding: 1.6rem; border-radius: 22px; background: #fff; border: 1px solid var(--hp3-line); box-shadow: 0 24px 50px -32px rgba(29, 25, 54, .35); }
+.hp3-leak p, .hp3-leak h3, .hp3-leak h4 { margin: 0; }
+.hp3-face-n { font: 800 3rem/1 var(--hp3-head); color: var(--hp3-indigo); }
+.hp3-face-k { font: 700 .72rem/1 var(--hp3-head); letter-spacing: .16em; text-transform: uppercase; color: var(--hp3-indigo); }
+.hp3-face-t { font: 800 1.3rem/1.2 var(--hp3-head); color: var(--hp3-ink); }
+.hp3-face-d { line-height: 1.6; color: var(--hp3-ink-2); }
+.hp3-turnbox { display: flex; flex-direction: column; gap: .5rem; margin-top: auto; padding: 1.2rem; border-radius: 16px; background: #1D1936; }
+.hp3-turnbox .hp3-face-k { color: #FFC94D; }
+.hp3-turnbox .hp3-face-t { color: #fff; font-size: 1.14rem; }
+.hp3-turnbox .hp3-face-d { color: #E8E5F4; }
 
 /* ========================================================= GROWTH STACK */
 
@@ -404,13 +392,19 @@ html:not(.js) .tt-score, .tt-hero.no-crowd .tt-score { display: none; }
     .hp3-actions .hp3-btn { flex: 1 1 100%; }
     .hp3-pin .hp3-actions .hp3-btn { flex: 1 1 auto; }
     .hp3-phone { grid-template-columns: 7rem minmax(0, 1fr); }
-    .hp3-flip-in { min-height: 280px; }
 }
 
 /* ======================================================= REDUCED MOTION */
 
 @media (prefers-reduced-motion: reduce) {
     .hp3-marquee-track, .hp3-cue span::after, .hp3-mark { animation: none; }
-    [data-tilt], .hp3-btn, .hp3-flip-in, .hp3-slab, .hp-js .hp3-sec [data-rise] { transition: none !important; }
+    [data-tilt], .hp3-btn, .hp3-slab, .hp-js .hp3-sec [data-rise] { transition: none !important; }
     .hp-js .hp3-sec [data-rise], .hp-js .hp3-final [data-rise] { opacity: 1 !important; transform: none !important; }
 }
+
+/* Labels on the bright slabs and step numbers need their own solid ground to stay readable. */
+.hp3-slab span { padding: .35em .7em; border-radius: 8px; background: #1D1936; color: #fff; }
+.hp3-move-n { background: #1D1936 !important; color: #fff !important; -webkit-text-fill-color: #fff !important; }
+
+/* Small labels on dark surfaces use gold, never blue on navy. */
+.hp3-sec--ink .hp3-kicker, .hp3-final .hp3-kicker, .hp3-engine-k, .hp3-facts dt { color: #FFC94D; }

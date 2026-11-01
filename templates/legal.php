@@ -1,10 +1,8 @@
 <?php /** Legal / policy pages. Expects: $page, $slug */ ?>
-<section class="page-hero">
-    <div class="container">
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-    </div>
-</section>
+<?php render_hero([
+    'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'stone', 'layout' => 'tight',
+    'visual' => hero_visual(['doc', $page['h1'], ['Plain language where we can', 'What this means for you', 'How to reach us'], 'Written to be read']),
+]); ?>
 
 <section class="section">
     <div class="container narrow legal-body">

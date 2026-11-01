@@ -10,13 +10,14 @@ echo jsonld_script([
     'itemListElement' => array_map(static fn($k, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => abs_url('/' . $hub . '/' . $k . '/')], array_keys($items), array_keys(array_keys($items))),
 ]);
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line"><?= $rtype === 'ebook' ? 'Read free, no form' : 'Bookmark and return' ?></p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-    </div>
-</section>
+<?php
+$hero_first = reset($items) ?: [];
+render_hero([
+    'k' => $rtype === 'ebook' ? 'Read free, no form' : 'Bookmark and return', 'h1' => $page['h1'], 'lede' => $page['lede'],
+    'tone' => 'lilac', 'layout' => $rtype === 'ebook' ? 'split' : 'flip',
+    'visual' => hero_visual(['book', $hero_first['title'] ?? $page['h1'], $rtype === 'ebook' ? 'E-book' : 'Guide']),
+]);
+?>
 
 <section class="section">
     <div class="container">
@@ -38,4 +39,3 @@ echo jsonld_script([
 
 <?php render_faqs(page_faqs($page, $slug), $rtype === 'ebook' ? 'About these e-books' : 'About these guides'); ?>
 
-<?php render_next_steps(); ?>

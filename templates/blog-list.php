@@ -12,13 +12,19 @@ if ($cat_filter !== '' && in_array($cat_filter, $cats, true)) {
 uasort($posts, fn($a, $b) => strcmp($b['date'], $a['date']));
 $base_url = '/' . ($slug === 'ai-blog-posts' ? 'ai-blog-posts' : 'blog') . '/';
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow">Free knowledge, applied daily</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-    </div>
-</section>
+<?php
+$hero_imgs = [];
+foreach ($posts as $pslug => $hp) {
+    if (is_file(BASE_PATH . '/assets/img/blog/' . $pslug . '-sm.webp') && count($hero_imgs) < 3) {
+        $hero_imgs[] = '/assets/img/blog/' . $pslug . '-sm.webp';
+    }
+}
+render_hero([
+    'k' => 'Free knowledge, applied daily', 'h1' => $page['h1'], 'lede' => $page['lede'],
+    'tone' => $slug === 'ai-blog-posts' ? 'lilac' : 'paper', 'layout' => $slug === 'ai-blog-posts' ? 'flip' : 'split',
+    'visual' => hero_visual(['covers', $hero_imgs]),
+]);
+?>
 
 <section class="section">
     <div class="container">
@@ -55,4 +61,3 @@ $base_url = '/' . ($slug === 'ai-blog-posts' ? 'ai-blog-posts' : 'blog') . '/';
     </div>
 </section>
 
-<?php render_next_steps(); ?>

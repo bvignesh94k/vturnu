@@ -1,15 +1,8 @@
 <?php /** 404 page. Expects: $page */ ?>
-<section class="page-hero">
-    <div class="container center-text">
-        <p class="eyebrow">404</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions center">
-            <a class="btn btn-primary" href="/">Back to Home</a>
-            <a class="btn btn-ghost" href="/contact-us/">Contact Us</a>
-        </div>
-    </div>
-</section>
+<?php render_hero([
+    'k' => '404', 'h1' => $page['h1'], 'lede' => $page['lede'], 'layout' => 'stack',
+    'cta' => ['Back to home', '/'], 'alt' => ['Contact us', '/contact-us/'],
+]); ?>
 
 <section class="section">
     <div class="container">

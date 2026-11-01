@@ -111,8 +111,8 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-800.woff2" crossorigin>
 <?php if ($slug === ''): ?>
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/figtree.woff2" crossorigin>
-<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caprasimo.woff2" crossorigin>
 <?php endif; ?>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/caprasimo.woff2" crossorigin>
 <style>
 @font-face{font-family:Poppins;font-style:normal;font-weight:400;font-display:swap;src:url(/assets/fonts/poppins-400.woff2) format("woff2")}
 @font-face{font-family:Poppins;font-style:normal;font-weight:500;font-display:swap;src:url(/assets/fonts/poppins-500.woff2) format("woff2")}
@@ -167,7 +167,7 @@ elseif ($slug !== '__404__' && ($node = jsonld_page($page, $slug, $canonical, $p
 <?= jsonld_script($node) . "\n" ?>
 <?php endif; ?>
 </head>
-<body<?= $slug === "" ? " class=\"hp\"" : "" ?> data-scene="<?= e(page_scene($page, $slug)) ?>">
+<body<?= $slug === "" ? " class=\"hp\"" : "" ?>>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K68BCJ69"
 height="0" width="0" style="display:none;visibility:hidden" title="Tag Manager"></iframe></noscript>

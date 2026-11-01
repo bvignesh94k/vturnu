@@ -80,7 +80,7 @@
         <div class="footer-bottom">
             <?php /* The brand name links home: standard on agency sites, and it
                      gives every page one more internal link to the homepage. */ ?>
-            <p>Copyright &copy; <?= date('Y') ?> <a class="copy-brand" href="/">VTurnU</a>. All rights reserved.<?php if (gst_visible()): ?> <span class="footer-gst"><?= e(LEGAL_NAME) ?> · GSTIN <?= e(GSTIN) ?></span><?php endif; ?></p>
+            <p>Copyright &copy; <?= date('Y') ?> <a class="copy-brand" href="/">VTurnU</a>. All rights reserved.<?php if (gst_visible()): ?> <span class="footer-gst">GSTIN <?= e(GSTIN) ?></span><?php endif; ?></p>
             <ul class="footer-legal-links">
                 <li><a href="/privacy-policy/">Privacy Policy</a></li>
                 <li><a href="/terms-and-conditions/">Terms &amp; Conditions</a></li>
@@ -90,7 +90,6 @@
                          hand a visitor. */ ?>
                 <li><a href="/sitemap/">Sitemap</a></li>
             </ul>
-            <?= currency_switcher('cur-footer', 'cur-switch--dark') ?>
         </div>
     </div>
 </footer>

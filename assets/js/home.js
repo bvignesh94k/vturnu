@@ -7,7 +7,7 @@
 
    1. Hero: starts the 3D crowd (assets/js/hero-crowd.js) once a visitor
       engages. A poster of the same scene is on screen until then.
-   2. Depth: scroll reveals, pointer tilt, count-up numbers, flip cards,
+   2. Depth: scroll reveals, pointer tilt, count-up numbers,
       the isometric growth stack and the Turn Method timeline.
    3. Lead form: a three-step B2B qualifier with inline validation.
    ========================================================================== */
@@ -128,33 +128,6 @@
         if (finePointer) {
             window.addEventListener('load', function () { setTimeout(soon, 3500); });
         }
-    })();
-
-    /* ------------------------------------------------------- flip cards */
-
-    (function flips() {
-        var cards = Array.prototype.slice.call(hp.querySelectorAll('.hp3-flip'));
-        if (!cards.length) { return; }
-        cards.forEach(function (card) {
-            var btn = card.querySelector('.hp3-flip-in');
-            btn.addEventListener('click', function () {
-                var on = !card.classList.contains('is-flipped');
-                card.classList.toggle('is-flipped', on);
-                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-            });
-        });
-        /* One demonstration flip when the cards first appear, so visitors
-           on touch screens know the cards turn. */
-        if (!supportsIO || reduce) { return; }
-        var io = new IntersectionObserver(function (entries) {
-            if (!entries[0].isIntersecting) { return; }
-            io.disconnect();
-            cards.forEach(function (card, i) {
-                setTimeout(function () { card.classList.add('is-flipped'); }, 500 + i * 380);
-                setTimeout(function () { card.classList.remove('is-flipped'); }, 2300 + i * 380);
-            });
-        }, { threshold: 0.6 });
-        io.observe(cards[0]);
     })();
 
     /* ---------------------------------------------- growth stack + method */

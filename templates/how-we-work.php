@@ -8,17 +8,11 @@ $stages = [
     ['Report', 'Every month', 'A plain-language report: what changed, what it produced, and what happens next.'],
 ];
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">How we work</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions">
-            <a class="btn btn-grad" href="/contact-us/">Get My Growth Plan</a>
-            <a class="btn btn-outline" href="/case-studies/">See Client Results</a>
-        </div>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'How we work', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'lilac', 'layout' => 'flip',
+    'cta' => ['Get my growth plan', '/contact-us/'], 'alt' => ['See client results', '/case-studies/'],
+    'visual' => hero_visual(['steps', ['A senior reply within a day', 'An honest audit', 'A prioritised plan', 'Tracked execution', 'Plain reporting']]),
+]); ?>
 
 <section class="section">
     <div class="container">
@@ -53,6 +47,5 @@ $stages = [
     </div>
 </section>
 
-<?php render_compare(); ?>
 
 <?php render_faqs(page_faqs($page, $slug), 'Working with us: common questions'); ?>

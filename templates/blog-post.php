@@ -52,22 +52,19 @@ echo jsonld_script([
 ]);
 ?>
 <article>
-<section class="page-hero post-hero">
-    <div class="container narrow">
-        <div class="post-card-meta">
-            <span class="card-tag"><?= e($post['category']) ?></span>
-            <span class="post-intent"><?= e($post['intent']) ?></span>
-        </div>
-        <h1><?= e($post['h1']) ?></h1>
-        <p class="post-byline">By the VTurnU strategy team · <?= e(date('j F Y', strtotime($post['date']))) ?> · <?= e($post['read']) ?> read</p>
-    </div>
-</section>
+<?php
+$post_img = is_file(BASE_PATH . '/assets/img/blog/' . $page['post'] . '.webp')
+    ? '<img class="post-banner" src="/assets/img/blog/' . e($page['post']) . '.webp" srcset="/assets/img/blog/' . e($page['post']) . '-sm.webp 640w, /assets/img/blog/' . e($page['post']) . '.webp 1200w" sizes="(max-width: 920px) 100vw, 560px" alt="' . e($post['h1']) . '" width="1200" height="630" fetchpriority="high" decoding="async">'
+    : '';
+render_hero([
+    'k' => $post['category'] . ' · ' . $post['intent'], 'h1' => $post['h1'], 'tone' => 'paper', 'layout' => hero_layout($page['post']) === 'flip' ? 'flip' : 'split',
+    'extra' => '<p class="post-byline">By the VTurnU strategy team · ' . e(date('j F Y', strtotime($post['date']))) . ' · ' . e($post['read']) . ' read</p>',
+    'visual' => $post_img, 'class' => 'hx--post',
+]);
+?>
 
 <section class="section post-body-wrap">
     <div class="container narrow">
-        <?php if (is_file(BASE_PATH . '/assets/img/blog/' . $page['post'] . '.webp')): ?>
-        <img class="post-banner" src="/assets/img/blog/<?= e($page['post']) ?>.webp" srcset="/assets/img/blog/<?= e($page['post']) ?>-sm.webp 640w, /assets/img/blog/<?= e($page['post']) ?>.webp 1200w" sizes="(max-width: 860px) 100vw, 820px" alt="<?= e($post['h1']) ?>" width="1200" height="630" fetchpriority="high" decoding="async">
-        <?php endif; ?>
         <!-- AEO answer box: the quotable summary -->
         <div class="answer-box post-answer">
             <p class="answer-text"><?= e($post['lede']) ?></p>

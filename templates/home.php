@@ -113,7 +113,7 @@ $FAQS = [
     ['How soon will we see results?',
      'Paid campaigns can produce qualified enquiries in the first month. SEO usually shows movement by week eight and compounds from there. AI search visibility often moves fastest, because far fewer competitors are working on it yet.'],
     ['What does it cost?',
-     'Growth plans start from ' . price('starter') . ' a month, and the pricing page lists exactly what each plan includes. Larger programs are scoped after one call and quoted as a fixed monthly fee. There are no setup fees, and ad spend is paid directly to the platforms and stays in your accounts.'],
+     'Projects start from ' . min_budget() . '. We confirm the exact scope after a free audit, because the work depends on your market and starting point.'],
     ['What is AI search optimization, and why does it matter for B2B?',
      'Buyers now ask ChatGPT, Perplexity, Gemini and Google AI Overviews for vendor shortlists. AI search optimization makes your company one of the names those answers cite, using clean entity signals, structured data, third-party mentions and content written the way people ask questions.'],
     ['Can you build or rebuild our website as well?',
@@ -175,26 +175,21 @@ $cta_label = 'Start my growth plan';
     <div class="hp3-head" data-rise>
       <p class="hp3-kicker">Signal over noise</p>
       <h2 class="hp3-title" id="hp3-sig-h">Most B2B brands are loud in <span class="hp3-grad">the wrong rooms.</span></h2>
-      <p class="hp3-sub">Three habits quietly drain B2B budgets. Flip each card to see the turn we make.</p>
+      <p class="hp3-sub">Three habits quietly drain B2B budgets, and the turn we make for each.</p>
     </div>
     <div class="hp3-flips" data-rise>
       <?php foreach ($FLIPS as $i => [$ft, $fd, $bt, $bd]): ?>
-      <div class="hp3-flip" style="--i:<?= $i ?>">
-        <button type="button" class="hp3-flip-in" aria-pressed="false">
-          <span class="hp3-face hp3-face--front">
-            <span class="hp3-face-n" aria-hidden="true">0<?= $i + 1 ?></span>
-            <span class="hp3-face-k">The leak</span>
-            <span class="hp3-face-t"><?= e($ft) ?></span>
-            <span class="hp3-face-d"><?= e($fd) ?></span>
-            <span class="hp3-face-go" aria-hidden="true">Flip &#8635;</span>
-          </span>
-          <span class="hp3-face hp3-face--back">
-            <span class="hp3-face-k">The turn</span>
-            <span class="hp3-face-t"><?= e($bt) ?></span>
-            <span class="hp3-face-d"><?= e($bd) ?></span>
-          </span>
-        </button>
-      </div>
+      <article class="hp3-leak">
+        <span class="hp3-face-n" aria-hidden="true">0<?= $i + 1 ?></span>
+        <p class="hp3-face-k">The leak</p>
+        <h3 class="hp3-face-t"><?= e($ft) ?></h3>
+        <p class="hp3-face-d"><?= e($fd) ?></p>
+        <div class="hp3-turnbox">
+          <p class="hp3-face-k">The turn</p>
+          <h4 class="hp3-face-t"><?= e($bt) ?></h4>
+          <p class="hp3-face-d"><?= e($bd) ?></p>
+        </div>
+      </article>
       <?php endforeach; ?>
     </div>
   </div>
@@ -304,7 +299,7 @@ $cta_label = 'Start my growth plan';
         <div><dt>Headquarters</dt><dd>Chennai, India</dd></div>
         <div><dt>Team</dt><dd>25+ specialists</dd></div>
         <div><dt>Delivered</dt><dd>150+ projects in 10+ industries</dd></div>
-        <div><dt>Engagements</dt><dd>From <?= e(price('starter')) ?> / month, no setup fees</dd></div>
+        <div><dt>Minimum budget</dt><dd><?= e(min_budget()) ?></dd></div>
         <div><dt>Response time</dt><dd>Within 24 hours</dd></div>
       </dl>
     </aside>
@@ -325,8 +320,7 @@ $cta_label = 'Start my growth plan';
         <li>Which channels and markets will produce qualified leads fastest</li>
         <li>The first three moves we would make, and what each is worth</li>
       </ul>
-      <p class="hp3-fitnote"><b>Best fit:</b> B2B companies with a clear offer and the ability to invest from <?= e(price('starter')) ?> a month in growth.</p>
-      <?= currency_switcher('cur-home', 'cur-switch--dark') ?>
+      <p class="hp3-fitnote"><b>Best fit:</b> B2B companies with a clear offer and the ability to invest from <?= e(min_budget()) ?> a month in growth.</p>
     </div>
 
     <div class="hp3-form-card" data-rise>
@@ -472,7 +466,7 @@ $cta_label = 'Start my growth plan';
     </div>
     <div class="hp3-faq" data-rise>
       <?php foreach ($FAQS as $k => [$q, $a]): ?>
-      <details class="hp3-faq-i"<?= $k === 0 ? ' open' : '' ?>>
+      <details class="hp3-faq-i" name="faq"<?= $k === 0 ? ' open' : '' ?>>
         <summary><?= e($q) ?></summary>
         <p class="answer-text"><?= e($a) ?></p>
       </details>
@@ -519,7 +513,7 @@ echo jsonld_script([
             'slogan' => SITE_TAGLINE,
             'email' => CONTACT_EMAIL,
             'telephone' => CONTACT_PHONE,
-            'priceRange' => '₹35,000+ per month',
+            'priceRange' => '₹50,000+',
             'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
             'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Chennai', 'addressRegion' => 'Tamil Nadu', 'addressCountry' => 'IN'],
             'contactPoint' => [[

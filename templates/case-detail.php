@@ -10,23 +10,23 @@ $related = related_ring(!empty($case['real']) ? $real_pool : $CASES, $page['case
    Article with no @id and no link to the Organization or WebSite entities,
    leaving two competing descriptions of the same page in the markup. */
 ?>
-<section class="page-hero case-hero">
-    <div class="container">
-        <p class="eyebrow"><?= e($case['industry']) ?> · <?= e($case['duration']) ?></p>
-        <h1><?= e($case['h1']) ?></h1>
-        <p class="lede"><?= e($case['lede']) ?></p>
-        <div class="case-facts">
-            <span><strong>Client</strong><?= e($case['client']) ?></span>
-            <span><strong>Location</strong><?= e($case['location']) ?></span>
-            <?php if (!empty($case['site'])): ?>
-            <span><strong>Website</strong><?= ext_link($case['site'], $case['site_label'], true) ?></span>
-            <?php endif; ?>
-            <span><strong>Services</strong>
-                <?php foreach ($case['services'] as $i => [$sl, $su]): ?><a href="<?= e($su) ?>"><?= e($sl) ?></a><?= $i < count($case['services']) - 1 ? ', ' : '' ?><?php endforeach; ?>
-            </span>
-        </div>
-    </div>
-</section>
+<?php
+ob_start();
+?>
+<div class="hx-facts">
+    <span><strong>Client</strong><?= e($case['client']) ?></span>
+    <span><strong>Location</strong><?= e($case['location']) ?></span>
+    <?php if (!empty($case['site'])): ?><span><strong>Website</strong><?= ext_link($case['site'], $case['site_label'], true) ?></span><?php endif; ?>
+    <span><strong>Services</strong><?php foreach ($case['services'] as $i => [$sl, $su]): ?><a href="<?= e($su) ?>"><?= e($sl) ?></a><?= $i < count($case['services']) - 1 ? ', ' : '' ?><?php endforeach; ?></span>
+</div>
+<?php
+render_hero([
+    'k' => $case['industry'] . ' · ' . $case['duration'], 'h1' => $case['h1'], 'lede' => $case['lede'],
+    'tone' => 'peach', 'layout' => hero_layout($slug), 'extra' => ob_get_clean(),
+    'visual' => hero_visual(['metrics', $case['results'], !empty($case['real']) ? 'Measured, with sources' : '']),
+    'class' => 'hx--case',
+]);
+?>
 
 <!-- Results band up top: numbers earn attention -->
 <div class="case-results-band">

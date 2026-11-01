@@ -11,17 +11,11 @@ $logos = array_values(array_filter([
     ['yodgy.png', 'Yodgy'],
 ], static fn($l) => is_file(BASE_PATH . '/assets/img/clients/' . $l[0])));
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">Our clients</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions">
-            <a class="btn btn-grad" href="/contact-us/">Become a Client</a>
-            <a class="btn btn-outline" href="/case-studies/">Read the Case Studies</a>
-        </div>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'Our clients', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'peach', 'layout' => 'flip',
+    'cta' => ['Become a client', '/contact-us/'], 'alt' => ['Read the case studies', '/case-studies/'],
+    'visual' => hero_visual(['logos', array_map(static fn($l) => $l[0], $logos)]),
+]); ?>
 
 <section class="section">
     <div class="container">

@@ -62,35 +62,6 @@ function page_section(array $page, string $slug): string
     return 'marketing';
 }
 
-/** The inner-page hero scene, read by assets/js/scene3d.js from <body data-scene>. */
-function page_scene(array $page, string $slug): string
-{
-    if ($slug === '') {
-        return '';   // The homepage has its own WebGL stage.
-    }
-    if (!empty($page['scene'])) {
-        return (string) $page['scene'];
-    }
-    $tpl = $page['template'] ?? 'service';
-    return match (true) {
-        $tpl === 'landing' || $slug === 'enterprise-it-services' => 'orbit',
-        $tpl === 'pricing' => 'rings',
-        $tpl === 'resource' || $tpl === 'resource-list' => 'book',
-        $tpl === 'case-detail' || $tpl === 'case-list' || $slug === 'case-studies' => 'bars',
-        $tpl === 'blog-list' || $tpl === 'blog-post' => 'nodes',
-        $tpl === 'contact' || $tpl === 'about' || $tpl === 'sitemap' => 'globe',
-        default => match ($page['cat'] ?? '') {
-            'ai' => 'globe',
-            'ppc' => 'funnel',
-            'web' => 'cube',
-            'social' => 'nodes',
-            'content' => 'nodes',
-            'consulting' => 'rings',
-            default => 'bars',
-        },
-    };
-}
-
 /**
  * The FAQs a page carries, at most eight. header.php emits them as FAQPage
  * JSON-LD, so a template must render the same list with render_faqs().
@@ -104,7 +75,13 @@ function page_faqs(array $page, string $slug): array
     if (!empty($page['faqs'])) {
         $faqs = $page['faqs'];
     } elseif ($tpl === 'service') {
-        $faqs = service_faqs($page);
+        /* The direct answer leads, because that is what search and AI engines quote. */
+        $faqs = array_merge([answer_box($page)], service_faqs($page));
+        $seen = [];
+        $faqs = array_values(array_filter($faqs, static function (array $f) use (&$seen): bool {
+            $q = strtolower($f[0]);
+            return isset($seen[$q]) ? false : ($seen[$q] = true);
+        }));
     } elseif ($tpl === 'blog-post') {
         $faqs = $GLOBALS['BLOG'][$page['post']]['faqs'] ?? [];
     } elseif ($tpl === 'resource') {
@@ -112,12 +89,16 @@ function page_faqs(array $page, string $slug): array
     } elseif ($tpl === 'case-detail') {
         $faqs = $GLOBALS['CASES'][$page['case']]['faqs'] ?? [];
     } elseif ($tpl === 'landing') {
-        $faqs = $GLOBALS['LANDINGS'][$slug]['faqs'] ?? [];
+        $l = $GLOBALS['LANDINGS'][$slug] ?? [];
+        $faqs = array_merge(!empty($l['answer']) ? [$l['answer']] : [], $l['faqs'] ?? []);
     }
     return array_slice($faqs, 0, 8);
 }
 
-/** Two independent columns, so opening an answer never stretches its neighbour. */
+/**
+ * Two independent columns, so opening an answer never stretches its neighbour.
+ * The shared name makes it one accordion: opening a question closes the open one.
+ */
 function render_faqs(array $faqs, string $title = 'Frequently asked questions', string $eyebrow = 'Straight answers', string $class = ''): void
 {
     if (!$faqs) {
@@ -137,7 +118,7 @@ function render_faqs(array $faqs, string $title = 'Frequently asked questions', 
             <?php foreach ($cols as $c => $col): if (!$col) continue; ?>
             <div class="faq-col">
                 <?php foreach ($col as $i => [$q, $a]): ?>
-                <details class="faq2"<?= $i === 0 ? ' open' : '' ?> data-reveal="card">
+                <details class="faq2" name="faq"<?= $i === 0 ? ' open' : '' ?> data-reveal="card">
                     <summary><span class="faq2-n" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span><span class="faq2-q"><?= e($q) ?></span><span class="faq2-x" aria-hidden="true"></span></summary>
                     <p class="answer-text"><?= e($a) ?></p>
                 </details>

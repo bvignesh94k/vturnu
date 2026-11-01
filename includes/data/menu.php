@@ -162,7 +162,7 @@ $NAV = [
                 'url'     => '/case-studies/',
                 'items'   => [
                     ['Sai Impression', '/case-studies/sai-impression-label-manufacturer/', 'B2B manufacturing, Chennai'],
-                    ['FirstChoice Auto Parts', '/case-studies/firstchoice-used-auto-parts/', 'Ecommerce and AI visibility, US'],
+                    ['FirstChoice Auto Parts', '/case-studies/firstchoice-used-auto-parts/', 'Used auto parts, AI visibility, US'],
                     ['FlowEazy', '/case-studies/floweazy-odoo-partner-website/', 'B2B software, global'],
                     ['Cafy', '/case-studies/cafy-careers-uk-job-platform/', 'SaaS job platform, UK'],
                 ],
@@ -200,8 +200,6 @@ $NAV = [
             ],
         ],
     ],
-
-    ['label' => 'Pricing', 'url' => '/pricing/'],
 
     [
         'label' => 'Company',
@@ -270,7 +268,6 @@ $FOOTER = [
         ['How We Work', '/how-we-work/'],
         ['Our Clients', '/our-clients/'],
         ['Case Studies', '/case-studies/'],
-        ['Pricing', '/pricing/'],
         ['Blog', '/blog/'],
         ['Guides', '/guides/'],
         ['E-books', '/ebooks/'],

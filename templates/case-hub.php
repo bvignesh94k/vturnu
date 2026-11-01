@@ -6,17 +6,19 @@
 $real = array_filter($CASES, static fn($c) => !empty($c['real']));
 $other = array_filter($CASES, static fn($c) => empty($c['real']));
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">Case studies</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions">
-            <a class="btn btn-grad" href="/contact-us/">Start Your Own Story</a>
-            <a class="btn btn-outline" href="#clients">See the Results</a>
-        </div>
-    </div>
-</section>
+<?php
+$hero_rows = [];
+foreach ($CASES as $hc) {
+    if (!empty($hc['real'])) {
+        $hero_rows[] = [$hc['results'][0][0], $hc['results'][0][1]];
+    }
+}
+render_hero([
+    'k' => 'Case studies', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'peach', 'layout' => 'split',
+    'cta' => ['Start your own story', '/contact-us/'], 'alt' => ['See the results', '#clients'],
+    'visual' => hero_visual(['metrics', $hero_rows, 'Measured, with sources']),
+]);
+?>
 
 <section class="section" id="clients">
     <div class="container">
@@ -68,4 +70,3 @@ $other = array_filter($CASES, static fn($c) => empty($c['real']));
 
 <?php render_faqs(page_faqs($page, $slug), 'About our case studies'); ?>
 
-<?php render_next_steps(); ?>

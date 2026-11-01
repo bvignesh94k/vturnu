@@ -41,22 +41,12 @@ echo jsonld_script([
 ]);
 ?>
 <article class="reader">
-<section class="page-hero resource-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line"><?= e($type_label) ?> · <?= $minutes ?> minute read</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions">
-            <a class="btn btn-grad" href="#chapter-1">Start Reading</a>
-            <a class="btn btn-outline" href="/<?= e($hub) ?>/">All <?= $is_ebook ? 'E-books' : 'Guides' ?></a>
-        </div>
-        <ul class="hero-chips">
-            <li>No form, no email</li>
-            <li><?= count($chapters) ?> chapters</li>
-            <li>Written by practitioners</li>
-        </ul>
-    </div>
-</section>
+<?php render_hero([
+    'k' => $type_label . ' · ' . $minutes . ' minute read', 'h1' => $page['h1'], 'lede' => $page['lede'],
+    'tone' => 'lilac', 'layout' => hero_layout($slug),
+    'cta' => ['Start reading', '#chapter-1'], 'alt' => ['All ' . ($is_ebook ? 'e-books' : 'guides'), '/' . $hub . '/'],
+    'visual' => hero_visual(['book', $page['h1'], $type_label]),
+]); ?>
 
 <section class="section reader-intro">
     <div class="container split">

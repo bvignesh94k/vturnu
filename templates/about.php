@@ -1,15 +1,9 @@
 <?php /** About page. Expects: $page, $slug */ ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">About VTurnU</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions">
-            <a class="btn btn-grad" href="/contact-us/">Start a Conversation</a>
-            <a class="btn btn-outline" href="/how-we-work/">How We Work</a>
-        </div>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'About VTurnU', 'h1' => $page['h1'], 'lede' => $page['lede'], 'layout' => 'split',
+    'cta' => ['Start a conversation', '/contact-us/'], 'alt' => ['How we work', '/how-we-work/'],
+    'visual' => hero_visual(['routes', ['An honest audit', 'A plan tied to a number', 'Senior hands on the work', 'Reports in plain language']]),
+]); ?>
 
 <section class="section">
     <div class="container split">
@@ -64,7 +58,7 @@
         <aside class="facts-card" aria-labelledby="facts-h">
             <h2 id="facts-h">VTurnU at a glance</h2>
             <dl>
-                <div><dt>Company</dt><dd><?= e(LEGAL_NAME) ?></dd></div>
+                <div><dt>Company</dt><dd>VTurnU</dd></div>
                 <div><dt>Headquarters</dt><dd>Chennai, Tamil Nadu, India</dd></div>
                 <div><dt>Founded</dt><dd><?= e(FOUNDING_YEAR) ?></dd></div>
                 <div><dt>Email</dt><dd><a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a></dd></div>

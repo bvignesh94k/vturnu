@@ -4,17 +4,15 @@ $cs_type = $page['cs_type'] ?? '';
 /* Featured: full case studies matching this list's type, then the rest */
 $featured = [];
 foreach ($CASES as $cslug => $c) {
-    if ($c['cs_type'] === $cs_type) { $featured[$cslug] = $c; }
+    if ($c['cs_type'] === $cs_type || ($cs_type === 'ecom' && stripos($c['industry'], 'ecommerce') !== false)) { $featured[$cslug] = $c; }
 }
 if (!$featured) { $featured = array_slice($CASES, 0, 3, true); }
 
 ?>
-<section class="page-hero">
-    <div class="container">
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'Case studies', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'peach', 'layout' => hero_layout($slug),
+    'visual' => hero_visual(['routes', array_map(static fn($c) => $c['client'], array_slice(array_values($featured), 0, 4))]),
+]); ?>
 
 <section class="section">
     <div class="container">

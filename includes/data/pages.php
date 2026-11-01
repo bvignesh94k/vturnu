@@ -69,7 +69,7 @@ $PAGES = [
             ['Which industries does VTurnU work with?', 'Manufacturing, ecommerce, software and SaaS, professional services, healthcare, real estate and education, among others.'],
             ['Can I speak to a client?', 'Yes, where a relevant client is happy to talk. Ask us on your first call.'],
             ['Do you work with competitors in the same market?', 'We tell you up front if we work with a direct competitor, so you can decide.'],
-            ['Do you take on small businesses?', 'Yes. Our Starter plan exists for small businesses that want one channel working properly first.'],
+            ['Do you take on small businesses?', 'Yes, as long as the budget fits. Projects start from ' . min_budget() . ', and we will tell you honestly if a smaller first step makes more sense.'],
         ],
     ],
 
@@ -126,24 +126,6 @@ $PAGES = [
         'lede'  => 'Enter your website and get an instant report on what is holding your rankings back, including whether AI search engines can read your site at all. No signup, results in seconds.',
     ],
 
-    'pricing' => [
-        'template' => 'pricing',
-        'title' => 'Digital Marketing Pricing & Website Packages | Clear Plans',
-        'meta'  => 'See exactly what each VTurnU plan includes: monthly SEO, ads and content plans, one-time website packages, and how enterprise projects are priced.',
-        'h1'    => 'Clear Pricing, and Exactly What You Get',
-        'lede'  => 'Real prices, in your currency, with every plan spelled out. No setup fees, no surprise line items and no lock-in after 90 days.',
-        'faqs' => [
-            ['Is ad spend included in the monthly price?', 'No. The plan covers our team and the work. Ad spend is paid directly to Google or Meta and stays in your own accounts, so you always see where it goes.'],
-            ['How much ad budget do I need?', 'It depends on your market and goal. We recommend a budget after looking at cost per click and your target cost per lead, and we will tell you if a budget is too small to test properly.'],
-            ['Is the website really a one-time cost?', 'Yes. Design and development are charged once. After launch the site is yours, and hosting, domains and any paid licenses are billed at cost.'],
-            ['Are there long-term contracts?', 'There is an initial 90-day window, the minimum honest time to judge a search program. After that you work month to month.'],
-            ['Can I change plans?', 'Yes. You can move up or down between plans, or pause a channel, from one month to the next once the first 90 days are complete.'],
-            ['Can I mix services?', 'Yes, and most clients do. A common combination is a website build alongside a Growth plan.'],
-            ['Why do you show prices when other agencies do not?', 'Because a buyer deserves to know whether a conversation is worthwhile before having it. Larger or unusual scopes are quoted after a call.'],
-            ['Do you work with businesses outside India?', 'Yes. Prices appear in your local currency, and you can change it with the selector at the top of this page.'],
-        ],
-    ],
-
     'privacy-policy' => [
         'template' => 'legal',
         'title' => 'Privacy Policy | How We Collect, Use & Protect Your Data',
@@ -172,7 +154,7 @@ $PAGES = [
         'faqs' => [
             ['What is included in digital marketing services?', 'Typically SEO, paid advertising, content, social media, email and conversion work. We plan them together, so each channel supports the others.'],
             ['Which channel should I start with?', 'If people already search for what you sell, start with search. If they do not know it exists yet, paid social creates the demand. We recommend a mix after an audit.'],
-            ['How much does digital marketing cost?', 'Plans start from the Starter price on our pricing page. Ad spend is separate and is paid directly to the platforms.'],
+            ['How much does digital marketing cost?', 'Engagements start from ' . min_budget() . '. Ad spend is separate and paid directly to the platform. We confirm the exact scope after a free audit.'],
             ['How soon will I see results?', 'Paid campaigns can produce enquiries in the first month. SEO usually shows movement by week eight and compounds from there.'],
             ['How do you measure success?', 'In qualified leads, cost per lead and revenue, not in impressions or follower counts.'],
             ['Is branding part of digital marketing?', 'Yes. A clear brand lowers the cost of every other channel, because people recognize and trust you sooner.'],
@@ -229,7 +211,7 @@ $PAGES = [
         'h1'    => 'Websites Built to Grow Your Business',
         'lede'  => 'Design and development by goal or by platform: fast, secure, SEO-ready websites that turn visitors into customers.',
         'faqs' => [
-            ['How much does a website cost?', 'Our Business Website and Ecommerce Store packages are listed on the pricing page, and custom builds are quoted after a scoping call.'],
+            ['How much does a website cost?', 'Website projects start from ' . min_budget() . '. Custom builds are quoted after a scoping call, because the work depends on your pages, features and integrations.'],
             ['How long does a website take?', 'A business website usually takes three to four weeks, and an online store five to eight, once content is ready.'],
             ['Will I own my website?', 'Yes. Design and development are billed once, and the site, code and content are yours.'],
             ['Which platform should I choose?', 'Shopify suits most online stores, WordPress suits content-led sites, and a custom build suits unusual requirements. We recommend based on your needs, not our preference.'],

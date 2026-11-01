@@ -6,13 +6,10 @@ $labels = [
     'fail' => ['Critical', 'bad'],
 ];
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">Free tool, no signup</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'Free tool, no signup', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'mint', 'layout' => 'tight',
+    'visual' => hero_visual(['gauge', ['Speed', 'Indexing', 'Titles and meta', 'Structure']]),
+]); ?>
 
 <section class="section">
     <div class="container narrow">

@@ -25,6 +25,8 @@ require dirname(__DIR__) . '/includes/security.php';
 require dirname(__DIR__) . '/includes/currency.php';
 require dirname(__DIR__) . '/includes/lead-guard.php';
 require dirname(__DIR__) . '/includes/page-kit.php';
+require dirname(__DIR__) . '/includes/hero-kit.php';
+require dirname(__DIR__) . '/includes/money-kit.php';
 
 /* parse_url() returns false, not null, on a malformed URI, so ?? never caught
    it and trim(false) was a fatal under strict_types: a request to "//" or any
@@ -63,6 +65,8 @@ $visitor_dial_code = security_visitor_dial_code();
 
 /* URLs that moved or were retired. Permanent, so ranking signals follow. */
 $REDIRECTS = [
+    'pricing' => '/contact-us/',
+    'currency' => '/',
     'ai-visibility-tool' => '/ai-seo/',
     'email-marketing-services' => '/email-marketing/',
 ];
@@ -79,11 +83,6 @@ if ($slug === 'download') {
 /* XML sitemap. lastmod comes from the post date where we have one, so
    crawlers can tell what actually changed instead of refetching everything;
    pages without a date carry no lastmod at all. */
-/* Currency switcher: stores the visitor's choice and returns to the page. */
-if ($slug === 'currency') {
-    currency_route();
-}
-
 if ($slug === 'sitemap.xml') {
     header('Content-Type: application/xml; charset=UTF-8');
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -146,9 +145,8 @@ if ($slug === 'llms.txt') {
     $out[] = '> It also builds websites, and runs a separate Enterprise & IT practice covering SAP CPQ,';
     $out[] = '> Salesforce, Odoo ERP, ERPNext and IT staffing.';
     $out[] = '';
-    $out[] = 'Legal name: ' . LEGAL_NAME;
     $out[] = 'Contact: ' . CONTACT_EMAIL . ' | ' . CONTACT_PHONE;
-    $out[] = 'Pricing: ' . abs_url('/pricing/');
+    $out[] = 'Minimum budget: INR 50,000 (shown in local currency by country)';
     $out[] = 'Sitemap: ' . abs_url('/sitemap.xml');
     $out[] = '';
 
@@ -170,7 +168,7 @@ if ($slug === 'llms.txt') {
             $groups['Guides and E-books'][] = $line;
         } elseif ($tpl === 'case-detail') {
             $groups['Case Studies'][] = $line;
-        } elseif (in_array($s, ['about-us', 'how-we-work', 'our-clients', 'contact-us', 'pricing', 'ai-policy'], true)) {
+        } elseif (in_array($s, ['about-us', 'how-we-work', 'our-clients', 'contact-us', 'ai-policy'], true)) {
             $groups['Company'][] = $line;
         } elseif (in_array($tpl, ['service', 'hub'], true)) {
             $groups['Digital Marketing and AI Search'][] = $line;

@@ -22,35 +22,14 @@ echo jsonld_script([
     'speakable' => ['@type' => 'SpeakableSpecification', 'cssSelector' => ['h1', '.answer-text']],
 ]);
 ?>
-<section class="page-hero lp-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line"><?= e($l['eyebrow']) ?> · VTurnU Enterprise &amp; IT</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <div class="hero-actions">
-            <a class="btn btn-grad" href="#enquire">Talk to a Consultant</a>
-            <a class="btn btn-outline" href="#how">How We Work</a>
-        </div>
-        <ul class="hero-chips">
-            <?php foreach ($l['chips'] as $c): ?><li><?= e($c) ?></li><?php endforeach; ?>
-        </ul>
-    </div>
-</section>
-
-<section class="section">
-    <div class="container split">
-        <div class="answer-box" data-reveal="card">
-            <h2><?= e($l['answer'][0]) ?></h2>
-            <p class="answer-text"><?= e($l['answer'][1]) ?></p>
-        </div>
-        <div class="panel panel-accent" data-reveal="card">
-            <h2 class="panel-h">Who this is for</h2>
-            <ul class="check-list">
-                <?php foreach ($l['who'] as $w): ?><li><?= e($w) ?></li><?php endforeach; ?>
-            </ul>
-        </div>
-    </div>
-</section>
+<?php
+$m = money_data($slug);
+render_hero([
+    'k' => $l['eyebrow'] . ' · VTurnU Enterprise & IT', 'h1' => $page['h1'], 'lede' => $page['lede'],
+    'cta' => ['Talk to a consultant', '#enquire'], 'alt' => ['See how we work', '#how'],
+    'visual' => hero_visual($m['v'] ?? []), 'tone' => 'stone', 'layout' => hero_layout($slug),
+]);
+?>
 
 <section class="section section-tint">
     <div class="container">
@@ -136,46 +115,11 @@ echo jsonld_script([
     </div>
 </section>
 
-<?php render_faqs($l['faqs'], $l['service'] . ': questions buyers ask'); ?>
+<?php render_money_fit($l['who']); ?>
 
-<section class="section lp-form-sec" id="enquire">
-    <div class="container lp-form-grid">
-        <div class="lp-form-intro" data-reveal="card">
-            <p class="eyebrow">Start here</p>
-            <h2 class="section-title"><?= e($l['form'][0]) ?></h2>
-            <p><?= e($l['form'][1]) ?></p>
-            <ul class="check-list">
-                <li>A consultant reads every enquiry personally</li>
-                <li>Your details stay private</li>
-                <li>No obligation and no sales sequence</li>
-            </ul>
-            <p class="lp-direct">Prefer to talk? <a href="<?= e(CONTACT_PHONE_HREF) ?>"><?= e(CONTACT_PHONE) ?></a> or <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a></p>
-        </div>
-        <div class="contact-form-wrap" data-reveal="card">
-            <form class="contact-form lp-form" method="post" action="/contact-us/">
-                <?= csrf_field() ?>
-                <input type="hidden" name="recaptcha_token" class="js-recaptcha-token">
-                <input type="hidden" name="service" value="<?= e($l['service']) ?>">
-                <input type="hidden" name="lead_source" value="landing">
-                <div class="form-grid">
-                    <div class="form-row"><label for="lp-name">Your name *</label><input id="lp-name" name="name" type="text" required autocomplete="name"></div>
-                    <div class="form-row"><label for="lp-email">Work email *</label><input id="lp-email" name="email" type="email" required autocomplete="email"></div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-row"><label for="lp-phone">Phone / WhatsApp *</label>
-                        <div class="phone-group"><?= country_code_select('country_code', 'lp-cc') ?><input id="lp-phone" name="mobile" type="tel" inputmode="tel" required autocomplete="tel-national"></div>
-                    </div>
-                    <div class="form-row"><label for="lp-company">Company *</label><input id="lp-company" name="company" type="text" required autocomplete="organization"></div>
-                </div>
-                <div class="form-row"><label for="lp-message">What do you need? *</label><textarea id="lp-message" name="message" rows="4" required minlength="15" placeholder="Current systems, scope and timeline"></textarea></div>
-                <div class="form-row honeypot" aria-hidden="true"><label for="lp-website">Website</label><input id="lp-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-                <div class="alert alert-error lp-error" role="alert" hidden></div>
-                <button class="btn btn-grad btn-block" type="submit">Send My Requirement</button>
-                <p class="recaptcha-disclosure">Protected by reCAPTCHA. The Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener nofollow">Terms of Service</a> apply.</p>
-            </form>
-        </div>
-    </div>
-</section>
+<?php render_faqs(page_faqs($page, $slug), $l['service'] . ': questions buyers ask'); ?>
+
+<?php render_lead_form($l['service'], $l['form'][0], $l['form'][1]); ?>
 
 <section class="section section-tint">
     <div class="container">

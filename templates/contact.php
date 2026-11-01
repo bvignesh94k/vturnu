@@ -1,15 +1,13 @@
 <?php /** Contact page. Expects: $page, $form_status, $slug */ ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">Contact</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'Contact', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'peach', 'layout' => 'flip',
+    'visual' => hero_visual(['reply', 'A senior strategist replies within one working day.']),
+]); ?>
 
 <section class="section">
     <div class="container split contact-split">
         <div class="contact-info">
+            <p class="contact-budget">Projects start from <strong><?= e(min_budget()) ?></strong>.</p>
             <h2>Reach us directly</h2>
             <p>For projects, partnerships or a first conversation.</p>
             <ul class="contact-list">

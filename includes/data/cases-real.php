@@ -64,10 +64,10 @@ return [
     'meta'  => 'How VTurnU rebuilt 99 pages for a US used auto parts seller: 178K Google impressions in three months and 10.7K citations in Bing and Copilot AI answers.',
     'h1'    => 'FirstChoice Used Auto Parts: 99 Pages Rebuilt, 10.7K AI Citations',
     'lede'  => 'A US used auto parts seller lives on quote requests. We rebuilt its part and vehicle pages, tightened every quote form, and made it a source AI assistants cite when buyers ask where to shop.',
-    'client' => 'FirstChoice Used Auto Parts', 'industry' => 'Ecommerce · Automotive', 'cs_type' => 'ecom',
+    'client' => 'FirstChoice Used Auto Parts', 'industry' => 'Automotive · Used Parts', 'cs_type' => 'seo',
     'site' => 'https://www.firstchoiceautopart.com/', 'site_label' => 'firstchoiceautopart.com',
     'logo' => 'firstchoice-autoparts.webp',
-    'services' => [['Ecommerce SEO', '/ecommerce-seo/'], ['AI SEO', '/ai-seo/'], ['WordPress', '/wordpress-web-design/'], ['Lead Gen Web Design', '/lead-gen-web-design/']],
+    'services' => [['Lead Generation SEO', '/lead-generation-seo/'], ['AI SEO', '/ai-seo/'], ['WordPress', '/wordpress-web-design/'], ['Lead Gen Web Design', '/lead-gen-web-design/']],
     'location' => 'United States', 'duration' => '2026, ongoing',
     'challenge' => [
         'The business depends on one action: a buyer requesting a quote for a specific part on a specific vehicle. Pages were thin and inconsistent, warranty and hours were stated differently across the site, and one form promised a part was "available" before anyone had checked stock.',
@@ -82,8 +82,8 @@ return [
     'results' => [
         ['10.7K', 'Citations in Bing and Copilot AI answers'],
         ['178K', 'Google impressions in 3 months'],
+        ['+13%', 'Google impressions in 5 weeks'],
         ['2.2K', 'Google clicks in 3 months'],
-        ['9.4', 'Average Google position'],
     ],
     'outcomes' => [
         ['AI visibility', 'Bing Webmaster Tools AI Performance recorded 10.7K citations in Copilot and Bing AI answers in September 2026. Bing cites the site for "best used auto parts website" and "how much does a used transmission cost".'],
@@ -168,8 +168,8 @@ return [
     'results' => [
         ['14.8K', 'Google clicks in 3 months'],
         ['51.7%', 'Click-through rate'],
-        ['27,377', 'Words of planned content'],
-        ['710', 'Linking domains audited'],
+        ['28.6K', 'Google impressions in 3 months'],
+        ['106 ms', 'Real-user desktop INP'],
     ],
     'outcomes' => [
         ['Organic traffic', 'Search Console, 30 July to 29 October 2026: 14.8K clicks, 28.6K impressions, 51.7% click-through rate. Most of this is branded search, which is exactly why the content plan targets non-branded demand next.'],

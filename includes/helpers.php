@@ -247,116 +247,6 @@ function jsonld_script(array $data): string
 /* Content generators, vary sections by page category                */
 /* ------------------------------------------------------------------ */
 
-/** Six "what's included" cards for a service page. */
-function service_features(array $page): array
-{
-    if (!empty($page['features'])) {
-        return $page['features'];
-    }
-    $name = $page['h1'];
-    $cat = $page['cat'] ?? 'seo';
-
-    $sets = [
-        'seo' => [
-            ['Technical SEO Audit', 'Crawl health, Core Web Vitals, indexation and site architecture, we fix the foundation before building on it.'],
-            ['Keyword & Intent Strategy', 'Keyword research mapped to buyer intent and your funnel, so every page has a clear job to do.'],
-            ['On-Page Optimization', 'Titles, structure, internal links and schema markup tuned page by page for maximum relevance.'],
-            ['Content That Ranks', 'Briefs and content built from SERP analysis, written to answer better than whatever ranks today.'],
-            ['Authority Building', 'Clean, editorial link acquisition and digital PR that strengthens your whole domain.'],
-            ['Transparent Reporting', 'Monthly reporting on rankings, traffic and, most importantly, leads and revenue.'],
-        ],
-        'ai' => [
-            ['AI Visibility Audit', 'Where does your brand appear across ChatGPT, Perplexity, Gemini and AI Overviews today? We map your baseline.'],
-            ['Entity & Brand Optimization', 'Knowledge-graph and entity work so AI systems understand exactly who you are and what you offer.'],
-            ['Answer-Ready Content', 'Content restructured into the clear, citable format generative engines prefer to quote.'],
-            ['Structured Data at Scale', 'Schema and machine-readable signals that make your pages easy for AI crawlers to parse and trust.'],
-            ['Citation & Mention Building', 'Placements on the sources AI engines cite most, so you enter the answer pool.'],
-            ['AI Visibility Tracking', 'Ongoing monitoring of your share of voice inside AI answers, with monthly insight reports.'],
-        ],
-        'ppc' => [
-            ['Account & Tracking Setup', 'Conversion tracking, audiences and account structure built correctly before a rupee is spent.'],
-            ['Campaign Strategy', 'Channel and budget mix designed around your margins, targets and sales cycle.'],
-            ['Creative & Copy', 'Ads that earn the click: tested hooks, angles and formats refreshed before fatigue sets in.'],
-            ['Bid & Budget Optimization', 'Continuous optimization against CPA and ROAS targets with automation guardrails.'],
-            ['Landing Page CRO', 'Paid traffic deserves better than your homepage, pages built to convert each campaign.'],
-            ['Live Reporting', 'A dashboard you can open anytime, plus monthly deep-dives on what moved and why.'],
-        ],
-        'social' => [
-            ['Channel Strategy', 'The right platforms for your audience, with a clear role for each in your funnel.'],
-            ['Content Calendar & Creation', 'Thumb-stopping posts, reels and stories produced on a consistent, planned cadence.'],
-            ['Community Management', 'Comments, DMs and mentions handled fast, in your brand voice.'],
-            ['Paid Social Amplification', 'Organic tells us what works; paid puts it in front of thousands more of the right people.'],
-            ['Influencer & UGC', 'Creator partnerships and user-generated content that borrow trust your ads can\'t buy.'],
-            ['Analytics & Iteration', 'Monthly performance reviews that feed straight back into next month\'s content.'],
-        ],
-        'content' => [
-            ['Content Strategy', 'Audience research, topic clusters and an editorial roadmap tied to business goals.'],
-            ['Expert Writing', 'Writers matched to your industry, with editorial review on every piece.'],
-            ['SEO Optimization', 'Every asset structured and optimized to earn search visibility from day one.'],
-            ['Design & Formatting', 'Content packaged to be read: visuals, formatting and UX that keep people on the page.'],
-            ['Distribution', 'Email, social and outreach plans so great content actually gets seen.'],
-            ['Performance Measurement', 'Content tracked to leads and revenue, with refresh cycles for what\'s working.'],
-        ],
-        'web' => [
-            ['Discovery & UX Strategy', 'We start with your users and goals: sitemaps, wireframes and flows before any pixels.'],
-            ['Custom Design', 'A design system built for your brand, not a template with your logo dropped in.'],
-            ['Performance-First Build', 'Fast by default: optimized assets, clean code and Core Web Vitals in the green.'],
-            ['SEO-Ready Architecture', 'Semantic markup, schema, clean URLs and migration-safe redirects baked into every build.'],
-            ['Responsive & Accessible', 'Flawless on every device and usable by everyone, accessibility treated as a requirement.'],
-            ['Launch & Support', 'Structured QA, smooth launch and a support plan so your site keeps improving after go-live.'],
-        ],
-        'consulting' => [
-            ['Marketing Audit', 'A frank, evidence-based review of your channels, funnel and analytics.'],
-            ['Growth Strategy', 'A prioritized roadmap: where to invest, what to stop, and what to test next.'],
-            ['Analytics & Measurement', 'Tracking and dashboards that give you one version of the truth.'],
-            ['Channel Playbooks', 'Documented, repeatable playbooks your in-house team can run.'],
-            ['Team Coaching', 'Hands-on upskilling for your marketers through weekly working sessions.'],
-            ['Quarterly Reviews', 'Regular strategy checkpoints to keep the roadmap honest and current.'],
-        ],
-        'seo-industry' => [], // filled below
-    ];
-
-    if ($cat === 'seo-industry') {
-        $ind = $page['industry'] ?? 'your industry';
-        return [
-            ['Industry Keyword Research', "Keyword and intent mapping specific to how buyers in $ind actually search."],
-            ['Competitor Gap Analysis', "We reverse-engineer the sites winning in $ind and find the gaps you can own."],
-            ['Technical SEO', 'Crawlability, speed and structured data, the foundation tuned for your platform.'],
-            ['Specialist Content', "Content written with genuine $ind expertise, reviewed for accuracy and compliance."],
-            ['Authority & Trust Signals', 'Links, mentions and reviews from sources that matter in your space.'],
-            ['Lead & Revenue Reporting', 'Reporting focused on enquiries and revenue, not just positions.'],
-        ];
-    }
-
-    return $sets[$cat] ?? $sets['seo'];
-}
-
-/** Four process steps varied by category. */
-function service_process(array $page): array
-{
-    $cat = $page['cat'] ?? 'seo';
-    $map = [
-        'web' => [
-            ['Discover', 'Goals, users, content and technical requirements, captured in a clear brief.'],
-            ['Design', 'Wireframes to polished UI, reviewed with you at every stage.'],
-            ['Build', 'Clean, fast, SEO-ready development with structured QA.'],
-            ['Launch & Grow', 'Smooth go-live, then measurement and iteration to keep improving.'],
-        ],
-        'ppc' => [
-            ['Audit & Setup', 'Tracking verified, account restructured, waste eliminated.'],
-            ['Launch', 'Campaigns live with clear hypotheses and success metrics.'],
-            ['Optimize', 'Weekly testing of bids, audiences, creative and landing pages.'],
-            ['Scale', 'Double down on winners and expand into new channels profitably.'],
-        ],
-    ];
-    return $map[$cat] ?? [
-        ['Audit & Research', 'We analyze your current position, competitors and opportunity.'],
-        ['Strategy', 'A prioritized roadmap with clear targets and timelines.'],
-        ['Execute', 'Our specialists implement, create and optimize, fast.'],
-        ['Measure & Improve', 'Transparent reporting and continuous iteration on results.'],
-    ];
-}
-
 /**
  * FAQs for a service page. Each category answers the questions buyers of that
  * service really ask, so sixty pages do not repeat one generic list. Industry
@@ -368,13 +258,19 @@ function service_faqs(array $page): array
         return $page['faqs'];
     }
     $h1 = preg_replace('/\s+Services$/i', '', $page['h1']);
-    $name = strtolower($h1);
+    /* Lower case reads naturally in a question, except for names that are always capitalised. */
+    $name = strtr(strtolower($h1), [
+        'seo' => 'SEO', 'ai ' => 'AI ', 'ppc' => 'PPC', 'chatgpt' => 'ChatGPT', 'google' => 'Google', 'perplexity' => 'Perplexity',
+        'facebook' => 'Facebook', 'instagram' => 'Instagram', 'wordpress' => 'WordPress', 'shopify' => 'Shopify',
+        'magento' => 'Magento', 'woocommerce' => 'WooCommerce', 'bigcommerce' => 'BigCommerce',
+    ]);
     $cat = $page['cat'] ?? 'seo';
     $ind = $page['industry'] ?? '';
+    $min = min_budget();
 
     $sets = [
         'seo' => [
-            ["How much does {$name} cost?", 'Our Starter and Growth plans on the pricing page cover most businesses. Larger or more competitive programs are quoted after a free audit, because the work depends on your market and starting point.'],
+            ["How much does {$name} cost?", "Engagements start from {$min}. Larger or more competitive programs are quoted after a free audit, because the work depends on your market and starting point."],
             ["How long does {$name} take to work?", 'You will usually see early movement within six to eight weeks, and results compound from month three onward. Very competitive terms can take longer.'],
             ['What do you do in the first month?', 'We audit the site, fix tracking, map keywords to buying intent, and start on the technical issues that hold everything else back.'],
             ['Do you guarantee a number one ranking?', 'No, and nobody honest can, because no one controls Google. We commit to the work, clear reporting and a plan based on evidence.'],
@@ -385,7 +281,7 @@ function service_faqs(array $page): array
             ["Why does {$ind} need specialist SEO?", "Buyers in {$ind} search in their own way and need specific reassurance. Generic SEO misses that language and the proof they look for."],
             ["How long does SEO take for {$ind}?", 'Most businesses see movement within six to eight weeks. Competitive markets take longer, and we forecast this after an audit.'],
             ['What makes content rank in this field?', 'Real expertise. Named experts, accurate claims, specific examples and pages that answer buyers\' real questions.'],
-            ['Do you work with businesses of my size?', 'Yes. We work with single-location businesses as well as larger brands, and the Starter plan suits smaller budgets.'],
+            ['Do you work with businesses of my size?', "Yes, from single-location businesses to larger brands. Engagements start from {$min}."],
             ['How do you measure success?', 'In enquiries and revenue, with rankings and traffic as supporting signals.'],
         ],
         'ai' => [
@@ -397,7 +293,7 @@ function service_faqs(array $page): array
             ['Is my industry a good fit?', 'If your buyers research before they buy, yes. B2B services, software and considered purchases benefit the most.'],
         ],
         'ppc' => [
-            ["How much does {$name} cost?", 'Management is covered by our monthly plans, and ad spend is paid directly to the platform. We recommend a budget after looking at your market and target cost per lead.'],
+            ["How much does {$name} cost?", "Management starts from {$min}, and ad spend is paid directly to the platform. We recommend a budget after looking at your market and target cost per lead."],
             ['How soon will campaigns produce results?', 'Campaigns collect data immediately. Expect meaningful optimization in the first four to six weeks.'],
             ['Who owns the ad account?', 'You do. Accounts stay in your name, so you keep all data and history if we ever part ways.'],
             ['What do you track?', 'Real conversions such as qualified leads, calls and sales, set up before we spend your budget.'],
@@ -405,21 +301,21 @@ function service_faqs(array $page): array
             ['What is a good cost per lead?', 'It depends on what a customer is worth to you. We calculate an affordable target from your margins first.'],
         ],
         'social' => [
-            ["How much does {$name} cost?", 'It is part of our Growth plan, and standalone scopes are quoted after a free review of your profiles.'],
+            ["How much does {$name} cost?", "Engagements start from {$min}. We confirm the scope after a free review of your profiles."],
             ['Which platforms should we use?', 'The ones your buyers use. LinkedIn usually leads for B2B, and Instagram and Facebook for consumer brands.'],
             ['Do you create the content?', 'Yes. We plan, design and write posts, and we use your real people and work wherever we can.'],
             ['How do you measure social media?', 'Against leads, sales and reach among your target audience, not likes alone.'],
             ['Should we run paid social too?', 'Usually yes. Organic content shows what works, and paid puts it in front of more of the right people.'],
         ],
         'content' => [
-            ["How much does {$name} cost?", 'Content is included in our monthly plans, and larger programs are quoted after a free strategy session.'],
+            ["How much does {$name} cost?", "Engagements start from {$min}. Larger programs are quoted after a free strategy session."],
             ['Who writes the content?', 'Specialist writers who interview your experts, with an editor reviewing every piece. AI may help with research, but people write, check and approve.'],
             ['How long until content brings results?', 'Usually three to six months, and well-chosen content keeps working for years.'],
             ['Will you match our brand voice?', 'Yes. We document your tone first, and you approve early pieces before we scale.'],
             ['How do you measure content performance?', 'By the rankings, leads and pipeline it influences, not pageviews alone.'],
         ],
         'web' => [
-            ["How much does {$name} cost?", 'Our website packages are on the pricing page, and custom builds are quoted after a scoping call. Design and development are billed once.'],
+            ["How much does {$name} cost?", "Projects start from {$min}. Custom builds are quoted after a scoping call, and design and development are billed once."],
             ['How long does a website project take?', 'A business website takes around three to four weeks and an online store five to eight, once content is ready.'],
             ['Will the site be fast?', 'We target 90+ on PageSpeed and test Core Web Vitals on real pages before launch.'],
             ['Will I be able to edit it myself?', 'Yes. We build on a platform that suits your team and show you how to manage it.'],
@@ -748,11 +644,11 @@ function answer_box(array $page): array
         ],
         'ppc' => [
             "What does $name include?",
-            "VTurnU's $lname covers strategy, campaign build, creative, conversion tracking and continuous optimization: managed by certified specialists and reported against CPA and ROAS, not vanity metrics. Most accounts see measurable efficiency gains within the first 4 to 6 weeks.",
+            "VTurnU's $lname covers strategy, campaign build, creative, conversion tracking and continuous optimization, reported against cost per qualified lead rather than clicks.",
         ],
         'web' => [
             "What makes VTurnU's $lname different?",
-            "Every website VTurnU builds is engineered to score 90+ on Google PageSpeed, rank in search and convert visitors into enquiries. You get custom design (no bloated templates), SEO-ready architecture, mobile-first responsiveness and a fixed timeline agreed before we start.",
+            "Every website VTurnU builds is engineered for speed, search and enquiries. You get custom design (no bloated templates), SEO-ready architecture, mobile-first responsiveness and a fixed timeline agreed before we start.",
         ],
         'social' => [
             "How does $lname grow a business?",
@@ -764,7 +660,7 @@ function answer_box(array $page): array
         ],
         'consulting' => [
             "When do you need $lname?",
-            "If you're spending on marketing but can't say which channel is profitable, you need $lname. VTurnU audits your funnel, fixes measurement and gives you a prioritized roadmap, typically finding 20 to 40% of budget that can work harder within the first month.",
+            "If you're spending on marketing but can't say which channel is profitable, you need $lname. VTurnU audits your funnel, fixes measurement and gives you a prioritized roadmap.",
         ],
         'seo-industry' => [
             "Why does " . ($page['industry'] ?? 'your industry') . " need specialist SEO?",
@@ -775,17 +671,6 @@ function answer_box(array $page): array
             "$name is the process of earning higher rankings and qualified organic traffic through technical excellence, intent-matched content and authority building. VTurnU delivers it as a measurable growth program: audited, prioritized and reported against leads and revenue, with early movement typically visible in 6 to 8 weeks.",
         ],
     };
-}
-
-/** Buying-intent bullets shown beside the answer box. */
-function why_choose(array $page): array
-{
-    return $page['why'] ?? [
-        'Free audit and a clear proposal before you commit',
-        'Senior specialists on your account, with no junior handoffs',
-        'Reporting tied to leads and revenue',
-        'Month to month after 90 days: we earn renewal with results',
-    ];
 }
 
 /**
@@ -809,96 +694,6 @@ function cta_offer(array $page): array
         'seo-industry' => ['Get a Free Industry SEO Audit', 'See exactly where you rank against your top three competitors, and the gaps you can win.', 'Get My Free Audit'],
         default => ['Get a Free SEO Audit', 'A 47-point audit of your site with a prioritized action plan: yours free, whether we work together or not.', 'Get My Free SEO Audit'],
     };
-}
-
-/** Trust badge row, guarantees that remove purchase anxiety. */
-function render_trust_badges(): void
-{
-    $badges = [
-        ['M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1 13-3-3 1.4-1.4L11 12.2l4.6-4.6L17 9l-6 6Z', 'No lock-in contracts'],
-        ['M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.3 0-8 1.7-8 5v3h16v-3c0-3.3-4.7-5-8-5Z', 'Senior specialists only'],
-        ['M4 20V10h3v10H4Zm6.5 0V4h3v16h-3ZM17 20v-7h3v7h-3Z', 'Reported in revenue'],
-        ['M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm4.2 14.2L11 13V7h1.5v5.3l4.5 2.7-.8 1.2Z', '24-hour reply guarantee'],
-    ];
-    echo '<ul class="badge-row" aria-label="Our guarantees">';
-    foreach ($badges as $i => [$path, $label]) {
-        echo '<li class="badge badge-' . ($i + 1) . '"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="' . $path . '"/></svg>' . e($label) . '</li>';
-    }
-    echo '</ul>';
-}
-
-/** "Typical agency vs VTurnU" comparison, the strongest differentiator block. */
-function render_compare(): void
-{
-    ?>
-<section class="section compare-band" aria-label="How VTurnU compares to a typical agency">
-    <div class="container">
-        <div class="center-text" data-reveal="head">
-            <p class="eyebrow">The difference</p>
-            <h2 class="section-title">Any agency can promise. <span class="grad-text">Here's what actually changes.</span></h2>
-        </div>
-        <div class="compare-grid">
-            <div class="compare-col compare-them" data-reveal="left">
-                <h3>A typical agency</h3>
-                <ul>
-                    <li>Junior executives run your account after the sales call</li>
-                    <li>Reports full of impressions, reach and vanity metrics</li>
-                    <li>The same recycled strategy for every client, every industry</li>
-                    <li>12-month lock-ins signed before any proof of results</li>
-                    <li>Days of silence when you ask a hard question</li>
-                </ul>
-            </div>
-            <div class="compare-col compare-us" data-reveal="right">
-                <span class="compare-tag">The VTurnU way</span>
-                <h3>Working with VTurnU</h3>
-                <ul>
-                    <li>Senior specialists on your account: nothing outsourced</li>
-                    <li>Reporting that talks revenue, leads and cost per acquisition</li>
-                    <li>Strategy built from your market, competitors and margins</li>
-                    <li>Month-to-month engagements: we re-earn your business</li>
-                    <li>A guaranteed reply within one business day, every time</li>
-                </ul>
-                <a class="btn btn-grad" href="/contact-us/">Work the VTurnU way →</a>
-            </div>
-        </div>
-    </div>
-</section>
-    <?php
-}
-
-/** "What happens when you enquire", removes the fear of hitting send. */
-function render_next_steps(): void
-{
-    ?>
-<section class="section next-steps" aria-label="What happens after you enquire">
-    <div class="container">
-        <div class="center-text" data-reveal="head">
-            <p class="eyebrow">Zero-risk start</p>
-            <h2 class="section-title">What happens when you hit <span class="grad-text">"send"</span></h2>
-        </div>
-        <div class="steps-line">
-            <?php
-            $steps = [
-                ['Within 24 hours', 'A senior strategist replies', 'No bots, no sales reps, a specialist personally reviews your website and goals before writing back.'],
-                ['Within 72 hours', 'You get a free mini-audit', 'Concrete gaps and quick wins you can act on immediately, whether or not you hire us.'],
-                ['Only if it fits', 'A roadmap and honest quote', "If we can't move the needle for you, we'll say so, and point you toward what will."],
-            ];
-            foreach ($steps as [$time, $title, $desc]): ?>
-            <div class="step-card" data-reveal="card">
-                <span class="step-time"><?= e($time) ?></span>
-                <h3><?= e($title) ?></h3>
-                <p><?= e($desc) ?></p>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php render_trust_badges(); ?>
-        <p class="center next-steps-cta" data-reveal="cta">
-            <a class="btn btn-grad" href="/free-seo-audit/">Start With a Free Audit</a><br>
-            <small>No pressure. No obligation. You keep the audit either way.</small>
-        </p>
-    </div>
-</section>
-    <?php
 }
 
 /**

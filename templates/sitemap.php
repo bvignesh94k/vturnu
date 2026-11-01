@@ -92,14 +92,11 @@ $count = static function (array $node): int {
 };
 $total = array_sum(array_map($count, $tree)) + 1;
 ?>
-<section class="page-hero">
-    <div class="container">
-        <p class="eyebrow eyebrow-line">Site map</p>
-        <h1><?= e($page['h1']) ?></h1>
-        <p class="lede"><?= e($page['lede']) ?></p>
-        <p class="sm-count"><?= $total ?> pages in <?= count($tree) ?> sections</p>
-    </div>
-</section>
+<?php render_hero([
+    'k' => 'Site map', 'h1' => $page['h1'], 'lede' => $page['lede'], 'tone' => 'stone', 'layout' => 'split',
+    'extra' => '<p class="sm-count">' . $total . ' pages in ' . count($tree) . ' sections</p>',
+    'visual' => hero_visual(['tree', array_keys($tree)]),
+]); ?>
 
 <section class="section sm-jump-sec">
     <div class="container">

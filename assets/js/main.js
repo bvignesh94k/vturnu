@@ -464,19 +464,19 @@
         });
     }
 
-    // Currency switcher: apply on change, so the Set button is only the
-    // no-JavaScript fallback.
-    document.querySelectorAll('.cur-switch').forEach(function (f) {
-        var sel = f.querySelector('.js-cur-select');
-        var go = f.querySelector('.js-cur-go');
-        if (!sel) return;
-        if (go) go.hidden = true;
-        sel.addEventListener('change', function () { f.submit(); });
+    // One FAQ open at a time, for browsers without <details name>.
+    document.querySelectorAll('details[name]').forEach(function (d) {
+        d.addEventListener('toggle', function () {
+            if (!d.open) return;
+            document.querySelectorAll('details[name="' + d.getAttribute('name') + '"][open]').forEach(function (o) {
+                if (o !== d) o.open = false;
+            });
+        });
     });
 
     // Pointer tilt on cards: a little physical depth, desktop only.
     if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        document.querySelectorAll('.card, .tilt, .price-card, .client-card').forEach(function (card) {
+        document.querySelectorAll('.card, .tilt, .client-card').forEach(function (card) {
             if (card.closest('.hp')) { return; }
             var raf = 0;
             card.addEventListener('pointermove', function (e) {
@@ -494,22 +494,6 @@
                 card.style.removeProperty('--ry');
                 card.style.removeProperty('--rx');
             });
-        });
-    }
-
-    /* Hero 3D scene. Added after load and idle, as decoration: the heading is
-       already painted, so it cannot affect LCP or block the first tap. */
-    var sceneName = document.body.getAttribute('data-scene');
-    var sceneHost = document.querySelector('.page-hero');
-    if (sceneName && sceneHost) {
-        var startScene = function () {
-            var s = document.createElement('script');
-            s.src = document.body.getAttribute('data-scene-src') || '/assets/js/scene3d.js';
-            s.async = true;
-            document.head.appendChild(s);
-        };
-        window.addEventListener('load', function () {
-            if ('requestIdleCallback' in window) { requestIdleCallback(startScene, { timeout: 1800 }); } else { setTimeout(startScene, 900); }
         });
     }
 
