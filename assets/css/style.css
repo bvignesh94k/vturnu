@@ -2402,3 +2402,8 @@ h1, h2, .section-title { text-wrap: balance; }
 .cta-mid .btn-dark { background: #1D1936; color: #fff; }
 .cta-band { background: linear-gradient(95deg, #FF7CAF, #FFB347); }
 .cta-band p { color: #1D1936; }
+
+/* Footer text stays clearly readable on the dark ground. */
+.site-footer { background-color: #14112A; }
+.footer-blurb, .footer-contact-list small, .footer-news-note, .footer-bottom p, .footer-bottom a, .footer-gst, .footer-legal-links a { color: #D6D4E2; }
+.footer-col a:hover, .footer-contact-list a:hover, .footer-legal-links a:hover { color: #FFC94D; }
