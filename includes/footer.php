@@ -133,60 +133,12 @@
             <h2 id="qm-title">Let's Talk Possibilities.</h2>
             <p class="qm-sub">Share a few details and we'll reply within one business day, with a free mini-audit and honest next steps.</p>
         </div>
-        <form class="contact-form qm-form" method="post" action="/contact-us/">
-            <?= csrf_field() ?>
-            <input type="hidden" name="recaptcha_token" class="js-recaptcha-token">
-            <div class="form-grid">
-                <div class="form-row"><label for="qm-name">Your name *</label><input id="qm-name" name="name" type="text" placeholder="Full name" required autocomplete="name"></div>
-                <div class="form-row"><label for="qm-email">Email *</label><input id="qm-email" name="email" type="email" placeholder="you@company.com" required autocomplete="email"></div>
-            </div>
-            <div class="form-grid">
-                <div class="form-row"><label for="qm-phone">Phone / WhatsApp *</label>
-                    <div class="phone-group"><?= country_code_select('country_code', 'qm-cc') ?><input id="qm-phone" name="phone" type="tel" inputmode="tel" placeholder="98765 43210" required autocomplete="tel-national"></div>
-                </div>
-                <div class="form-row"><label for="qm-company">Company *</label><input id="qm-company" name="company" type="text" placeholder="Business name" required autocomplete="organization"></div>
-            </div>
-            <div class="form-grid">
-                <div class="form-row">
-                    <label for="qm-service">What do you need?</label>
-                    <select id="qm-service" name="service">
-                        <option>SEO and AI search visibility</option>
-                        <option>Paid advertising (Google / Meta)</option>
-                        <option>Social media marketing</option>
-                        <option>Branding and design</option>
-                        <option>Website development</option>
-                        <option>AI development</option>
-                        <option>SAP CPQ</option>
-                        <option>Salesforce</option>
-                        <option>Odoo ERP or ERPNext</option>
-                        <option>IT staffing</option>
-                        <option>Full-stack growth (multiple)</option>
-                    </select>
-                </div>
-                <div class="form-row">
-                    <label for="qm-budget">Monthly budget range</label>
-                    <select id="qm-budget" name="budget">
-                        <?= budget_options(['One-time project, need a quote']) ?>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row"><label for="qm-message">What do you want to achieve? *</label><textarea id="qm-message" name="message" rows="3" required minlength="15" placeholder="For example: we want more qualified leads from Google in the next 6 months."></textarea></div>
-            <div class="form-row honeypot" aria-hidden="true"><label for="qm-website">Website</label><input id="qm-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-            <div class="alert alert-error qm-error" role="alert" hidden>Please fill in every field marked with a star, then try again.</div>
-            <button class="btn btn-grad btn-block" type="submit">Get My Custom Quote</button>
-            <p class="form-privacy">We reply within 1 business day. Your details stay private.</p>
-            <p class="recaptcha-disclosure">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener nofollow">Terms of Service</a> apply.</p>
-        </form>
-        <div class="quote-done qm-success" hidden>
-            <span class="quote-done-icon" aria-hidden="true">✓</span>
-            <h3>Request received</h3>
-            <p>We'll review your details and reply within one business day with your mini-audit and quote.</p>
-            <button class="btn btn-ghost qm-done-close" type="button">Close</button>
-        </div>
+        <?php render_lead_form_card(['uid' => 'qm', 'source' => 'popup', 'lazy' => true, 'service' => lead_page_service($page ?? [], $slug ?? ''), 'button' => 'Get my custom quote']); ?>
     </div>
 </dialog>
 
 <script src="/assets/js/main.js?v=<?= asset_v('/assets/js/main.js') ?>" defer></script>
+<script src="/assets/js/lead-form.js?v=<?= asset_v('/assets/js/lead-form.js') ?>" defer></script>
 <?php if ($slug === ""): $home_js_v = asset_v('/assets/js/home.js'); ?>
 <script src="/assets/js/home.js?v=<?= $home_js_v ?>" defer></script>
 <?php endif; ?>

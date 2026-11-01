@@ -339,7 +339,7 @@ function hx_logos(array $files): string
 {
     $out = '<div class="hx-logos">';
     foreach (array_slice($files, 0, 6) as $f) {
-        $out .= '<span><img src="/assets/img/clients/' . e((string) $f) . '" alt="" loading="eager" decoding="async"></span>';
+        $out .= '<span>' . client_logo_img((string) $f, '', true, 120, 46, 2800) . '</span>';
     }
     return $out . '</div>';
 }

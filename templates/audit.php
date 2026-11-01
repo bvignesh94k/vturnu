@@ -47,43 +47,7 @@ $labels = [
             <div class="panel panel-accent audit-lead-panel">
                 <h2>Want a strategist to review it with you?</h2>
                 <p>Skip the wait. Tell us about your goals and a senior strategist replies within one business day with a growth plan, not just a report.</p>
-                <form class="contact-form audit-lead-form" id="audit-lead-form">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="recaptcha_token" class="js-recaptcha-token">
-                    <div class="form-row">
-                        <label for="l-name">Your name *</label>
-                        <input id="l-name" name="name" type="text" placeholder="Full name" required autocomplete="name">
-                    </div>
-                    <div class="form-row">
-                        <label for="l-email">Email *</label>
-                        <input id="l-email" name="email" type="email" placeholder="you@company.com" required autocomplete="email">
-                    </div>
-                    <div class="form-row">
-                        <label for="l-phone">Phone / WhatsApp</label>
-                        <div class="phone-group">
-                            <?= country_code_select('country_code', 'l-cc') ?>
-                            <input id="l-phone" name="phone" type="tel" inputmode="tel" placeholder="98765 43210" autocomplete="tel-national">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <label for="l-message">What are you trying to grow?</label>
-                        <textarea id="l-message" name="message" rows="3" placeholder="e.g. More qualified leads from Google in the next 6 months"></textarea>
-                    </div>
-                    <input type="hidden" name="service" value="Free SEO Audit Page: Consultation Request">
-                    <div class="form-row honeypot" aria-hidden="true">
-                        <label for="l-website">Website</label>
-                        <input id="l-website" name="website" type="text" tabindex="-1" autocomplete="off">
-                    </div>
-                    <div class="alert alert-error al-error" role="alert" hidden>Please fill in your name and a valid email address, then try again.</div>
-                    <button class="btn btn-dark btn-block" type="submit">Get My Free Consultation</button>
-                    <p class="form-privacy">We reply within 1 business day. Your details stay private.</p>
-                    <p class="recaptcha-disclosure">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener nofollow">Terms of Service</a> apply.</p>
-                </form>
-                <div class="quote-done al-success" hidden>
-                    <span class="quote-done-icon" aria-hidden="true">✓</span>
-                    <h3>Request received</h3>
-                    <p>We'll review your details and reply within one business day.</p>
-                </div>
+                <?php render_lead_form_card(['uid' => 'au', 'source' => 'audit-consultation', 'service' => 'SEO', 'button' => 'Get my free consultation']); ?>
             </div>
         </div>
 

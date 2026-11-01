@@ -212,9 +212,12 @@
         field.name = '_hx';
         form.appendChild(field);
         var t0 = 0, keys = 0, points = 0;
+        /* Set by the browser itself when something other than a person is driving it. */
+        var auto = (navigator.webdriver ? 1 : 0) | (/HeadlessChrome|PhantomJS|Electron\//i.test(navigator.userAgent) ? 2 : 0)
+            | (navigator.languages && navigator.languages.length === 0 ? 4 : 0);
         var mark = function () {
             if (!t0) { t0 = Date.now(); loadRecaptcha(); }
-            field.value = (Date.now() - t0) + '.' + keys + '.' + points;
+            field.value = (Date.now() - t0) + '.' + keys + '.' + points + '.' + auto;
         };
         form.addEventListener('focusin', mark);
         form.addEventListener('keydown', function () { keys++; mark(); });
@@ -254,41 +257,6 @@
         // Click on the backdrop closes
         modal.addEventListener('click', function (e) {
             if (e.target === modal) closeModal();
-        });
-
-        var qmForm = modal.querySelector('.qm-form');
-        var qmError = modal.querySelector('.qm-error');
-        var qmSuccess = modal.querySelector('.qm-success');
-        qmForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            qmError.hidden = true;
-            if (!qmForm.reportValidity()) { return; }
-            var btn = qmForm.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.textContent = 'Sending…';
-            withRecaptcha('submit', function (token) {
-                var tokenField = qmForm.querySelector('.js-recaptcha-token');
-                if (tokenField) tokenField.value = token;
-                fetch('/enquiry/', { method: 'POST', body: new FormData(qmForm) })
-                    .then(readJsonTolerantly)
-                    .then(function (data) {
-                        if (data.ok) {
-                            /* Go to the real thank-you page. The old behaviour
-                               revealed a success panel while leaving the form
-                               and its submit button on screen above it, which
-                               read as though nothing had happened. */
-                            window.location.href = data.redirect || '/thank-you/';
-                        } else {
-                            if (data.error) { qmError.textContent = data.error; }
-                            qmError.hidden = false;
-                        }
-                    })
-                    .catch(function () { qmError.hidden = false; })
-                    .finally(function () {
-                        btn.disabled = false;
-                        btn.textContent = 'Get My Custom Quote';
-                    });
-            });
         });
     }
 
@@ -348,84 +316,6 @@
                         } else { btn.disabled = false; }
                     })
                     .catch(function () { btn.disabled = false; });
-            });
-        });
-    }
-
-    // Enterprise landing page form: background submit, same thank-you page.
-    var lpForm = document.querySelector('.lp-form');
-    if (lpForm && window.fetch) {
-        lpForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            var box = lpForm.querySelector('.lp-error');
-            var btn = lpForm.querySelector('button[type="submit"]');
-            var label = btn.textContent;
-            box.hidden = true;
-            btn.disabled = true;
-            btn.textContent = 'Sending…';
-            withRecaptcha('submit', function (token) {
-                var tokenField = lpForm.querySelector('.js-recaptcha-token');
-                if (tokenField) tokenField.value = token;
-                fetch('/enquiry/', { method: 'POST', body: new FormData(lpForm) })
-                    .then(readJsonTolerantly)
-                    .then(function (data) {
-                        if (data.ok) {
-                            window.location.href = data.redirect || '/thank-you/';
-                        } else {
-                            box.textContent = data.error || 'Please check the form and try again, or email connect@vturnu.com.';
-                            box.hidden = false;
-                        }
-                    })
-                    .catch(function () {
-                        box.textContent = 'That did not go through. Please try again, or email connect@vturnu.com.';
-                        box.hidden = false;
-                    })
-                    .finally(function () { btn.disabled = false; btn.textContent = label; });
-            });
-        });
-    }
-
-    // Real (non-AJAX) lead forms: home page inline quote + contact page.
-    // Validate, fetch a reCAPTCHA token, then submit for real so the
-    // server-rendered success/error page still works exactly as before.
-    document.querySelectorAll('.raw-lead-form').forEach(function (rform) {
-        rform.addEventListener('submit', function (e) {
-            e.preventDefault();
-            if (!rform.reportValidity()) { return; }
-            var btn = rform.querySelector('button[type="submit"]');
-            if (btn) btn.disabled = true;
-            withRecaptcha('submit', function (token) {
-                var tokenField = rform.querySelector('.js-recaptcha-token');
-                if (tokenField) tokenField.value = token;
-                rform.submit();
-            });
-        });
-    });
-
-    // Free SEO audit page: separate lead-capture form (distinct from the audit
-    // checker above it). Background submit via the shared /enquiry/ endpoint.
-    var auditLeadForm = document.getElementById('audit-lead-form');
-    if (auditLeadForm && window.fetch) {
-        auditLeadForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            var errBox = auditLeadForm.querySelector('.al-error');
-            var success = document.querySelector('.al-success');
-            var btn = auditLeadForm.querySelector('button[type="submit"]');
-            if (errBox) errBox.hidden = true;
-            btn.disabled = true;
-            btn.textContent = 'Sending…';
-            withRecaptcha('submit', function (token) {
-                var tokenField = auditLeadForm.querySelector('.js-recaptcha-token');
-                if (tokenField) tokenField.value = token;
-                fetch('/enquiry/', { method: 'POST', body: new FormData(auditLeadForm) })
-                    .then(readJsonTolerantly)
-                    .then(function (data) {
-                        if (data.ok) {
-                            window.location.href = data.redirect || '/thank-you/?s=audit-consultation';
-                        } else if (errBox) { errBox.hidden = false; }
-                    })
-                    .catch(function () { if (errBox) errBox.hidden = false; })
-                    .finally(function () { btn.disabled = false; btn.textContent = 'Get My Free Consultation'; });
             });
         });
     }

@@ -2,13 +2,11 @@
 $logos = array_values(array_filter([
     ['sai-impression.webp', 'Sai Impression'],
     ['firstchoice-autoparts.webp', 'FirstChoice Used Auto Parts'],
-    ['shineprints.png', 'Shineprints'],
+    ['shineprints.webp', 'Shine Prints'],
     ['masaami.webp', 'Masaami'],
     ['ateliers-gym.png', 'Ateliers Gym'],
     ['black-sheep-collective.png', 'The Black Sheep Collective'],
     ['pemotech.png', 'Pemotech'],
-    ['boosterio.png', 'Boosterio'],
-    ['yodgy.png', 'Yodgy'],
 ], static fn($l) => is_file(BASE_PATH . '/assets/img/clients/' . $l[0])));
 ?>
 <?php render_hero([
@@ -22,7 +20,7 @@ $logos = array_values(array_filter([
         <h2 class="section-title center">Brands that turned with us</h2>
         <ul class="logo-wall">
             <?php foreach ($logos as [$file, $name]): ?>
-            <li class="tilt"><img src="/assets/img/clients/<?= e($file) ?>" alt="<?= e($name) ?>" width="160" height="56" loading="lazy" decoding="async"></li>
+            <li><?= client_logo_img($file, $name) ?></li>
             <?php endforeach; ?>
         </ul>
     </div>

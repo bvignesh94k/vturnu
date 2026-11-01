@@ -166,9 +166,12 @@ function lead_screen(array $entry, string $source, bool $network = true, array $
         $ms = (int) ($parts[0] ?? 0);
         $keys = (int) ($parts[1] ?? 0);
         $points = (int) ($parts[2] ?? 0);
-        if ($signals['hx'] === '') {
-            $flag(25, 'No browser interaction recorded');
-        } elseif ($ms > 0 && $ms < 2500) {
+        $auto = (int) ($parts[3] ?? 0);
+        if ($auto > 0) {
+            $flag(60, 'Automated browser detected');
+        } elseif ($signals['hx'] === '') {
+            $flag(40, 'No browser interaction recorded');
+        } elseif ($ms > 0 && $ms < 4000) {
             $flag(30, 'Form completed too fast');
         } elseif ($keys === 0 && $points === 0) {
             $flag(25, 'Form filled without typing or clicking');

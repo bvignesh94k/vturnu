@@ -31,15 +31,13 @@ $hp_result = static function (string $cslug, int $i = 0) use ($CASES): ?array {
 };
 
 $LOGOS = array_values(array_filter([
-    ['shineprints.png',            'Shineprints'],
+    ['shineprints.webp',           'Shine Prints'],
     ['masaami.webp',               'Masaami'],
     ['ateliers-gym.png',           'Ateliers Gym'],
     ['sai-impression.webp',        'Sai Impression'],
     ['black-sheep-collective.png', 'The Black Sheep Collective'],
     ['firstchoice-autoparts.webp', 'FirstChoice Used Auto Parts'],
     ['pemotech.png',               'Pemotech'],
-    ['boosterio.png',              'Boosterio'],
-    ['yodgy.png',                  'Yodgy'],
 ], static function (array $l): bool {
     return is_file(BASE_PATH . '/assets/img/clients/' . $l[0]);
 }));
@@ -95,9 +93,6 @@ $CASE_CARDS = array_values(array_filter([
     $hp_result('cafy-careers-uk-job-platform'),
 ]));
 
-$FORM_SERVICES = ['SEO', 'AI search visibility', 'Google Ads / PPC', 'Paid social', 'Outbound & email', 'Content marketing', 'Website / landing pages', 'Full growth program'];
-$FORM_SIZE     = ['1 to 10 people', '11 to 50 people', '51 to 200 people', '201 to 1,000 people', '1,000+ people'];
-$FORM_WHEN     = ['As soon as possible', 'Within 1 to 3 months', 'In 3 to 6 months', 'Just researching'];
 
 $hq_names = country_names();
 $hq_selected = $hq_names[security_visitor_country()] ?? 'India';
@@ -159,9 +154,7 @@ $cta_label = 'Start my growth plan';
     <div class="hp3-marquee-track">
       <?php for ($pass = 0; $pass < 2; $pass++): ?>
         <?php foreach ($LOGOS as [$file, $name]): ?>
-        <img src="/assets/img/clients/<?= e($file) ?>"
-             <?= $pass === 0 ? 'alt="' . e($name) . '"' : 'alt="" aria-hidden="true"' ?>
-             width="140" height="48" loading="lazy" decoding="async">
+        <span class="hp3-logo"><?= client_logo_img($file, $name, $pass !== 0, 164, 56, 6000) ?></span>
         <?php endforeach; ?>
       <?php endfor; ?>
     </div>
@@ -175,21 +168,26 @@ $cta_label = 'Start my growth plan';
     <div class="hp3-head" data-rise>
       <p class="hp3-kicker">Signal over noise</p>
       <h2 class="hp3-title" id="hp3-sig-h">Most B2B brands are loud in <span class="hp3-grad">the wrong rooms.</span></h2>
-      <p class="hp3-sub">Three habits quietly drain B2B budgets, and the turn we make for each.</p>
+      <p class="hp3-sub">Three habits quietly drain B2B budgets. Hover or tap a card to see the turn we make.</p>
     </div>
     <div class="hp3-flips" data-rise>
       <?php foreach ($FLIPS as $i => [$ft, $fd, $bt, $bd]): ?>
-      <article class="hp3-leak">
-        <span class="hp3-face-n" aria-hidden="true">0<?= $i + 1 ?></span>
-        <p class="hp3-face-k">The leak</p>
-        <h3 class="hp3-face-t"><?= e($ft) ?></h3>
-        <p class="hp3-face-d"><?= e($fd) ?></p>
-        <div class="hp3-turnbox">
-          <p class="hp3-face-k">The turn</p>
-          <h4 class="hp3-face-t"><?= e($bt) ?></h4>
-          <p class="hp3-face-d"><?= e($bd) ?></p>
-        </div>
-      </article>
+      <div class="hp3-flip" style="--i:<?= $i ?>">
+        <button type="button" class="hp3-flip-in" aria-pressed="false">
+          <span class="hp3-face hp3-face--front">
+            <span class="hp3-face-n" aria-hidden="true">0<?= $i + 1 ?></span>
+            <span class="hp3-face-k">The leak</span>
+            <span class="hp3-face-t"><?= e($ft) ?></span>
+            <span class="hp3-face-d"><?= e($fd) ?></span>
+            <svg class="hp3-face-go" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="hp3-face hp3-face--back">
+            <span class="hp3-face-k">The turn</span>
+            <span class="hp3-face-t"><?= e($bt) ?></span>
+            <span class="hp3-face-d"><?= e($bd) ?></span>
+          </span>
+        </button>
+      </div>
       <?php endforeach; ?>
     </div>
   </div>
@@ -312,7 +310,7 @@ $cta_label = 'Start my growth plan';
     <div class="hp3-form-intro" data-rise>
       <p class="hp3-kicker">Start the turn</p>
       <h2 class="hp3-title" id="hp-form-h">Get a growth plan built for your market.</h2>
-      <p class="hp3-sub">Two minutes, three steps. Within one working day a senior strategist sends a specific read on your visibility, your competitors and the fastest route to qualified pipeline.</p>
+      <p class="hp3-sub">One short form. Within one working day a senior strategist sends a specific read on your visibility, your competitors and the fastest route to qualified pipeline.</p>
     </div>
     <div class="hp3-form-aside" data-rise>
       <ul class="hp3-get">
@@ -324,135 +322,8 @@ $cta_label = 'Start my growth plan';
     </div>
 
     <div class="hp3-form-card" data-rise>
-      <?php if ($form_status === 'success'): ?>
-      <div class="hp3-form-ok" role="status">
-        <p><strong>Thank you.</strong> Your request is in. A strategist will reply within one working day.</p>
-      </div>
-      <?php else: ?>
-      <form class="hp3-form" id="hp-form" method="post" action="/#start" novalidate
-            data-recaptcha="<?= e(RECAPTCHA_SITE_KEY) ?>" data-inbox="<?= e(ENQUIRY_TO) ?>">
-        <?= csrf_field() ?>
-        <input type="hidden" name="recaptcha_token" class="js-recaptcha-token">
-        <input type="hidden" name="form_variant" value="b2b-qualifier-v2">
-        <div class="hp3-hp" aria-hidden="true">
-          <label for="f-website">Website</label>
-          <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
-        </div>
-
-        <div class="hp3-steps" hidden>
-          <span class="hp3-steps-bar"><i></i></span>
-          <p class="hp3-steps-t" aria-live="polite">Step <b class="js-step-n">1</b> of 3</p>
-        </div>
-
-        <?php if ($form_status === 'error'): ?>
-        <p class="hp3-form-bad" role="alert">Something did not go through. Check your name and work email, then send it again, or email <?= e(ENQUIRY_TO) ?>.</p>
-        <?php endif; ?>
-
-        <fieldset class="hp3-step" data-step="1">
-          <legend>What do you need?</legend>
-          <div class="hp3-chipset" role="group" aria-label="Services you are interested in">
-            <?php foreach ($FORM_SERVICES as $s): ?>
-            <label class="hp3-chip"><input type="checkbox" name="services[]" value="<?= e($s) ?>"><span><?= e($s) ?></span></label>
-            <?php endforeach; ?>
-          </div>
-          <span class="hp3-err" data-err-for="services"></span>
-          <div class="hp3-f">
-            <label for="f-market">Where do you want to grow? <span class="hp3-opt">Optional</span></label>
-            <input id="f-market" name="markets" type="text" autocomplete="off" placeholder="Country, region or city">
-          </div>
-        </fieldset>
-
-        <fieldset class="hp3-step" data-step="2">
-          <legend>About your company</legend>
-          <div class="hp3-row">
-            <div class="hp3-f">
-              <label for="f-company">Company name</label>
-              <input id="f-company" name="company" type="text" autocomplete="organization" placeholder="Acme Industries" required>
-              <span class="hp3-err" data-err-for="f-company"></span>
-            </div>
-            <div class="hp3-f">
-              <label for="f-site">Company website</label>
-              <input id="f-site" name="company_website" type="text" inputmode="url" autocomplete="url" placeholder="acme.com" required>
-              <span class="hp3-err" data-err-for="f-site"></span>
-            </div>
-          </div>
-          <div class="hp3-row">
-            <div class="hp3-f">
-              <label for="f-hq">Headquartered in</label>
-              <select id="f-hq" name="hq_country">
-                <?php foreach ($hq_names as $iso => $cname): ?>
-                <option value="<?= e($cname) ?>"<?= $cname === $hq_selected ? ' selected' : '' ?>><?= e($cname) ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <div class="hp3-f">
-              <label for="f-size">Company size</label>
-              <select id="f-size" name="company_size" required>
-                <option value="">Select</option>
-                <?php foreach ($FORM_SIZE as $o): ?><option><?= e($o) ?></option><?php endforeach; ?>
-              </select>
-              <span class="hp3-err" data-err-for="f-size"></span>
-            </div>
-          </div>
-          <div class="hp3-row">
-            <div class="hp3-f">
-              <label for="f-budget">Monthly marketing budget</label>
-              <select id="f-budget" name="budget" required>
-                <option value="">Select</option>
-                <?= budget_options(['Not decided yet']) ?>
-              </select>
-              <span class="hp3-err" data-err-for="f-budget"></span>
-            </div>
-            <div class="hp3-f">
-              <label for="f-when">When do you want to start?</label>
-              <select id="f-when" name="timeline" required>
-                <option value="">Select</option>
-                <?php foreach ($FORM_WHEN as $o): ?><option><?= e($o) ?></option><?php endforeach; ?>
-              </select>
-              <span class="hp3-err" data-err-for="f-when"></span>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="hp3-step" data-step="3">
-          <legend>Where should we send your plan?</legend>
-          <div class="hp3-row">
-            <div class="hp3-f">
-              <label for="f-name">Your name</label>
-              <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Priya Raman" required>
-              <span class="hp3-err" data-err-for="f-name"></span>
-            </div>
-            <div class="hp3-f">
-              <label for="f-role">Your role</label>
-              <input id="f-role" name="designation" type="text" autocomplete="organization-title" placeholder="Head of Marketing">
-            </div>
-          </div>
-          <div class="hp3-f">
-            <label for="f-email">Work email</label>
-            <input id="f-email" name="email" type="email" autocomplete="email" placeholder="priya@acme.com" required>
-            <span class="hp3-err" data-err-for="f-email"></span>
-          </div>
-          <div class="hp3-f">
-            <label for="f-mobile">Phone or WhatsApp <span class="hp3-opt">Optional</span></label>
-            <div class="hp3-phone">
-              <?= country_code_select('country_code', 'f-cc') ?>
-              <input id="f-mobile" name="mobile" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="Phone number">
-            </div>
-          </div>
-          <div class="hp3-f">
-            <label for="f-message">Your biggest growth challenge <span class="hp3-opt">Optional</span></label>
-            <textarea id="f-message" name="message" rows="3" placeholder="We want more qualified RFQs from the GCC, but most enquiries today are small domestic orders."></textarea>
-          </div>
-        </fieldset>
-
-        <div class="hp3-nav">
-          <button type="button" class="hp3-btn hp3-btn--ghost js-back" hidden>Back</button>
-          <button type="button" class="hp3-btn hp3-btn--primary js-next" hidden>Continue <span aria-hidden="true">&rarr;</span></button>
-          <button type="submit" class="hp3-btn hp3-btn--primary js-submit">Send my growth plan request</button>
-        </div>
-        <p class="hp3-fine">No spam and no sales sequence. Your details are used only to prepare your plan. <a href="/privacy-policy/">Privacy policy</a></p>
-      </form>
-      <?php endif; ?>
+      <h3 class="lf-card-h">Tell us about your project</h3>
+      <?php render_lead_form_card(['uid' => 'hp', 'source' => 'home-quote', 'service' => lf_old('service', ''), 'button' => $cta_label]); ?>
     </div>
   </div>
 </section>

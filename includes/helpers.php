@@ -383,7 +383,7 @@ function enquiry_qualify(array $post): array
         $items = array_filter(array_map('trim', is_array($v) ? $v : [(string) $v]), 'strlen');
         return implode(', ', array_slice($items, 0, 12));
     };
-    $services = $list($post['services'] ?? '');
+    $services = $list($post['services'] ?? ($post['service'] ?? ''));
     $markets  = $list($post['markets'] ?? '');
     $site     = trim((string) ($post['company_website'] ?? ''));
     $hq       = trim((string) ($post['hq_country'] ?? ''));
@@ -409,7 +409,10 @@ function enquiry_qualify(array $post): array
     $summary = [
         'Lead grade: ' . $grade . ' (' . $points . '/10)',
         'Services: ' . ($services !== '' ? $services : 'Not specified'),
-        'Target markets: ' . ($markets !== '' ? $markets : 'Not specified'),
+        'Source page: ' . (trim((string) ($post['from_page'] ?? '')) ?: 'Not recorded'),
+        'Visitor country: ' . (security_visitor_country() ?: 'Unknown')
+            . (($pi = strtoupper(trim((string) ($post['country_iso'] ?? '')))) !== '' && $pi !== security_visitor_country() ? ' (phone country: ' . $pi . ')' : ''),
+        ...($markets !== '' ? ['Target markets: ' . $markets] : []),
         'Website: ' . ($site !== '' ? $site : 'Not given'),
         'Headquarters: ' . ($hq !== '' ? $hq : 'Not given'),
         'Company size: ' . ($size !== '' ? $size : 'Not given'),
@@ -550,7 +553,9 @@ function mail_enquiry(array $entry): bool
     $lines[] = 'Reply directly to this email to respond to the enquirer.';
 
     $prefix = ['ok' => '', 'review' => '[Check first] ', 'junk' => '[Likely junk] '][$quality['verdict']] ?? '';
+    $grade = preg_match('/Lead grade: ([ABC])/', (string) ($entry['message'] ?? ''), $gm) ? ' [Grade ' . $gm[1] . ']' : '';
     $subject = $prefix . sprintf('New enquiry: %s%s', $entry['name'], $entry['service'] !== '' ? ' (' . $entry['service'] . ')' : '');
+    $subject .= $grade;
 
     return send_email(ENQUIRY_TO, $subject, implode("\n", $lines), [
         'reply_to' => $entry['name'] . ' <' . $entry['email'] . '>',

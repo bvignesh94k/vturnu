@@ -246,6 +246,33 @@ function reader_html(string $raw): string
     return implode("\n", $out);
 }
 
+/**
+ * Display size for a client logo, balanced by visual area rather than height, so
+ * a long thin wordmark and a squarer badge carry the same weight side by side.
+ * Never enlarged past 1.15x its file, so nothing is shown blurry.
+ *
+ * @return array{0:int,1:int} width and height in CSS pixels
+ */
+function client_logo_box(string $file, int $maxW = 176, int $maxH = 60, int $area = 6600): array
+{
+    $size = @getimagesize(BASE_PATH . '/assets/img/clients/' . $file) ?: [140, 48];
+    $aspect = max(0.2, $size[0] / max(1, $size[1]));
+    $w = sqrt($area * $aspect);
+    $h = $w / $aspect;
+    if ($w > $maxW) { $w = $maxW; $h = $w / $aspect; }
+    if ($h > $maxH) { $h = $maxH; $w = $h * $aspect; }
+    if ($w > $size[0] * 1.15) { $w = $size[0] * 1.15; $h = $w / $aspect; }
+    return [(int) round($w), (int) round($h)];
+}
+
+/** One client logo at its balanced size. */
+function client_logo_img(string $file, string $name, bool $decorative = false, int $maxW = 176, int $maxH = 60, int $area = 6600): string
+{
+    [$w, $h] = client_logo_box($file, $maxW, $maxH, $area);
+    return '<img src="/assets/img/clients/' . e($file) . '" ' . ($decorative ? 'alt="" aria-hidden="true"' : 'alt="' . e($name) . '"')
+        . ' width="' . $w . '" height="' . $h . '" style="width:' . $w . 'px;height:' . $h . 'px" loading="lazy" decoding="async">';
+}
+
 /** The four named client projects, with a followed link to each live site. */
 function render_work_showcase(string $title = 'Websites we built and grew', string $intro = 'Live client sites you can visit today, with the measured result of the work.'): void
 {

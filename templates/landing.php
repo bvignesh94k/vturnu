@@ -119,7 +119,7 @@ render_hero([
 
 <?php render_faqs(page_faqs($page, $slug), $l['service'] . ': questions buyers ask'); ?>
 
-<?php render_lead_form($l['service'], $l['form'][0], $l['form'][1]); ?>
+<?php render_lead_form($l['service'], $l['form'][0], $l['form'][1], 'enquire', 'Send my requirement', 'landing-page'); ?>
 
 <section class="section section-tint">
     <div class="container">

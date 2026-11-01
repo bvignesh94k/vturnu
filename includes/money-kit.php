@@ -181,7 +181,7 @@ function render_money_proof(string $cat): void
 function render_money_plan(string $cat): void
 {
     ?>
-<section class="mp-sec" style="padding-top:0">
+<section class="mp-sec">
     <div class="container">
         <p class="mp-k">Your first 90 days</p>
         <h2>What happens after you say yes</h2>
@@ -217,45 +217,48 @@ function render_money_fit(array $fit): void
     <?php
 }
 
-/** Short enquiry form, so a buyer never has to leave the page to act. */
-function render_lead_form(string $service, string $title, string $sub, string $id = 'enquire', string $btn = 'Send My Requirement'): void
+/** A call to action between sections, for the moment a buyer has just seen the proof. */
+function render_cta_band(string $title, string $sub, string $btn, string $href = '#enquire'): void
 {
     ?>
-<section class="section lp-form-sec mp-form" id="<?= e($id) ?>">
-    <div class="container lp-form-grid">
-        <div class="lp-form-intro" data-reveal="card">
+<section class="mp-cta" aria-label="Get started">
+    <div class="container mp-cta-in">
+        <div>
+            <h2><?= e($title) ?></h2>
+            <p><?= e($sub) ?></p>
+        </div>
+        <div class="mp-cta-act">
+            <a class="hx-cta" href="<?= e($href) ?>"><?= e($btn) ?> <span aria-hidden="true">&rarr;</span></a>
+            <a class="mp-cta-call" href="<?= e(CONTACT_PHONE_HREF) ?>">or call <?= e(CONTACT_PHONE) ?></a>
+        </div>
+    </div>
+</section>
+    <?php
+}
+
+/**
+ * The enquiry section: what happens next on the left, the one lead form on the
+ * right. Used by every service, hub and enterprise page.
+ */
+function render_lead_form(string $service, string $title, string $sub, string $id = 'enquire', string $btn = 'Send my enquiry', string $source = 'service-page'): void
+{
+    ?>
+<section class="section mp-form lf-sec" id="<?= e($id) ?>">
+    <div class="container lf-wrap">
+        <div class="lf-intro" data-reveal="card">
             <p class="eyebrow">Start here</p>
             <h2 class="section-title"><?= e($title) ?></h2>
-            <p><?= e($sub) ?></p>
-            <ul class="check-list">
-                <li>A senior strategist reads every enquiry personally</li>
-                <li>Your details stay private</li>
-                <li>Projects start from <?= e(min_budget()) ?></li>
-            </ul>
-            <p class="lp-direct">Prefer to talk? <a href="<?= e(CONTACT_PHONE_HREF) ?>"><?= e(CONTACT_PHONE) ?></a> or <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a></p>
+            <p class="lf-sub"><?= e($sub) ?></p>
+            <ol class="lf-next">
+                <li><b>Within one working day</b><span>A senior strategist reads your enquiry and replies personally.</span></li>
+                <li><b>A short call</b><span>Fifteen to thirty minutes to understand your goal, with no sales script.</span></li>
+                <li><b>A clear proposal</b><span>Scope, timeline and price in writing. Projects start from <?= e(min_budget()) ?>.</span></li>
+            </ol>
+            <p class="lf-direct">Prefer to talk? <a href="<?= e(CONTACT_PHONE_HREF) ?>"><?= e(CONTACT_PHONE) ?></a>, <a href="https://wa.me/<?= e(CONTACT_WHATSAPP) ?>" target="_blank" rel="noopener nofollow">WhatsApp</a> or <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a></p>
         </div>
-        <div class="contact-form-wrap" data-reveal="card">
-            <form class="contact-form lp-form" method="post" action="/contact-us/">
-                <?= csrf_field() ?>
-                <input type="hidden" name="recaptcha_token" class="js-recaptcha-token">
-                <input type="hidden" name="service" value="<?= e($service) ?>">
-                <input type="hidden" name="lead_source" value="landing">
-                <div class="form-grid">
-                    <div class="form-row"><label for="lp-name">Your name *</label><input id="lp-name" name="name" type="text" required autocomplete="name"></div>
-                    <div class="form-row"><label for="lp-email">Work email *</label><input id="lp-email" name="email" type="email" required autocomplete="email"></div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-row"><label for="lp-phone">Phone / WhatsApp *</label>
-                        <div class="phone-group"><?= country_code_select('country_code', 'lp-cc') ?><input id="lp-phone" name="mobile" type="tel" inputmode="tel" required autocomplete="tel-national"></div>
-                    </div>
-                    <div class="form-row"><label for="lp-company">Company *</label><input id="lp-company" name="company" type="text" required autocomplete="organization"></div>
-                </div>
-                <div class="form-row"><label for="lp-message">What do you need? *</label><textarea id="lp-message" name="message" rows="4" required minlength="15" placeholder="Your website, your goal and your timeline"></textarea></div>
-                <div class="form-row honeypot" aria-hidden="true"><label for="lp-website">Website</label><input id="lp-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-                <div class="alert alert-error lp-error" role="alert" hidden></div>
-                <button class="btn btn-grad btn-block" type="submit"><?= e($btn) ?></button>
-                <p class="recaptcha-disclosure">Protected by reCAPTCHA. The Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener nofollow">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener nofollow">Terms of Service</a> apply.</p>
-            </form>
+        <div class="lf-card" data-reveal="card">
+            <h3 class="lf-card-h">Tell us about your project</h3>
+            <?php render_lead_form_card(['uid' => 'lf-' . $id, 'source' => $source, 'service' => lead_service_option($service), 'button' => $btn]); ?>
         </div>
     </div>
 </section>

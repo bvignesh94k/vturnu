@@ -25,6 +25,7 @@ require dirname(__DIR__) . '/includes/security.php';
 require dirname(__DIR__) . '/includes/currency.php';
 require dirname(__DIR__) . '/includes/lead-guard.php';
 require dirname(__DIR__) . '/includes/page-kit.php';
+require dirname(__DIR__) . '/includes/lead-form.php';
 require dirname(__DIR__) . '/includes/hero-kit.php';
 require dirname(__DIR__) . '/includes/money-kit.php';
 
@@ -197,6 +198,16 @@ if ($slug === 'admin' || str_starts_with($slug, 'admin/')) {
 /* AJAX enquiry endpoint (quote pop-up, resource downloads, newsletter, audit-page consultation) */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'enquiry') {
     header('Content-Type: application/json; charset=UTF-8');
+
+    /* The shared lead form: validated, screened, stored and emailed by lead_submit(). */
+    if (($_POST['vt_form'] ?? '') === 'lead-v3') {
+        $r = lead_submit($_POST);
+        echo json_encode([
+            'ok' => $r['ok'], 'error' => $r['error'], 'errors' => (object) $r['errors'],
+            'redirect' => $r['ok'] ? '/thank-you/?s=' . rawurlencode($r['source']) : null,
+        ]);
+        exit;
+    }
     $check = security_check_submission($_POST);
     if (!$check['ok']) {
         echo json_encode(['ok' => false, 'error' => $check['error']]);
@@ -229,7 +240,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'enquiry') {
    page with a flag: it gives the visitor a clean finish, gives analytics one
    conversion URL to fire on, and means a refresh cannot resubmit the form. */
 $form_status = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''], true)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''], true) && ($_POST['vt_form'] ?? '') === 'lead-v3') {
+    /* No JavaScript: the shared form posts here and gets a redirect or its own errors back. */
+    $r = lead_submit($_POST);
+    if ($r['ok']) {
+        header('Location: /thank-you/?s=' . rawurlencode($r['source']), true, 303);
+        exit;
+    }
+    $form_status = 'error';
+    $form_error = $r['error'];
+    $form_errors = $r['errors'];
+    $slug = 'contact-us';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($slug, ['contact-us', ''], true)) {
     $check = security_check_submission($_POST);
     $source = $slug === '' ? 'home-quote' : 'contact-page';
     // The homepage form is the B2B qualifier: fold its extra answers and grade into the lead.

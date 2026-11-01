@@ -7,9 +7,8 @@
 
    1. Hero: starts the 3D crowd (assets/js/hero-crowd.js) once a visitor
       engages. A poster of the same scene is on screen until then.
-   2. Depth: scroll reveals, pointer tilt, count-up numbers,
+   2. Depth: scroll reveals, pointer tilt, count-up numbers, flip cards,
       the isometric growth stack and the Turn Method timeline.
-   3. Lead form: a three-step B2B qualifier with inline validation.
    ========================================================================== */
 (function () {
     'use strict';
@@ -130,6 +129,33 @@
         }
     })();
 
+    /* ------------------------------------------------------- flip cards */
+
+    (function flips() {
+        var cards = Array.prototype.slice.call(hp.querySelectorAll('.hp3-flip'));
+        if (!cards.length) { return; }
+        cards.forEach(function (card) {
+            var btn = card.querySelector('.hp3-flip-in');
+            btn.addEventListener('click', function () {
+                var on = !card.classList.contains('is-flipped');
+                card.classList.toggle('is-flipped', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+        });
+        /* One demonstration turn when the cards first appear, so visitors
+           on touch screens know the cards turn. */
+        if (!supportsIO || reduce) { return; }
+        var io = new IntersectionObserver(function (entries) {
+            if (!entries[0].isIntersecting) { return; }
+            io.disconnect();
+            cards.forEach(function (card, i) {
+                setTimeout(function () { card.classList.add('is-flipped'); }, 500 + i * 380);
+                setTimeout(function () { card.classList.remove('is-flipped'); }, 2300 + i * 380);
+            });
+        }, { threshold: 0.6 });
+        io.observe(cards[0]);
+    })();
+
     /* ---------------------------------------------- growth stack + method */
 
     (function scrollScenes() {
@@ -180,131 +206,6 @@
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onScroll);
         tick();
-    })();
-
-    /* --------------------------------------------------------- lead form */
-
-    (function leadForm() {
-        var form = document.getElementById('hp-form');
-        if (!form) { return; }
-        var steps = Array.prototype.slice.call(form.querySelectorAll('.hp3-step'));
-        var nextBtn = form.querySelector('.js-next');
-        var backBtn = form.querySelector('.js-back');
-        var submitBtn = form.querySelector('.js-submit');
-        var meter = form.querySelector('.hp3-steps');
-        var bar = form.querySelector('.hp3-steps-bar i');
-        var stepN = form.querySelector('.js-step-n');
-        var idx = 0, started = false;
-
-        var FREE = ['gmail.com', 'googlemail.com', 'yahoo.com', 'yahoo.co.in', 'yahoo.co.uk', 'ymail.com', 'hotmail.com',
-            'outlook.com', 'live.com', 'msn.com', 'icloud.com', 'me.com', 'mac.com', 'aol.com', 'proton.me', 'protonmail.com',
-            'zoho.com', 'zohomail.in', 'gmx.com', 'mail.com', 'yandex.com', 'rediffmail.com', 'qq.com', '163.com'];
-
-        function $(id) { return document.getElementById(id); }
-        function err(key, el, msg) {
-            var slot = form.querySelector('[data-err-for="' + key + '"]');
-            if (slot) { slot.textContent = msg || ''; }
-            if (el) { if (msg) { el.setAttribute('aria-invalid', 'true'); } else { el.removeAttribute('aria-invalid'); } }
-            return !msg;
-        }
-        function filled(id) { var el = $(id); return el && el.value.trim() !== ''; }
-
-        var checks = [
-            function () {
-                var any = form.querySelector('input[name="services[]"]:checked');
-                return err('services', null, any ? '' : 'Pick at least one, so we prepare the right plan.') ? null : form.querySelector('input[name="services[]"]');
-            },
-            function () {
-                var bad = null;
-                var site = $('f-site');
-                if (!err('f-company', $('f-company'), filled('f-company') ? '' : 'Please add your company name.')) { bad = bad || $('f-company'); }
-                var siteOk = /^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)+(\/.*)?$/i.test(site.value.trim());
-                if (!err('f-site', site, siteOk ? '' : 'Please add your company website, for example acme.com.')) { bad = bad || site; }
-                if (!err('f-size', $('f-size'), filled('f-size') ? '' : 'Please choose your company size.')) { bad = bad || $('f-size'); }
-                if (!err('f-budget', $('f-budget'), filled('f-budget') ? '' : 'Please choose a budget range. It helps us recommend the right channels.')) { bad = bad || $('f-budget'); }
-                if (!err('f-when', $('f-when'), filled('f-when') ? '' : 'Please choose a timeline.')) { bad = bad || $('f-when'); }
-                return bad;
-            },
-            function () {
-                var bad = null;
-                if (!err('f-name', $('f-name'), filled('f-name') ? '' : 'Please tell us who we are writing to.')) { bad = bad || $('f-name'); }
-                var email = $('f-email'), v = email.value.trim().toLowerCase(), msg = '';
-                if (!v) { msg = 'We need your work email to send the plan.'; }
-                else if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)) { msg = 'That does not look like a complete email address.'; }
-                else if (FREE.indexOf(v.split('@')[1]) > -1) { msg = 'Please use your company email, so we can research your business before we reply. No company email? Write to ' + (form.getAttribute('data-inbox') || 'connect@vturnu.com') + '.'; }
-                if (!err('f-email', email, msg)) { bad = bad || email; }
-                return bad;
-            }
-        ];
-
-        function show(i, focus) {
-            idx = i;
-            steps.forEach(function (s, k) { s.classList.toggle('is-current', k === i); });
-            if (bar) { bar.style.width = ((i + 1) / steps.length * 100).toFixed(2) + '%'; }
-            if (stepN) { stepN.textContent = String(i + 1); }
-            backBtn.hidden = i === 0;
-            nextBtn.hidden = i === steps.length - 1;
-            submitBtn.hidden = i !== steps.length - 1;
-            if (focus) {
-                var first = steps[i].querySelector('input:not([type="hidden"]), select, textarea');
-                if (first) { first.focus({ preventScroll: true }); }
-                var r = form.getBoundingClientRect();
-                if (r.top < 0 || r.top > window.innerHeight * 0.6) {
-                    form.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-                }
-            }
-        }
-
-        function next() {
-            var bad = checks[idx]();
-            if (bad) { bad.focus(); return; }
-            track('lead_form_step', { form_step: idx + 2 });
-            show(idx + 1, true);
-        }
-
-        /* Stepped mode needs all three pieces; otherwise it stays one form. */
-        if (steps.length === 3 && nextBtn && backBtn && submitBtn) {
-            form.classList.add('hp3-stepped');
-            if (meter) { meter.hidden = false; }
-            show(0, false);
-            nextBtn.addEventListener('click', next);
-            backBtn.addEventListener('click', function () { show(Math.max(0, idx - 1), true); });
-        } else {
-            steps.forEach(function (s) { s.classList.add('is-current'); });
-            idx = steps.length - 1;
-        }
-
-        form.addEventListener('input', function (e) {
-            if (!started) { started = true; track('lead_form_start', {}); }
-            if (e.target.getAttribute('aria-invalid') === 'true' || e.target.name === 'services[]') { checks[idx](); }
-        });
-
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            if (form.classList.contains('hp3-stepped') && idx < steps.length - 1) { next(); return; }
-            for (var k = 0; k < checks.length; k++) {
-                var bad = checks[k]();
-                if (bad) {
-                    if (form.classList.contains('hp3-stepped')) { show(k, false); }
-                    bad.focus();
-                    return;
-                }
-            }
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending your request…';
-            var budget = $('f-budget') ? $('f-budget').value : '';
-            var sent = false;
-            function send(token) {
-                if (sent) { return; }
-                sent = true;
-                var field = form.querySelector('.js-recaptcha-token');
-                if (field) { field.value = token || ''; }
-                track('generate_lead', { form_id: 'b2b-qualifier', lead_budget: budget });
-                form.submit();
-            }
-            setTimeout(function () { send(''); }, 4500);
-            if (window.vtRecaptcha) { window.vtRecaptcha('submit', send); } else { send(''); }
-        });
     })();
 
     /* ------------------------------------------------------ CTA routing */

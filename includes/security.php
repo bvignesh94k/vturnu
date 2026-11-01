@@ -84,10 +84,11 @@ function security_client_ip(): string
  * file write: a persistence hiccup must never be the thing that blocks a
  * real customer's enquiry.
  */
-function security_rate_ok(string $bucket, int $max, int $windowSeconds): bool
+function security_rate_ok(string $bucket, int $max, int $windowSeconds, ?string $subject = null): bool
 {
     $safeBucket = preg_replace('/[^a-z0-9_-]/', '', strtolower($bucket));
-    $key = hash('sha256', security_client_ip());
+    /* Counted per visitor IP unless the caller names something else to count, such as an email address. */
+    $key = hash('sha256', $subject ?? security_client_ip());
     $now = time();
     try {
         $pdo = db();
@@ -112,6 +113,36 @@ function security_rate_ok(string $bucket, int $max, int $windowSeconds): bool
     }
 }
 
+/**
+ * A form token can be used once. Peek asks whether it already was, burn records
+ * that it has. Burning only after a lead is saved lets a visitor fix a mistake
+ * and resend with the same token, while a script replaying one scraped token
+ * for hundreds of posts stops at the first. Fails open on a database error.
+ */
+function security_token_used(string $token): bool
+{
+    try {
+        $stmt = db()->prepare('SELECT 1 FROM rate_limits WHERE bucket = ? AND key_hash = ?');
+        $stmt->execute(['once', hash('sha256', $token)]);
+        return (bool) $stmt->fetchColumn();
+    } catch (Throwable $e) {
+        error_log('security_token_used: ' . $e->getMessage());
+        return false;
+    }
+}
+
+function security_token_burn(string $token): void
+{
+    try {
+        db()->prepare(
+            'INSERT INTO rate_limits (bucket, key_hash, hits, updated_at) VALUES (?, ?, ?::jsonb, now())
+             ON CONFLICT (bucket, key_hash) DO NOTHING'
+        )->execute(['once', hash('sha256', $token), json_encode([time()])]);
+    } catch (Throwable $e) {
+        error_log('security_token_burn: ' . $e->getMessage());
+    }
+}
+
 /* ------------------------------------------------------------------ */
 /* Bot heuristics                                                      */
 /* ------------------------------------------------------------------ */
@@ -130,7 +161,9 @@ function security_ua_is_bot(): bool
     }
     $blocked = '/curl|wget|python-requests|python-urllib|scrapy|go-http-client|'
         . 'libwww-perl|httpclient|okhttp|axios\/|node-fetch|phantomjs|'
-        . 'headlesschrome|selenium|puppeteer|playwright|bot|spider|crawl|scan/i';
+        . 'headlesschrome|selenium|puppeteer|playwright|bot|spider|crawl|scan|'
+        . 'chatgpt|openai|oai-|gpt|claude|anthropic|perplexity|gemini-|google-extended|cohere|mistral|bytespider|'
+        . 'diffbot|firecrawl|apify|browserbase|browser-use|crawlee|httpx|aiohttp|java\/|jakarta|restsharp|postman|insomnia/i';
     return (bool) preg_match($blocked, $ua);
 }
 
@@ -253,8 +286,8 @@ function security_check_submission(array $post): array
         return ['ok' => false, 'error' => 'Your session expired. Please refresh the page and try again.'];
     }
 
-    if (csrf_age($token) < 2) {
-        // Filled and submitted in under 2 seconds: no human does that.
+    if (csrf_age($token) < 4) {
+        // Seven fields filled and sent in under 4 seconds: no human does that.
         return ['ok' => false, 'error' => 'Please try again.'];
     }
 

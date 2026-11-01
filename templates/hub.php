@@ -48,6 +48,7 @@ if ($slug === 'web-services') {
 if ($cat !== '') {
     render_money_proof($cat);
 }
+render_cta_band('Not sure which service fits?', 'Tell us your goal and we will recommend the right mix. Projects start from ' . min_budget() . '.', $offer_btn);
 render_money_plan($cat !== '' ? $cat : 'enterprise');
 render_money_fit($m['fit']);
 render_faqs(page_faqs($page, $slug), 'Questions buyers ask');
