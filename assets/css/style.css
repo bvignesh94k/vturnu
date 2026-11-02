@@ -935,7 +935,7 @@ a.card:hover, .card:hover {
             animation-timeline: view();
             animation-range: entry 0% entry 55%;
         }
-        @keyframes sectionRise { from { opacity: .35; transform: translateY(20px); } }
+        @keyframes sectionRise { from { transform: translateY(20px); } }
     }
 }
 
