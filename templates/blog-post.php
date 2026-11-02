@@ -19,6 +19,21 @@ foreach (($post['sections'] ?? []) as $sec) {
     $post_words += str_word_count(implode(' ', $sec[1] ?? [])) + str_word_count(implode(' ', $sec[2] ?? []));
 }
 
+/* A long-form post brings its own markup from includes/data/posts/. */
+$rich = !empty($post['rich']) ? require BASE_PATH . '/includes/data/posts/' . basename((string) $post['rich']) . '.php' : null;
+$rich_body = $rich_closing = '';
+if ($rich) {
+    ob_start();
+    $rich['body']();
+    $rich_body = (string) ob_get_clean();
+    ob_start();
+    $rich['closing']();
+    $rich_closing = (string) ob_get_clean();
+    $post_words = str_word_count(strip_tags($rich_body . ' ' . $rich_closing));
+    /* Hyphenated words in headings stay on one line. */
+    $rich_body = preg_replace_callback('~(<h2[^>]*>)(.*?)(</h2>)~', static fn ($m) => $m[1] . preg_replace('/[^ ]+-[^ ]+/', '<span class="nb">$0</span>', $m[2]) . $m[3], $rich_body);
+}
+
 echo jsonld_script([
     '@context' => 'https://schema.org',
     '@type' => 'BlogPosting',
@@ -63,6 +78,19 @@ render_hero([
 ]);
 ?>
 
+<?php if ($rich): ?>
+<section class="section post-body-wrap">
+    <div class="container narrow">
+        <div class="post-body post-rich"><?= $rich_body ?></div>
+    </div>
+</section>
+<?php render_faqs($post['faqs'] ?? [], 'Frequently Asked Questions'); ?>
+<section class="section post-body-wrap post-closing">
+    <div class="container narrow">
+        <div class="post-body post-rich"><?= $rich_closing ?></div>
+    </div>
+</section>
+<?php else: ?>
 <section class="section post-body-wrap">
     <div class="container narrow">
         <!-- AEO answer box: the quotable summary -->
@@ -148,6 +176,7 @@ render_hero([
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <section class="section">
     <div class="container">

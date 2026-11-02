@@ -191,6 +191,21 @@ const ART = {
         let s = `<g filter="url(#sh)"><circle cx="196" cy="180" r="116" fill="#00b8d9" opacity=".9"/><circle cx="302" cy="180" r="116" fill="#ff3d8a" opacity=".82"/><circle cx="248" cy="282" r="116" fill="#ff9100" opacity=".82"/></g>`;
         return s + sparkle(420, 80, 28, 'url(#gV)') + sparkle(60, 340, 20);
     },
+    aidata() {
+        /* A data stack and an AI chip feeding one growth line. */
+        let s = `<path d="M122 300C122 196 200 170 244 150M362 268C362 190 288 170 252 150" fill="none" stroke="#b8b4ee" stroke-width="5" stroke-dasharray="9 9"/>`;
+        s += '<g filter="url(#sh)">';
+        [0, 1, 2].forEach((i) => {
+            const y = 356 - i * 46;
+            s += `<path d="M42 ${y}v34a80 26 0 0 0 160 0v-34z" fill="${PAL[i % 2 ? 1 : 0][2]}"/><ellipse cx="122" cy="${y}" rx="80" ry="26" fill="${PAL[i % 2 ? 1 : 0][i === 2 ? 0 : 1]}"/>`;
+        });
+        s += '</g>';
+        s += `<g filter="url(#sh)"><rect x="288" y="252" width="150" height="150" rx="30" fill="url(#gU)"/><text x="363" y="345" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="62" fill="#fff">AI</text></g>`;
+        [278, 327, 376].forEach((y) => { s += `<path d="M276 ${y}h12M438 ${y}h12` + `" stroke="#ff7a3d" stroke-width="7" stroke-linecap="round"/>`; });
+        [314, 363, 412].forEach((x) => { s += `<path d="M${x} 240v12M${x} 402v12" stroke="#ff7a3d" stroke-width="7" stroke-linecap="round"/>`; });
+        s += `<g filter="url(#sh)"><circle cx="248" cy="104" r="74" fill="url(#gB)"/><path d="M206 134l32-34 20 18 36-40" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M270 76h26v26" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+        return s + sparkle(420, 90, 22) + sparkle(70, 150, 18, 'url(#gV)');
+    },
     social() {
         let s = panel(120, 40, 240, 400, 34);
         s += `<rect x="142" y="86" width="196" height="150" rx="16" fill="url(#gB)"/>` + bar(142, 254, 170) + bar(142, 278, 130);
@@ -202,7 +217,7 @@ const ART = {
 
 /* Concept per blog post, chosen for what the article is about. */
 const BLOG_ART = {
-    'how-to-stop-junk-leads-on-your-website': 'filter', 'seo-vs-aeo-vs-geo-explained-for-business-leaders': 'compare', 'how-to-measure-ai-search-visibility': 'dashboard',
+    'ai-first-vs-data-first-marketing': 'aidata', 'how-to-stop-junk-leads-on-your-website': 'filter', 'seo-vs-aeo-vs-geo-explained-for-business-leaders': 'compare', 'how-to-measure-ai-search-visibility': 'dashboard',
     'what-is-sap-cpq-and-when-do-you-need-it': 'quote', 'odoo-vs-erpnext-which-erp-fits-your-business': 'modules', 'salesforce-implementation-checklist-for-growing-teams': 'orbit',
     'it-staffing-models-contract-vs-direct-hire': 'people', 'account-based-marketing-for-mid-market-companies': 'target', 'marketing-attribution-for-long-sales-cycles': 'dashboard',
     'linkedin-ads-vs-google-ads-for-lead-generation': 'compare', 'affordable-seo-service-providers': 'price', 'what-is-answer-engine-optimization': 'answer',
@@ -252,12 +267,13 @@ radial-gradient(ellipse 520px 360px at 0% 100%,rgba(255,145,0,.11),transparent 6
 .mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding:14px 0}
 .kick{align-self:flex-start;padding:8px 18px;border-radius:999px;color:#fff;font-weight:700;font-size:17px;letter-spacing:.02em;background:linear-gradient(100deg,#00b8d9,#4338ca 45%,#ff3d8a 78%,#ff9100);margin-bottom:20px}
 h1{font-size:${size}px;line-height:1.14;font-weight:800;letter-spacing:-.022em;text-wrap:balance}
+.nb{white-space:nowrap}
 .foot{font-weight:700;font-size:20px;color:#3b3560}
 .art{position:absolute;right:26px;top:66px;width:480px;height:500px}
 .strip{position:absolute;left:0;right:0;bottom:0;height:12px;background:linear-gradient(90deg,#00b8d9,#4338ca 42%,#ff3d8a 72%,#ff9100)}
 </style></head><body>
 <div class="left"><div class="lock">${MARK}<div><div class="word"><span class="v">V</span>Turn<span class="u">U</span></div><div class="tag">TOGETHER WE TURN HEADS</div></div></div>
-<div class="mid"><div class="kick">${esc(kicker)}</div><h1>${esc(title)}</h1></div><div class="foot">vturnu.com</div></div>
+<div class="mid"><div class="kick">${esc(kicker)}</div><h1>${esc(title).replace(/[^ ]+-[^ ]+/g, (w) => `<span class="nb">${w}</span>`)}</h1></div><div class="foot">vturnu.com</div></div>
 <svg class="art" viewBox="0 0 480 500" xmlns="http://www.w3.org/2000/svg">${DEFS}${ART[concept(p)]()}</svg>
 <div class="strip"></div></body></html>`;
 }

@@ -7,6 +7,26 @@
 
 return [
 
+'ai-first-vs-data-first-marketing' => [
+    'rich'  => 'ai-first-vs-data-first-marketing',
+    'title' => 'AI-First vs Data-First Marketing: What Drives B2B Growth?',
+    'meta'  => 'AI-first or data-first marketing? See how each affects B2B pipeline, what breaks without reliable data, and a 90-day plan to connect both to revenue.',
+    'h1'    => 'AI-First vs. Data-First Marketing: What Drives B2B Growth?',
+    'lede'  => 'AI-first marketing makes AI the default way work gets done. Data-first marketing makes reliable evidence the default way decisions get made. For B2B growth they are a sequence, not a choice: fix the data behind one revenue decision, apply AI to that decision, keep people accountable for the output, and measure the result in qualified pipeline.',
+    'category' => 'Strategy', 'intent' => 'Comparison', 'date' => '2026-11-02', 'read' => '13 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['Is AI-first marketing the same as marketing automation?', 'No. Marketing automation follows rules your team writes, such as sending an email when a form is filled in. AI-first marketing uses models that draft, predict or recommend inside a workflow designed around them. Many teams run both, with automation moving the work and AI improving what moves.'],
+        ['How much data do you need before using AI in marketing?', 'It depends on the use case. Research and drafting need very little of your own data. Predictive lead scoring needs a meaningful history of closed deals, including lost ones, because the model learns from outcomes. Check the minimum your vendor requires, then test it on your own records before you trust it.'],
+        ['Can a small B2B team do this without a data warehouse?', 'Yes. A well-kept CRM, consistent lifecycle stages and reliable source tracking cover most early needs. A data warehouse becomes useful once several systems need to be combined for reporting.'],
+        ['Who should own AI governance in a marketing team?', 'A named marketing leader should be accountable, with input from revenue operations, IT and legal. Keep the rules short: which tools are approved, what data can enter them and who reviews what before it goes live.'],
+        ['Will AI-written content hurt our search rankings?', 'Not because AI was used. Google\'s guidance focuses on whether content is helpful, and warns against generating many pages without adding value. Content still needs real expertise, accurate facts and a human editor.'],
+        ['How long does it take to see a return from AI in marketing?', 'Time savings can appear within weeks. Pipeline and revenue effects take at least one full sales cycle, so set expectations by sales cycle and not by the date a tool went live.'],
+    ],
+    'cta' => ['Ready to Build a Smarter B2B Growth Strategy?', 'Tell VTurnU about your goals and challenges.', 'Get My Custom Growth Plan'],
+],
+
 'how-to-stop-junk-leads-on-your-website' => [
     'title' => 'How to Stop Junk Leads on Your Website: A B2B Playbook',
     'meta'  => 'Fake enquiries waste sales time. Learn the four types of junk lead, how to spot the brand-impersonation scam, and how to filter leads without losing real ones.',

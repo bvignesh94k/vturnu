@@ -364,6 +364,14 @@
         });
     });
 
+    // Article CTAs report which offer was clicked. Tag Manager picks this up as cta_click.
+    document.addEventListener('click', function (e) {
+        var cta = e.target.closest && e.target.closest('[data-cta]');
+        if (cta) {
+            (window.dataLayer = window.dataLayer || []).push({ event: 'cta_click', cta_id: cta.getAttribute('data-cta'), page_path: location.pathname });
+        }
+    });
+
     // Pointer tilt on cards: a little physical depth, desktop only.
     if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         document.querySelectorAll('.card, .tilt, .client-card').forEach(function (card) {

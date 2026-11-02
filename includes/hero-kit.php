@@ -25,7 +25,7 @@ function render_hero(array $h): void
     <div class="container hx-grid">
         <div class="hx-copy">
             <?php if (!empty($h['k'])): ?><p class="hx-k"><?= e($h['k']) ?></p><?php endif; ?>
-            <h1><?= e($h['h1']) ?></h1>
+            <h1><?= preg_replace('/[^ ]+-[^ ]+/', '<span class="nb">$0</span>', e($h['h1'])) ?></h1>
             <?php if (!empty($h['lede'])): ?><p class="lede"><?= e($h['lede']) ?></p><?php endif; ?>
             <?php if (!empty($h['cta']) || !empty($h['alt'])): ?>
             <div class="hx-actions">
