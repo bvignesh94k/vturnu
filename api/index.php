@@ -24,6 +24,7 @@ require dirname(__DIR__) . '/includes/helpers.php';
 require dirname(__DIR__) . '/includes/security.php';
 require dirname(__DIR__) . '/includes/currency.php';
 require dirname(__DIR__) . '/includes/lead-guard.php';
+require dirname(__DIR__) . '/includes/crm.php';
 require dirname(__DIR__) . '/includes/page-kit.php';
 require dirname(__DIR__) . '/includes/lead-form.php';
 require dirname(__DIR__) . '/includes/hero-kit.php';
@@ -212,6 +213,11 @@ if ($slug === 'llms.txt') {
 /* Admin panel + CRM */
 if ($slug === 'admin' || str_starts_with($slug, 'admin/')) {
     require dirname(__DIR__) . '/includes/admin.php';
+    exit;
+}
+
+/* CRM: private web proposals, email open pixels and the morning digest. */
+if (crm_route($slug)) {
     exit;
 }
 

@@ -157,7 +157,8 @@ function admin_load_leads(bool $junk = false): array {
         $rows = db()->query(
             "SELECT id, created_at, source, name, email, mobile, company, designation, service, budget,
                     message, status, notes, value, priority, owner,
-                    to_char(followup, 'YYYY-MM-DD') AS followup, tags, activity
+                    to_char(followup, 'YYYY-MM-DD') AS followup, tags, activity,
+                    channel, channel_group, attribution, form_page, country, grade, score, contacted_at
              FROM enquiries WHERE deleted_at IS NULL AND status " . ($junk ? "= 'junk'" : "<> 'junk'") . "
              ORDER BY created_at DESC"
         )->fetchAll();
@@ -171,6 +172,10 @@ function admin_load_leads(bool $junk = false): array {
         $l['notes'] = json_decode($l['notes'] ?? '[]', true) ?: [];
         $l['activity'] = json_decode($l['activity'] ?? '[]', true) ?: [];
         $l['followup'] = $l['followup'] ?? '';
+        $l['attribution'] = json_decode($l['attribution'] ?? '{}', true) ?: [];
+        $l['channel'] = (string) ($l['channel'] ?? '') ?: 'Not tracked';
+        $l['channel_group'] = (string) ($l['channel_group'] ?? '') ?: 'Not tracked';
+        $l['grade'] = (string) ($l['grade'] ?? '');
     }
     return $rows;
 }
@@ -332,8 +337,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($prev !== $st) {
                         admin_log_activity($lid, 'Status: ' . ucfirst($prev) . ' to ' . ucfirst($st));
                     }
+                    /* Leaving "new" is the first reply, which the response-time figures count from. */
+                    if ($prev === 'new' && $st !== 'new' && ctype_digit($lid)) {
+                        db()->prepare('UPDATE enquiries SET contacted_at = coalesce(contacted_at, now()) WHERE id = ?')->execute([(int) $lid]);
+                    }
                     $flash = 'Status updated.';
                 }
+                break;
+
+            /* A proposal or follow-up written in the composer, sent from connect@vturnu.com. */
+            case 'proposal_send':
+                $lid = (string) ($_POST['id'] ?? '');
+                $target = ctype_digit($lid) ? crm_lead((int) $lid) : null;
+                $kind = ($_POST['kind'] ?? '') === 'followup' ? 'followup' : 'proposal';
+                if (!$target) {
+                    $flash = 'Lead not found.';
+                    break;
+                }
+                $parent = null;
+                foreach (crm_proposals((int) $lid) as $pp) {
+                    if ($pp['kind'] === 'proposal') { $parent = $pp; break; }
+                }
+                $sent = crm_send($target, $kind, (string) ($_POST['subject'] ?? ''), (string) ($_POST['body'] ?? ''), [
+                    'stage' => $kind === 'proposal' && !empty($_POST['stage']),
+                    'remind_days' => !empty($_POST['remind']) ? max(1, min(30, (int) ($_POST['remind_days'] ?? 3))) : 0,
+                    'copy' => !empty($_POST['copy']),
+                    'by' => $auth['user'],
+                    'link_token' => $kind === 'followup' ? (string) ($parent['token'] ?? '') : '',
+                    'parent_id' => $kind === 'followup' && $parent ? (int) $parent['id'] : 0,
+                ]);
+                if ($sent['ok'] && $sent['error'] === '') {
+                    header('Location: /admin/?view=lead&id=' . $lid . '&sent=' . $kind); exit;
+                }
+                $flash = $sent['ok'] ? $sent['error'] : 'Not sent: ' . $sent['error'];
+                if (!$sent['ok']) { $composer_post = $_POST; }
+                break;
+
+            case 'crm_settings':
+                crm_save_settings($_POST);
+                $flash = 'CRM settings saved.';
+                break;
+
+            case 'digest_now':
+                $d = crm_daily_digest(true);
+                $flash = $d['sent'] ? 'Digest sent to ' . ENQUIRY_TO . '.' : 'The digest could not be sent. Check that email is set up.';
                 break;
 
             case 'lead_update':
@@ -495,14 +542,19 @@ if ($logged_in && $view === 'export') {
     header('Content-Disposition: attachment; filename="vturnu-' . $segName . '-' . date('Y-m-d') . '.csv"');
     $out = fopen('php://output', 'w');
     fputcsv($out, ['Date', 'Status', 'Priority', 'Owner', 'Deal value', 'Next follow-up', 'Tags',
-                   'Source', 'Name', 'Email', 'Phone', 'Company', 'Service', 'Budget', 'Message', 'Notes']);
+                   'Form', 'Channel', 'Channel group', 'Campaign or referrer', 'First landing page', 'Form page', 'Country', 'Grade', 'Proposal',
+                   'Name', 'Email', 'Phone', 'Company', 'Service', 'Budget', 'Message', 'Notes']);
     $rows = admin_load_leads();
+    $pidx = crm_proposal_index();
     if ($segName !== 'all') { $rows = leads_in($rows, $segName); }
     foreach ($rows as $l) {
         $notes = implode(' | ', array_map(fn($n) => ($n['date'] ?? '') . ' ' . ($n['text'] ?? ''), $l['notes'] ?? []));
+        $a = $l['attribution'];
         fputcsv($out, [
             $l['date'] ?? '', $l['status'], $l['priority'], $l['owner'], $l['value'], $l['followup'], $l['tags'],
-            $l['source'] ?? '', $l['name'] ?? '', $l['email'] ?? '', $l['mobile'] ?? '', $l['company'] ?? '',
+            $l['source'] ?? '', $l['channel'], $l['channel_group'], (string) ($a['detail'] ?? ''), (string) ($a['first']['landing'] ?? ''),
+            $l['form_page'] ?? '', $l['country'] ?? '', $l['grade'], crm_proposal_state($pidx[$l['id']] ?? null),
+            $l['name'] ?? '', $l['email'] ?? '', $l['mobile'] ?? '', $l['company'] ?? '',
             $l['service'] ?? '', $l['budget'] ?? '', $l['message'] ?? '', $notes,
         ]);
     }
@@ -512,6 +564,8 @@ if ($logged_in && $view === 'export') {
 /* Data for views */
 $leads = $logged_in ? admin_load_leads() : [];
 $junk_leads = $logged_in ? admin_load_leads(true) : [];
+/* The latest proposal for each lead, so lists and the dashboard can show where it stands. */
+$proposal_index = $logged_in ? crm_proposal_index() : [];
 $custom_posts = admin_get_overrides('blog');
 $custom_cases = admin_get_overrides('case');
 $custom_resources = admin_get_overrides('resource');
@@ -533,6 +587,40 @@ function priority_badge(string $p): string {
     $c = ['high' => '#FF3D8A', 'normal' => '#5B56C9', 'low' => '#9A93BC'][$p] ?? '#9A93BC';
     return '<span class="badge-st" style="--st:' . $c . '">' . e_a(ucfirst($p)) . '</span>';
 }
+/* Channel groups in the order the dashboard lists them, each with its colour. */
+const CRM_GROUP_COLORS = [
+    'Paid ads' => '#FF3D8A', 'Organic search' => '#12A150', 'AI assistants' => '#4338CA', 'Social' => '#00B8D9', 'Referral' => '#FF9100',
+    'Email' => '#5B56C9', 'Campaigns' => '#B0388A', 'Direct' => '#6F6992', 'Unknown' => '#9A93BC', 'Not tracked' => '#B9B4D0',
+];
+/** Where a lead came from, as a coloured chip; the campaign or referrer goes in the tooltip. */
+function channel_badge(array $l): string {
+    $c = CRM_GROUP_COLORS[$l['channel_group'] ?? ''] ?? '#9A93BC';
+    $tip = trim((string) ($l['attribution']['detail'] ?? ''));
+    return '<span class="badge-st src" style="--st:' . $c . '"' . ($tip !== '' ? ' title="' . e_a($tip) . '"' : '') . '>' . e_a($l['channel'] ?? 'Not tracked') . '</span>';
+}
+function grade_badge(string $g): string {
+    if ($g === '') return '<span style="color:var(--muted)">-</span>';
+    $c = ['A' => '#12A150', 'B' => '#FF9100', 'C' => '#9A93BC'][$g] ?? '#9A93BC';
+    return '<span class="badge-st grade" style="--st:' . $c . '" title="Lead grade from budget, size, timeline, website and email">' . e_a($g) . '</span>';
+}
+/** Where the latest proposal stands: Sent, Opened, Read or Said yes. */
+function proposal_badge(?array $p): string {
+    $state = crm_proposal_state($p);
+    if ($state === 'none') return '<span style="color:var(--muted)">Not sent</span>';
+    [$label, $c] = ['sent' => ['Sent', '#5B56C9'], 'opened' => ['Opened', '#00B8D9'], 'viewed' => ['Read', '#FF9100'], 'accepted' => ['Said yes', '#12A150']][$state];
+    $tip = 'Sent ' . date('j M', strtotime((string) $p['sent_at'])) . ((int) ($p['sent_count'] ?? 1) > 1 ? ', ' . (int) $p['sent_count'] . ' emails in all' : '');
+    return '<span class="badge-st" style="--st:' . $c . '" title="' . e_a($tip) . '">' . $label . '</span>';
+}
+/** How long a new lead has waited for a first reply. */
+function waiting_for(array $l): string {
+    $h = (int) floor((time() - strtotime((string) ($l['date'] ?? 'now'))) / 3600);
+    return $h < 1 ? 'under an hour' : ($h < 48 ? $h . 'h' : (int) floor($h / 24) . ' days');
+}
+/** The visitor's phone as digits for wa.me and tel: links. */
+function phone_digits(string $mobile): string {
+    return (string) preg_replace('/\D/', '', $mobile);
+}
+
 /** Indian-format money, e.g. 250000 -> 2,50,000. */
 function money_fmt($v): string {
     $n = (int) preg_replace('/[^0-9]/', '', (string) $v);
@@ -652,7 +740,46 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
 .board-meta i.due { color:#fff; background:#D62C74; border-color:#D62C74; }
 .board-empty { color:var(--muted); font-size:.74rem; text-align:center; padding:10px 0; }
 
+/* ---------- Leads dashboard, sources and proposals ---------- */
+.badge-st.src { font-weight:700; }
+.badge-st.grade { min-width:24px; text-align:center; }
+.kpi small { display:block; font-size:.72rem; color:var(--muted); margin-top:2px; }
+.kpi.hot { border-color:rgba(255,61,138,.45); background:linear-gradient(180deg,#FFF5F9,#fff); }
+.kpi.hot b { color:#D62C74; }
+.attn td { vertical-align:middle; }
+.attn .why { font-size:.72rem; font-weight:800; white-space:nowrap; }
+.split { display:grid; grid-template-columns:1.25fr 1fr; gap:16px; align-items:start; }
+.split > .panel { margin:0; }
+.group-row td { padding:7px 10px; }
+.group-row .chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.group-row .chips span { font-size:.68rem; color:var(--soft); background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:1px 8px; }
+.days { display:grid; grid-template-columns:repeat(14,1fr); gap:6px; align-items:end; height:120px; padding-top:8px; }
+.days div { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:4px; }
+.days i { display:block; width:100%; min-height:3px; border-radius:6px 6px 2px 2px; background:var(--grad-v); }
+.days small { font-size:.6rem; color:var(--muted); }
+.days b { font-size:.66rem; }
+.kv td:first-child { width:150px; color:var(--muted); }
+.lead-actions { display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 18px; }
+.lead-actions .btn { text-decoration:none; }
+.btn.wa { background:#E7F8EE; color:#11733E; }
+.quote { border-left:3px solid var(--p); background:#FFF7FA; padding:9px 12px; border-radius:0 8px 8px 0; font-size:.88rem; margin:6px 0 10px; }
+.prop-list { list-style:none; display:grid; gap:9px; }
+.prop-list li { border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:#FBFAF6; }
+.prop-list strong { display:block; font-size:.86rem; }
+.prop-list .meta { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:6px; font-size:.72rem; color:var(--muted); }
+.composer { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start; }
+.composer textarea.body { min-height:560px; font-family:Consolas,'Cascadia Mono',monospace; font-size:.82rem; line-height:1.55; }
+.composer .opts { display:grid; gap:8px; margin:12px 0; }
+.composer .opts input[type=number] { width:70px; padding:4px 8px; }
+.mail-preview { background:#fff; border:1px solid var(--line); border-radius:12px; padding:22px 24px; max-height:820px; overflow:auto; }
+.mail-preview .mp-head { font-size:.76rem; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:14px; }
+.mail-preview .mp-head b { color:var(--ink); }
+.detected li { list-style:none; font-size:.82rem; padding:4px 0; border-bottom:1px dashed var(--line); }
+.detected li b { color:var(--soft); font-weight:700; margin-right:6px; }
+.dash-warn { display:none; color:#C22349; font-size:.76rem; font-weight:700; margin-top:6px; }
+
 @media (max-width:1100px){ .board{grid-template-columns:repeat(3,minmax(180px,1fr))} }
+@media (max-width:1100px){ .composer,.split{grid-template-columns:1fr} }
 @media (max-width:860px){ .layout{grid-template-columns:1fr} .side{flex-direction:row;flex-wrap:wrap;align-items:center} .side .spacer{display:none} .cards{grid-template-columns:1fr 1fr} .grid2,.grid3{grid-template-columns:1fr} .board{grid-template-columns:1fr} }
 </style>
 </head>
@@ -708,7 +835,11 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
     <?php if ($view === 'dashboard'):
         $week_ago = date('c', strtotime('-7 days'));
         $month_ago = date('c', strtotime('-30 days'));
-        $this_week = count(array_filter($leads, fn($l) => ($l['date'] ?? '') >= $week_ago));
+        $day_ago = date('c', strtotime('-24 hours'));
+        $today_start = date('c', strtotime('today'));
+        $sales = leads_in($leads, 'lead');
+        $this_week = count(array_filter($sales, fn($l) => ($l['date'] ?? '') >= $week_ago));
+        $today_n = count(array_filter($sales, fn($l) => ($l['date'] ?? '') >= $today_start));
         $this_month = count(array_filter($leads, fn($l) => ($l['date'] ?? '') >= $month_ago));
         $by_status = array_fill_keys(ADMIN_STATUSES, 0);
         $open_value = 0; $won_value = 0;
@@ -722,30 +853,128 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         $win_rate = $closed > 0 ? round($by_status['won'] / $closed * 100) : 0;
         $today = date('Y-m-d');
         $due = array_filter($leads, fn($l) => $l['followup'] !== '' && $l['followup'] <= $today && !in_array($l['status'], ADMIN_CLOSED, true));
-        $unworked = array_filter($leads, fn($l) => $l['status'] === 'new');
-        // Source mix, so you can see which form actually produces pipeline.
-        $by_source = [];
-        foreach ($leads as $l) { $s = $l['source'] ?: 'unknown'; $by_source[$s] = ($by_source[$s] ?? 0) + 1; }
-        arsort($by_source);
+        /* Sales leads still waiting for a first reply, oldest first: speed to lead wins deals. */
+        $unworked = array_values(array_filter($sales, fn($l) => $l['status'] === 'new'));
+        usort($unworked, fn($a, $b) => strcmp($a['date'], $b['date']));
+        $late = array_filter($unworked, fn($l) => ($l['date'] ?? '') < $day_ago);
+        /* Proposals in the last 30 days, and how far each got. */
+        $recent_p = array_filter($proposal_index, fn($p) => strtotime((string) $p['sent_at']) >= strtotime('-30 days'));
+        $p_opened = count(array_filter($recent_p, fn($p) => crm_proposal_state($p) !== 'sent'));
+        $p_read = count(array_filter($recent_p, fn($p) => in_array(crm_proposal_state($p), ['viewed', 'accepted'], true)));
+        $p_yes = count(array_filter($recent_p, fn($p) => crm_proposal_state($p) === 'accepted'));
+        /* One list of what needs a person, most urgent first: a yes, a proposal being read,
+           a lead waiting too long, a lead just in, then follow-ups that are due. */
+        $byId = array_column($leads, null, 'id');
+        $attn = [];
+        foreach ($proposal_index as $plid => $p) {
+            $l = $byId[(string) $plid] ?? null;
+            if (!$l || in_array($l['status'], ADMIN_CLOSED, true)) continue;
+            $st = crm_proposal_state($p);
+            if ($st === 'accepted') { $attn[] = [0, $l, 'Said yes to the proposal', '#12A150', 'call']; }
+            elseif ($st === 'viewed' && strtotime((string) ($p['any_viewed'] ?? '')) >= strtotime('-7 days')) { $attn[] = [1, $l, 'Read the proposal', '#FF9100', 'followup']; }
+        }
+        foreach ($unworked as $l) {
+            $old = ($l['date'] ?? '') < $day_ago;
+            $attn[] = [$old ? 2 : 3, $l, 'Waiting ' . waiting_for($l), $old ? '#D62C74' : '#5B56C9', 'proposal'];
+        }
+        foreach ($due as $l) { $attn[] = [4, $l, 'Follow-up due ' . date('j M', strtotime($l['followup'])), '#4338CA', isset($proposal_index[$l['id']]) ? 'followup' : 'proposal']; }
+        usort($attn, fn($a, $b) => $a[0] <=> $b[0]);
+        $listed = [];
+        $attn = array_values(array_filter($attn, function ($a) use (&$listed) {
+            if (isset($listed[$a[1]['id']])) return false;
+            return $listed[$a[1]['id']] = true;
+        }));
+        /* Where sales leads come from: channel groups, with the channels inside each. */
+        $groups = [];
+        foreach ($sales as $l) {
+            $g = $l['channel_group'];
+            $groups[$g]['n'] = ($groups[$g]['n'] ?? 0) + 1;
+            $groups[$g]['a'] = ($groups[$g]['a'] ?? 0) + ($l['grade'] === 'A' ? 1 : 0);
+            $groups[$g]['ch'][$l['channel']] = ($groups[$g]['ch'][$l['channel']] ?? 0) + 1;
+        }
+        uasort($groups, fn($a, $b) => $b['n'] <=> $a['n']);
+        $max_g = max(1, ...array_values(array_map(fn($d) => $d['n'], $groups ?: [['n' => 1]])));
+        $by_service = [];
+        foreach ($sales as $l) {
+            $s = trim((string) preg_replace('/,.*$/', '', (string) $l['service'])) ?: 'Not chosen';
+            $by_service[$s] = ($by_service[$s] ?? 0) + 1;
+        }
+        arsort($by_service);
+        $days = [];
+        for ($i = 13; $i >= 0; $i--) { $days[date('Y-m-d', strtotime("-$i days"))] = 0; }
+        foreach ($sales as $l) { $d = date('Y-m-d', strtotime($l['date'])); if (isset($days[$d])) { $days[$d]++; } }
+        $max_d = max(1, ...array_values($days));
+        /* Typical time to a first reply over the last 90 days. */
+        $resp = [];
+        foreach ($sales as $l) {
+            if (!empty($l['contacted_at']) && ($l['date'] ?? '') >= date('c', strtotime('-90 days'))) {
+                $resp[] = max(0, strtotime((string) $l['contacted_at']) - strtotime($l['date'])) / 3600;
+            }
+        }
+        sort($resp);
+        $median_resp = $resp ? $resp[intdiv(count($resp), 2)] : null;
     ?>
         <h1>Dashboard</h1>
-        <p class="sub">Pipeline health at a glance.</p>
+        <p class="sub">Leads, proposals and pipeline at a glance.</p>
         <div class="cards">
-            <div class="kpi grad"><b><?= count($leads) ?></b><span>Total leads</span></div>
-            <div class="kpi"><b><?= $this_week ?></b><span>New this week</span></div>
-            <div class="kpi"><b>₹<?= money_fmt($open_value) ?: '0' ?></b><span>Open pipeline value</span></div>
-            <div class="kpi"><b><?= $win_rate ?>%</b><span>Win rate (<?= $by_status['won'] ?>/<?= $closed ?> closed)</span></div>
+            <a class="kpi kpi-link grad" href="/admin/?view=leads"><b><?= $this_week ?></b><span>New leads this week</span><small><?= $today_n ?> today · <?= count($sales) ?> in all</small></a>
+            <a class="kpi kpi-link<?= $late ? ' hot' : '' ?>" href="/admin/?view=leads&status=new"><b><?= count($unworked) ?></b><span>Waiting for a first reply</span><small><?= $unworked ? 'Oldest waiting ' . e_a(waiting_for($unworked[0])) : 'Everyone has had a reply' ?></small></a>
+            <a class="kpi kpi-link" href="/admin/?view=leads&proposal=sent"><b><?= count($recent_p) ?></b><span>Proposals sent, last 30 days</span><small><?= $p_opened ?> opened · <?= $p_read ?> read · <?= $p_yes ?> said yes</small></a>
+            <div class="kpi"><b>₹<?= money_fmt($open_value) ?: '0' ?></b><span>Open pipeline value</span><small>Win rate <?= $win_rate ?>% (<?= $by_status['won'] ?>/<?= $closed ?> closed)<?= $median_resp !== null ? ' · first reply in ' . ($median_resp < 1 ? 'under an hour' : round($median_resp) . 'h') . ', typically' : '' ?></small></div>
         </div>
 
-        <?php if ($due || $unworked): ?>
-        <div class="panel" style="border-color:rgba(255,61,138,.35)">
-            <h2>Needs attention</h2>
-            <div class="actions-row" style="gap:14px">
-                <?php if ($due): ?><a class="btn" href="/admin/?view=leads&due=1"><?= count($due) ?> follow-up<?= count($due) === 1 ? '' : 's' ?> due</a><?php endif; ?>
-                <?php if ($unworked): ?><a class="btn ghost" href="/admin/?view=leads&status=new"><?= count($unworked) ?> new, not yet contacted</a><?php endif; ?>
+        <div class="panel"<?= $attn ? ' style="border-color:rgba(255,61,138,.35)"' : '' ?>>
+            <h2>Needs attention<?= $attn ? ' (' . count($attn) . ')' : '' ?></h2>
+            <?php if ($attn): ?>
+            <table class="attn"><tbody>
+            <?php foreach (array_slice($attn, 0, 10) as [$rank, $l, $why, $color, $next]): ?>
+                <tr>
+                    <td style="width:170px"><span class="why" style="color:<?= $color ?>"><?= e_a($why) ?></span></td>
+                    <td><strong><?= e_a($l['name']) ?></strong><?= $l['company'] !== '' ? '<br><small style="color:var(--muted)">' . e_a(mb_substr((string) $l['company'], 0, 44)) . '</small>' : '' ?></td>
+                    <td><?= e_a(mb_substr((string) $l['service'], 0, 30)) ?></td>
+                    <td><?= channel_badge($l) ?></td>
+                    <td><?= grade_badge($l['grade']) ?></td>
+                    <td style="text-align:right;white-space:nowrap">
+                        <?php if ($next === 'proposal'): ?><a class="btn sm grad" href="/admin/?view=proposal&id=<?= e_a($l['id']) ?>">Send proposal</a>
+                        <?php elseif ($next === 'followup'): ?><a class="btn sm" href="/admin/?view=proposal&kind=followup&id=<?= e_a($l['id']) ?>">Follow up</a>
+                        <?php elseif (phone_digits((string) $l['mobile']) !== ''): ?><a class="btn sm" href="tel:+<?= e_a(phone_digits((string) $l['mobile'])) ?>">Call now</a><?php endif; ?>
+                        <a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody></table>
+            <?php else: ?><p class="note">Nothing is waiting. New leads, proposals being read and follow-ups that fall due appear here.</p><?php endif; ?>
+        </div>
+
+        <div class="split" style="margin-bottom:18px">
+            <div class="panel">
+                <h2>Where leads come from</h2>
+                <table><tbody>
+                <?php foreach ($groups as $g => $d): arsort($d['ch']); ?>
+                    <tr class="group-row">
+                        <td style="width:46%"><strong><?= e_a((string) $g) ?></strong><div class="chips"><?php foreach (array_slice($d['ch'], 0, 4, true) as $ch => $n): ?><span><?= e_a((string) $ch) ?> · <?= $n ?></span><?php endforeach; ?></div></td>
+                        <td><span class="barline"><i style="width:<?= (int) round($d['n'] / $max_g * 100) ?>%;background:<?= CRM_GROUP_COLORS[$g] ?? '#9A93BC' ?>"></i></span></td>
+                        <td style="text-align:right;width:80px"><strong><?= $d['n'] ?></strong><br><small style="color:var(--muted)"><?= $d['a'] ?> grade A</small></td>
+                    </tr>
+                <?php endforeach; if (!$groups): ?><tr><td>No leads yet.</td></tr><?php endif; ?>
+                </tbody></table>
+                <p class="note">Every new enquiry records the search engine, ad, AI assistant, social network or site that brought the visitor. Leads from before tracking started show as Not tracked.</p>
+            </div>
+            <div class="panel">
+                <h2>Last 14 days</h2>
+                <div class="days" role="img" aria-label="Sales leads per day, last 14 days">
+                <?php foreach ($days as $d => $n): ?>
+                    <div title="<?= e_a(date('j M', strtotime($d))) ?>: <?= $n ?> <?= $n === 1 ? 'lead' : 'leads' ?>"><b><?= $n ?: '' ?></b><i style="height:<?= max(3, (int) round($n / $max_d * 86)) ?>px"></i><small><?= e_a(date('j', strtotime($d))) ?></small></div>
+                <?php endforeach; ?>
+                </div>
+                <h2 style="margin-top:18px">What people ask for</h2>
+                <table><tbody>
+                <?php foreach (array_slice($by_service, 0, 6, true) as $s => $n): ?>
+                    <tr><td><?= e_a((string) $s) ?></td><td style="text-align:right;font-weight:800"><?= $n ?></td></tr>
+                <?php endforeach; if (!$by_service): ?><tr><td>No leads yet.</td></tr><?php endif; ?>
+                </tbody></table>
             </div>
         </div>
-        <?php endif; ?>
 
         <?php /* Contacts split by funnel, because each is worked differently. */ ?>
         <div class="cards">
@@ -781,11 +1010,14 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <p class="note">Won revenue booked: <strong>₹<?= money_fmt($won_value) ?: '0' ?></strong> · <?= $this_month ?> leads in last 30 days</p>
             </div>
             <div class="panel" style="margin:0">
-                <h2>Where leads come from</h2>
+                <h2>Which form they used</h2>
+                <?php $by_form = [];
+                foreach ($leads as $l) { $s = CRM_PLACEMENTS[$l['source']] ?? ($l['source'] ?: 'unknown'); $by_form[$s] = ($by_form[$s] ?? 0) + 1; }
+                arsort($by_form); ?>
                 <table><tbody>
-                <?php foreach (array_slice($by_source, 0, 7, true) as $src => $n): ?>
-                    <tr><td><?= e_a($src) ?></td><td style="text-align:right;font-weight:800"><?= $n ?></td></tr>
-                <?php endforeach; if (!$by_source): ?><tr><td>No leads yet.</td></tr><?php endif; ?>
+                <?php foreach (array_slice($by_form, 0, 7, true) as $src => $n): ?>
+                    <tr><td><?= e_a(ucfirst((string) $src)) ?></td><td style="text-align:right;font-weight:800"><?= $n ?></td></tr>
+                <?php endforeach; if (!$by_form): ?><tr><td>No leads yet.</td></tr><?php endif; ?>
                 </tbody></table>
             </div>
         </div>
@@ -793,17 +1025,19 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         <div class="panel">
             <h2>Recent leads</h2>
             <table>
-                <thead><tr><th>Lead</th><th>Service</th><th>Value</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>Lead</th><th>Source</th><th>Service</th><th>Grade</th><th>Proposal</th><th>Status</th><th></th></tr></thead>
                 <tbody>
-                <?php foreach (array_slice($leads, 0, 6) as $l): ?>
+                <?php foreach (array_slice($leads, 0, 8) as $l): ?>
                     <tr>
                         <td><strong><?= e_a($l['name'] ?? '') ?></strong><br><small style="color:var(--muted)"><?= e_a($l['email'] ?? '') ?></small></td>
+                        <td><?= channel_badge($l) ?></td>
                         <td><?= e_a(mb_substr($l['service'] ?? '', 0, 32)) ?></td>
-                        <td><?= $l['value'] !== '' ? '₹' . money_fmt($l['value']) : '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td><?= grade_badge($l['grade']) ?></td>
+                        <td><?= lead_segment($l) === 'lead' ? proposal_badge($proposal_index[$l['id']] ?? null) : '<span style="color:var(--muted)">-</span>' ?></td>
                         <td><?= status_badge($l['status']) ?></td>
                         <td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a></td>
                     </tr>
-                <?php endforeach; if (!$leads): ?><tr><td colspan="5">No leads yet.</td></tr><?php endif; ?>
+                <?php endforeach; if (!$leads): ?><tr><td colspan="7">No leads yet.</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -844,23 +1078,35 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         $f_owner  = trim($_GET['owner'] ?? '');
         $f_due    = !empty($_GET['due']);
         $f_q      = trim($_GET['q'] ?? '');
+        $f_chan   = trim($_GET['channel'] ?? '');
+        $f_grade  = $_GET['grade'] ?? '';
+        $f_prop   = $_GET['proposal'] ?? '';
         $today    = date('Y-m-d');
         $scope    = leads_in($leads, 'lead');
-        $filtered = array_filter($scope, function ($l) use ($f_status, $f_prio, $f_owner, $f_due, $f_q, $today) {
+        $filtered = array_filter($scope, function ($l) use ($f_status, $f_prio, $f_owner, $f_due, $f_q, $f_chan, $f_grade, $f_prop, $today, $proposal_index) {
             if ($f_status !== '' && $l['status'] !== $f_status) return false;
             if ($f_prio !== '' && $l['priority'] !== $f_prio) return false;
             if ($f_owner !== '' && strcasecmp($l['owner'], $f_owner) !== 0) return false;
             if ($f_due && !($l['followup'] !== '' && $l['followup'] <= $today && !in_array($l['status'], ADMIN_CLOSED, true))) return false;
+            if ($f_chan !== '' && $l['channel'] !== $f_chan && $l['channel_group'] !== $f_chan) return false;
+            if ($f_grade !== '' && $l['grade'] !== $f_grade) return false;
+            if ($f_prop !== '') {
+                $st = crm_proposal_state($proposal_index[$l['id']] ?? null);
+                if ($f_prop === 'sent' ? $st === 'none' : $st !== $f_prop) return false;
+            }
             if ($f_q !== '') {
                 $hay = strtolower(($l['name'] ?? '') . ' ' . ($l['email'] ?? '') . ' ' . ($l['company'] ?? '')
-                     . ' ' . ($l['service'] ?? '') . ' ' . $l['tags'] . ' ' . ($l['mobile'] ?? ''));
+                     . ' ' . ($l['service'] ?? '') . ' ' . $l['tags'] . ' ' . ($l['mobile'] ?? '') . ' ' . $l['channel']);
                 if (!str_contains($hay, strtolower($f_q))) return false;
             }
             return true;
         });
         $owners = array_values(array_unique(array_filter(array_map(fn($l) => $l['owner'], $leads))));
         sort($owners);
-        $qs = array_filter(['status' => $f_status, 'priority' => $f_prio, 'owner' => $f_owner, 'due' => $f_due ? '1' : '', 'q' => $f_q]);
+        $channels = array_values(array_unique(array_map(fn($l) => $l['channel'], $scope)));
+        sort($channels);
+        $qs = array_filter(['status' => $f_status, 'priority' => $f_prio, 'owner' => $f_owner, 'due' => $f_due ? '1' : '', 'q' => $f_q,
+                            'channel' => $f_chan, 'grade' => $f_grade, 'proposal' => $f_prop]);
     ?>
         <h1>Sales leads</h1>
         <p class="sub">Enquiries from the quote, contact and consultation forms.
@@ -890,34 +1136,57 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <?php endforeach; ?>
             </select>
             <?php endif; ?>
+            <?php if ($channels): ?>
+            <select name="channel" onchange="this.form.submit()">
+                <option value="">Any source</option>
+                <?php foreach (array_keys(CRM_GROUP_COLORS) as $g): if (!in_array($g, array_map(fn($l) => $l['channel_group'], $scope), true)) continue; ?>
+                <option value="<?= e_a($g) ?>"<?= $f_chan === $g ? ' selected' : '' ?>>All <?= e_a(strtolower($g)) ?></option>
+                <?php endforeach; ?>
+                <?php foreach ($channels as $c): ?>
+                <option value="<?= e_a($c) ?>"<?= $f_chan === $c ? ' selected' : '' ?>><?= e_a($c) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php endif; ?>
+            <select name="grade" onchange="this.form.submit()">
+                <option value="">Any grade</option>
+                <?php foreach (['A', 'B', 'C'] as $g): ?><option value="<?= $g ?>"<?= $f_grade === $g ? ' selected' : '' ?>>Grade <?= $g ?></option><?php endforeach; ?>
+            </select>
+            <select name="proposal" onchange="this.form.submit()">
+                <?php foreach (['' => 'Any proposal state', 'none' => 'No proposal yet', 'sent' => 'Proposal sent', 'opened' => 'Opened', 'viewed' => 'Read', 'accepted' => 'Said yes'] as $k => $label): ?>
+                <option value="<?= $k ?>"<?= $f_prop === $k ? ' selected' : '' ?>><?= $label ?></option>
+                <?php endforeach; ?>
+            </select>
             <label class="chk"><input type="checkbox" name="due" value="1"<?= $f_due ? ' checked' : '' ?> onchange="this.form.submit()"> Follow-up due</label>
             <button class="btn ghost" type="submit">Filter</button>
             <?php if ($qs): ?><a class="btn ghost" href="/admin/?view=leads">Clear</a><?php endif; ?>
         </form>
         <div class="panel">
             <table>
-                <thead><tr><th>When</th><th>Lead</th><th>Service</th><th>Value</th><th>Owner</th><th>Follow-up</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>When</th><th>Lead</th><th>Source</th><th>Service</th><th>Grade</th><th>Proposal</th><th>Follow-up</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($filtered as $l):
-                    $overdue = $l['followup'] !== '' && $l['followup'] <= $today && !in_array($l['status'], ADMIN_CLOSED, true); ?>
+                    $overdue = $l['followup'] !== '' && $l['followup'] <= $today && !in_array($l['status'], ADMIN_CLOSED, true);
+                    $pstate = crm_proposal_state($proposal_index[$l['id']] ?? null); ?>
                     <tr>
                         <td style="white-space:nowrap"><?= e_a(date('j M', strtotime($l['date'] ?? 'now'))) ?><br><small style="color:var(--muted)"><?= e_a(date('H:i', strtotime($l['date'] ?? 'now'))) ?></small></td>
                         <td>
                             <strong><?= e_a($l['name'] ?? '') ?></strong>
                             <?php if ($l['priority'] === 'high'): ?> <span class="tag-hi">High</span><?php endif; ?>
                             <br><small style="color:var(--muted)"><?= e_a($l['email'] ?? '') ?></small>
+                            <?php if ($l['company'] !== ''): ?><br><small><?= e_a(mb_substr((string) $l['company'], 0, 48)) ?></small><?php endif; ?>
                             <?php if ($l['tags'] !== ''): ?><br><small class="tag-list"><?= e_a($l['tags']) ?></small><?php endif; ?>
                         </td>
-                        <td><?= e_a(mb_substr($l['service'] ?? '', 0, 34)) ?></td>
-                        <td style="white-space:nowrap"><?= $l['value'] !== '' ? '₹' . money_fmt($l['value']) : '<span style="color:var(--muted)">-</span>' ?></td>
-                        <td><?= $l['owner'] !== '' ? e_a($l['owner']) : '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td><?= channel_badge($l) ?><?php if (($l['attribution']['detail'] ?? '') !== ''): ?><br><small style="color:var(--muted)"><?= e_a(mb_substr((string) $l['attribution']['detail'], 0, 36)) ?></small><?php endif; ?></td>
+                        <td><?= e_a(mb_substr($l['service'] ?? '', 0, 34)) ?><?= $l['value'] !== '' ? '<br><small style="color:var(--muted)">₹' . money_fmt($l['value']) . ($l['owner'] !== '' ? ' · ' . e_a($l['owner']) : '') . '</small>' : '' ?></td>
+                        <td><?= grade_badge($l['grade']) ?></td>
+                        <td><?= proposal_badge($proposal_index[$l['id']] ?? null) ?></td>
                         <td style="white-space:nowrap"><?= $l['followup'] !== ''
                             ? '<span class="' . ($overdue ? 'due-flag' : '') . '">' . e_a(date('j M', strtotime($l['followup']))) . '</span>'
                             : '<span style="color:var(--muted)">-</span>' ?></td>
-                        <td><?= status_badge($l['status']) ?></td>
-                        <td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a></td>
+                        <td><?= status_badge($l['status']) ?><?= $l['status'] === 'new' ? '<br><small class="' . (($l['date'] ?? '') < date('c', strtotime('-24 hours')) ? 'due-flag' : '') . '" style="font-size:.68rem">' . e_a(waiting_for($l)) . '</small>' : '' ?></td>
+                        <td style="white-space:nowrap"><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a><?php if ($pstate === 'none' && !in_array($l['status'], ADMIN_CLOSED, true)): ?> <a class="btn sm grad" href="/admin/?view=proposal&id=<?= e_a($l['id']) ?>">Proposal</a><?php endif; ?></td>
                     </tr>
-                <?php endforeach; if (!$filtered): ?><tr><td colspan="8">No leads match.</td></tr><?php endif; ?>
+                <?php endforeach; if (!$filtered): ?><tr><td colspan="9">No leads match.</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -1096,19 +1365,58 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         foreach ($leads as $l) { if ($l['id'] === ($_GET['id'] ?? '')) { $lead = $l; break; } }
         if (!$lead): ?>
         <h1>Lead not found</h1>
-        <?php else: ?>
-        <h1><?= e_a($lead['name'] ?? 'Lead') ?></h1>
-        <p class="sub"><a href="/admin/?view=leads">← Back</a> · captured <?= e_a(date('j M Y, H:i', strtotime($lead['date'] ?? 'now'))) ?> via <strong><?= e_a($lead['source'] ?? '') ?></strong></p>
+        <?php else:
+            $facts = crm_lead_facts($lead);
+            $attr = $lead['attribution'];
+            $props = crm_proposals((int) $lead['id']);
+            $hasProposal = (bool) array_filter($props, fn($p) => $p['kind'] === 'proposal');
+            $digits = phone_digits((string) $lead['mobile']);
+            $crm_cfg = crm_settings();
+            $wa_text = 'Hi ' . $facts['first'] . ', this is ' . crm_first_name((string) $crm_cfg['sender_name']) . ' from VTurnU, about your enquiry'
+                . ($facts['service'] !== '' ? ' on ' . crm_service_phrase($facts, crm_intent($facts)) : '') . '.';
+            $others = array_values(array_filter($leads, fn($o) => $o['id'] !== $lead['id']
+                && (strcasecmp((string) $o['email'], (string) $lead['email']) === 0 || (strlen($digits) >= 8 && phone_digits((string) $o['mobile']) === $digits))));
+            $touch_line = function (?array $t): string {
+                if (!$t) return '';
+                [$ch, , $detail] = crm_classify_touch($t);
+                return e_a($t['at'] !== '' ? date('j M Y, H:i', strtotime($t['at'])) : 'Date not recorded') . ' · ' . e_a($ch) . ($detail !== '' ? ' (' . e_a($detail) . ')' : '')
+                    . ($t['landing'] !== '' ? '<br><small class="mono">' . e_a(mb_substr($t['landing'], 0, 90)) . '</small>' : '')
+                    . ($t['ref'] !== '' ? '<br><small style="color:var(--muted)">from ' . e_a(mb_substr($t['ref'], 0, 90)) . '</small>' : '');
+            };
+            $first_t = $attr['first'] ?? null;
+            $last_t = $attr['last'] ?? null;
+        ?>
+        <h1><?= e_a($lead['name'] ?? 'Lead') ?> <?= grade_badge($lead['grade']) ?> <?= channel_badge($lead) ?></h1>
+        <p class="sub"><a href="/admin/?view=leads">← Back</a> · captured <?= e_a(date('j M Y, H:i', strtotime($lead['date'] ?? 'now'))) ?> from the <strong><?= e_a(CRM_PLACEMENTS[$lead['source']] ?? $lead['source']) ?></strong><?= ($lead['form_page'] ?? '') !== '' ? ' on <span class="mono">' . e_a(strtok((string) $lead['form_page'], '?')) . '</span>' : '' ?><?= $lead['status'] === 'new' ? ' · waiting ' . e_a(waiting_for($lead)) . ' for a first reply' : '' ?></p>
+        <?php if (!empty($_GET['sent'])): ?><div class="flash">✓ <?= ($_GET['sent'] === 'followup' ? 'Follow-up' : 'Proposal') ?> sent to <?= e_a($lead['email']) ?> from <?= e_a(CONTACT_EMAIL) ?>. When they open it, read it online or say yes, it shows up here and in the morning digest.</div><?php endif; ?>
+        <div class="lead-actions">
+            <a class="btn grad" href="/admin/?view=proposal&id=<?= e_a($lead['id']) ?>"><?= $hasProposal ? 'Send a new proposal' : 'Send proposal' ?></a>
+            <?php if ($hasProposal): ?><a class="btn" href="/admin/?view=proposal&kind=followup&id=<?= e_a($lead['id']) ?>">Send follow-up</a><?php endif; ?>
+            <?php if ($digits !== ''): ?>
+            <a class="btn wa" href="https://wa.me/<?= e_a($digits) ?>?text=<?= rawurlencode($wa_text) ?>" target="_blank" rel="noopener">WhatsApp</a>
+            <a class="btn ghost" href="tel:+<?= e_a($digits) ?>">Call</a>
+            <?php endif; ?>
+            <a class="btn ghost" href="mailto:<?= e_a($lead['email']) ?>">Email</a>
+        </div>
         <div class="cards" style="grid-template-columns:1.4fr 1fr">
             <div class="panel" style="margin:0">
                 <h2>Enquiry</h2>
-                <table><tbody>
-                    <tr><td style="width:100px;color:var(--muted)">Email</td><td><a href="mailto:<?= e_a($lead['email'] ?? '') ?>" style="font-weight:700;color:var(--p)"><?= e_a($lead['email'] ?? '') ?></a></td></tr>
-                    <tr><td style="color:var(--muted)">Phone</td><td><?= $lead['mobile'] ? '<a href="tel:' . e_a($lead['mobile']) . '" style="font-weight:700">' . e_a($lead['mobile']) . '</a>' : '-' ?></td></tr>
-                    <tr><td style="color:var(--muted)">Company</td><td><?= e_a($lead['company'] ?: '-') ?></td></tr>
-                    <tr><td style="color:var(--muted)">Service</td><td><?= e_a($lead['service'] ?: '-') ?></td></tr>
-                    <tr><td style="color:var(--muted)">Message</td><td><?= nl2br(e_a($lead['message'] ?: '-')) ?></td></tr>
+                <table class="kv"><tbody>
+                    <tr><td>Email</td><td><a href="mailto:<?= e_a($lead['email'] ?? '') ?>" style="font-weight:700;color:var(--p)"><?= e_a($lead['email'] ?? '') ?></a></td></tr>
+                    <tr><td>Phone</td><td><?= $lead['mobile'] ? '<a href="tel:+' . e_a($digits) . '" style="font-weight:700">' . e_a($lead['mobile']) . '</a>' : '-' ?></td></tr>
+                    <tr><td>Company</td><td><?= e_a($facts['company'] ?: '-') ?><?= $facts['website'] !== '' ? ' · <a href="' . e_a($facts['website']) . '" target="_blank" rel="noopener nofollow" style="color:var(--v);font-weight:700">' . e_a($facts['domain']) . ' ↗</a>' : '' ?></td></tr>
+                    <tr><td>Service</td><td><?= e_a($lead['service'] ?: '-') ?></td></tr>
+                    <tr><td>Budget</td><td><?= e_a($lead['budget'] ?: '-') ?></td></tr>
+                    <?php if ($facts['timeline'] !== ''): ?><tr><td>Timeline</td><td><?= e_a($facts['timeline']) ?></td></tr><?php endif; ?>
+                    <?php if ($facts['size'] !== ''): ?><tr><td>Company size</td><td><?= e_a($facts['size']) ?></td></tr><?php endif; ?>
                 </tbody></table>
+                <?php if ($facts['note'] !== ''): ?>
+                <label style="margin-top:14px">In their words</label>
+                <div class="quote"><?= nl2br(e_a($facts['note'])) ?></div>
+                <?php endif; ?>
+                <details style="margin-top:8px"><summary style="cursor:pointer;font-size:.78rem;color:var(--muted)">Full message as received</summary>
+                    <p style="font-size:.82rem;margin-top:8px"><?= nl2br(e_a($lead['message'] ?: '-')) ?></p>
+                </details>
             </div>
             <div>
                 <div class="panel">
@@ -1158,6 +1466,57 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 </div>
             </div>
         </div>
+        <div class="cards" style="grid-template-columns:1fr 1.4fr">
+            <div class="panel" style="margin:0">
+                <h2>How they found you</h2>
+                <?php if ($attr): ?>
+                <table class="kv"><tbody>
+                    <tr><td>Source</td><td><?= channel_badge($lead) ?><?= ($attr['detail'] ?? '') !== '' ? ' <small>' . e_a((string) $attr['detail']) . '</small>' : '' ?></td></tr>
+                    <?php if ($first_t): ?><tr><td>First visit</td><td><?= $touch_line($first_t) ?></td></tr><?php endif; ?>
+                    <?php if ($last_t && $last_t !== $first_t): ?><tr><td>Latest visit</td><td><?= $touch_line($last_t) ?></td></tr><?php endif; ?>
+                    <?php if (($attr['pages'] ?? 0) > 0):
+                        $span = $first_t && ($first_t['at'] ?? '') !== '' ? (int) floor((strtotime($lead['date']) - strtotime($first_t['at'])) / 86400) : null; ?>
+                    <tr><td>Pages viewed</td><td><?= (int) $attr['pages'] ?> before enquiring<?= $span === null ? '' : ($span < 1 ? ', on their first day' : ', over ' . $span . ($span === 1 ? ' day' : ' days')) ?></td></tr><?php endif; ?>
+                    <tr><td>Form</td><td><?= e_a(ucfirst(CRM_PLACEMENTS[$attr['placement'] ?? ''] ?? (CRM_PLACEMENTS[$lead['source']] ?? $lead['source']))) ?><?= ($attr['form_page'] ?? '') !== '' ? ' on <span class="mono">' . e_a(strtok((string) $attr['form_page'], '?')) . '</span>' : '' ?></td></tr>
+                    <?php if (($attr['device'] ?? '') !== '' || ($attr['country'] ?? '') !== ''): ?><tr><td>Device</td><td><?= e_a(trim(($attr['device'] ?? '') . (($attr['country'] ?? '') !== '' ? ', ' . (country_names()[$attr['country']] ?? $attr['country']) : ''), ', ')) ?></td></tr><?php endif; ?>
+                    <?php $tags = array_merge($first_t['q'] ?? [], $last_t['q'] ?? []); if ($tags): ?><tr><td>Campaign tags</td><td class="mono" style="font-size:.74rem"><?php foreach ($tags as $k => $v): ?><?= e_a($k) ?>=<?= e_a(mb_substr((string) $v, 0, 40)) ?><br><?php endforeach; ?></td></tr><?php endif; ?>
+                </tbody></table>
+                <?php else: ?>
+                <p class="note">This lead arrived before source tracking started (or from a browser that blocks it), so where they came from was not recorded.<?= ($lead['form_page'] ?? '') !== '' ? ' They sent the form from <span class="mono">' . e_a((string) $lead['form_page']) . '</span>.' : '' ?></p>
+                <?php endif; ?>
+            </div>
+            <div class="panel" style="margin:0">
+                <h2>Proposals and follow-ups</h2>
+                <?php if ($props): ?>
+                <ul class="prop-list">
+                <?php foreach ($props as $p): ?>
+                    <li>
+                        <strong><?= e_a($p['subject']) ?></strong>
+                        <div class="meta">
+                            <span><?= $p['kind'] === 'followup' ? 'Follow-up' : 'Proposal' ?> sent <?= e_a(date('j M, H:i', strtotime((string) $p['sent_at']))) ?><?= $p['sent_by'] !== '' ? ' by ' . e_a($p['sent_by']) : '' ?></span>
+                            <?= !empty($p['opened_at']) ? '<span class="badge-st" style="--st:#00B8D9">Opened' . ((int) $p['open_count'] > 1 ? ' ×' . (int) $p['open_count'] : '') . '</span>' : '<span>not opened yet</span>' ?>
+                            <?= !empty($p['viewed_at']) ? '<span class="badge-st" style="--st:#FF9100">Read online' . ((int) $p['view_count'] > 1 ? ' ×' . (int) $p['view_count'] : '') . ((int) $p['read_seconds'] >= 60 ? ', ' . (int) round($p['read_seconds'] / 60) . ' min' : '') . '</span>' : '' ?>
+                            <?= !empty($p['accepted_at']) ? '<span class="badge-st" style="--st:#12A150">Said yes ' . e_a(date('j M', strtotime((string) $p['accepted_at']))) . '</span>' : '' ?>
+                            <?php if ($p['kind'] === 'proposal'): ?><a href="<?= e_a(crm_preview_url((string) $p['token'])) ?>" target="_blank" rel="noopener" style="color:var(--v);font-weight:700">View as the client sees it ↗</a><?php endif; ?>
+                        </div>
+                        <?php if (($p['accept_note'] ?? '') !== ''): ?><div class="quote" style="margin-top:8px"><?= nl2br(e_a((string) $p['accept_note'])) ?></div><?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+                <p class="note">"Opened" comes from the email's image loading, which some mail apps do on their own. "Read online" and "Said yes" are certain.</p>
+                <?php else: ?>
+                <p class="note">No proposal yet. <a href="/admin/?view=proposal&id=<?= e_a($lead['id']) ?>" style="color:var(--p);font-weight:800">Draft one now</a>: it is written from this enquiry, and you can edit every word before it goes.</p>
+                <?php endif; ?>
+                <?php if ($others): ?>
+                <h2 style="margin-top:16px">Other enquiries from this person</h2>
+                <table><tbody>
+                <?php foreach ($others as $o): ?>
+                    <tr><td><?= e_a(date('j M Y', strtotime($o['date']))) ?></td><td><?= e_a(mb_substr((string) $o['service'], 0, 40)) ?></td><td><?= status_badge($o['status']) ?></td><td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($o['id']) ?>">Open</a></td></tr>
+                <?php endforeach; ?>
+                </tbody></table>
+                <?php endif; ?>
+            </div>
+        </div>
         <div class="cards" style="grid-template-columns:1.4fr 1fr">
             <div class="panel" style="margin:0">
                 <h2>Notes</h2>
@@ -1184,6 +1543,119 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 </ul>
             </div>
         </div>
+        <?php endif; ?>
+
+    <?php elseif ($view === 'proposal'):
+        /* The composer: a draft written from the enquiry, edited by a person, sent from connect@vturnu.com. */
+        $lead = null;
+        foreach ($leads as $l) { if ($l['id'] === ($_GET['id'] ?? '')) { $lead = $l; break; } }
+        if (!$lead): ?>
+        <h1>Lead not found</h1>
+        <p class="sub"><a href="/admin/?view=leads">← Sales leads</a></p>
+        <?php else:
+            $props = crm_proposals((int) $lead['id']);
+            $parent = null;
+            foreach ($props as $pp) { if ($pp['kind'] === 'proposal') { $parent = $pp; break; } }
+            $kind = ($_GET['kind'] ?? '') === 'followup' && $parent ? 'followup' : 'proposal';
+            $crm_cfg = crm_settings();
+            $draft = $kind === 'followup' ? crm_followup_draft($lead, $parent, $crm_cfg) : crm_proposal_draft($lead, $crm_cfg);
+            $facts = crm_lead_facts($lead);
+            $intent = $draft['intent'] ?? crm_intent($facts);
+            $c_subject = (string) ($composer_post['subject'] ?? $draft['subject']);
+            $c_body = (string) ($composer_post['body'] ?? $draft['body']);
+        ?>
+        <h1><?= $kind === 'followup' ? 'Follow-up to ' : 'Proposal for ' ?><?= e_a($lead['name']) ?><?= $facts['company'] !== '' ? ', ' . e_a($facts['company']) : '' ?></h1>
+        <p class="sub"><a href="/admin/?view=lead&id=<?= e_a($lead['id']) ?>">← Back to the lead</a> · drafted from their enquiry. Read it, change anything you like, then send.</p>
+        <div class="composer">
+            <form method="post" action="/admin/?view=proposal&id=<?= e_a($lead['id']) ?><?= $kind === 'followup' ? '&kind=followup' : '' ?>" class="panel" style="margin:0" data-confirm="<?= e_a('Send this ' . ($kind === 'followup' ? 'follow-up' : 'proposal') . ' to ' . $lead['email'] . ' now?') ?>" onsubmit="return confirm(this.dataset.confirm)">
+                <input type="hidden" name="action" value="proposal_send">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <input type="hidden" name="id" value="<?= e_a($lead['id']) ?>">
+                <input type="hidden" name="kind" value="<?= $kind ?>">
+                <table class="kv"><tbody>
+                    <tr><td>From</td><td><?= e_a(crm_from($crm_cfg)) ?></td></tr>
+                    <tr><td>To</td><td><?= e_a($lead['name']) ?> &lt;<?= e_a($lead['email']) ?>&gt;</td></tr>
+                    <tr><td>Replies go to</td><td><?= e_a(CONTACT_EMAIL) ?></td></tr>
+                </tbody></table>
+                <label for="pc-subject">Subject</label>
+                <input id="pc-subject" name="subject" maxlength="200" required value="<?= e_a($c_subject) ?>">
+                <label for="pc-body">Message <span style="text-transform:none;font-weight:400;letter-spacing:0">("## " starts a heading, "- " a bullet, **bold** for emphasis)</span></label>
+                <textarea id="pc-body" name="body" class="body" required><?= e_a($c_body) ?></textarea>
+                <p class="dash-warn" id="pc-dash">This text contains a long dash. It is replaced with a comma (or "to" between numbers) when sent.</p>
+                <div class="opts">
+                    <?php if ($kind === 'proposal'): ?><label class="chk"><input type="checkbox" name="stage" value="1" checked> Move the lead to the Proposal stage</label><?php endif; ?>
+                    <label class="chk"><input type="checkbox" name="remind" value="1" checked> Remind me to follow up in <input type="number" name="remind_days" min="1" max="30" value="<?= (int) $crm_cfg['followup_days'] ?: 3 ?>"> days</label>
+                    <label class="chk"><input type="checkbox" name="copy" value="1" checked> Send a copy to <?= e_a(ENQUIRY_TO) ?></label>
+                </div>
+                <div class="actions-row">
+                    <button class="btn grad" type="submit">Send to <?= e_a($lead['email']) ?></button>
+                    <a class="btn ghost" href="/admin/?view=proposal&id=<?= e_a($lead['id']) ?><?= $kind === 'followup' ? '&kind=followup' : '' ?>">Start again from a fresh draft</a>
+                    <?php if ($kind === 'proposal' && $parent): ?><a class="btn ghost" href="/admin/?view=proposal&kind=followup&id=<?= e_a($lead['id']) ?>">Write a follow-up instead</a><?php endif; ?>
+                </div>
+                <?php if ($kind === 'proposal'): ?><p class="note">The email carries a button to a private web copy of the proposal. You will see when it is opened and read, and they can say yes there in one click.</p><?php endif; ?>
+            </form>
+            <div>
+                <?php if ($kind === 'proposal'): ?>
+                <div class="panel">
+                    <h2>What the draft is based on</h2>
+                    <ul class="detected">
+                        <li><b>Service</b><?= e_a($lead['service'] ?: 'Not chosen') ?></li>
+                        <li><b>Their goals</b><?= e_a(crm_list(array_map(fn($g) => CRM_GOALS[$g][1], array_slice($intent['goals'], 0, 3)))) ?></li>
+                        <?php if ($intent['quote'] !== ''): ?><li><b>Quoted back</b>"<?= e_a($intent['quote']) ?>"</li><?php endif; ?>
+                        <?php if ($intent['industry'] !== ''): ?><li><b>Industry</b><?= e_a(ucfirst($intent['industry'])) ?> (from their words and company)</li><?php endif; ?>
+                        <?php if ($intent['horizon'] !== '' || $intent['target'] !== ''): ?><li><b>Target</b><?= e_a(trim($intent['target'] . ($intent['horizon'] !== '' ? ' within ' . $intent['horizon'] : ''))) ?></li><?php endif; ?>
+                        <?php if ($intent['markets']): ?><li><b>Markets</b><?= e_a(crm_list($intent['markets'])) ?></li><?php endif; ?>
+                        <li><b>Budget</b><?= e_a($lead['budget'] ?: 'Not given') ?></li>
+                        <li><b>Timeline</b><?= e_a($facts['timeline'] ?: 'Not given') ?></li>
+                        <li><b>Proof cited</b><?= ($draft['proof'] ?? []) ? e_a(crm_list(array_map(fn($p) => $p['client'], $draft['proof']))) : 'None that fits this service, so none is claimed' ?></li>
+                        <li><b>Source</b><?= channel_badge($lead) ?></li>
+                    </ul>
+                    <p class="note">Case study figures are quoted exactly as published on the site. Change anything that does not fit this client.</p>
+                </div>
+                <?php endif; ?>
+                <div class="mail-preview">
+                    <div class="mp-head"><b id="pc-psubject"><?= e_a($c_subject) ?></b><br>From <?= e_a(crm_from($crm_cfg)) ?> to <?= e_a($lead['email']) ?></div>
+                    <div id="pc-preview"><?= crm_markup_html(crm_no_dashes($c_body)) ?></div>
+                    <?php if ($kind === 'proposal' || $parent): ?><p style="margin:6px 0 14px"><span style="display:inline-block;padding:10px 20px;border-radius:999px;background:#4338CA;color:#fff;font:bold 13px Arial">Open your proposal</span></p><?php endif; ?>
+                    <p style="font:13px/1.55 Arial;color:#4A4470"><strong style="color:#1D1936"><?= e_a((string) $crm_cfg['sender_name']) ?></strong><br><?= e_a((string) $crm_cfg['sender_title']) ?>, VTurnU<br><?= e_a((string) $crm_cfg['sender_phone']) ?> · vturnu.com</p>
+                </div>
+            </div>
+        </div>
+        <script>
+        (function () {
+            var body = document.getElementById('pc-body'), subject = document.getElementById('pc-subject');
+            var out = document.getElementById('pc-preview'), head = document.getElementById('pc-psubject'), warn = document.getElementById('pc-dash');
+            function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function inline(s) {
+                return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, function (u) { return '<a href="' + u + '" style="color:#4338CA">' + u + '</a>'; });
+            }
+            var P = 'margin:0 0 14px;font:15px/1.65 Arial,Helvetica,sans-serif;color:#1D1936', H = 'margin:22px 0 8px;font:bold 16px/1.4 Arial,Helvetica,sans-serif;color:#4338CA';
+            function render() {
+                var text = body.value.replace(/(\d)\s*[–—]\s*(\d)/g, '$1 to $2').replace(/\s*[—―]\s*/g, ', ').replace(/\s+–\s+/g, ', ');
+                var html = [], list = [], para = [];
+                function flush() {
+                    if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; }
+                    if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; }
+                }
+                text.split(/\r?\n/).forEach(function (line) {
+                    var t = line.replace(/\s+$/, '');
+                    var m = t.match(/^\s*[-*] (.+)$/);
+                    if (t.indexOf('## ') === 0) { flush(); html.push('<h2 style="' + H + '">' + inline(t.slice(3)) + '</h2>'); }
+                    else if (m) { if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; } list.push('<li style="margin:0 0 7px;font:15px/1.6 Arial">' + inline(m[1]) + '</li>'); }
+                    else if (!t.trim()) { flush(); }
+                    else { if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; } para.push(inline(t)); }
+                });
+                flush();
+                out.innerHTML = html.join('');
+                head.textContent = subject.value;
+                warn.style.display = /[–—]/.test(body.value + subject.value) ? 'block' : 'none';
+            }
+            body.addEventListener('input', render);
+            subject.addEventListener('input', render);
+            render();
+        })();
+        </script>
         <?php endif; ?>
 
     <?php elseif ($view === 'blogs'): ?>
@@ -1659,6 +2131,21 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         }
         uasort($src_stats, fn($a, $b) => $b['value'] <=> $a['value'] ?: $b['n'] <=> $a['n']);
 
+        /* The same question by channel: which searches, ads, AI assistants and
+           sites bring leads that turn into proposals, yeses and revenue. */
+        $chan_stats = [];
+        foreach (leads_in($leads, 'lead') as $l) {
+            $c = $l['channel'];
+            $chan_stats[$c] ??= ['group' => $l['channel_group'], 'n' => 0, 'a' => 0, 'prop' => 0, 'yes' => 0, 'won' => 0, 'value' => 0];
+            $chan_stats[$c]['n']++;
+            $chan_stats[$c]['a'] += $l['grade'] === 'A' ? 1 : 0;
+            $ps = crm_proposal_state($proposal_index[$l['id']] ?? null);
+            $chan_stats[$c]['prop'] += $ps !== 'none' ? 1 : 0;
+            $chan_stats[$c]['yes'] += $ps === 'accepted' ? 1 : 0;
+            if ($l['status'] === 'won') { $chan_stats[$c]['won']++; $chan_stats[$c]['value'] += (int) $l['value']; }
+        }
+        uasort($chan_stats, fn($a, $b) => $b['value'] <=> $a['value'] ?: $b['n'] <=> $a['n']);
+
         $owner_stats = [];
         foreach ($leads as $l) {
             $o = $l['owner'] !== '' ? $l['owner'] : 'Unassigned';
@@ -1725,9 +2212,29 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         </div>
 
         <div class="panel">
-            <h2>Which source earns its keep</h2>
+            <h2>Which channel earns its keep</h2>
             <table>
-                <thead><tr><th>Source</th><th>Contacts</th><th>Won</th><th>Lost</th><th>Win rate</th><th style="text-align:right">Revenue</th></tr></thead>
+                <thead><tr><th>Channel</th><th>Sales leads</th><th>Grade A</th><th>Proposals</th><th>Said yes</th><th>Won</th><th style="text-align:right">Revenue</th></tr></thead>
+                <tbody>
+                <?php foreach ($chan_stats as $c => $d): ?>
+                    <tr>
+                        <td><?= channel_badge(['channel' => $c, 'channel_group' => $d['group'], 'attribution' => []]) ?> <small style="color:var(--muted)"><?= e_a((string) $d['group']) ?></small></td>
+                        <td style="font-weight:800"><?= $d['n'] ?></td>
+                        <td><?= $d['a'] ?: '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td><?= $d['prop'] ?: '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td><?= $d['yes'] ?: '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td><?= $d['won'] ?: '<span style="color:var(--muted)">-</span>' ?></td>
+                        <td style="text-align:right;font-weight:800"><?= $d['value'] ? '₹' . money_fmt($d['value']) : '<span style="color:var(--muted);font-weight:400">-</span>' ?></td>
+                    </tr>
+                <?php endforeach; if (!$chan_stats): ?><tr><td colspan="7">No sales leads yet.</td></tr><?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>Which form earns its keep</h2>
+            <table>
+                <thead><tr><th>Form</th><th>Contacts</th><th>Won</th><th>Lost</th><th>Win rate</th><th style="text-align:right">Revenue</th></tr></thead>
                 <tbody>
                 <?php foreach ($src_stats as $s => $d):
                     $closed = $d['won'] + $d['lost'];
@@ -1795,6 +2302,31 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <label>New Password * (min 8 chars)</label>
                 <input name="new" type="password" required minlength="8" autocomplete="new-password">
                 <br><br><button class="btn grad" type="submit">Update Credentials</button>
+            </form>
+        </div>
+        <?php $crm_cfg = crm_settings(); ?>
+        <div class="panel" style="max-width:640px">
+            <h2>Proposals and automation</h2>
+            <form method="post">
+                <input type="hidden" name="action" value="crm_settings">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <p class="note" style="margin:0 0 4px">Proposals, follow-ups and acknowledgements are sent from <strong><?= e_a(CONTACT_EMAIL) ?></strong> under this name, and replies come back to it.</p>
+                <div class="grid3">
+                    <div><label for="s-name">Sender name</label><input id="s-name" name="sender_name" maxlength="60" value="<?= e_a((string) $crm_cfg['sender_name']) ?>"></div>
+                    <div><label for="s-title">Title</label><input id="s-title" name="sender_title" maxlength="60" value="<?= e_a((string) $crm_cfg['sender_title']) ?>"></div>
+                    <div><label for="s-phone">Phone / WhatsApp</label><input id="s-phone" name="sender_phone" maxlength="30" value="<?= e_a((string) $crm_cfg['sender_phone']) ?>"></div>
+                </div>
+                <div class="opts" style="display:grid;gap:8px;margin-top:14px">
+                    <label class="chk"><input type="checkbox" name="auto_ack" value="1"<?= $crm_cfg['auto_ack'] ? ' checked' : '' ?>> Send every new sales enquiry an instant, personal acknowledgement</label>
+                    <label class="chk"><input type="checkbox" name="digest" value="1"<?= $crm_cfg['digest'] ? ' checked' : '' ?>> Email a morning digest to <?= e_a(ENQUIRY_TO) ?> at 9:00 am IST (new leads, waiting leads, follow-ups due, proposals read or accepted)</label>
+                    <label class="chk">Default follow-up reminder after a proposal: <input type="number" name="followup_days" min="0" max="30" value="<?= (int) $crm_cfg['followup_days'] ?>" style="width:70px;padding:4px 8px"> days</label>
+                </div>
+                <br><button class="btn grad" type="submit">Save</button>
+            </form>
+            <form method="post" style="margin-top:12px">
+                <input type="hidden" name="action" value="digest_now">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <button class="btn ghost" type="submit">Send the digest now</button>
             </form>
         </div>
         <div class="panel" style="max-width:500px">

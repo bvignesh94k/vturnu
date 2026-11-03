@@ -434,6 +434,9 @@ function enquiry_qualify(array $post): array
     $post['company'] = trim((string) ($post['company'] ?? '')) . ($site !== '' ? ' (' . $site . ')' : '');
     $post['message'] = implode("\n", $summary) . ($note !== '' ? "\n\n" . $note : '');
     $post['budget'] = $budget;
+    /* Also as fields, so the CRM can sort and filter by grade without reading the message. */
+    $post['lead_grade'] = $grade;
+    $post['lead_score'] = $points;
     return $post;
 }
 
@@ -481,17 +484,34 @@ function save_enquiry(array $post, string $source): bool
             . ($screen['reasons'] ? ': ' . implode('; ', $screen['reasons']) : ''),
     ]], JSON_UNESCAPED_UNICODE);
 
+    /* Where the visitor came from (search, ads, an AI assistant, a referral)
+       and the grade, stored as columns so the CRM can filter and report on them. */
+    $attr = function_exists('crm_attribution') ? crm_attribution($post) : [];
+    $grade = preg_match('/^[ABC]$/', (string) ($post['lead_grade'] ?? '')) ? (string) $post['lead_grade'] : '';
+    $score = $grade !== '' && is_numeric($post['lead_score'] ?? null) ? max(0, min(10, (int) $post['lead_score'])) : null;
+    $entry['attribution'] = $attr;
+    $entry['grade'] = $grade;
+
     $stored = false;
     try {
-        db()->prepare(
-            'INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message, status, tags, activity)
-             VALUES (:source, :name, :email, :mobile, :company, :designation, :service, :budget, :message, :status, :tags, CAST(:activity AS jsonb))'
-        )->execute([
+        $stmt = db()->prepare(
+            'INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message, status, tags, activity,
+                                    channel, channel_group, attribution, form_page, country, grade, score)
+             VALUES (:source, :name, :email, :mobile, :company, :designation, :service, :budget, :message, :status, :tags, CAST(:activity AS jsonb),
+                     :channel, :channel_group, CAST(:attribution AS jsonb), :form_page, :country, :grade, :score)
+             RETURNING id'
+        );
+        $stmt->execute([
             ':source' => $entry['source'], ':name' => $entry['name'], ':email' => $entry['email'],
             ':mobile' => $entry['mobile'], ':company' => $entry['company'], ':designation' => $entry['designation'],
             ':service' => $entry['service'], ':budget' => $entry['budget'], ':message' => $entry['message'],
             ':status' => $status, ':tags' => $tags, ':activity' => $activity,
+            ':channel' => (string) ($attr['channel'] ?? ''), ':channel_group' => (string) ($attr['group'] ?? ''),
+            ':attribution' => json_encode($attr ?: new stdClass(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            ':form_page' => (string) ($attr['form_page'] ?? ''), ':country' => (string) ($attr['country'] ?? ''),
+            ':grade' => $grade, ':score' => $score,
         ]);
+        $entry['id'] = (string) $stmt->fetchColumn();
         $stored = true;
     } catch (Throwable $e) {
         error_log('save_enquiry: DB insert failed: ' . $e->getMessage());
@@ -517,6 +537,10 @@ function save_enquiry(array $post, string $source): bool
     }
     if (!$stored) {
         error_log('save_enquiry: DB unavailable, lead delivered by email only: ' . $entry['email']);
+    }
+    /* A real enquiry gets an instant, personal acknowledgement (Settings can turn it off). */
+    if ($stored && $screen['verdict'] === 'ok' && function_exists('crm_auto_ack')) {
+        crm_auto_ack($entry);
     }
 
     return true;
@@ -554,15 +578,25 @@ function mail_enquiry(array $entry): bool
         }
     }
     $lines[] = '';
-    $lines[] = str_pad('Source:', 18) . ($entry['source'] ?? 'website');
+    $attr = is_array($entry['attribution'] ?? null) ? $entry['attribution'] : [];
+    $channel = (string) ($attr['channel'] ?? '');
+    if ($attr && function_exists('crm_source_line')) {
+        $lines[] = str_pad('Came from:', 18) . crm_source_line($attr);
+    }
+    $lines[] = str_pad('Form:', 18) . ((defined('CRM_PLACEMENTS') ? (CRM_PLACEMENTS[$entry['source'] ?? ''] ?? '') : '') ?: ($entry['source'] ?? 'website'));
     $lines[] = str_pad('Received:', 18) . date('d M Y, g:i a T', strtotime($entry['date'] ?? 'now'));
     $lines[] = '';
+    if (!empty($entry['id'])) {
+        $lines[] = 'Open the lead:     ' . SITE_URL . '/admin/?view=lead&id=' . $entry['id'];
+        $lines[] = 'Send a proposal:   ' . SITE_URL . '/admin/?view=proposal&id=' . $entry['id'];
+        $lines[] = '';
+    }
     $lines[] = 'Reply directly to this email to respond to the enquirer.';
 
     $prefix = ['ok' => '', 'review' => '[Check first] ', 'junk' => '[Likely junk] '][$quality['verdict']] ?? '';
     $grade = preg_match('/Lead grade: ([ABC])/', (string) ($entry['message'] ?? ''), $gm) ? ' [Grade ' . $gm[1] . ']' : '';
     $subject = $prefix . sprintf('New enquiry: %s%s', $entry['name'], $entry['service'] !== '' ? ' (' . $entry['service'] . ')' : '');
-    $subject .= $grade;
+    $subject .= $grade . ($channel !== '' && !in_array($channel, ['Unknown', 'Not tracked'], true) ? ' via ' . $channel : '');
 
     return send_email(ENQUIRY_TO, $subject, implode("\n", $lines), [
         'reply_to' => $entry['name'] . ' <' . $entry['email'] . '>',
@@ -580,13 +614,6 @@ function mail_enquiry(array $entry): bool
  */
 function send_email(string $to, string $subject, string $body, array $opts = []): bool
 {
-    // env_var() rather than getenv(): see the note in includes/config.php.
-    $apiKey = env_var('RESEND_API_KEY', '');
-    if ($apiKey === '') {
-        error_log('send_email: RESEND_API_KEY is not set, dropping email to ' . $to);
-        return false;
-    }
-
     $host = parse_url(SITE_URL, PHP_URL_HOST) ?: 'vturnu.com';
     $payload = [
         'from' => SITE_NAME . ' <noreply@' . $host . '>',
@@ -605,6 +632,31 @@ function send_email(string $to, string $subject, string $body, array $opts = [])
             'filename' => $opts['attachment']['filename'],
             'content' => base64_encode($opts['attachment']['content']),
         ]];
+    }
+    return resend_send($payload)['ok'];
+}
+
+/**
+ * Hand one message to Resend: the payload is Resend's own shape (from, to,
+ * subject, text, html, reply_to, bcc, attachments). Returns the message id,
+ * or the reason it failed, so the CRM can tell the person who pressed Send.
+ * MAIL_TRANSPORT=capture keeps messages in $GLOBALS['captured_mail'] instead,
+ * for local tests.
+ *
+ * @return array{ok:bool,id:string,error:string}
+ */
+function resend_send(array $payload): array
+{
+    $to = implode(', ', (array) ($payload['to'] ?? []));
+    if (env_var('MAIL_TRANSPORT', '') === 'capture') {
+        $GLOBALS['captured_mail'][] = $payload;
+        return ['ok' => true, 'id' => 'captured-' . count($GLOBALS['captured_mail']), 'error' => ''];
+    }
+    // env_var() rather than getenv(): see the note in includes/config.php.
+    $apiKey = env_var('RESEND_API_KEY', '');
+    if ($apiKey === '') {
+        error_log('send_email: RESEND_API_KEY is not set, dropping email to ' . $to);
+        return ['ok' => false, 'id' => '', 'error' => 'sending email is not set up on this site'];
     }
 
     $ch = curl_init('https://api.resend.com/emails');
@@ -625,13 +677,14 @@ function send_email(string $to, string $subject, string $body, array $opts = [])
 
     if ($res === false || $curlErr !== '') {
         error_log('send_email: curl error sending to ' . $to . ': ' . $curlErr);
-        return false;
+        return ['ok' => false, 'id' => '', 'error' => 'the mail service could not be reached'];
     }
+    $data = json_decode((string) $res, true);
     if ($httpCode < 200 || $httpCode >= 300) {
         error_log('send_email: Resend HTTP ' . $httpCode . ' for ' . $to . ': ' . substr((string) $res, 0, 300));
-        return false;
+        return ['ok' => false, 'id' => '', 'error' => is_array($data) && isset($data['message']) ? (string) $data['message'] : 'the mail service refused it (HTTP ' . $httpCode . ')'];
     }
-    return true;
+    return ['ok' => true, 'id' => is_array($data) ? (string) ($data['id'] ?? '') : '', 'error' => ''];
 }
 
 /**

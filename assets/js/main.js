@@ -1,4 +1,35 @@
 /* VTurnU: navigation & small enhancements */
+
+/**
+ * Where this visitor came from, kept for their enquiry (lead-form.js sends it).
+ * "first" is the first visit in 90 days; "last" is the latest visit that came
+ * from somewhere (a search, an ad, a referral, an AI assistant), so a lead
+ * that first found us on Google and came back from LinkedIn shows both.
+ * Internal navigation and plain direct visits never overwrite a real source.
+ */
+(function () {
+    'use strict';
+    try {
+        var KEY = 'vt_src';
+        var now = new Date();
+        var params = new URLSearchParams(location.search);
+        var q = {};
+        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'msclkid', 'fbclid', 'li_fat_id', 'ttclid'].forEach(function (k) {
+            var v = params.get(k);
+            if (v) { q[k] = v.slice(0, 150); }
+        });
+        var ref = document.referrer || '';
+        if (ref && ref.indexOf(location.origin) === 0) { ref = ''; }
+        var touch = { at: now.toISOString(), landing: (location.pathname + location.search).slice(0, 300), ref: ref.slice(0, 300), q: q };
+        var data = null;
+        try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { data = null; }
+        if (!data || !data.first || (now - new Date(data.first.at)) > 90 * 864e5) { data = { first: touch, pages: 0 }; }
+        if (ref || Object.keys(q).length) { data.last = touch; }
+        data.pages = (data.pages || 0) + 1;
+        localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (e) { /* Private mode or storage blocked: the lead simply arrives without a source. */ }
+})();
+
 (function () {
     'use strict';
 

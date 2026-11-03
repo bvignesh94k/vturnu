@@ -5,6 +5,9 @@
       "maxDuration": 30
     }
   },
+  "crons": [
+    { "path": "/cron/crm-daily/", "schedule": "30 3 * * *" }
+  ],
   "routes": [
     {
       "src": "/(.*)",

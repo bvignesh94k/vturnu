@@ -308,7 +308,10 @@
             var send = function (token) {
                 var tokenField = form.querySelector('.js-recaptcha-token');
                 if (tokenField) { tokenField.value = token || ''; }
-                fetch('/enquiry/', { method: 'POST', body: new FormData(form), headers: { 'X-Requested-With': 'fetch' } })
+                var body = new FormData(form);
+                /* How the visitor found us, kept by main.js, so the lead arrives with its source. */
+                try { body.set('attribution', localStorage.getItem('vt_src') || ''); } catch (err) { /* storage blocked */ }
+                fetch('/enquiry/', { method: 'POST', body: body, headers: { 'X-Requested-With': 'fetch' } })
                     .then(function (r) { return r.text(); })
                     .then(function (body) {
                         var data;
