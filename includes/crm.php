@@ -1359,10 +1359,12 @@ function crm_show_gstin(string $country): bool
 }
 
 /**
- * The signature block under every client email: logo, social profiles and the
- * website on the left; company, services, email, WhatsApp and GSTIN on the
- * right. Images are PNG (mail clients do not show SVG) and every link carries
- * readable anchor text or alt text. The two columns stack on a phone.
+ * The signature block under every client email, laid out the way the owner
+ * designed it: logo, social profiles and the website button on the left, a
+ * divider, then company, services, email, WhatsApp, GSTIN and the tagline on
+ * the right. One fixed 600px row that never stacks, so it reads the same in
+ * every inbox (phones scale it down whole). Images are PNG (mail apps do not
+ * show SVG) and every link carries readable anchor text or alt text.
  */
 function crm_signature_html(array $settings, string $country = ''): string
 {
@@ -1374,51 +1376,51 @@ function crm_signature_html(array $settings, string $country = ''): string
     $phone = (string) $settings['sender_phone'];
     $wa = crm_whatsapp_url($phone);
 
-    $socials = '';
+    $socials = [];
     foreach (CRM_SIG_SOCIAL as $key => $file) {
         $url = (string) (SOCIAL_LINKS[$key] ?? '');
         if ($url === '') {
             continue;
         }
         $label = $key === 'Twitter' ? 'X' : $key;
-        $socials .= '<td style="padding:0 10px 0 0"><a href="' . $h($url) . '" title="VTurnU on ' . $h($label) . '" style="text-decoration:none">'
-            . '<img src="' . $img . $file . '" width="40" height="40" alt="' . $h($label) . '" style="display:block;border:0;width:40px;height:40px"></a></td>';
+        $socials[] = '<td style="padding:0;width:44px"><a href="' . $h($url) . '" title="VTurnU on ' . $h($label) . '" style="text-decoration:none">'
+            . '<img src="' . $img . $file . '" width="44" height="44" alt="' . $h($label) . '" style="display:block;border:0;width:44px;height:44px"></a></td>';
     }
-    $row = static fn(string $icon, string $content): string => '<tr>'
-        . '<td style="padding:0 12px 10px 0;vertical-align:middle;width:30px"><img src="' . $img . $icon . '" width="30" height="30" alt="" style="display:block;border:0;width:30px;height:30px"></td>'
-        . '<td style="padding:0 0 10px;vertical-align:middle;font:15px/1.4 ' . $font . ';color:#1D1936">' . $content . '</td></tr>';
-    $rows = $row('sig-email.png', '<a href="mailto:' . CONTACT_EMAIL . '" style="' . $link . ';font-weight:bold">' . $h(CONTACT_EMAIL) . '</a>');
+    $gap = '<td style="padding:0;width:8px;font-size:0;line-height:0">&nbsp;</td>';
+
+    $items = [['sig-email.png', '<a href="mailto:' . CONTACT_EMAIL . '" style="' . $link . ';font-weight:bold">' . $h(CONTACT_EMAIL) . '</a>']];
     if ($phone !== '') {
-        $rows .= $row('sig-whatsapp.png', '<a href="' . $h($wa !== '' ? $wa : 'tel:' . preg_replace('/[^\d+]/', '', $phone)) . '" title="' . ($wa !== '' ? 'Chat on WhatsApp' : 'Call') . '" style="' . $link . '">' . $h($phone) . '</a>'
-            . ($wa !== '' ? ' <a href="' . $h($wa) . '" style="font:bold 12px ' . $font . ';color:#22A55B;text-decoration:none">WhatsApp</a>' : ''));
+        $items[] = ['sig-whatsapp.png', '<a href="' . $h($wa !== '' ? $wa : 'tel:' . preg_replace('/[^\d+]/', '', $phone)) . '" title="' . ($wa !== '' ? 'Chat on WhatsApp' : 'Call') . '" style="' . $link . '">' . $h($phone) . '</a>'
+            . ($wa !== '' ? '&nbsp; <a href="' . $h($wa) . '" style="font:bold 12px ' . $font . ';color:#22A55B;text-decoration:none">WhatsApp</a>' : '')];
     }
     if (crm_show_gstin($country)) {
-        $rows .= $row('sig-gstin.png', '<strong>GSTIN: ' . $h(GSTIN) . '</strong>');
+        $items[] = ['sig-gstin.png', '<strong>GSTIN: ' . $h(GSTIN) . '</strong>'];
     }
-    $list = static fn(array $items): string => implode(' ', array_map(
-        static fn(string $s, int $i) => '<span style="white-space:nowrap">' . $s . ($i < count($items) - 1 ? '&nbsp; |' : '') . '</span>',
-        $items, array_keys($items)
-    ));
+    $rows = '';
+    foreach ($items as $i => [$icon, $content]) {
+        $pad = $i === count($items) - 1 ? '0' : '10px';
+        $rows .= '<tr><td style="padding:0 12px ' . $pad . ' 0;width:32px;vertical-align:middle"><img src="' . $img . $icon . '" width="32" height="32" alt="" style="display:block;border:0;width:32px;height:32px"></td>'
+            . '<td style="padding:0 0 ' . $pad . ';vertical-align:middle;white-space:nowrap;font:15px/1.3 ' . $font . ';color:#1D1936">' . $content . '</td></tr>';
+    }
+    /* Items separated by pipes, each line kept whole: the services sit on two lines, as designed. */
+    $line = static fn(array $parts): string => '<span style="white-space:nowrap">' . implode(' &nbsp;|&nbsp; ', array_map($h, $parts)) . '</span>';
 
-    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:14px 0 0"><tr><td style="font-size:0;line-height:0;text-align:left;padding:0">'
-        . '<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0"><tr><td width="236" valign="top"><![endif]-->'
-        . '<div style="display:inline-block;vertical-align:top;width:100%;max-width:236px">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
-        . '<tr><td style="padding:4px 16px 0 0"><a href="' . $site . '/" title="VTurnU" style="text-decoration:none"><img src="' . $img . 'sig-logo.png" width="200" height="55" alt="VTurnU, together we turn heads" style="display:block;border:0;width:200px;height:auto"></a></td></tr>'
-        . ($socials !== '' ? '<tr><td style="padding:16px 0 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr>' . $socials . '</tr></table></td></tr>' : '')
-        . '<tr><td style="padding:16px 0 14px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="padding:0;border-radius:999px;background:#4F46E5">'
-        . '<a href="' . $site . '/" style="display:inline-block;padding:11px 22px;font:bold 15px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px">&#127760; www.vturnu.com &rarr;</a>'
-        . '</td></tr></table></td></tr></table></div>'
-        . '<!--[if mso]></td><td width="364" valign="top"><![endif]-->'
-        . '<div style="display:inline-block;vertical-align:top;width:100%;max-width:362px">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-left:2px solid #DCD9F2;padding:2px 0 2px 20px">'
-        . '<div style="font:bold 19px/1.3 ' . $font . ';color:#1D1936;margin:0 0 8px">' . $h(defined('LEGAL_NAME') ? LEGAL_NAME : 'VTurnU') . '</div>'
-        . '<div style="font:13px/1.7 ' . $font . ';color:#6F6992;margin:0 0 14px">' . $list(CRM_SIG_SERVICES) . '</div>'
-        . '<table role="presentation" cellpadding="0" cellspacing="0">' . $rows . '</table>'
-        . '<div style="border-top:1px solid #DCD9F2;margin:2px 0 0;padding:10px 0 0;font:13px/1.6 ' . $font . ';color:#6F6992">' . $list(CRM_SIG_TAGLINE) . '</div>'
-        . '</td></tr></table></div>'
-        . '<!--[if mso]></td></tr></table><![endif]-->'
-        . '</td></tr></table>';
+    return '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;border-collapse:collapse;margin:18px 0 0">'
+        . '<tr>'
+        . '<td width="206" valign="top" style="width:206px;padding:4px 22px 4px 0;vertical-align:top">'
+        . '<a href="' . $site . '/" title="VTurnU" style="text-decoration:none"><img src="' . $img . 'sig-logo.png" width="200" height="55" alt="VTurnU, together we turn heads" style="display:block;border:0;width:200px;height:55px"></a>'
+        . ($socials ? '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:26px 0 0"><tr>' . implode($gap, $socials) . '</tr></table>' : '')
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:28px 0 0"><tr><td style="padding:0;border-radius:999px;background:#4F46E5">'
+        . '<a href="' . $site . '/" style="display:inline-block;padding:13px 18px;font:bold 14px/16px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px;white-space:nowrap">&#127760;&nbsp; www.vturnu.com &nbsp;&rarr;</a>'
+        . '</td></tr></table>'
+        . '</td>'
+        . '<td valign="top" style="padding:4px 0 4px 22px;border-left:2px solid #DCD9F2;vertical-align:top">'
+        . '<div style="font:bold 20px/1.25 ' . $font . ';color:#1D1936;margin:0 0 8px;white-space:nowrap">' . $h(defined('LEGAL_NAME') ? LEGAL_NAME : 'VTurnU') . '</div>'
+        . '<div style="font:12px/1.75 ' . $font . ';color:#6F6992;margin:0 0 14px">' . $line(array_slice(CRM_SIG_SERVICES, 0, 5)) . '<br>' . $line(array_slice(CRM_SIG_SERVICES, 5)) . '</div>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">' . $rows . '</table>'
+        . '<div style="border-top:1px solid #DCD9F2;margin:14px 0 0;padding:10px 0 0;white-space:nowrap;font:12.5px/1.5 ' . $font . ';color:#6F6992">' . $line(CRM_SIG_TAGLINE) . '</div>'
+        . '</td>'
+        . '</tr></table>';
 }
 
 /** The same signature as plain text, every link spelled out, for the text part of the email. */

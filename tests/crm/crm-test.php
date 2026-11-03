@@ -140,9 +140,10 @@ check('ack only for sales forms', count($GLOBALS['captured_mail']) === 1 && $GLO
 $sig = $m['html'] ?? '';
 foreach (['/assets/img/email/sig-logo.png', 'href="https://www.linkedin.com/company/vturnu"', 'href="https://www.instagram.com/vturnu"', 'href="https://www.facebook.com/VTurnUDigital"',
           'href="https://x.com/VTurnU_Digital"', 'alt="LinkedIn"', 'alt="X"', 'href="https://wa.me/919363731498"', '>+91 93637 31498</a>', 'href="mailto:connect@vturnu.com"',
-          '&#127760; www.vturnu.com &rarr;</a>', 'VTurnU Digital Solutions LLP', 'Web Development&nbsp; |', 'IT Consulting</span>', 'Better Growth</span>', 'GSTIN: 33ABAFV8139L2ZS'] as $needle) {
+          'www.vturnu.com &nbsp;&rarr;</a>', 'VTurnU Digital Solutions LLP', 'Web Development</span><br><span', 'IT Consulting</span>', 'Better Growth</span>', 'GSTIN: 33ABAFV8139L2ZS'] as $needle) {
     check('signature has: ' . $needle, str_contains($sig, $needle), $needle);
 }
+check('signature is one horizontal row that never stacks', str_contains($sig, '<table role="presentation" width="600"') && str_contains($sig, '<td width="206" valign="top"') && !str_contains($sig, 'display:inline-block;vertical-align:top;width:100%'));
 foreach (['WhatsApp: +91 93637 31498 (https://wa.me/919363731498)', 'LinkedIn: https://www.linkedin.com/company/vturnu', 'X: https://x.com/VTurnU_Digital', 'Website: https://vturnu.com', 'GSTIN: 33ABAFV8139L2ZS'] as $needle) {
     check('text signature has: ' . $needle, str_contains($m['text'] ?? '', $needle), $needle);
 }
