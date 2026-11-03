@@ -1863,7 +1863,7 @@ body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.7 'Segoe UI
 .bar { height:5px; background:var(--grad); }
 .wrap { max-width:1080px; margin:0 auto; padding:28px 18px 60px; display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:26px; align-items:start; }
 header { max-width:1080px; margin:0 auto; padding:26px 18px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
-header img { height:34px; width:auto; }
+header img { display:block; height:50px; width:auto; }
 header p { margin:0; color:var(--muted); font-size:.86rem; }
 .doc { background:#fff; border:1px solid var(--line); border-radius:16px; padding:34px 38px; box-shadow:0 18px 50px rgba(29,25,54,.06); }
 .doc .eyebrow { font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--v); margin:0 0 4px; }
@@ -1901,7 +1901,7 @@ footer { text-align:center; color:var(--muted); font-size:.8rem; padding:0 18px 
 <body>
 <div class="bar"></div>
 <header>
-    <img src="/assets/img/vturnu-logo-horizontal.svg" alt="VTurnU" width="140" height="34">
+    <a href="/" title="VTurnU"><img src="/assets/img/email/sig-logo.png" alt="VTurnU, together we turn heads" width="181" height="50"></a>
     <p>Prepared for <?= $h($f['name']) ?><?= $f['company'] !== '' ? ', ' . $h($f['company']) : '' ?> · <?= $h(date('j F Y', (int) strtotime((string) $p['sent_at']))) ?></p>
 </header>
 <div class="wrap">
