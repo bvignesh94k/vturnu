@@ -64,7 +64,7 @@ check('subject', $d['subject'] === 'Acme Labels: a plan to win more enquiries fr
 foreach (['Hi Priya,', '## What we heard', 'In your words: "We manufacture', 'win more qualified enquiries', 'within the next six months', 'Your target is 50 qualified leads',
           'as soon as possible', '51 to 200 people', 'acmelabels.in', '## How we would approach it', 'buyers and procurement teams', '## Proof from similar work',
           '**Sai Impression and Packaging Solutions** (Manufacturing)', 'https://vturnu.com/case-studies/sai-impression-label-manufacturer/', '## Investment',
-          'You mentioned a budget of ₹50,000 to ₹1,50,000 a month', 'no lock-in after the first 90 days', '## Next step', 'Since you want to move quickly', 'Kalpana V'] as $needle) {
+          'You mentioned a budget of ₹50,000 to ₹1,50,000 a month', 'no lock-in after the first 90 days', '## Next step', 'Since you want to move quickly'] as $needle) {
     check('proposal has: ' . $needle, str_contains($b, $needle), $needle);
 }
 check('no dashes in proposal', !$dash($d['subject'] . $b));
@@ -147,7 +147,10 @@ check('signature is one horizontal row that never stacks', str_contains($sig, '<
 foreach (['WhatsApp: +91 93637 31498 (https://wa.me/919363731498)', 'LinkedIn: https://www.linkedin.com/company/vturnu', 'X: https://x.com/VTurnU_Digital', 'Website: https://vturnu.com', 'GSTIN: 33ABAFV8139L2ZS'] as $needle) {
     check('text signature has: ' . $needle, str_contains($m['text'] ?? '', $needle), $needle);
 }
-check('sign-off has name and title', str_contains($d['body'], "Kalpana V\nFounder"), substr($d['body'], -60));
+/* The owner's call: no "Warm regards, name, title" above the signature in any draft. */
+foreach (['proposal' => $d['body'], 'follow-up' => crm_followup_draft(fixture_lead(), $stored)['body'], 'acknowledgement' => crm_ack_draft(fixture_lead())['body']] as $kind => $text) {
+    check("no sign-off in the $kind", !preg_match('/regards,|Looking forward to it,|\nKalpana V\b|\nFounder$/i', $text), substr($text, -80));
+}
 check('no GSTIN for clients abroad', !str_contains(crm_signature_html(crm_settings(), 'US'), 'GSTIN') && !str_contains(crm_signature_text(crm_settings(), 'US'), 'GSTIN'));
 check('whatsapp needs a country code', crm_whatsapp_url('+91 93637 31498') === 'https://wa.me/919363731498' && crm_whatsapp_url('93637 31498') === '');
 

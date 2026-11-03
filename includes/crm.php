@@ -1140,8 +1140,7 @@ function crm_proposal_draft(array $lead, ?array $settings = null): array
         $L[] = '';
         $L[] = 'Since you want to move quickly, I will keep my calendar flexible this week to fit around yours.';
     }
-    $L[] = '';
-    array_push($L, ...crm_signoff(crm_pick(['Warm regards,', 'Best regards,', 'Looking forward to it,'], $seed . 'close'), $settings));
+    /* No sign-off: the signature block under the email closes it. */
 
     return [
         'subject' => crm_no_dashes($subject),
@@ -1202,8 +1201,6 @@ function crm_followup_draft(array $lead, array $proposal, ?array $settings = nul
         'One thing worth knowing while you think it over: ' . $book['tip'],
         '',
         'If the timing or scope needs to change, tell me and I will adjust it. Or, if it helps, we can walk through it together in 20 minutes. Would ' . $d1 . ' or ' . $d2 . ' work for you?',
-        '',
-        ...crm_signoff(crm_pick(['Warm regards,', 'Best regards,'], $seed . 'close'), $settings),
     ];
     $subject = (string) ($proposal['subject'] ?? '');
     return [
@@ -1233,8 +1230,6 @@ function crm_ack_draft(array $lead, ?array $settings = null): array
         '',
         'You will hear from me within one working day with a clear plan and the next steps. If anything is urgent, '
             . ($phone !== '' ? 'message me on WhatsApp at ' . $phone . ' or ' : '') . 'simply reply to this email.',
-        '',
-        ...crm_signoff('Warm regards,', $settings),
     ];
     return [
         'subject' => crm_no_dashes($f['first'] !== 'there' ? $f['first'] . ', thank you for your enquiry' : 'Thank you for your enquiry'),
@@ -1444,12 +1439,6 @@ function crm_signature_text(array $settings, string $country = ''): string
     $lines[] = '';
     $lines[] = implode(' | ', CRM_SIG_TAGLINE);
     return implode("\n", $lines);
-}
-
-/** The sign-off at the end of a draft: closing line, then the sender's name and title. */
-function crm_signoff(string $closing, array $settings): array
-{
-    return array_values(array_filter([$closing, (string) $settings['sender_name'], (string) $settings['sender_title']], static fn(string $s): bool => $s !== ''));
 }
 
 /** The private web copy of a proposal. */

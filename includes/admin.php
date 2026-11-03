@@ -386,8 +386,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /* A sample of what clients receive, sent to the company inbox, so the signature can be checked in a real mail app. */
             case 'signature_test':
                 $cfg = crm_settings();
-                $body = "Hi,\n\nThis is a sample of how proposals, follow-ups and acknowledgements look when they reach a client.\n\n## The signature\n- Every social profile, the WhatsApp number and the website are links.\n- The GSTIN is shown to clients in India only.\n\n"
-                    . implode("\n", crm_signoff('Warm regards,', $cfg));
+                $body = "Hi,\n\nThis is a sample of how proposals, follow-ups and acknowledgements look when they reach a client.\n\n## The signature\n- Every social profile, the WhatsApp number and the website are links.\n- The GSTIN is shown to clients in India only.";
                 $sent = resend_send([
                     'from' => crm_from($cfg), 'to' => [ENQUIRY_TO], 'subject' => 'Sample: how your client emails look',
                     'html' => crm_email_html('Sample: how your client emails look', $body, $cfg, '', '', false, 'IN'),
