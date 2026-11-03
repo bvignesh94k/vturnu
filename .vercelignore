@@ -17,3 +17,6 @@ deploy.sh
 # Local development only. A .php file at the root would be served as plain text.
 /_preview-router.php
 .claude/
+
+# Local tests only (tests/crm/run.mjs); they are never deployed.
+tests/

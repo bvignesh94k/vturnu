@@ -1539,7 +1539,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                     <?php foreach (array_reverse($lead['activity']) as $a): ?>
                     <li><span><?= e_a($a['text']) ?></span><small><?= e_a($a['date']) ?></small></li>
                     <?php endforeach; ?>
-                    <li><span>Lead captured via <?= e_a($lead['source'] ?? 'website') ?></span><small><?= e_a(date('Y-m-d H:i', strtotime($lead['date'] ?? 'now'))) ?></small></li>
+                    <li><span>Lead captured from the <?= e_a(CRM_PLACEMENTS[$lead['source'] ?? ''] ?? ($lead['source'] ?? 'website')) ?><?= $lead['channel'] !== 'Not tracked' ? ' (came from ' . e_a($lead['channel']) . ')' : '' ?></span><small><?= e_a(date('Y-m-d H:i', strtotime($lead['date'] ?? 'now'))) ?></small></li>
                 </ul>
             </div>
         </div>
