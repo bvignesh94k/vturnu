@@ -1141,8 +1141,7 @@ function crm_proposal_draft(array $lead, ?array $settings = null): array
         $L[] = 'Since you want to move quickly, I will keep my calendar flexible this week to fit around yours.';
     }
     $L[] = '';
-    $L[] = crm_pick(['Warm regards,', 'Best regards,', 'Looking forward to it,'], $seed . 'close');
-    $L[] = (string) $settings['sender_name'];
+    array_push($L, ...crm_signoff(crm_pick(['Warm regards,', 'Best regards,', 'Looking forward to it,'], $seed . 'close'), $settings));
 
     return [
         'subject' => crm_no_dashes($subject),
@@ -1204,8 +1203,7 @@ function crm_followup_draft(array $lead, array $proposal, ?array $settings = nul
         '',
         'If the timing or scope needs to change, tell me and I will adjust it. Or, if it helps, we can walk through it together in 20 minutes. Would ' . $d1 . ' or ' . $d2 . ' work for you?',
         '',
-        crm_pick(['Warm regards,', 'Best regards,'], $seed . 'close'),
-        (string) $settings['sender_name'],
+        ...crm_signoff(crm_pick(['Warm regards,', 'Best regards,'], $seed . 'close'), $settings),
     ];
     $subject = (string) ($proposal['subject'] ?? '');
     return [
@@ -1236,8 +1234,7 @@ function crm_ack_draft(array $lead, ?array $settings = null): array
         'You will hear from me within one working day with a clear plan and the next steps. If anything is urgent, '
             . ($phone !== '' ? 'message me on WhatsApp at ' . $phone . ' or ' : '') . 'simply reply to this email.',
         '',
-        'Warm regards,',
-        (string) $settings['sender_name'],
+        ...crm_signoff('Warm regards,', $settings),
     ];
     return [
         'subject' => crm_no_dashes($f['first'] !== 'there' ? $f['first'] . ', thank you for your enquiry' : 'Thank you for your enquiry'),
@@ -1342,9 +1339,115 @@ function crm_from(array $settings): string
     return $name . ' from VTurnU <' . CONTACT_EMAIL . '>';
 }
 
-function crm_signature_text(array $settings): string
+/* The signature, as the owner designed it: services under the company name,
+   a tagline at the foot, and the social profiles in this order. */
+const CRM_SIG_SERVICES = ['Digital Marketing', 'SEO', 'AEO', 'GEO', 'Web Development', 'UI/UX', 'AI Marketing', 'PPC', 'ORM', 'Branding', 'IT Consulting'];
+const CRM_SIG_TAGLINE = ['Strategic Marketing', 'Smarter Technology', 'Better Growth'];
+const CRM_SIG_SOCIAL = ['LinkedIn' => 'sig-linkedin.png', 'Instagram' => 'sig-instagram.png', 'Facebook' => 'sig-facebook.png', 'Twitter' => 'sig-x.png'];
+
+/** A WhatsApp chat link for a phone number written with its country code, or ''. */
+function crm_whatsapp_url(string $phone): string
 {
-    return trim($settings['sender_title'] . ', VTurnU' . "\n" . ($settings['sender_phone'] !== '' ? $settings['sender_phone'] . ' · ' : '') . 'vturnu.com');
+    $digits = (string) preg_replace('/\D/', '', $phone);
+    return strlen($digits) >= 10 && str_starts_with(trim($phone), '+') ? 'https://wa.me/' . $digits : '';
+}
+
+/** The GSTIN goes to Indian clients only, as on the website. Unknown country counts as India, where most leads come from. */
+function crm_show_gstin(string $country): bool
+{
+    return defined('GSTIN') && in_array($country, ['IN', ''], true);
+}
+
+/**
+ * The signature block under every client email: logo, social profiles and the
+ * website on the left; company, services, email, WhatsApp and GSTIN on the
+ * right. Images are PNG (mail clients do not show SVG) and every link carries
+ * readable anchor text or alt text. The two columns stack on a phone.
+ */
+function crm_signature_html(array $settings, string $country = ''): string
+{
+    $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    $site = defined('SITE_URL') ? SITE_URL : 'https://vturnu.com';
+    $img = $site . '/assets/img/email/';
+    $font = 'Arial,Helvetica,sans-serif';
+    $link = 'color:#1A56DB;text-decoration:underline';
+    $phone = (string) $settings['sender_phone'];
+    $wa = crm_whatsapp_url($phone);
+
+    $socials = '';
+    foreach (CRM_SIG_SOCIAL as $key => $file) {
+        $url = (string) (SOCIAL_LINKS[$key] ?? '');
+        if ($url === '') {
+            continue;
+        }
+        $label = $key === 'Twitter' ? 'X' : $key;
+        $socials .= '<td style="padding:0 10px 0 0"><a href="' . $h($url) . '" title="VTurnU on ' . $h($label) . '" style="text-decoration:none">'
+            . '<img src="' . $img . $file . '" width="40" height="40" alt="' . $h($label) . '" style="display:block;border:0;width:40px;height:40px"></a></td>';
+    }
+    $row = static fn(string $icon, string $content): string => '<tr>'
+        . '<td style="padding:0 12px 10px 0;vertical-align:middle;width:30px"><img src="' . $img . $icon . '" width="30" height="30" alt="" style="display:block;border:0;width:30px;height:30px"></td>'
+        . '<td style="padding:0 0 10px;vertical-align:middle;font:15px/1.4 ' . $font . ';color:#1D1936">' . $content . '</td></tr>';
+    $rows = $row('sig-email.png', '<a href="mailto:' . CONTACT_EMAIL . '" style="' . $link . ';font-weight:bold">' . $h(CONTACT_EMAIL) . '</a>');
+    if ($phone !== '') {
+        $rows .= $row('sig-whatsapp.png', '<a href="' . $h($wa !== '' ? $wa : 'tel:' . preg_replace('/[^\d+]/', '', $phone)) . '" title="' . ($wa !== '' ? 'Chat on WhatsApp' : 'Call') . '" style="' . $link . '">' . $h($phone) . '</a>'
+            . ($wa !== '' ? ' <a href="' . $h($wa) . '" style="font:bold 12px ' . $font . ';color:#22A55B;text-decoration:none">WhatsApp</a>' : ''));
+    }
+    if (crm_show_gstin($country)) {
+        $rows .= $row('sig-gstin.png', '<strong>GSTIN: ' . $h(GSTIN) . '</strong>');
+    }
+    $list = static fn(array $items): string => implode(' ', array_map(
+        static fn(string $s, int $i) => '<span style="white-space:nowrap">' . $s . ($i < count($items) - 1 ? '&nbsp; |' : '') . '</span>',
+        $items, array_keys($items)
+    ));
+
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:14px 0 0"><tr><td style="font-size:0;line-height:0;text-align:left;padding:0">'
+        . '<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0"><tr><td width="236" valign="top"><![endif]-->'
+        . '<div style="display:inline-block;vertical-align:top;width:100%;max-width:236px">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+        . '<tr><td style="padding:4px 16px 0 0"><a href="' . $site . '/" title="VTurnU" style="text-decoration:none"><img src="' . $img . 'sig-logo.png" width="200" height="55" alt="VTurnU, together we turn heads" style="display:block;border:0;width:200px;height:auto"></a></td></tr>'
+        . ($socials !== '' ? '<tr><td style="padding:16px 0 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr>' . $socials . '</tr></table></td></tr>' : '')
+        . '<tr><td style="padding:16px 0 14px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="padding:0;border-radius:999px;background:#4F46E5">'
+        . '<a href="' . $site . '/" style="display:inline-block;padding:11px 22px;font:bold 15px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px">&#127760; www.vturnu.com &rarr;</a>'
+        . '</td></tr></table></td></tr></table></div>'
+        . '<!--[if mso]></td><td width="364" valign="top"><![endif]-->'
+        . '<div style="display:inline-block;vertical-align:top;width:100%;max-width:362px">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-left:2px solid #DCD9F2;padding:2px 0 2px 20px">'
+        . '<div style="font:bold 19px/1.3 ' . $font . ';color:#1D1936;margin:0 0 8px">' . $h(defined('LEGAL_NAME') ? LEGAL_NAME : 'VTurnU') . '</div>'
+        . '<div style="font:13px/1.7 ' . $font . ';color:#6F6992;margin:0 0 14px">' . $list(CRM_SIG_SERVICES) . '</div>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0">' . $rows . '</table>'
+        . '<div style="border-top:1px solid #DCD9F2;margin:2px 0 0;padding:10px 0 0;font:13px/1.6 ' . $font . ';color:#6F6992">' . $list(CRM_SIG_TAGLINE) . '</div>'
+        . '</td></tr></table></div>'
+        . '<!--[if mso]></td></tr></table><![endif]-->'
+        . '</td></tr></table>';
+}
+
+/** The same signature as plain text, every link spelled out, for the text part of the email. */
+function crm_signature_text(array $settings, string $country = ''): string
+{
+    $phone = (string) $settings['sender_phone'];
+    $wa = crm_whatsapp_url($phone);
+    $lines = [defined('LEGAL_NAME') ? LEGAL_NAME : 'VTurnU', implode(' | ', CRM_SIG_SERVICES), '', 'Email: ' . CONTACT_EMAIL];
+    if ($phone !== '') {
+        $lines[] = 'WhatsApp: ' . $phone . ($wa !== '' ? ' (' . $wa . ')' : '');
+    }
+    $lines[] = 'Website: ' . (defined('SITE_URL') ? SITE_URL : 'https://vturnu.com');
+    foreach (CRM_SIG_SOCIAL as $key => $file) {
+        if (!empty(SOCIAL_LINKS[$key])) {
+            $lines[] = ($key === 'Twitter' ? 'X' : $key) . ': ' . SOCIAL_LINKS[$key];
+        }
+    }
+    if (crm_show_gstin($country)) {
+        $lines[] = 'GSTIN: ' . GSTIN;
+    }
+    $lines[] = '';
+    $lines[] = implode(' | ', CRM_SIG_TAGLINE);
+    return implode("\n", $lines);
+}
+
+/** The sign-off at the end of a draft: closing line, then the sender's name and title. */
+function crm_signoff(string $closing, array $settings): array
+{
+    return array_values(array_filter([$closing, (string) $settings['sender_name'], (string) $settings['sender_title']], static fn(string $s): bool => $s !== ''));
 }
 
 /** The private web copy of a proposal. */
@@ -1364,16 +1467,11 @@ function crm_preview_url(string $token): string
  * and the open pixel. Kept deliberately plain so it reads as one person
  * writing to another, not as a newsletter.
  */
-function crm_email_html(string $subject, string $markup, array $settings, string $linkToken, string $pixelToken, bool $button = true): string
+function crm_email_html(string $subject, string $markup, array $settings, string $linkToken, string $pixelToken, bool $button = true, string $country = ''): string
 {
     $site = defined('SITE_URL') ? SITE_URL : 'https://vturnu.com';
     $font = 'Arial,Helvetica,sans-serif';
-    $sig = '<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:6px"><tr>'
-        . '<td style="padding-right:12px;vertical-align:top"><img src="' . $site . '/assets/img/vturnu-icon-180.png" width="38" height="38" alt="VTurnU" style="display:block;border:0;border-radius:8px"></td>'
-        . '<td style="font:13px/1.55 ' . $font . ';color:#4A4470"><strong style="color:#1D1936">' . htmlspecialchars((string) $settings['sender_name'], ENT_QUOTES, 'UTF-8') . '</strong><br>'
-        . htmlspecialchars((string) $settings['sender_title'], ENT_QUOTES, 'UTF-8') . ', VTurnU<br>'
-        . ($settings['sender_phone'] !== '' ? htmlspecialchars((string) $settings['sender_phone'], ENT_QUOTES, 'UTF-8') . ' · ' : '')
-        . '<a href="' . $site . '/" style="color:#4338CA;text-decoration:none">vturnu.com</a></td></tr></table>';
+    $sig = crm_signature_html($settings, $country);
     $cta = $button
         ? '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 18px"><tr><td style="border-radius:999px;background:#4338CA">'
             . '<a href="' . crm_proposal_url($linkToken) . '" style="display:inline-block;padding:12px 24px;font:bold 14px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px">Open your proposal</a>'
@@ -1511,13 +1609,14 @@ function crm_send(array $lead, string $kind, string $subject, string $body, arra
     $kind = in_array($kind, ['proposal', 'followup'], true) ? $kind : 'proposal';
     $token = bin2hex(random_bytes(16));
     $linkToken = $kind === 'proposal' ? $token : ((string) ($o['link_token'] ?? '') ?: $token);
-    $text = crm_markup_text($body) . "\n\n" . crm_signature_text($settings)
-        . ($kind === 'proposal' || !empty($o['link_token']) ? "\n\nYour proposal online: " . crm_proposal_url($linkToken) : '');
+    $country = crm_lead_facts($lead)['country'];
+    $withLink = $kind === 'proposal' || !empty($o['link_token']);
+    $text = crm_markup_text($body) . ($withLink ? "\n\nYour proposal online: " . crm_proposal_url($linkToken) : '') . "\n\n" . crm_signature_text($settings, $country);
     $payload = [
         'from' => crm_from($settings),
         'to' => [$to],
         'subject' => $subject,
-        'html' => crm_email_html($subject, $body, $settings, $linkToken, $token, $kind === 'proposal' || !empty($o['link_token'])),
+        'html' => crm_email_html($subject, $body, $settings, $linkToken, $token, $withLink, $country),
         'text' => $text,
         'reply_to' => CONTACT_EMAIL,
     ];
@@ -1570,12 +1669,13 @@ function crm_auto_ack(array $lead): void
             return;
         }
         $draft = crm_ack_draft($lead, $settings);
+        $country = crm_lead_facts($lead)['country'];
         $sent = resend_send([
             'from' => crm_from($settings),
             'to' => [(string) $lead['email']],
             'subject' => $draft['subject'],
-            'html' => crm_email_html($draft['subject'], $draft['body'], $settings, '', '', false),
-            'text' => crm_markup_text($draft['body']) . "\n\n" . crm_signature_text($settings),
+            'html' => crm_email_html($draft['subject'], $draft['body'], $settings, '', '', false, $country),
+            'text' => crm_markup_text($draft['body']) . "\n\n" . crm_signature_text($settings, $country),
             'reply_to' => CONTACT_EMAIL,
         ]);
         if (!empty($lead['id']) && $sent['ok']) {
@@ -1799,6 +1899,9 @@ textarea { min-height:80px; resize:vertical; }
 .who img { width:44px; height:44px; border-radius:10px; }
 .who b { display:block; }
 .who span { color:var(--muted); font-size:.86rem; }
+.social { display:flex; gap:8px; align-items:center; margin-top:14px; }
+.social img { display:block; }
+.social .site { margin-left:auto; font-weight:700; font-size:.86rem; color:var(--v); text-decoration:none; }
 footer { text-align:center; color:var(--muted); font-size:.8rem; padding:0 18px 30px; }
 @media (max-width:860px) { .wrap { grid-template-columns:1fr; } aside { position:static; } .doc { padding:24px 20px; } }
 @media print { aside, .bar { display:none; } .wrap { display:block; } .doc { border:0; box-shadow:none; } }
@@ -1819,6 +1922,12 @@ footer { text-align:center; color:var(--muted); font-size:.8rem; padding:0 18px 
     <aside>
         <div class="card">
             <div class="who"><img src="/assets/img/vturnu-icon-180.png" alt="" width="44" height="44"><div><b><?= $h((string) $settings['sender_name']) ?></b><span><?= $h((string) $settings['sender_title']) ?>, VTurnU</span></div></div>
+            <div class="social">
+                <?php foreach (CRM_SIG_SOCIAL as $key => $file): if (empty(SOCIAL_LINKS[$key])) { continue; } $label = $key === 'Twitter' ? 'X' : $key; ?>
+                <a href="<?= $h((string) SOCIAL_LINKS[$key]) ?>" target="_blank" rel="noopener" title="VTurnU on <?= $h($label) ?>"><img src="/assets/img/email/<?= $h($file) ?>" width="32" height="32" alt="<?= $h($label) ?>"></a>
+                <?php endforeach; ?>
+                <a class="site" href="/">www.vturnu.com</a>
+            </div>
         </div>
         <?php if ($preview): ?>
         <div class="card warn"><h2>Preview</h2><p>This is how <?= $h($f['first']) ?> sees the proposal. Opening it from the admin does not count as a read.</p></div>

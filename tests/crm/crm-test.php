@@ -136,6 +136,20 @@ crm_auto_ack(fixture_lead());
 crm_auto_ack(fixture_lead(['source' => 'newsletter']));
 check('ack only for sales forms', count($GLOBALS['captured_mail']) === 1 && $GLOBALS['captured_mail'][0]['to'] === ['priya@acmelabels.in'] && !str_contains($GLOBALS['captured_mail'][0]['html'], '/p/o/'));
 
+/* ---------------- the signature, as the owner designed it ---------------- */
+$sig = $m['html'] ?? '';
+foreach (['/assets/img/email/sig-logo.png', 'href="https://www.linkedin.com/company/vturnu"', 'href="https://www.instagram.com/vturnu"', 'href="https://www.facebook.com/VTurnUDigital"',
+          'href="https://x.com/VTurnU_Digital"', 'alt="LinkedIn"', 'alt="X"', 'href="https://wa.me/919363731498"', '>+91 93637 31498</a>', 'href="mailto:connect@vturnu.com"',
+          '&#127760; www.vturnu.com &rarr;</a>', 'VTurnU Digital Solutions LLP', 'Web Development&nbsp; |', 'IT Consulting</span>', 'Better Growth</span>', 'GSTIN: 33ABAFV8139L2ZS'] as $needle) {
+    check('signature has: ' . $needle, str_contains($sig, $needle), $needle);
+}
+foreach (['WhatsApp: +91 93637 31498 (https://wa.me/919363731498)', 'LinkedIn: https://www.linkedin.com/company/vturnu', 'X: https://x.com/VTurnU_Digital', 'Website: https://vturnu.com', 'GSTIN: 33ABAFV8139L2ZS'] as $needle) {
+    check('text signature has: ' . $needle, str_contains($m['text'] ?? '', $needle), $needle);
+}
+check('sign-off has name and title', str_contains($d['body'], "Kalpana V\nFounder"), substr($d['body'], -60));
+check('no GSTIN for clients abroad', !str_contains(crm_signature_html(crm_settings(), 'US'), 'GSTIN') && !str_contains(crm_signature_text(crm_settings(), 'US'), 'GSTIN'));
+check('whatsapp needs a country code', crm_whatsapp_url('+91 93637 31498') === 'https://wa.me/919363731498' && crm_whatsapp_url('93637 31498') === '');
+
 /* ---------------- the owner's notification ---------------- */
 $GLOBALS['captured_mail'] = [];
 mail_enquiry(['date' => date('c'), 'id' => '42', 'attribution' => $a] + fixture_lead());

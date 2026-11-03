@@ -383,6 +383,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $flash = $d['sent'] ? 'Digest sent to ' . ENQUIRY_TO . '.' : 'The digest could not be sent. Check that email is set up.';
                 break;
 
+            /* A sample of what clients receive, sent to the company inbox, so the signature can be checked in a real mail app. */
+            case 'signature_test':
+                $cfg = crm_settings();
+                $body = "Hi,\n\nThis is a sample of how proposals, follow-ups and acknowledgements look when they reach a client.\n\n## The signature\n- Every social profile, the WhatsApp number and the website are links.\n- The GSTIN is shown to clients in India only.\n\n"
+                    . implode("\n", crm_signoff('Warm regards,', $cfg));
+                $sent = resend_send([
+                    'from' => crm_from($cfg), 'to' => [ENQUIRY_TO], 'subject' => 'Sample: how your client emails look',
+                    'html' => crm_email_html('Sample: how your client emails look', $body, $cfg, '', '', false, 'IN'),
+                    'text' => crm_markup_text($body) . "\n\n" . crm_signature_text($cfg, 'IN'), 'reply_to' => CONTACT_EMAIL,
+                ]);
+                $flash = $sent['ok'] ? 'Sample sent to ' . ENQUIRY_TO . '. Open it to see the signature as clients will.' : 'Not sent: ' . $sent['error'];
+                break;
+
             case 'lead_update':
                 $lid = $_POST['id'] ?? '';
                 if ($lid !== '') {
@@ -773,6 +786,11 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
 .composer .opts input[type=number] { width:70px; padding:4px 8px; }
 .mail-preview { background:#fff; border:1px solid var(--line); border-radius:12px; padding:22px 24px; max-height:820px; overflow:auto; }
 .mail-preview .mp-head { font-size:.76rem; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:14px; }
+/* The preview shows the email as a mail app would: none of the admin's table styling. */
+.mail-preview table { font-size:inherit; }
+.mail-preview table:not([width]) { width:auto; }
+.mail-preview td { border-bottom:0; }
+.mail-preview tr:hover td { background:none; }
 .mail-preview .mp-head b { color:var(--ink); }
 .detected li { list-style:none; font-size:.82rem; padding:4px 0; border-bottom:1px dashed var(--line); }
 .detected li b { color:var(--soft); font-weight:700; margin-right:6px; }
@@ -1617,7 +1635,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                     <div class="mp-head"><b id="pc-psubject"><?= e_a($c_subject) ?></b><br>From <?= e_a(crm_from($crm_cfg)) ?> to <?= e_a($lead['email']) ?></div>
                     <div id="pc-preview"><?= crm_markup_html(crm_no_dashes($c_body)) ?></div>
                     <?php if ($kind === 'proposal' || $parent): ?><p style="margin:6px 0 14px"><span style="display:inline-block;padding:10px 20px;border-radius:999px;background:#4338CA;color:#fff;font:bold 13px Arial">Open your proposal</span></p><?php endif; ?>
-                    <p style="font:13px/1.55 Arial;color:#4A4470"><strong style="color:#1D1936"><?= e_a((string) $crm_cfg['sender_name']) ?></strong><br><?= e_a((string) $crm_cfg['sender_title']) ?>, VTurnU<br><?= e_a((string) $crm_cfg['sender_phone']) ?> · vturnu.com</p>
+                    <?= crm_signature_html($crm_cfg, $facts['country']) ?>
                 </div>
             </div>
         </div>
@@ -2305,7 +2323,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             </form>
         </div>
         <?php $crm_cfg = crm_settings(); ?>
-        <div class="panel" style="max-width:640px">
+        <div class="panel" style="max-width:720px">
             <h2>Proposals and automation</h2>
             <form method="post">
                 <input type="hidden" name="action" value="crm_settings">
@@ -2323,11 +2341,20 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 </div>
                 <br><button class="btn grad" type="submit">Save</button>
             </form>
-            <form method="post" style="margin-top:12px">
-                <input type="hidden" name="action" value="digest_now">
-                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
-                <button class="btn ghost" type="submit">Send the digest now</button>
-            </form>
+            <div class="actions-row" style="margin-top:12px">
+                <form method="post">
+                    <input type="hidden" name="action" value="digest_now">
+                    <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                    <button class="btn ghost" type="submit">Send the digest now</button>
+                </form>
+                <form method="post">
+                    <input type="hidden" name="action" value="signature_test">
+                    <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                    <button class="btn ghost" type="submit">Email me a sample of the signature</button>
+                </form>
+            </div>
+            <label style="margin-top:16px">Signature on every client email</label>
+            <div class="mail-preview" style="max-height:none;padding:16px 18px"><?= crm_signature_html($crm_cfg, 'IN') ?></div>
         </div>
         <div class="panel" style="max-width:500px">
             <h2>Data & Backups</h2>
