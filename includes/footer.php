@@ -25,7 +25,6 @@
                     </span>
                 </a>
                 <p class="footer-blurb">Digital marketing and branding from Chennai for growth-serious businesses worldwide. Every engagement maps to a revenue metric.</p>
-                <?php render_trust_badges('footer', 'Rated and listed on'); ?>
                 <div class="footer-social">
                     <?php $icons = [
                         'LinkedIn' => 'M6.5 8.5h-3v11h3v-11ZM5 7.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6ZM20.5 13c0-3-1.7-4.7-4.1-4.7-1.5 0-2.5.7-3 1.6V8.5h-3v11h3v-5.8c0-1.5.8-2.5 2.2-2.5 1.3 0 1.9.9 1.9 2.5v5.8h3V13Z',
@@ -73,6 +72,11 @@
                 <p class="footer-news-done" hidden>✓ You're in, see you in the next issue.</p>
             </div>
         </div>
+
+        <?php /* Full-width strip, so the badge tiles get the same equal
+                 four-across layout as the home hero instead of being
+                 squeezed into the brand column. */ ?>
+        <?php render_trust_badges('footer', 'Rated and listed on'); ?>
 
         <div class="footer-bottom">
             <?php /* The brand name links home: standard on agency sites, and it

@@ -89,33 +89,41 @@ define('ENTITY_PROFILES', [
     'https://www.brownbook.net/business/56074057/vturnu',
 ]);
 
-/* Trust badges: the independent places a buyer can check us. One list feeds
-   every placement (home hero, footer, About, Contact) through
-   render_trust_badges() in includes/trust-kit.php, so a new badge is one
-   entry here. Display order is list order.
+/* Trust badges: the independent places a buyer can check us. THIS LIST IS THE
+   ONE PLACE TO ADD, REMOVE OR REORDER A BADGE. It feeds every placement (home
+   hero, footer strip, About card, Contact page) through render_trust_badges()
+   in includes/trust-kit.php. To add one: an entry here plus its logo file in
+   assets/img/badges/. Display order is list order.
 
-   Ratings and review counts are copied from the platform by hand: the date
-   in 'checked' says when. Update them when they change; never round up.
-   Every badge link is nofollow (owner's rule, 7 Nov 2026).
-
-   Entry shapes:
-   - rating:  name, url, rating, reviews, mark (our SVG of their logo), checked
-   - listed:  name, url, label, sub, mark
-   - art:     name, url, image (the badge the platform supplies, shown as
-              given so its verification bot finds it), image_w/h, alt, attr */
+   Every badge is drawn as the same tile, so the fields below only describe
+   the platform:
+   - key, name, url   a short id, the platform's name, our profile there
+   - logo, logo_w/h   the logo file and its intrinsic size
+   - size             the height the logo is shown at, in px, chosen so every
+                      logo carries the same visual weight (a square icon needs
+                      more height than a long wordmark)
+   - color            the platform's brand colour, used for the hover glow
+   - rating           our average rating there, copied by hand on the date in
+                      'checked'. Never rounded up. Leave it out while the
+                      platform has no reviews: the tile then shows the logo only.
+   - follow           true only where the platform's verification needs a
+                      followed link (TechBehemoths, owner, 7 Nov 2026). Every
+                      other badge link is nofollow.
+   - alt, attr        the image alt and link attribute a platform's own badge
+                      snippet uses, kept as given so its verification bot finds it */
 define('TRUST_BADGES', [
     ['key' => 'google', 'name' => 'Google', 'url' => 'https://g.page/r/Cae7OU9v9lRbEBM/',
-     'rating' => '4.8', 'reviews' => 19, 'checked' => '2026-11-07',
-     'mark' => '/assets/img/badges/google-g.svg', 'mark_w' => 48, 'mark_h' => 48],
+     'logo' => '/assets/img/badges/google-g.svg', 'logo_w' => 48, 'logo_h' => 48, 'size' => 24,
+     'color' => '#4285F4', 'rating' => '4.8', 'checked' => '2026-11-07'],
     ['key' => 'clutch', 'name' => 'Clutch', 'url' => 'https://clutch.co/profile/vturnu-digital-solutions',
-     'rating' => '4.8', 'reviews' => 2, 'checked' => '2026-11-07',
-     'mark' => '/assets/img/badges/clutch.svg', 'mark_w' => 406, 'mark_h' => 115],
+     'logo' => '/assets/img/badges/clutch.svg', 'logo_w' => 406, 'logo_h' => 115, 'size' => 15,
+     'color' => '#E62415', 'rating' => '4.8', 'checked' => '2026-11-07'],
     ['key' => 'goodfirms', 'name' => 'GoodFirms', 'url' => 'https://www.goodfirms.co/company/vturnu',
-     'label' => 'Listed', 'sub' => 'Company profile',
-     'mark' => '/assets/img/badges/goodfirms.svg', 'mark_w' => 190, 'mark_h' => 37],
+     'logo' => '/assets/img/badges/goodfirms.svg', 'logo_w' => 190, 'logo_h' => 37, 'size' => 17,
+     'color' => '#B8913F'],
     ['key' => 'techbehemoths', 'name' => 'TechBehemoths', 'url' => 'https://techbehemoths.com/company/vturnu',
-     'image' => 'https://cdn.techbehemoths.com/public/static/validation/tb-verified-logo.svg',
-     'image_w' => 123, 'image_h' => 40, 'alt' => 'TechBehemoths Verification', 'attr' => 'data-techbehemoths-verification'],
+     'logo' => 'https://cdn.techbehemoths.com/public/static/validation/tb-verified-logo.svg', 'logo_w' => 123, 'logo_h' => 40, 'size' => 36,
+     'color' => '#3672FF', 'follow' => true, 'alt' => 'TechBehemoths Verification', 'attr' => 'data-techbehemoths-verification'],
 ]);
 
 /* Countries the business targets. These drive areaServed in the structured data
