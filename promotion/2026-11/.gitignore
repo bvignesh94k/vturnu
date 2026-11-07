@@ -1,0 +1,6 @@
+# Unpublished manuscripts stay out of git. This repository is public, and a
+# draft that is readable on GitHub before a publisher runs it can fail their
+# "original and unpublished" check. Drafts live in articles/drafts/ during a
+# session, in the Gmail draft that carries them, and in the owner's messages.
+articles/drafts/
+*.docx

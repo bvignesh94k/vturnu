@@ -13,3 +13,7 @@ deploy.sh
 # the repo root only, so api/index.php (the real, executed entry point) is
 # unaffected.
 /index.php
+
+# Promotion campaign records (tracker, logs, listing packs, reports). They are
+# working notes, not website content, and must never be deployed.
+promotion/
