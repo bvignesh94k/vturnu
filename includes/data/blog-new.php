@@ -8,6 +8,9 @@
 return [
 
 'selectedfirms-interview-qualified-leads-beat-traffic' => [
+    /* Held back on 8 Nov 2026 until SelectedFirms corrects the pronouns in
+       its interview ("her", "she"). Remove this line when the owner says so. */
+    'draft' => true,
     'rich'  => 'selectedfirms-interview-qualified-leads-beat-traffic',
     'title' => 'Qualified Leads Beat Traffic: Lessons From Our CEO Interview',
     'meta'  => 'Our CEO\'s SelectedFirms interview in six lessons: why qualified leads beat traffic, the metrics that show growth, AI search and choosing an agency.',

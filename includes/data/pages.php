@@ -939,6 +939,11 @@ $BLOG = apply_content_overrides($BLOG, 'blog', [
     'sections' => [], 'takeaways' => [], 'faqs' => [],
 ]);
 
+/* Drafts: a post marked 'draft' => true is held back everywhere, so its URL
+   is a 404 and it is left out of the blog lists, related posts, the sitemap,
+   the feed and llms.txt. Delete the flag to publish it again. */
+$BLOG = array_filter($BLOG, static fn(array $b): bool => empty($b['draft']));
+
 $CASES = apply_content_overrides($CASES, 'case', [
     'industry' => '', 'service' => 'multi', 'date' => '', 'challenge' => '',
     'solution' => '', 'results' => [], 'quote' => null, 'cta' => ['', '', ''],
