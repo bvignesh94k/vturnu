@@ -20,3 +20,6 @@ deploy.sh
 
 # Local tests only (tests/crm/run.mjs); they are never deployed.
 tests/
+
+# Promo video renders and their sources: large local media, never part of a deploy.
+promo-video/

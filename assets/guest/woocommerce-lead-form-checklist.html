@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>WooCommerce lead form checklist: score your store out of 15</title>
+<style>
+  :root { --ink: #1c1c28; --muted: #6b6b80; --accent: #00659a; --good: #1b8a4c; --warn: #b7791f; --bad: #c0392b; --line: #e4e4ee; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--ink); background: #fff; line-height: 1.5; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 8px; }
+  p.lead { color: var(--muted); margin: 0 0 20px; }
+  .score { position: sticky; top: 0; background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .score b { font-size: 32px; }
+  .score span { color: var(--muted); }
+  .bar { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+  .verdict { font-weight: 600; }
+  ol { list-style: none; padding: 0; margin: 0; }
+  li { border-top: 1px solid var(--line); padding: 12px 0; }
+  li label { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
+  li input { width: 22px; height: 22px; margin-top: 2px; flex: 0 0 22px; accent-color: var(--accent); }
+  li strong { display: block; }
+  li small { color: var(--muted); }
+  .actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button { border: 1px solid var(--line); background: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font: inherit; }
+  footer { margin-top: 28px; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>WooCommerce lead form checklist</h1>
+  <p class="lead">Tick each thing your store already does. One point each, fifteen in total. Nothing you tick here is sent anywhere; the score stays in your browser.</p>
+  <div class="score" aria-live="polite">
+    <div><b id="n">0</b><span> / 15</span><div class="bar"><i id="bar"></i></div></div>
+    <div class="verdict" id="verdict">Start ticking to see your score.</div>
+  </div>
+  <ol id="list">
+    <li><label><input type="checkbox"><span><strong>1. A hidden honeypot field on every lead form</strong><small>Bots fill it, humans never see it, the submission is discarded.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>2. Submissions made in under three seconds are flagged</strong><small>Time from render to submit, quarantined rather than rejected.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>3. Email domains checked for disposable services and MX records</strong><small>Temporary mailboxes and nonsense domains do not reach sales.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>4. Phone numbers validated by country format</strong><small>Length, leading digits and country code.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>5. Submissions limited per IP address and per session</strong><small>For example five an hour, the rest quarantined.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>6. Duplicate message bodies detected</strong><small>Same text with a new name each time counts once.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>7. Link-stuffed and keyword-stuffed messages filtered</strong><small>An editable pattern list the sales team can update.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>8. A CAPTCHA score is one signal, not the only one</strong><small>Score decides accept or quarantine, never accept or reject.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>9. Suspicious leads are quarantined, never deleted</strong><small>A human can release a genuine enquiry that tripped a filter.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>10. Only verified leads go to the CRM and the sales inbox</strong><small>Bots stop scheduling your salespeople's day.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>11. Ad conversion events fire only for verified leads</strong><small>Meta and Google learn from buyers, not from bots.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>12. Every form is tested end to end monthly</strong><small>Email, CRM record and thank-you page, with every field present.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>13. One source of truth for warranty, hours and availability wording</strong><small>The same promise on every form.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>14. An acknowledgement email that reaches the inbox</strong><small>Reference number and a realistic response time.</small></span></label></li>
+    <li><label><input type="checkbox"><span><strong>15. The quarantine queue is reviewed weekly</strong><small>Release the real ones, add new patterns, note what works.</small></span></label></li>
+  </ol>
+  <div class="actions"><button type="button" id="reset">Reset</button><button type="button" id="copy">Copy my score</button></div>
+  <footer>Companion to the article "15 Ways Bots Poison WooCommerce Lead Forms (and the Fix for Each)". The checklist runs entirely in your browser.</footer>
+</main>
+<script>
+  (function () {
+    var boxes = Array.prototype.slice.call(document.querySelectorAll('#list input'));
+    var n = document.getElementById('n'), bar = document.getElementById('bar'), verdict = document.getElementById('verdict');
+    function update() {
+      var s = boxes.filter(function (b) { return b.checked; }).length;
+      n.textContent = s; bar.style.width = (s / 15 * 100) + '%';
+      bar.style.background = s >= 13 ? '#1b8a4c' : s >= 8 ? '#b7791f' : '#c0392b';
+      verdict.textContent = s === 0 ? 'Start ticking to see your score.' : s >= 13 ? 'Clean pipeline. Spend the time on conversion.' : s >= 8 ? 'Good foundations. Items 9, 10 and 11 are usually the missing ones.' : 'Start with the honeypot, the time check and quarantine this week.';
+    }
+    boxes.forEach(function (b) { b.addEventListener('change', update); });
+    document.getElementById('reset').addEventListener('click', function () { boxes.forEach(function (b) { b.checked = false; }); update(); });
+    document.getElementById('copy').addEventListener('click', function () {
+      var s = boxes.filter(function (b) { return b.checked; }).length;
+      var text = 'My WooCommerce lead form score: ' + s + ' / 15';
+      if (navigator.clipboard) { navigator.clipboard.writeText(text); }
+      verdict.textContent = text + ' (copied)';
+    });
+    update();
+  })();
+</script>
+</body>
+</html>
