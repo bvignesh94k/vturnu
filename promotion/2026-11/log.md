@@ -38,3 +38,12 @@
 
 ### Waiting on
 - Owner: fix GitHub write access; review and send the MarTech Series draft; apply on Zyppy List; check and register on AdForum.
+
+### Follow-up the same night (owner replies)
+- MarTech Series: the owner sent the draft; Gmail shows it in Sent at 19:16 UTC on 7 Nov. Status: submitted.
+- Zyppy List: the sign-up page says user registration is disabled. A short enquiry to the Zyppy List inbox is drafted in Gmail and waits for the owner's approval to send.
+- AdForum: the owner found an earlier VTurnU submission awaiting approval (profile 6729981, slug built from the legal name). It is not a new listing for this campaign; it is tracked so the name can be fixed after approval.
+- LinkedIn: the owner confirmed https://www.linkedin.com/company/vturnu (it redirects to /company/vturnu-digital/). Packs updated.
+- GitHub: the owner granted access, but pushes still fail with 403 and the session still acts as "coinshelve" ("Resource not accessible by integration").
+- Replacement directories checked directly: Hubstaff Talent passes (free, moderated, no existing profile; website link is nofollow; needs one colleague's contractor profile linked), pack ready. Rejected after checking: Digital Agency Network (agency plans are paid; only SaaS tools list free), Europages (mandatory public VAT number would expose the GSTIN internationally), Social Champ (no public directory of real profiles found; 12-month trading rule), Databox (paid Premier partners only), BrightLocal (US only). Startup India Hub kept as a reserve (wrong audience for agency buyers).
+- Day 1 result, honestly: 1 article submitted; 1 new listing pack ready (Hubstaff Talent), 1 blocked by the directory (Zyppy List), and 1 earlier submission pending (AdForum). The two-new-listings target was not met with sites that pass the quality checks; tomorrow's batch starts with extra directory research.

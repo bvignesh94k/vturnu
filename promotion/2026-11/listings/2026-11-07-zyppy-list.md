@@ -1,5 +1,7 @@
 # Zyppy List: listing pack
 
+**Update, 7 Nov 2026 (owner):** the sign-up page says "User registration is disabled, please login to continue", so a new account cannot be created right now. Next step: a short email to the Zyppy List inbox shown on https://zyppy.com/contact/ asking how to apply (drafted in Gmail; sent only with the owner's approval). Keep the values below for when they reply.
+
 | Item | Detail |
 | --- | --- |
 | Site | Zyppy List, a curated directory of marketing agencies and consultants run by SEO practitioner Cyrus Shepard |
@@ -35,7 +37,7 @@
 | Short description | B2B digital marketing and branding agency in Chennai, India. SEO, AI search visibility, Google Ads, content, branding and conversion-focused websites that win qualified leads. Senior strategist reply within one working day; no lock-in after 90 days. |
 | Full description | Medium description from `00-common-fields.md`; the Long one if the box allows it |
 | Contact methods | Website, email and phone as above; WhatsApp link https://wa.me/919363731498 if offered |
-| Social profiles | LinkedIn company page (confirm which URL loads: /company/vturnu or /company/vturnu-digital/), https://www.facebook.com/VTurnUDigital, https://www.instagram.com/vturnu, https://x.com/VTurnU_Digital |
+| Social profiles | LinkedIn: https://www.linkedin.com/company/vturnu, https://www.facebook.com/VTurnUDigital, https://www.instagram.com/vturnu, https://x.com/VTurnU_Digital |
 | Team bio (every profile has one) | Vignesh B, CEO. Suggested text, adapted from the approved bio for directory use (no founder title, per the Listings Kit): "Vignesh B is the CEO of VTurnU and an omni-channel digital marketing practitioner whose career began in 2017. He leads the company's work on search, AI search visibility, paid media, social and websites that turn visits into qualified enquiries." Owner to approve before use. |
 | Photo for the team bio | https://vturnu.com/assets/img/guest/vignesh-b-headshot.jpg (800 x 800, real photo) |
 | Logo | https://vturnu.com/assets/img/vturnu-icon-512.png |

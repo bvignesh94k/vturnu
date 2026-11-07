@@ -33,7 +33,7 @@ Never name the founder or the CEO inside a description. No price lists, no hourl
 
 | Network | URL |
 | --- | --- |
-| LinkedIn | https://www.linkedin.com/company/vturnu (the kit's value; the campaign brief lists https://www.linkedin.com/company/vturnu-digital/, so confirm which one loads before submitting) |
+| LinkedIn | https://www.linkedin.com/company/vturnu (confirmed by the owner on 7 Nov 2026; it redirects to https://www.linkedin.com/company/vturnu-digital/, and both work) |
 | Facebook | https://www.facebook.com/VTurnUDigital |
 | Instagram | https://www.instagram.com/vturnu |
 | X | https://x.com/VTurnU_Digital |
