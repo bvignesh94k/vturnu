@@ -2575,6 +2575,10 @@ html.js-nav .lf-cc-select { position: absolute; width: 1px; height: 1px; opacity
 .bx-ground li:nth-child(n+4) b { background: linear-gradient(135deg, #B3175A, #C75B00); }
 
 .post-rich .bx-note { padding: 12px 15px; border-left: 4px solid #FF9100; border-radius: 0 10px 10px 0; background: #FFF6EC; line-height: 1.6; color: #3B3560; }
+/* Pull quote: a short line from an interview, with who said it. */
+.post-rich .bx-quote { margin: 20px 0 22px; padding: 16px 20px 16px 22px; border-left: 4px solid; border-image: linear-gradient(180deg, #00B8D9, #4338CA) 1; background: #F8F6FD; }
+.post-rich .bx-quote p { margin: 0; font-size: clamp(1.06rem, 1.8vw, 1.18rem); line-height: 1.5; font-weight: 600; color: #1D1936; }
+.post-rich .bx-quote cite { display: block; margin-top: 8px; font-style: normal; font-size: .86rem; font-weight: 600; color: #4B4668; }
 .bx-phase { margin: 0 0 8px; padding: 12px 15px; list-style: none; border-radius: 12px; background: #F8F6FD; display: grid; gap: 6px; }
 .bx-phase li { line-height: 1.55; color: #2A2C33; font-size: .96rem; }
 

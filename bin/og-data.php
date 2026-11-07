@@ -24,7 +24,8 @@ foreach ($PAGES as $s => $p) {
     if ($tpl === 'blog-post') {
         $row['file'] = 'blog-' . $p['post'];
         $row['post'] = $p['post'];
-        $row['kicker'] = $BLOG[$p['post']]['category'] ?? 'Insight';
+        /* A post can name its own banner label; otherwise its category. */
+        $row['kicker'] = $BLOG[$p['post']]['kicker'] ?? $BLOG[$p['post']]['category'] ?? 'Insight';
     } else {
         $row['file'] = 'page-' . str_replace('/', '-', $s);
         $row['kicker'] = match ($tpl) {

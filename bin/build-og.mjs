@@ -206,6 +206,20 @@ const ART = {
         s += `<g filter="url(#sh)"><circle cx="248" cy="104" r="74" fill="url(#gB)"/><path d="M206 134l32-34 20 18 36-40" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M270 76h26v26" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>`;
         return s + sparkle(420, 90, 22) + sparkle(70, 150, 18, 'url(#gV)');
     },
+    interview() {
+        /* A microphone and two speech bubbles: an interview, with the answer that landed. */
+        let s = panel(150, 40, 300, 190, 30);
+        s += `<path d="M212 226l-8 50 52-50z" fill="#fff"/>`;
+        s += `<text x="178" y="138" font-family="Caprasimo, serif" font-size="110" fill="url(#gU)">&#8220;</text>`;
+        s += bar(262, 86, 160) + bar(262, 114, 132) + bar(186, 156, 236, '#e2e0f6') + bar(186, 184, 180, '#ecebfa');
+        s += panel(236, 268, 214, 98, 26, 'url(#gB)') + bar(264, 302, 128, 'rgba(255,255,255,.92)') + bar(264, 328, 88, 'rgba(255,255,255,.72)');
+        s += `<path d="M414 366l10 40-44-40z" fill="#e8436b"/>`;
+        s += `<g filter="url(#sh)"><circle cx="424" cy="268" r="31" fill="#fff"/><circle cx="424" cy="268" r="24" fill="#0a8fc4"/>${tick(424, 270, 1.05)}</g>`;
+        s += `<g filter="url(#sh)"><rect x="56" y="210" width="96" height="156" rx="48" fill="url(#gV)"/>`;
+        [250, 276, 302, 328].forEach((y) => { s += `<path d="M74 ${y}h60" stroke="rgba(255,255,255,.5)" stroke-width="6" stroke-linecap="round"/>`; });
+        s += `</g><path d="M38 318a66 66 0 0 0 132 0" fill="none" stroke="#1d1936" stroke-width="10" stroke-linecap="round"/><path d="M104 386v48M66 440h76" stroke="#1d1936" stroke-width="10" stroke-linecap="round"/>`;
+        return s + sparkle(436, 440, 24) + sparkle(104, 132, 22, 'url(#gV)') + sparkle(196, 452, 14);
+    },
     social() {
         let s = panel(120, 40, 240, 400, 34);
         s += `<rect x="142" y="86" width="196" height="150" rx="16" fill="url(#gB)"/>` + bar(142, 254, 170) + bar(142, 278, 130);
@@ -217,6 +231,7 @@ const ART = {
 
 /* Concept per blog post, chosen for what the article is about. */
 const BLOG_ART = {
+    'selectedfirms-interview-qualified-leads-beat-traffic': 'interview',
     'ai-first-vs-data-first-marketing': 'aidata', 'how-to-stop-junk-leads-on-your-website': 'filter', 'seo-vs-aeo-vs-geo-explained-for-business-leaders': 'compare', 'how-to-measure-ai-search-visibility': 'dashboard',
     'what-is-sap-cpq-and-when-do-you-need-it': 'quote', 'odoo-vs-erpnext-which-erp-fits-your-business': 'modules', 'salesforce-implementation-checklist-for-growing-teams': 'orbit',
     'it-staffing-models-contract-vs-direct-hire': 'people', 'account-based-marketing-for-mid-market-companies': 'target', 'marketing-attribution-for-long-sales-cycles': 'dashboard',

@@ -141,6 +141,7 @@ return [
 'guides' => ['Free B2B Marketing Guides: SEO, AI SEO, Google Ads & Lead Gen', 'In-depth free guides to SEO, AI search, content strategy, Google Ads and B2B lead generation, written by practitioners. Read online with no sign-up required.'],
 
 /* ---------- Blog ---------- */
+'blog/selectedfirms-interview-qualified-leads-beat-traffic' => ['Qualified Leads Beat Traffic: Lessons From Our CEO Interview', 'Our CEO\'s SelectedFirms interview in six lessons: why qualified leads beat traffic, the metrics that show growth, AI search and choosing an agency.'],
 'blog/ai-first-vs-data-first-marketing' => ['AI-First vs Data-First Marketing: What Drives B2B Growth?', 'AI-first or data-first marketing? See how each affects B2B pipeline, what breaks without reliable data, and a 90-day plan to connect both to revenue.'],
 'blog/how-to-stop-junk-leads-on-your-website' => ['How to Stop Spam & Junk Leads on Your Website: B2B Playbook', 'Tired of fake enquiries? See how to stop spam leads and bots without losing real buyers, using form design, screening and a quarantine for your sales team.'],
 'blog/seo-vs-aeo-vs-geo-explained-for-business-leaders' => ['SEO vs AEO vs GEO: What B2B Business Leaders Need to Know', 'SEO, AEO and GEO explained in plain English: how each works, where they overlap and how a B2B company should split effort to appear in search and AI answers.'],

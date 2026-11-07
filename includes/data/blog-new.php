@@ -7,6 +7,25 @@
 
 return [
 
+'selectedfirms-interview-qualified-leads-beat-traffic' => [
+    'rich'  => 'selectedfirms-interview-qualified-leads-beat-traffic',
+    'title' => 'Qualified Leads Beat Traffic: Lessons From Our CEO Interview',
+    'meta'  => 'Our CEO\'s SelectedFirms interview in six lessons: why qualified leads beat traffic, the metrics that show growth, AI search and choosing an agency.',
+    'h1'    => 'Why Qualified Leads Beat Traffic: Inside Our SelectedFirms Interview',
+    'lede'  => 'Traffic shows that people found you. Growth shows that the right people chose you. In his SelectedFirms interview, our CEO B. Vignesh explains why qualified leads, conversion rates, acquisition cost and revenue are the numbers to watch, and why you should choose an agency for its approach, not its promises.',
+    'kicker' => 'CEO interview',
+    'category' => 'Strategy', 'intent' => 'Interview', 'date' => '2026-11-08', 'read' => '6 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['Who did SelectedFirms interview?', 'SelectedFirms interviewed B. Vignesh, CEO of VTurnU, as part of its interviews with agency leaders. He answered eight questions on marketing growth, AI search, the metrics that matter and how to choose a digital marketing agency.'],
+        ['What is the main takeaway from the interview?', 'Growth comes from qualified leads and revenue, not traffic alone. Visibility matters when it reaches the right audience and turns into enquiries your sales team can win.'],
+        ['Which marketing metrics matter more than traffic?', 'Qualified leads, conversion rates, customer acquisition cost and revenue. Comparing qualified leads with traffic shows whether your visibility is reaching the right people.'],
+        ['What should you look for when comparing agencies on SelectedFirms?', 'Look beyond ratings and portfolios to clear communication, relevant industry experience, transparent reporting and a practical understanding of your audience. A good agency asks the right questions before it proposes a plan.'],
+    ],
+    'cta' => ['Want Marketing You Can Measure in Qualified Leads?', 'Tell us your goals. A senior strategist replies within one working day with an honest plan.', 'Get My Growth Plan'],
+],
+
 'ai-first-vs-data-first-marketing' => [
     'rich'  => 'ai-first-vs-data-first-marketing',
     'title' => 'AI-First vs Data-First Marketing: What Drives B2B Growth?',
