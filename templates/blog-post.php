@@ -88,6 +88,7 @@ render_hero([
 <section class="section post-body-wrap post-closing">
     <div class="container narrow">
         <div class="post-body post-rich"><?= $rich_closing ?></div>
+        <?php render_related_service(blog_service_link((string) ($post['category'] ?? '')), 'is where we put this to work for clients.'); ?>
     </div>
 </section>
 <?php else: ?>
@@ -158,6 +159,7 @@ render_hero([
         </div>
         <?php endif; ?>
 
+        <?php render_related_service(blog_service_link((string) ($post['category'] ?? '')), 'is where we put this to work for clients.'); ?>
     </div>
 </section>
 

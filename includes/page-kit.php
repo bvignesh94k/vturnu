@@ -312,3 +312,82 @@ function render_work_showcase(string $title = 'Websites we built and grew', stri
 </section>
     <?php
 }
+
+/* ------------------------------------------------------------------ */
+/* Contextual links to the service hubs                                */
+/* ------------------------------------------------------------------ */
+/* A crawl on 7 Nov 2026 found the service hubs (/seo/, /ai/,
+   /web-services/, /digital-marketing/ and the rest) had only two in-body
+   links each: everything else pointing at them sat in the menu and footer.
+   These helpers give each service page one in-body link up to its hub, and
+   each article and guide one link to the service it teaches, with a plain
+   descriptive anchor. Keep every target a live, indexable page. */
+
+/** Anchor text for a hub when a child service page links up to it; '' = no link. */
+function hub_anchor(string $slug): string
+{
+    return [
+        'seo' => 'SEO services',
+        'ai' => 'AI search optimization services',
+        'web-services' => 'website design and development services',
+        'digital-marketing' => 'digital marketing services',
+        'paid-advertising' => 'paid advertising services',
+        'content-marketing' => 'content marketing services',
+        'online-marketing' => 'online marketing services',
+        'ecommerce-seo' => 'ecommerce SEO services',
+        'lead-generation-seo' => 'lead generation SEO services',
+        'enterprise-it-services' => 'enterprise and IT services',
+    ][$slug] ?? '';
+}
+
+/** The service a blog category teaches, as [url, anchor], or null. */
+function blog_service_link(string $category): ?array
+{
+    return [
+        'SEO' => ['/seo/', 'B2B SEO services'],
+        'AI Search' => ['/ai/', 'AI search optimization'],
+        'Web' => ['/web-services/', 'website design and development'],
+        'Conversion' => ['/web-design/', 'conversion-focused web design'],
+        'Paid Media' => ['/paid-advertising/', 'paid advertising management'],
+        'Content' => ['/content-marketing/', 'content marketing services'],
+        'Social' => ['/social-media-marketing/', 'social media marketing'],
+        'Strategy' => ['/digital-marketing/', 'B2B digital marketing services'],
+        'Innovation' => ['/digital-marketing/', 'B2B digital marketing services'],
+        'Enterprise IT' => ['/enterprise-it-services/', 'enterprise and IT services'],
+        'Case Study' => ['/seo/', 'B2B SEO services'],
+    ][$category] ?? null;
+}
+
+/** The service an e-book or guide teaches, as [url, anchor], or null. */
+function resource_service_link(string $slug): ?array
+{
+    return [
+        'ai-search-playbook' => ['/ai/', 'AI search optimization'],
+        'complete-guide-to-ai-seo' => ['/ai-seo/', 'AI SEO services'],
+        'ecommerce-seo-from-crawl-to-cart' => ['/ecommerce-seo/', 'ecommerce SEO services'],
+        'complete-guide-to-ecommerce-platforms' => ['/ecommerce-web-design/', 'ecommerce web design'],
+        'lead-gen-website-blueprint' => ['/web-design/', 'lead-generation web design'],
+        'complete-guide-to-business-lead-gen-seo' => ['/lead-generation-seo/', 'lead generation SEO'],
+        'local-seo-for-multi-location' => ['/local-seo/', 'local SEO services'],
+        'complete-guide-to-local-seo' => ['/local-seo/', 'local SEO services'],
+        'paid-media-budgeting-for-founders' => ['/paid-advertising/', 'paid advertising management'],
+        'complete-guide-to-google-ads' => ['/google-ads/', 'Google Ads management'],
+        'business-content-engine' => ['/content-marketing/', 'content marketing services'],
+        'complete-guide-to-content-strategy' => ['/content-marketing/', 'content marketing services'],
+        'website-speed-handbook' => ['/web-services/', 'website design and development'],
+        'whatsapp-marketing-playbook' => ['/digital-marketing/', 'digital marketing services'],
+        'marketing-analytics-starter' => ['/digital-marketing/', 'digital marketing services'],
+        'brand-identity-for-growth' => ['/branding-services/', 'branding services'],
+    ][$slug] ?? null;
+}
+
+/** One-line "Related service" note inside an article or guide body. */
+function render_related_service(?array $svc, string $note): void
+{
+    if (!$svc) {
+        return;
+    }
+    ?>
+<p class="rel-service"><span class="rel-service-k">Related service</span> <a href="<?= e($svc[0]) ?>"><?= e(ucfirst($svc[1])) ?></a> <span class="rel-service-note"><?= e($note) ?></span></p>
+    <?php
+}

@@ -29,8 +29,12 @@ render_money_fit($m['fit']);
 render_faqs(page_faqs($page, $slug), $page['h1'] . ': questions buyers ask');
 render_lead_form($page['h1'], $offer_title, $offer_sub, 'enquire', $offer_btn);
 ?>
-<?php if ($related): ?>
+<?php $hub = (string) ($page['parent'] ?? ''); $hub_label = isset($PAGES[$hub]) ? hub_anchor($hub) : ''; ?>
+<?php if ($related || $hub_label !== ''): ?>
 <div class="container">
+    <?php if ($hub_label !== ''): ?>
+    <p class="mp-rel-h">More from our <a href="<?= e(page_url($hub)) ?>"><?= e($hub_label) ?></a>:</p>
+    <?php endif; ?>
     <ul class="mp-rel" aria-label="Related services">
         <?php foreach ($related as $rslug => $rpage): ?>
         <li><a href="<?= e(page_url($rslug)) ?>"><?= e($rpage['h1']) ?></a></li>

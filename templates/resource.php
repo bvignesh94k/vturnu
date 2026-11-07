@@ -99,6 +99,7 @@ echo jsonld_script([
             </aside>
             <?php endif; ?>
             <?php endforeach; ?>
+            <?php render_related_service(resource_service_link($rslug), 'if you would rather have our team do it.'); ?>
         </div>
     </div>
 </section>

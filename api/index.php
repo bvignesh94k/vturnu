@@ -355,6 +355,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'free-seo-audit') {
     }
 }
 
+/* One URL per page. Without this, /seo-services and /seo-services/ both
+   answered 200 (only the canonical tag named the slash form), which splits
+   links and crawling between two addresses. GET and HEAD only, so a form
+   posted to a bare path still reaches its handler above. */
+if ($slug !== '' && isset($PAGES[$slug]) && is_string($uri) && !str_ends_with($uri, '/')
+    && in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
+    $qs = (string) ($_SERVER['QUERY_STRING'] ?? '');
+    header('Location: ' . page_url($slug) . ($qs !== '' ? '?' . $qs : ''), true, 308);
+    exit;
+}
+
 /* Resolve page */
 if (!isset($PAGES[$slug])) {
     http_response_code(404);
