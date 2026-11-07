@@ -1,10 +1,12 @@
 # Hubstaff Talent: listing pack
 
+**Update, 7 Nov 2026 (owner):** the owner has created a Hubstaff account; the agency profile on Hubstaff Talent is not created yet.
+
 | Item | Detail |
 | --- | --- |
 | Site | Hubstaff Talent, a free marketplace where companies post jobs and search freelancers and agencies (run by Hubstaff / Netsoft Holdings) |
 | Home | https://hubstafftalent.net/ |
-| Sign-up | https://hubstaff.com/signup (one Hubstaff account), then Avatar > Agencies > Add agency, as described in https://support.hubstaff.com/add-agency/ |
+| Sign-up | Use Hubstaff Talent's own sign-in at https://hubstafftalent.net/login (one Hubstaff account works across products), then Avatar > Agencies > Add agency, as described in https://support.hubstaff.com/add-agency/ . Skip the organization wizard at app.hubstaff.com: that sets up Hubstaff's separate time-tracking product and is not needed for a Talent agency profile. |
 | Who uses it | Companies hiring remote talent and agencies; employers search a separate Agencies tab and invite agencies to their job posts |
 | Cost (checked 7 Nov 2026) | Free: "Hubstaff Talent does not take any commission fees and is 100% free of charge" (FAQ). No paid tiers. |
 | Approval | Moderation team reviews each agency profile (the guide says up to 24 hours; the FAQ says 1 to 2 business days) |
