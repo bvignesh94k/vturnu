@@ -17,6 +17,9 @@ return [
         ['Your rankings look fine, and traffic is falling', 'AI Overviews answer the question before anyone clicks.'],
     ],
     'fit' => ['Your buyers research before they buy', 'Your website has real, specific information to quote', 'You want to move before your competitors do'],
+    /* One line under the service list: [text before, anchor, url, text after].
+       Followed on purpose: the listicle is VTurnU's own Google Site (owner, 7 Nov 2026). */
+    'note' => ['Still comparing agencies? See our list of the ', 'best AEO service providers', 'https://sites.google.com/vturnu.com/aeo-service-providers', ': ten agencies, VTurnU included, with what each one offers and how it measures results.'],
 ],
 
 'content-marketing' => [

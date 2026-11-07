@@ -2189,6 +2189,8 @@ h1, h2, .section-title { text-wrap: balance; }
 .mp-routes a:hover, .mp-routes a:focus-visible { transform: translateY(-3px); box-shadow: 0 20px 30px -22px rgba(29, 25, 54, .6); }
 .mp-routes b { display: block; margin-bottom: 4px; font-size: 1.04rem; }
 .mp-routes span { color: var(--mp-soft); font-size: .92rem; line-height: 1.5; }
+.mp-note { max-width: 760px; margin: clamp(18px, 2.4vw, 28px) 0 0; color: var(--mp-soft); line-height: 1.6; }
+.mp-note a { color: #2A25A0; font-weight: 700; }
 
 .mp-form { background: #EFEBFA; }
 .mp-rel { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 22px 0; list-style: none; border-top: 1.5px solid #E4E0EF; font-weight: 600; }

@@ -38,6 +38,9 @@ render_money_pain($m['pain']);
             <li data-reveal="card"><a href="<?= e(page_url($child)) ?>"><b><?= e($c['h1']) ?></b><span><?= e($cm['h'] ?? $c['lede']) ?></span></a></li>
             <?php endforeach; ?>
         </ul>
+        <?php if (!empty($m['note'])): [$note_pre, $note_label, $note_url, $note_post] = $m['note']; ?>
+        <p class="mp-note"><?= e($note_pre) ?><?= ext_link($note_url, $note_label, true) ?><?= e($note_post) ?></p>
+        <?php endif; ?>
     </div>
 </section>
 <?php endif; ?>
