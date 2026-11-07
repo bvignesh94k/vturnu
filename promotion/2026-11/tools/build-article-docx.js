@@ -5,6 +5,7 @@
 //
 // Input format:
 //   ---
+//   abstract: ...             (optional standfirst, printed in italics under the title)
 //   seo_title: ...            (optional, printed under the title)
 //   meta_description: ...     (optional)
 //   slug: ...                 (optional)
@@ -98,6 +99,12 @@ for (const line of lines) {
     children.push(new Paragraph({ heading: HeadingLevel.TITLE, children: inline(m[1]) }));
     if (!titleDone) {
       titleDone = true;
+      if (meta.abstract) {
+        children.push(new Paragraph({
+          spacing: { before: 0, after: 200 },
+          children: inline(meta.abstract, { italics: true, size: 24, color: '404040' }),
+        }));
+      }
       const seo = [
         ['SEO title', meta.seo_title],
         ['Meta description', meta.meta_description],
