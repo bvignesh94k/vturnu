@@ -83,6 +83,7 @@ $NAV = [
                     ['What is AEO?', '/blog/what-is-answer-engine-optimization/', 'The plain-English guide'],
                     ['Rank in AI Overviews', '/blog/how-to-rank-in-google-ai-overviews/', 'Step-by-step playbook'],
                     ['The AI Search Playbook', '/ebooks/ai-search-playbook/', 'Read the full e-book'],
+                    ['AI Crawler Checker', '/ai-crawler-checker/', 'Free robots.txt check'],
                 ],
             ],
         ],
@@ -247,6 +248,7 @@ $FOOTER = [
         ['ChatGPT SEO', '/chatgpt-seo/'],
         ['Perplexity SEO', '/perplexity-seo/'],
         ['Free SEO Audit', '/free-seo-audit/'],
+        ['AI Crawler Checker', '/ai-crawler-checker/'],
     ],
     'Web & Engineering' => [
         ['Web Design', '/web-design/'],

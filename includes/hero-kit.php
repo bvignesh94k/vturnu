@@ -109,7 +109,7 @@ function hero_visual(array $v): string
         'quote' => hx_quote((string) $a[0], (array) $a[1], (string) $a[2]),
         'modules' => hx_modules((string) $a[0], (array) $a[1]),
         'talent' => hx_talent((array) $a[0]),
-        'code' => hx_code((string) $a[0], (array) $a[1]),
+        'code' => hx_code((string) $a[0], (array) $a[1], (string) ($a[2] ?? 'Shipped and tested')),
         'chart' => hx_chart((string) $a[0], (array) $a[1]),
         'metrics' => hx_metrics((array) $a[0], (string) ($a[1] ?? '')),
         'book' => hx_book((string) $a[0], (string) $a[1]),
@@ -260,13 +260,13 @@ function hx_talent(array $people): string
     return $out . '</div>' . hx_tag('Screened and interviewed', 'hx-tag--a');
 }
 
-function hx_code(string $title, array $lines): string
+function hx_code(string $title, array $lines, string $tag = 'Shipped and tested'): string
 {
     $body = '<pre class="hx-pre">';
     foreach (array_slice($lines, 0, 6) as $l) {
         $body .= e((string) $l) . "\n";
     }
-    return hx_win($title, $body . '</pre>', 'hx-dark') . hx_tag('Shipped and tested', 'hx-tag--a');
+    return hx_win($title, $body . '</pre>', 'hx-dark') . hx_tag($tag, 'hx-tag--a');
 }
 
 function hx_chart(string $title, array $rows): string

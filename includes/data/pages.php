@@ -126,6 +126,24 @@ $PAGES = [
         'lede'  => 'Enter your website and get an instant report on what is holding your rankings back, including whether AI search engines can read your site at all. No signup, results in seconds.',
     ],
 
+    /* Free linkable tool: crawler data and the checker live in includes/ai-crawlers.php. */
+    'ai-crawler-checker' => [
+        'template' => 'ai-crawler-checker',
+        'title' => 'AI Crawler Checker: Can ChatGPT, Claude & Perplexity See You?',
+        'meta'  => 'Free AI crawler checker. See which of 23 AI crawlers your robots.txt allows, from GPTBot to PerplexityBot, and what they can read without JavaScript.',
+        'h1'    => 'AI Crawler Checker',
+        'lede'  => 'See which AI crawlers your robots.txt lets in, from ChatGPT, Claude and Perplexity to Google, Apple and Meta. Then see how much of your page they can read without running JavaScript.',
+        'cat' => 'ai', 'parent' => 'ai',
+        'faqs' => [
+            ['Does blocking GPTBot remove my site from ChatGPT search?', 'OpenAI documents them separately. GPTBot collects content that may be used to train its models, while OAI-SearchBot finds pages for ChatGPT search. Each has its own robots.txt token, so you can block one and allow the other.'],
+            ['Does Google-Extended affect Google Search or AI Overviews?', 'Google says Google-Extended does not affect inclusion in Google Search and is not a ranking signal. AI Overviews and AI Mode link to pages that are indexed in Google Search with a snippet, so they depend on Googlebot and on snippet controls such as nosnippet.'],
+            ['Do AI crawlers obey robots.txt?', 'The search and training crawlers listed here are documented with robots.txt controls. Several user fetchers are not: OpenAI says robots.txt rules may not apply to ChatGPT-User, Perplexity says Perplexity-User generally ignores them, and Meta and Amazon say their user fetchers may bypass them.'],
+            ['My robots.txt allows everything. Why can AI tools still not read my site?', 'Common causes are a firewall or CDN rule that blocks AI crawlers, main content that only appears after JavaScript runs, and noindex or nosnippet tags. This checker shows the last two. Your firewall settings and server logs show the first.'],
+            ['Do I need an llms.txt file?', 'No. llms.txt is a proposed convention, not a standard, and robots.txt is the control these companies document. The checker notes whether you have one.'],
+            ['How often should I check?', 'After any change to robots.txt, your CMS or plugins, your CDN or security settings, or a redesign. Companies also add and rename crawlers, and the reference list on this page shows the date it was last checked.'],
+        ],
+    ],
+
     'privacy-policy' => [
         'template' => 'legal',
         'title' => 'Privacy Policy | How We Collect, Use & Protect Your Data',
@@ -184,7 +202,7 @@ $PAGES = [
         'meta'  => 'Get your brand named in ChatGPT, Gemini, Perplexity and Google AI Overviews. AEO and GEO services from VTurnU, with real AI citation results to show.',
         'h1'    => 'AI Search: Be the Brand AI Recommends',
         'lede'  => 'Search is changing. We help your brand get found, and chosen, inside ChatGPT, Gemini, Perplexity, Copilot and Google AI Overviews.',
-        'children' => ['ai-seo', 'google-ai-overviews-seo', 'chatgpt-seo', 'perplexity-seo', 'selling-on-chatgpt', 'ai-blog-posts'],
+        'children' => ['ai-seo', 'google-ai-overviews-seo', 'chatgpt-seo', 'perplexity-seo', 'selling-on-chatgpt', 'ai-blog-posts', 'ai-crawler-checker'],
         'faqs' => [
             ['What is AEO?', 'Answer engine optimization, or AEO, is the practice of making your content the source AI assistants and search features quote when they answer a question.'],
             ['What is GEO?', 'Generative engine optimization, or GEO, means earning visibility inside AI-generated answers. In practice it overlaps almost entirely with AEO.'],

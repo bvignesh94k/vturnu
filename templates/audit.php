@@ -58,6 +58,7 @@ $labels = [
                 <div><strong>On-page SEO</strong><span>Title and description length, H1 structure, content depth, image alt text, mobile viewport</span></div>
                 <div><strong>AI search readiness</strong><span>Schema markup, FAQ data, and whether ChatGPT, Claude, Perplexity or Google AI are blocked</span></div>
             </div>
+            <p class="audit-also">Need a crawler-by-crawler answer for one page? Try the free <a href="/ai-crawler-checker/">AI Crawler Checker</a>.</p>
         </div>
 
         <?php /* Shown before the audit runs too, because a share of visitors

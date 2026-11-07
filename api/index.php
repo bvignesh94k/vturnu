@@ -174,7 +174,7 @@ if ($slug === 'llms.txt') {
     $out[] = '';
 
     $groups = [
-        'Digital Marketing and AI Search' => [], 'Enterprise & IT' => [], 'Guides and E-books' => [],
+        'Digital Marketing and AI Search' => [], 'Free tools' => [], 'Enterprise & IT' => [], 'Guides and E-books' => [],
         'Articles' => [], 'Case Studies' => [], 'Company' => [],
     ];
     foreach ($PAGES as $s => $p) {
@@ -183,7 +183,9 @@ if ($slug === 'llms.txt') {
         if (!empty($p['noindex'])) {
             continue;
         }
-        if ($tpl === 'landing' || $s === 'enterprise-it-services') {
+        if (in_array($tpl, ['audit', 'ai-crawler-checker'], true)) {
+            $groups['Free tools'][] = $line;
+        } elseif ($tpl === 'landing' || $s === 'enterprise-it-services') {
             $groups['Enterprise & IT'][] = $line;
         } elseif (str_starts_with($s, 'blog/')) {
             $groups['Articles'][] = $line;
@@ -353,6 +355,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'free-seo-audit') {
             });
         }
     }
+}
+
+/* AI Crawler Checker: a plain form post, answered by the page itself, so the
+   tool works without JavaScript and keeps no state. */
+$aic_result = null;
+$aic_error = '';
+$aic_input = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $slug === 'ai-crawler-checker') {
+    require_once dirname(__DIR__) . '/includes/ai-crawlers.php';
+    [$aic_result, $aic_error, $aic_input] = aic_handle_post();
 }
 
 /* One URL per page. Without this, /seo-services and /seo-services/ both
