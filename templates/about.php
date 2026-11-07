@@ -67,6 +67,7 @@
                 <div><dt>GSTIN</dt><dd><?= e(GSTIN) ?></dd></div>
                 <?php endif; ?>
             </dl>
+            <?php render_trust_badges('card', 'Rated and listed on'); ?>
         </aside>
     </div>
 </section>

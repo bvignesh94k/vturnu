@@ -4,7 +4,7 @@
  *   static assets → stale-while-revalidate (instant, refreshed in background)
  * Never touches admin, form posts, or stored lead data.
  */
-const VERSION = 'vturnu-v12';
+const VERSION = 'vturnu-v13';
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -66,8 +66,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets (incl. Google Fonts): serve from cache, refresh behind the scenes.
-    if (isAsset(url) || url.hostname.endsWith('gstatic.com') || url.hostname.endsWith('googleapis.com')) {
+    // Our own static assets (plus Google Fonts): serve from cache, refresh
+    // behind the scenes. Other third-party images (the TechBehemoths badge
+    // on cdn.techbehemoths.com) must go straight to the network: a fetch made
+    // from inside this worker is refused by the site's Content Security
+    // Policy, which left that badge broken for every returning visitor.
+    if ((sameOrigin && isAsset(url)) || url.hostname.endsWith('gstatic.com') || url.hostname.endsWith('googleapis.com')) {
         event.respondWith(
             caches.match(req).then((hit) => {
                 const network = fetch(req)

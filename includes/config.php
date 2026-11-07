@@ -85,13 +85,44 @@ define('ENTITY_PROFILES', [
     'https://www.ambitionbox.com/overview/vturnu-overview',
     'https://www.trustpilot.com/review/vturnu.com',
     'https://medium.com/@vturnu',
+    'https://www.sortlist.com/agency/vturnu',
+    'https://www.brownbook.net/business/56074057/vturnu',
+]);
+
+/* Trust badges: the independent places a buyer can check us. One list feeds
+   every placement (home hero, footer, About, Contact) through
+   render_trust_badges() in includes/trust-kit.php, so a new badge is one
+   entry here. Display order is list order.
+
+   Ratings and review counts are copied from the platform by hand: the date
+   in 'checked' says when. Update them when they change; never round up.
+   Every badge link is nofollow (owner's rule, 7 Nov 2026).
+
+   Entry shapes:
+   - rating:  name, url, rating, reviews, mark (our SVG of their logo), checked
+   - listed:  name, url, label, sub, mark
+   - art:     name, url, image (the badge the platform supplies, shown as
+              given so its verification bot finds it), image_w/h, alt, attr */
+define('TRUST_BADGES', [
+    ['key' => 'google', 'name' => 'Google', 'url' => 'https://g.page/r/Cae7OU9v9lRbEBM/',
+     'rating' => '4.8', 'reviews' => 19, 'checked' => '2026-11-07',
+     'mark' => '/assets/img/badges/google-g.svg', 'mark_w' => 48, 'mark_h' => 48],
+    ['key' => 'clutch', 'name' => 'Clutch', 'url' => 'https://clutch.co/profile/vturnu-digital-solutions',
+     'rating' => '4.8', 'reviews' => 2, 'checked' => '2026-11-07',
+     'mark' => '/assets/img/badges/clutch.svg', 'mark_w' => 406, 'mark_h' => 115],
+    ['key' => 'goodfirms', 'name' => 'GoodFirms', 'url' => 'https://www.goodfirms.co/company/vturnu',
+     'label' => 'Listed', 'sub' => 'Company profile',
+     'mark' => '/assets/img/badges/goodfirms.svg', 'mark_w' => 190, 'mark_h' => 37],
+    ['key' => 'techbehemoths', 'name' => 'TechBehemoths', 'url' => 'https://techbehemoths.com/company/vturnu',
+     'image' => 'https://cdn.techbehemoths.com/public/static/validation/tb-verified-logo.svg',
+     'image_w' => 123, 'image_h' => 40, 'alt' => 'TechBehemoths Verification', 'attr' => 'data-techbehemoths-verification'],
 ]);
 
 /* Countries the business targets. These drive areaServed in the structured data
    that search and AI engines read. They are deliberately not listed on any page. */
 /* Last site-wide content change. Update when many pages change at once:
    the sitemap and schema report it, and search engines recrawl on it. */
-define('SITE_UPDATED', '2026-11-01');
+define('SITE_UPDATED', '2026-11-07');
 
 define('TARGET_MARKETS', [
     'India', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Singapore', 'Malaysia', 'Indonesia',
@@ -103,7 +134,7 @@ define('TARGET_MARKETS', [
    Deliberately absent from JSON-LD, which every country and crawler reads. */
 define('GSTIN', '33ABAFV8139L2ZS');
 define('LEGAL_NAME', 'VTurnU Digital Solutions LLP');
-define('FOUNDING_YEAR', '2020');
+define('FOUNDING_YEAR', '2025');
 define('FOUNDER_NAME', 'Kalpana V');
 define('FOUNDER_TITLE', 'Founder');
 

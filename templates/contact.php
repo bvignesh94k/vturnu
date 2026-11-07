@@ -19,6 +19,7 @@
                 <li><strong>GSTIN:</strong> <?= e(GSTIN) ?></li>
                 <?php endif; ?>
             </ul>
+            <?php render_trust_badges('card', 'Rated and listed on'); ?>
             <div class="panel panel-accent">
                 <h3>What happens next?</h3>
                 <ol class="mini-steps">

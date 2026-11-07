@@ -29,6 +29,7 @@ require dirname(__DIR__) . '/includes/page-kit.php';
 require dirname(__DIR__) . '/includes/lead-form.php';
 require dirname(__DIR__) . '/includes/hero-kit.php';
 require dirname(__DIR__) . '/includes/money-kit.php';
+require dirname(__DIR__) . '/includes/trust-kit.php';
 
 /* parse_url() returns false, not null, on a malformed URI, so ?? never caught
    it and trim(false) was a fatal under strict_types: a request to "//" or any
