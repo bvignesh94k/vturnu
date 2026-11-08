@@ -1,12 +1,14 @@
 <?php
 /**
  * Trust badges: the independent places a buyer can check us (Google reviews,
- * Clutch, GoodFirms, TechBehemoths). The list lives in TRUST_BADGES in
- * includes/config.php; this file only draws it.
+ * Clutch, GoodFirms, TechBehemoths, Pick an Agency). The list lives in
+ * TRUST_BADGES in includes/config.php; this file only draws it.
  *
  * One renderer, four placements: the home hero under the call to action, the
  * footer strip on every page, the About facts card and the Contact page.
- * Adding an entry to TRUST_BADGES puts it in all four at once.
+ * Adding an entry to TRUST_BADGES puts it in all four at once, unless the
+ * entry limits itself with 'only' (one placement) or 'home' => false (never
+ * on the home page). Pick an Agency uses both: inner-page footers only.
  *
  * Every badge is the same tile: equal width and height, the platform's logo
  * centred at its own optical size, and the average rating in a gold pill where
@@ -22,26 +24,39 @@ declare(strict_types=1);
  * @param string $variant hero (home hero), footer (strip on the dark footer)
  *                        or card (white panels on inner pages)
  * @param string $heading short label above the tiles; '' for none
+ * @param bool   $on_home true when drawn on the home page, which leaves out
+ *                        every badge marked 'home' => false
  */
-function render_trust_badges(string $variant = 'card', string $heading = ''): void
+function render_trust_badges(string $variant = 'card', string $heading = '', bool $on_home = false): void
 {
-    if (!TRUST_BADGES) {
+    $badges = trust_badges_for($variant, $on_home);
+    if (!$badges) {
         return;
     }
     $id = 'trust-' . $variant;
     $label = $heading !== '' ? ' aria-labelledby="' . e($id) . '"' : ' aria-label="Independent ratings and listings"';
+    /* trust--n5 lets the CSS lay five tiles out evenly (see TRUST BADGES). */
     ?>
-<div class="trust trust--<?= e($variant) ?>" role="group"<?= $label ?>>
+<div class="trust trust--<?= e($variant) ?> trust--n<?= count($badges) ?>" role="group"<?= $label ?>>
     <?php if ($heading !== ''): ?><p class="trust-h" id="<?= e($id) ?>"><?= e($heading) ?></p><?php endif; ?>
     <div class="trust-body">
         <ul class="trust-list">
-            <?php foreach (TRUST_BADGES as $b): ?>
+            <?php foreach ($badges as $b): ?>
             <li><?= trust_badge($b, $variant === 'hero') ?></li>
             <?php endforeach; ?>
         </ul>
     </div>
 </div>
     <?php
+}
+
+/** The badges one placement shows: TRUST_BADGES in list order, less any entry
+    limited to another placement ('only') or kept off the home page ('home'). */
+function trust_badges_for(string $variant, bool $on_home = false): array
+{
+    return array_values(array_filter(TRUST_BADGES, static fn(array $b): bool =>
+        (!isset($b['only']) || $b['only'] === $variant)
+        && !($on_home && ($b['home'] ?? true) === false)));
 }
 
 /** One badge tile. The fields are documented above TRUST_BADGES. */

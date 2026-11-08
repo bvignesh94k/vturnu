@@ -632,6 +632,18 @@ a.card:hover, .card:hover {
 .trust--footer .trust-body { flex: 1; max-width: 720px; }
 .trust--footer .tb { border-color: transparent; }
 .trust--footer + .footer-bottom { margin-top: 24px; }
+/* Five tiles (inner-page footers, where Pick an Agency joins the four): still
+   equal tiles. Five across when the room allows, else three then two, or two,
+   two and one, with a short last row centred rather than stretched. */
+.trust--n5 .trust-list { display: flex; flex-wrap: wrap; justify-content: center; }
+.trust--n5 .trust-list > li { flex: 0 0 calc((100% - 8px) / 2); }
+@container trust (min-width: 600px) {
+    .trust--n5 .trust-list > li { flex-basis: calc((100% - 16px) / 3); }
+}
+@container trust (min-width: 760px) {
+    .trust--n5 .trust-list > li { flex-basis: calc((100% - 32px) / 5); }
+}
+.trust--footer.trust--n5 .trust-body { max-width: 900px; }
 /* About and Contact cards. */
 .trust--card { margin-top: 22px; }
 @media (max-width: 760px) {

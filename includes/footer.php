@@ -76,7 +76,9 @@
         <?php /* Full-width strip, so the badge tiles get the same equal
                  four-across layout as the home hero instead of being
                  squeezed into the brand column. */ ?>
-        <?php render_trust_badges('footer', 'Rated and listed on'); ?>
+        <?php /* On the home page the badges marked 'home' => false stay out
+                 (Pick an Agency shows in every footer but the home page's). */ ?>
+        <?php render_trust_badges('footer', 'Rated and listed on', $slug === ''); ?>
 
         <div class="footer-bottom">
             <?php /* The brand name links home: standard on agency sites, and it

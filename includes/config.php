@@ -110,7 +110,14 @@ define('ENTITY_PROFILES', [
                       followed link (TechBehemoths, owner, 7 Nov 2026). Every
                       other badge link is nofollow.
    - alt, attr        the image alt and link attribute a platform's own badge
-                      snippet uses, kept as given so its verification bot finds it */
+                      snippet uses, kept as given so its verification bot finds it
+                      (a text-only snippet's link text becomes the alt)
+   - only             the one placement a badge is limited to: hero, footer or
+                      card. Leave it out and the badge shows in all of them.
+   - home             false keeps the badge off the home page, footer included
+                      (Pick an Agency: footer only, never on the home page,
+                      owner, 8 Nov 2026). Its url keeps the ref code from the
+                      platform's snippet. */
 define('TRUST_BADGES', [
     ['key' => 'google', 'name' => 'Google', 'url' => 'https://g.page/r/Cae7OU9v9lRbEBM/',
      'logo' => '/assets/img/badges/google-g.svg', 'logo_w' => 48, 'logo_h' => 48, 'size' => 24,
@@ -124,6 +131,9 @@ define('TRUST_BADGES', [
     ['key' => 'techbehemoths', 'name' => 'TechBehemoths', 'url' => 'https://techbehemoths.com/company/vturnu',
      'logo' => 'https://cdn.techbehemoths.com/public/static/validation/tb-verified-logo.svg', 'logo_w' => 123, 'logo_h' => 40, 'size' => 36,
      'color' => '#3672FF', 'follow' => true, 'alt' => 'TechBehemoths Verification', 'attr' => 'data-techbehemoths-verification'],
+    ['key' => 'pickanagency', 'name' => 'Pick an Agency', 'url' => 'https://www.pickanagency.com/agencies/vturnu?ref=pa-7bae742b96f463046dc0485ce450913f',
+     'logo' => '/assets/img/badges/pickanagency.svg', 'logo_w' => 701, 'logo_h' => 103, 'size' => 17,
+     'color' => '#5E2EE5', 'alt' => 'Featured on Pick an Agency', 'only' => 'footer', 'home' => false],
 ]);
 
 /* Countries the business targets. These drive areaServed in the structured data

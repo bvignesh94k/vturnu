@@ -137,7 +137,7 @@ $cta_label = 'Start my growth plan';
       <a class="tt-link" href="/case-studies/">See the results</a>
       <?php endif; ?>
     </div>
-    <?php render_trust_badges('hero', 'Rated and listed on'); ?>
+    <?php render_trust_badges('hero', 'Rated and listed on', true); ?>
   </div>
 
   <p class="tt-score" aria-hidden="true">
