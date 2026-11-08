@@ -49,3 +49,26 @@
 - Day 1 result, honestly: 1 article submitted; 1 new listing pack ready (Hubstaff Talent), 1 blocked by the directory (Zyppy List), and 1 earlier submission pending (AdForum). The two-new-listings target was not met with sites that pass the quality checks; tomorrow's batch starts with extra directory research.
 - Later the same night: the owner approved the Zyppy enquiry; Gmail shows it already sent at 19:52 UTC, so it was not sent twice. The owner created a Hubstaff account but landed in the time-tracking app's organization wizard; the pack now points to Hubstaff Talent's own sign-in (https://hubstafftalent.net/login) and says to skip that wizard. The AdForum profile URL returns 404 for the owner, so it is not public yet. GitHub's search API shows the connected account "coinshelve" has push: false on the repository, which is why pushes fail.
 - Hubstaff Talent: the owner submitted the agency profile (https://hubstafftalent.net/agencies/vturnu). It is not public yet (404 for the owner, 403 for a logged-out request here), so it is recorded as submitted and pending review. Day 1 listings submitted: 1 (Hubstaff Talent); live: 0.
+
+## Sunday 8 November 2026 (day 2)
+
+### Start of day
+- The daily scheduled task fired at 9:34 AM IST. Local commits from day 1 are intact. Push to GitHub still fails: the search API shows the connected GitHub account "coinshelve" has push: false on the repository.
+
+### Re-checks (logged out)
+- Hubstaff Talent: LIVE at https://hubstafftalent.net/agencies/vturnu (HTTP 200, name, location and Listings Kit description shown). All three vturnu.com links carry rel="nofollow", and the page is noindex, which is the platform default (three other agency profiles checked show the same). Counted as day 1's live listing.
+- MarTech Series: no reply yet; not in the guest-author archive.
+- Zyppy List: no reply yet to the enquiry sent on 7 Nov.
+- AdForum: still behind a Cloudflare challenge for automated requests; the owner saw a 404 on 7 Nov, so it is not public.
+- Inbox: Hubstaff asked the owner to confirm the new account's email address.
+
+### Article (1, pitch first)
+- NZ Marketing Magazine: its write-for-us page asks contributors to discuss ideas with the editor. Recent Industry Insight pieces cover AI summaries and AI traffic, so the pitch avoids AI search. Lead angle: "Your B2B newsletter is judged by the inbox before the reader" (Gmail and Yahoo sender rules since February 2024, Microsoft enforcement for high-volume senders to Outlook.com since May 2025, and New Zealand's Unsolicited Electronic Messages Act). Alternative: "Brief your agency like a buyer". Facts checked through search results the same morning; site search found no recent piece on email deliverability. Pitch drafted in Gmail; it has no attachment, so it can be sent once the owner approves. Outline saved for the article if accepted. Planned vturnu.com link: https://vturnu.com/email-marketing/ (loads).
+
+### Listings (2 new packs)
+- Pick an Agency: free with no paid tier; its public search API found no VTurnU profile; profile links are nofollow. Pack ready.
+- Top Interactive Agencies: free submission form, human-edited and selective; India section active; sample Indian profile carries a followed website link; site search found no VTurnU. Pack ready, with a 400 x 60 JPG made from the official horizontal logo. The form has an anti-bot check, so the owner submits it.
+- Checked and rejected: 50Pros (publishing needs a $750 verification fee), Desirely (unrelated niche), Make, Postiz, Zapier, Webflow, Wix, Shopify, Dribbble, Rankability, Pipedrive, ProvenExpert. Behance kept as a reserve.
+
+### Waiting on
+- Owner: approve sending the NZ Marketing pitch; add VTurnU on Pick an Agency; submit the Top Interactive Agencies form; confirm the Hubstaff account email; fix GitHub write access.
