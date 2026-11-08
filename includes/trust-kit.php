@@ -15,7 +15,8 @@
  * the platform rates us. Nothing else: no review counts, no captions.
  *
  * Links open in a new tab. They are nofollow, except where an entry sets
- * 'follow' (TechBehemoths, whose verification only accepts a followed link).
+ * 'follow' (TechBehemoths and Pick an Agency, whose verification only
+ * accepts a followed link).
  */
 
 declare(strict_types=1);

@@ -107,8 +107,9 @@ define('ENTITY_PROFILES', [
                       'checked'. Never rounded up. Leave it out while the
                       platform has no reviews: the tile then shows the logo only.
    - follow           true only where the platform's verification needs a
-                      followed link (TechBehemoths, owner, 7 Nov 2026). Every
-                      other badge link is nofollow.
+                      followed link (TechBehemoths, owner, 7 Nov 2026; Pick an
+                      Agency, owner, 8 Nov 2026, after its check rejected the
+                      nofollow link). Every other badge link is nofollow.
    - alt, attr        the image alt and link attribute a platform's own badge
                       snippet uses, kept as given so its verification bot finds it
                       (a text-only snippet's link text becomes the alt)
@@ -133,7 +134,7 @@ define('TRUST_BADGES', [
      'color' => '#3672FF', 'follow' => true, 'alt' => 'TechBehemoths Verification', 'attr' => 'data-techbehemoths-verification'],
     ['key' => 'pickanagency', 'name' => 'Pick an Agency', 'url' => 'https://www.pickanagency.com/agencies/vturnu?ref=pa-7bae742b96f463046dc0485ce450913f',
      'logo' => '/assets/img/badges/pickanagency.svg', 'logo_w' => 701, 'logo_h' => 103, 'size' => 17,
-     'color' => '#5E2EE5', 'alt' => 'Featured on Pick an Agency', 'only' => 'footer', 'home' => false],
+     'color' => '#5E2EE5', 'follow' => true, 'alt' => 'Featured on Pick an Agency', 'only' => 'footer', 'home' => false],
 ]);
 
 /* Countries the business targets. These drive areaServed in the structured data
