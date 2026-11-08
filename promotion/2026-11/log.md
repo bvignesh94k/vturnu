@@ -72,3 +72,11 @@
 
 ### Waiting on
 - Owner: approve sending the NZ Marketing pitch; add VTurnU on Pick an Agency; submit the Top Interactive Agencies form; confirm the Hubstaff account email; fix GitHub write access.
+
+### Later on 8 Nov (owner updates)
+- GitHub: the owner accepted the access invitation. The branch pushed successfully for the first time; all earlier commits are now on GitHub.
+- NZ Marketing pitch sent by the owner (04:45 UTC). Status: pitched.
+- Pick an Agency: approved and LIVE at https://www.pickanagency.com/agencies/vturnu, verified logged out; vturnu.com links are nofollow; the page is indexable. The profile's team size shows 1-10 and its description still has the sentences the owner no longer wants.
+- Top Interactive Agencies: submitted by the owner; pending editorial review.
+- New rule from the owner: company descriptions must not mention the Enterprise and IT practice or the engagement terms (reply time, fixed pricing, weekly reporting, no lock-in). `listings/00-common-fields.md` and every pack now use trimmed descriptions. The live Hubstaff Talent and Pick an Agency profiles need the same edit.
+- Running totals: articles 1 submitted (MarTech Series) and 1 pitched (NZ Marketing); listings live 2 (Hubstaff Talent, Pick an Agency), pending 2 (Top Interactive Agencies, AdForum), blocked 1 (Zyppy List, enquiry sent).

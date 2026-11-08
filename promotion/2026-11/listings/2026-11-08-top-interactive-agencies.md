@@ -31,7 +31,7 @@
 | Country * | India |
 | Agency Logo (JPG, 400 x 60 suggested) | Use the file vturnu-logo-400x60.jpg sent in the session (the official horizontal logo, resized; nothing else changed) |
 | Services * | Digital Marketing, SEO, AI Search Optimization, PPC (Google Ads), Social Media Marketing, Content Marketing, Branding, Web Design, Web Development, E-commerce Development |
-| Comments | B2B digital marketing and branding agency in Chennai, India. SEO, AI search visibility, Google Ads, content, branding and conversion-focused websites that win qualified leads. Senior strategist reply within one working day; no lock-in after 90 days. |
+| Comments | B2B digital marketing and branding agency in Chennai, India. SEO, AI search visibility, Google Ads, content, branding and conversion-focused websites that win qualified leads. |
 
 ## After submission
 - Note the date. If the profile appears under the India section, send me the URL and I will load it logged out and record the link attribute.

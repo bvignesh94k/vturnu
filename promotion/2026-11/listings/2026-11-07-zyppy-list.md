@@ -34,7 +34,7 @@
 | Minimum budget band | Under $1000 (VTurnU's minimum is US$550 a month, ₹50,000 in India) |
 | Founded | 2025 |
 | Team size | 10 to 49 |
-| Short description | B2B digital marketing and branding agency in Chennai, India. SEO, AI search visibility, Google Ads, content, branding and conversion-focused websites that win qualified leads. Senior strategist reply within one working day; no lock-in after 90 days. |
+| Short description | B2B digital marketing and branding agency in Chennai, India. SEO, AI search visibility, Google Ads, content, branding and conversion-focused websites that win qualified leads. |
 | Full description | Medium description from `00-common-fields.md`; the Long one if the box allows it |
 | Contact methods | Website, email and phone as above; WhatsApp link https://wa.me/919363731498 if offered |
 | Social profiles | LinkedIn: https://www.linkedin.com/company/vturnu, https://www.facebook.com/VTurnUDigital, https://www.instagram.com/vturnu, https://x.com/VTurnU_Digital |
