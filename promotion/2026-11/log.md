@@ -80,3 +80,9 @@
 - Top Interactive Agencies: submitted by the owner; pending editorial review.
 - New rule from the owner: company descriptions must not mention the Enterprise and IT practice or the engagement terms (reply time, fixed pricing, weekly reporting, no lock-in). `listings/00-common-fields.md` and every pack now use trimmed descriptions. The live Hubstaff Talent and Pick an Agency profiles need the same edit.
 - Running totals: articles 1 submitted (MarTech Series) and 1 pitched (NZ Marketing); listings live 2 (Hubstaff Talent, Pick an Agency), pending 2 (Top Interactive Agencies, AdForum), blocked 1 (Zyppy List, enquiry sent).
+
+### Paused by the owner (8 Nov 2026)
+- The owner asked to pause the daily scheduled task because credits are low this week. The schedule is disabled, not deleted, so it resumes with one step when the owner sends "resume".
+- On resume: re-enable the schedule, run a catch-up batch for the missed days (quality over count, no weaker sites), and re-check everything submitted so far logged out.
+- The final report is sent by the 30 November run. If the schedule is still paused then, send the report on resume (the owner has already approved that email).
+- While paused nothing watches the inbox. Pending replies and approvals: MarTech Series, NZ Marketing and Zyppy List (replies), Top Interactive Agencies and AdForum (approvals).
