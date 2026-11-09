@@ -25,8 +25,8 @@ declare(strict_types=1);
 const LEAD_JUNK_SCORE   = 60;
 const LEAD_REVIEW_SCORE = 30;
 
-/** Sources that collect no message, so the "say what you need" rules do not apply. */
-const LEAD_NO_MESSAGE_SOURCES = ['newsletter', 'seo-audit'];
+/** Sources that collect no message (or only an optional one, like the booking page), so the "say what you need" rules do not apply. */
+const LEAD_NO_MESSAGE_SOURCES = ['newsletter', 'seo-audit', 'booking'];
 
 const LEAD_DISPOSABLE_DOMAINS = [
     'lettersboxmail.com', 'belettersmail.com', 'mailinator.com', 'guerrillamail.com', 'guerrillamail.net',

@@ -33,9 +33,14 @@ const unit = await php.run({ code: `<?php require '/t/crm-test.php';` });
 process.stdout.write(unit.text);
 if (unit.errors || !/ 0 failed/.test(unit.text)) failed++;
 
+/* Book a Meeting: slots, time zones, the Google flow (against a stand-in), emails and pages. */
+const booking = await php.run({ code: `<?php require '/t/booking-test.php';` });
+process.stdout.write(booking.text);
+if (booking.errors || !/ 0 failed/.test(booking.text)) { failed++; if (booking.errors) console.log(String(booking.errors).slice(0, 1500)); }
+
 /* Every admin view must render without a single PHP warning. */
 const views = ['view=dashboard', 'view=leads', 'view=leads&channel=Organic+search&grade=A&proposal=none', 'view=lead&id=42', 'view=lead&id=43', 'view=proposal&id=42',
-  'view=proposal&id=43&kind=followup', 'view=pipeline', 'view=reports', 'view=settings', 'view=junk', 'view=audits', 'view=downloads', 'view=subscribers'];
+  'view=proposal&id=43&kind=followup', 'view=meeting&id=42', 'view=meeting&id=43', 'view=meetings', 'view=pipeline', 'view=reports', 'view=settings', 'view=junk', 'view=audits', 'view=downloads', 'view=subscribers'];
 for (const v of views) {
   const get = JSON.stringify(Object.fromEntries(new URLSearchParams(v))).replace(/'/g, "\\'");
   try {

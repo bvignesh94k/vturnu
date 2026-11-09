@@ -373,6 +373,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$sent['ok']) { $composer_post = $_POST; }
                 break;
 
+            /* Book a Meeting: email the lead a personal link to pick a time on the connect@ calendar. */
+            case 'meeting_send':
+                $lid = (string) ($_POST['id'] ?? '');
+                $target = ctype_digit($lid) ? crm_lead((int) $lid) : null;
+                if (!$target) {
+                    $flash = 'Lead not found.';
+                    break;
+                }
+                $sent = booking_send_request($target, (string) ($_POST['subject'] ?? ''), (string) ($_POST['body'] ?? ''), [
+                    'copy' => !empty($_POST['copy']), 'by' => $auth['user'], 'stage' => !empty($_POST['stage']),
+                ]);
+                if ($sent['ok'] && $sent['error'] === '') {
+                    header('Location: /admin/?view=lead&id=' . $lid . '&meeting=sent'); exit;
+                }
+                $flash = $sent['ok'] ? $sent['error'] : 'Not sent: ' . $sent['error'];
+                if (!$sent['ok']) { $meeting_post = $_POST; }
+                break;
+
+            /* Cancel a booked call from the CRM: Google withdraws the invitation and the lead can pick a new time. */
+            case 'meeting_cancel':
+                $mt = booking_by_token((string) ($_POST['token'] ?? ''));
+                if (!$mt) {
+                    $flash = 'Meeting not found.';
+                    break;
+                }
+                $c = booking_cancel($mt, (string) ($_POST['reason'] ?? ''), $auth['user'], true);
+                $flash = $c['ok'] ? 'Meeting cancelled. ' . $mt['name'] . ' has been told and can pick a new time with the same link.' : $c['error'];
+                break;
+
+            case 'booking_settings':
+                booking_save_settings($_POST);
+                $flash = 'Booking settings saved.';
+                break;
+
+            /* Ask Google for the next two days' busy times: proves the calendar connection end to end. */
+            case 'booking_check':
+                try {
+                    $busy = gcal_freebusy(time(), time() + 2 * 86400);
+                    $flash = 'Google Calendar is connected. connect@vturnu.com has ' . count($busy) . ' busy ' . (count($busy) === 1 ? 'block' : 'blocks') . ' in the next 48 hours, and the booking page leaves those times out.';
+                } catch (Throwable $e) {
+                    $flash = 'Google Calendar is not working: ' . $e->getMessage();
+                }
+                break;
+
             case 'crm_settings':
                 crm_save_settings($_POST);
                 $flash = 'CRM settings saved.';
@@ -623,6 +667,31 @@ function proposal_badge(?array $p): string {
     $tip = 'Sent ' . date('j M', strtotime((string) $p['sent_at'])) . ((int) ($p['sent_count'] ?? 1) > 1 ? ', ' . (int) $p['sent_count'] . ' emails in all' : '');
     return '<span class="badge-st" style="--st:' . $c . '" title="' . e_a($tip) . '">' . $label . '</span>';
 }
+/** Where a meeting stands (Requested, Booked, Rescheduled, Done, Cancelled) and the lead's answer to the calendar invitation. */
+function meeting_badge(array $m): string {
+    [$label, $c] = [
+        'requested' => ['Requested', '#5B56C9'], 'booked' => ['Booked', '#12A150'], 'rescheduled' => ['Rescheduled', '#FF9100'],
+        'done' => ['Done', '#6F6992'], 'cancelled' => ['Cancelled', '#9A93BC'],
+    ][booking_state($m)] ?? ['Unknown', '#9A93BC'];
+    $out = '<span class="badge-st" style="--st:' . $c . '">' . $label . '</span>';
+    if ($m['status'] === 'booked' && $m['end'] > time()) {
+        [$rl, $rc] = [
+            'accepted' => ['Accepted the invitation', '#12A150'], 'declined' => ['Declined the invitation', '#D62C74'],
+            'tentative' => ['Replied maybe', '#FF9100'], 'needsAction' => ['No reply to the invitation yet', '#9A93BC'],
+        ][$m['rsvp']] ?? ['', ''];
+        if ($rl !== '') { $out .= ' <span class="badge-st" style="--st:' . $rc . '">' . $rl . '</span>'; }
+    }
+    return $out;
+}
+/** "Tue 11 Nov 2026, 8:30 PM IST · 9:00 AM their time (Chicago)". */
+function meeting_when(array $m): string {
+    if ($m['start'] <= 0) return '';
+    $s = booking_ist($m['start']);
+    if ($m['time_zone'] !== '' && !booking_is_india($m['time_zone'])) {
+        $s .= ' · ' . booking_fmt($m['start'], $m['time_zone'], 'time') . ' their time (' . booking_zone_city($m['time_zone']) . ')';
+    }
+    return $s;
+}
 /** How long a new lead has waited for a first reply. */
 function waiting_for(array $l): string {
     $h = (int) floor((time() - strtotime((string) ($l['date'] ?? 'now'))) / 3600);
@@ -827,6 +896,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         <div class="side-sub">CRM & Content</div>
         <a class="nav<?= $view === 'dashboard' ? ' on' : '' ?>" href="/admin/?view=dashboard">Dashboard</a>
         <a class="nav<?= in_array($view, ['leads', 'lead'], true) ? ' on' : '' ?>" href="/admin/?view=leads">Sales leads</a>
+        <a class="nav<?= in_array($view, ['meetings', 'meeting'], true) ? ' on' : '' ?>" href="/admin/?view=meetings">Meetings</a>
         <a class="nav<?= $view === 'junk' ? ' on' : '' ?>" href="/admin/?view=junk">Junk filter<?= $junk_leads ? ' (' . count($junk_leads) . ')' : '' ?></a>
         <a class="nav<?= $view === 'audits' ? ' on' : '' ?>" href="/admin/?view=audits">Audit requests</a>
         <a class="nav<?= $view === 'downloads' ? ' on' : '' ?>" href="/admin/?view=downloads">E-book downloads</a>
@@ -939,6 +1009,25 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             <a class="kpi kpi-link" href="/admin/?view=leads&proposal=sent"><b><?= count($recent_p) ?></b><span>Proposals sent, last 30 days</span><small><?= $p_opened ?> opened · <?= $p_read ?> read · <?= $p_yes ?> said yes</small></a>
             <div class="kpi"><b>₹<?= money_fmt($open_value) ?: '0' ?></b><span>Open pipeline value</span><small>Win rate <?= $win_rate ?>% (<?= $by_status['won'] ?>/<?= $closed ?> closed)<?= $median_resp !== null ? ' · first reply in ' . ($median_resp < 1 ? 'under an hour' : round($median_resp) . 'h') . ', typically' : '' ?></small></div>
         </div>
+
+        <?php $upcoming = booking_upcoming(14, 8); if ($upcoming): ?>
+        <div class="panel">
+            <h2>Upcoming meetings (<?= count($upcoming) ?>)</h2>
+            <table class="attn"><tbody>
+            <?php foreach ($upcoming as $mt): ?>
+                <tr>
+                    <td style="width:230px"><strong><?= e_a(booking_fmt($mt['start'], BOOKING_HOST_TZ, 'short')) ?> IST</strong><?php if ($mt['time_zone'] !== '' && !booking_is_india($mt['time_zone'])): ?><br><small style="color:var(--muted)"><?= e_a(booking_fmt($mt['start'], $mt['time_zone'], 'time') . ' their time, ' . booking_zone_city($mt['time_zone'])) ?></small><?php endif; ?></td>
+                    <td><strong><?= e_a($mt['name']) ?></strong><?= $mt['company'] !== '' ? '<br><small style="color:var(--muted)">' . e_a(mb_substr($mt['company'], 0, 44)) . '</small>' : '' ?></td>
+                    <td><?= meeting_badge($mt) ?></td>
+                    <td style="text-align:right;white-space:nowrap">
+                        <?php if ($mt['meet_url'] !== ''): ?><a class="btn sm grad" href="<?= e_a($mt['meet_url']) ?>" target="_blank" rel="noopener">Join Meet</a><?php endif; ?>
+                        <?php if ($mt['enquiry_id'] > 0): ?><a class="btn ghost sm" href="/admin/?view=lead&id=<?= (int) $mt['enquiry_id'] ?>">Open</a><?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody></table>
+        </div>
+        <?php endif; ?>
 
         <div class="panel"<?= $attn ? ' style="border-color:rgba(255,61,138,.35)"' : '' ?>>
             <h2>Needs attention<?= $attn ? ' (' . count($attn) . ')' : '' ?></h2>
@@ -1201,7 +1290,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                             ? '<span class="' . ($overdue ? 'due-flag' : '') . '">' . e_a(date('j M', strtotime($l['followup']))) . '</span>'
                             : '<span style="color:var(--muted)">-</span>' ?></td>
                         <td><?= status_badge($l['status']) ?><?= $l['status'] === 'new' ? '<br><small class="' . (($l['date'] ?? '') < date('c', strtotime('-24 hours')) ? 'due-flag' : '') . '" style="font-size:.68rem">' . e_a(waiting_for($l)) . '</small>' : '' ?></td>
-                        <td style="white-space:nowrap"><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a><?php if ($pstate === 'none' && !in_array($l['status'], ADMIN_CLOSED, true)): ?> <a class="btn sm grad" href="/admin/?view=proposal&id=<?= e_a($l['id']) ?>">Proposal</a><?php endif; ?></td>
+                        <td style="white-space:nowrap"><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a><?php if ($pstate === 'none' && !in_array($l['status'], ADMIN_CLOSED, true)): ?> <a class="btn sm grad" href="/admin/?view=proposal&id=<?= e_a($l['id']) ?>">Proposal</a><?php endif; ?> <a class="btn sm" href="/admin/?view=meeting&id=<?= e_a($l['id']) ?>" title="Email <?= e_a($l['name'] ?? '') ?> a link to book a call">Book a Meeting</a></td>
                     </tr>
                 <?php endforeach; if (!$filtered): ?><tr><td colspan="9">No leads match.</td></tr><?php endif; ?>
                 </tbody>
@@ -1387,6 +1476,21 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             $attr = $lead['attribution'];
             $props = crm_proposals((int) $lead['id']);
             $hasProposal = (bool) array_filter($props, fn($p) => $p['kind'] === 'proposal');
+            /* Meetings, with each upcoming call checked against Google Calendar: a move or deletion
+               made in the calendar, or the lead's answer to the invitation, shows up here. */
+            $meetings = booking_for_lead((int) $lead['id']);
+            $synced = 0;
+            $changed = false;
+            foreach ($meetings as $i => $mt) {
+                if ($mt['status'] === 'booked' && $mt['end'] > time() && $synced < 3) {
+                    $meetings[$i] = booking_sync($mt);
+                    $synced++;
+                    $changed = $changed || $meetings[$i]['status'] !== $mt['status'] || $meetings[$i]['rsvp'] !== $mt['rsvp'] || $meetings[$i]['start'] !== $mt['start'];
+                }
+            }
+            if ($changed && ($fresh = crm_lead((int) $lead['id']))) {
+                $lead['activity'] = json_decode((string) ($fresh['activity'] ?? '[]'), true) ?: [];
+            }
             $digits = phone_digits((string) $lead['mobile']);
             $crm_cfg = crm_settings();
             $wa_text = 'Hi ' . $facts['first'] . ', this is ' . crm_first_name((string) $crm_cfg['sender_name']) . ' from VTurnU, about your enquiry'
@@ -1406,9 +1510,11 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         <h1><?= e_a($lead['name'] ?? 'Lead') ?> <?= grade_badge($lead['grade']) ?> <?= channel_badge($lead) ?></h1>
         <p class="sub"><a href="/admin/?view=leads">← Back</a> · captured <?= e_a(date('j M Y, H:i', strtotime($lead['date'] ?? 'now'))) ?> from the <strong><?= e_a(CRM_PLACEMENTS[$lead['source']] ?? $lead['source']) ?></strong><?= ($lead['form_page'] ?? '') !== '' ? ' on <span class="mono">' . e_a(strtok((string) $lead['form_page'], '?')) . '</span>' : '' ?><?= $lead['status'] === 'new' ? ' · waiting ' . e_a(waiting_for($lead)) . ' for a first reply' : '' ?></p>
         <?php if (!empty($_GET['sent'])): ?><div class="flash">✓ <?= ($_GET['sent'] === 'followup' ? 'Follow-up' : 'Proposal') ?> sent to <?= e_a($lead['email']) ?> from <?= e_a(CONTACT_EMAIL) ?>. When they open it, read it online or say yes, it shows up here and in the morning digest.</div><?php endif; ?>
+        <?php if (($_GET['meeting'] ?? '') === 'sent'): ?><div class="flash">✓ Meeting request sent to <?= e_a($lead['email']) ?> from <?= e_a(CONTACT_EMAIL) ?>. When they open it, look at the booking page and book, it shows up under Meetings and in the timeline.</div><?php endif; ?>
         <div class="lead-actions">
             <a class="btn grad" href="/admin/?view=proposal&id=<?= e_a($lead['id']) ?>"><?= $hasProposal ? 'Send a new proposal' : 'Send proposal' ?></a>
             <?php if ($hasProposal): ?><a class="btn" href="/admin/?view=proposal&kind=followup&id=<?= e_a($lead['id']) ?>">Send follow-up</a><?php endif; ?>
+            <a class="btn" href="/admin/?view=meeting&id=<?= e_a($lead['id']) ?>">Book a Meeting</a>
             <?php if ($digits !== ''): ?>
             <a class="btn wa" href="https://wa.me/<?= e_a($digits) ?>?text=<?= rawurlencode($wa_text) ?>" target="_blank" rel="noopener">WhatsApp</a>
             <a class="btn ghost" href="tel:+<?= e_a($digits) ?>">Call</a>
@@ -1533,6 +1639,46 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 </tbody></table>
                 <?php endif; ?>
             </div>
+        </div>
+        <div class="panel" id="meetings">
+            <h2>Meetings</h2>
+            <?php if ($meetings): ?>
+            <ul class="prop-list">
+            <?php foreach ($meetings as $mt): ?>
+                <li>
+                    <strong><?= $mt['start'] > 0 ? e_a(meeting_when($mt)) : 'Not booked yet' ?></strong>
+                    <div class="meta">
+                        <?= meeting_badge($mt) ?>
+                        <?php if (!empty($mt['requested_at'])): ?><span>Request sent <?= e_a(date('j M, H:i', strtotime((string) $mt['requested_at']))) ?><?= ($mt['requested_by'] ?? '') !== '' ? ' by ' . e_a($mt['requested_by']) : '' ?></span><?php elseif (!empty($mt['booked_at'])): ?><span>Booked from the booking page <?= e_a(date('j M, H:i', strtotime((string) $mt['booked_at']))) ?></span><?php endif; ?>
+                        <?= !empty($mt['opened_at']) ? '<span class="badge-st" style="--st:#00B8D9">Opened the email</span>' : '' ?>
+                        <?= !empty($mt['viewed_at']) ? '<span class="badge-st" style="--st:#FF9100">Looked at the booking page</span>' : '' ?>
+                        <?php if ($mt['reschedules'] > 0): ?><span>Moved <?= $mt['reschedules'] === 1 ? 'once' : $mt['reschedules'] . ' times' ?></span><?php endif; ?>
+                    </div>
+                    <div class="meta">
+                        <?php if ($mt['status'] === 'booked' && $mt['meet_url'] !== ''): ?><a href="<?= e_a($mt['meet_url']) ?>" target="_blank" rel="noopener" style="color:var(--v);font-weight:700">Google Meet: <?= e_a((string) preg_replace('#^https?://#', '', $mt['meet_url'])) ?> ↗</a><?php endif; ?>
+                        <?php if ($mt['status'] === 'booked' && $mt['event_link'] !== ''): ?><a href="<?= e_a($mt['event_link']) ?>" target="_blank" rel="noopener" style="color:var(--v);font-weight:700">Calendar event ↗</a><?php endif; ?>
+                        <a href="<?= e_a(booking_url($mt['token'])) ?>" target="_blank" rel="noopener" style="color:var(--v);font-weight:700">Their booking page ↗</a>
+                    </div>
+                    <?php if ($mt['status'] === 'cancelled'): ?><div class="quote" style="margin-top:8px">Cancelled<?= !empty($mt['cancelled_at']) ? ' ' . e_a(date('j M, H:i', strtotime((string) $mt['cancelled_at']))) : '' ?> by <?= e_a(['lead' => $mt['name'], 'calendar' => 'deleting it in Google Calendar'][$mt['cancelled_by']] ?? $mt['cancelled_by']) ?><?= $mt['cancel_reason'] !== '' ? ': ' . e_a($mt['cancel_reason']) : '' ?></div><?php endif; ?>
+                    <?php if ($mt['notes'] !== ''): ?><div class="quote" style="margin-top:8px">They wrote: <?= nl2br(e_a($mt['notes'])) ?></div><?php endif; ?>
+                    <?php if ($mt['status'] === 'booked' && $mt['end'] > time()): ?>
+                    <details style="margin-top:8px"><summary style="cursor:pointer;font-size:.78rem;color:var(--muted)">Cancel this meeting</summary>
+                        <form method="post" style="margin-top:8px" data-confirm="<?= e_a('Cancel the meeting with ' . $mt['name'] . '? Google withdraws the invitation, and they get an email with a link to pick a new time.') ?>" onsubmit="return confirm(this.dataset.confirm)">
+                            <input type="hidden" name="action" value="meeting_cancel">
+                            <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                            <input type="hidden" name="token" value="<?= e_a($mt['token']) ?>">
+                            <textarea name="reason" placeholder="Why, for the timeline (they do not see this)" style="min-height:60px"></textarea>
+                            <button class="btn danger sm" type="submit" style="margin-top:8px">Cancel the meeting</button>
+                        </form>
+                    </details>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+            <p class="note">Times update from Google Calendar each time this page opens: a meeting moved or deleted in the calendar, and the lead's answer to the invitation, show here and in the timeline.</p>
+            <?php else: ?>
+            <p class="note">No meeting yet. <a href="/admin/?view=meeting&id=<?= e_a($lead['id']) ?>" style="color:var(--p);font-weight:800">Book a Meeting</a>: <?= e_a($facts['first']) ?> gets a personal link to pick a time on the <?= e_a(CONTACT_EMAIL) ?> calendar, and the call comes with a Google Meet link.</p>
+            <?php endif; ?>
         </div>
         <div class="cards" style="grid-template-columns:1.4fr 1fr">
             <div class="panel" style="margin:0">
@@ -1674,6 +1820,152 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         })();
         </script>
         <?php endif; ?>
+
+    <?php elseif ($view === 'meeting'):
+        /* Book a Meeting: a short request carrying the lead's own booking link, read and edited by a person before it goes. */
+        $lead = null;
+        foreach ($leads as $l) { if ($l['id'] === ($_GET['id'] ?? '')) { $lead = $l; break; } }
+        if (!$lead): ?>
+        <h1>Lead not found</h1>
+        <p class="sub"><a href="/admin/?view=leads">← Sales leads</a></p>
+        <?php else:
+            $bk_cfg = booking_settings();
+            $crm_cfg = crm_settings();
+            $facts = crm_lead_facts($lead);
+            $draft = booking_request_draft($lead, $bk_cfg);
+            $topic = booking_topic($lead);
+            $m_subject = (string) ($meeting_post['subject'] ?? $draft['subject']);
+            $m_body = (string) ($meeting_post['body'] ?? $draft['body']);
+            $ahead = array_values(array_filter(booking_for_lead((int) $lead['id']), fn($m) => $m['status'] === 'booked' && $m['end'] > time()));
+            $ready = gcal_configured() && !empty($bk_cfg['enabled']);
+        ?>
+        <h1>Book a Meeting with <?= e_a($lead['name']) ?><?= $facts['company'] !== '' ? ', ' . e_a($facts['company']) : '' ?></h1>
+        <p class="sub"><a href="/admin/?view=lead&id=<?= e_a($lead['id']) ?>">← Back to the lead</a> · a short email with <?= e_a($facts['first']) ?>'s own booking link. Read it, change anything you like, then send.</p>
+        <?php if (!$ready): ?><div class="flash">Booking is not open yet (Google Calendar not connected, or booking paused in Settings), so the link would ask them to email instead. <a href="/admin/?view=settings#booking" style="font-weight:800">Booking settings</a></div><?php endif; ?>
+        <?php if ($ahead): ?><div class="flash"><?= e_a($facts['first']) ?> already has a call booked: <?= e_a(meeting_when($ahead[0])) ?>. A new request gives them a second link.</div><?php endif; ?>
+        <div class="composer">
+            <form method="post" action="/admin/?view=meeting&id=<?= e_a($lead['id']) ?>" class="panel" style="margin:0" data-confirm="<?= e_a('Send this meeting request to ' . $lead['email'] . ' now?') ?>" onsubmit="return confirm(this.dataset.confirm)">
+                <input type="hidden" name="action" value="meeting_send">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <input type="hidden" name="id" value="<?= e_a($lead['id']) ?>">
+                <table class="kv"><tbody>
+                    <tr><td>From</td><td><?= e_a(booking_from($bk_cfg)) ?></td></tr>
+                    <tr><td>To</td><td><?= e_a($lead['name']) ?> &lt;<?= e_a($lead['email']) ?>&gt;</td></tr>
+                    <tr><td>Replies go to</td><td><?= e_a(CONTACT_EMAIL) ?></td></tr>
+                    <tr><td>Their link</td><td>A personal booking page, made when you send. It knows their name and email and shows times in their own time zone.</td></tr>
+                </tbody></table>
+                <label for="mc-subject">Subject</label>
+                <input id="mc-subject" name="subject" maxlength="200" required value="<?= e_a($m_subject) ?>">
+                <label for="mc-body">Message <span style="text-transform:none;font-weight:400;letter-spacing:0">(the "Pick a time" button and the signature are added below it)</span></label>
+                <textarea id="mc-body" name="body" class="body" style="min-height:330px" required><?= e_a($m_body) ?></textarea>
+                <p class="dash-warn" id="mc-dash">This text contains a long dash. It is replaced with a comma (or "to" between numbers) when sent.</p>
+                <div class="opts">
+                    <?php if ($lead['status'] === 'new'): ?><label class="chk"><input type="checkbox" name="stage" value="1" checked> Move the lead from New to Contacted</label><?php endif; ?>
+                    <label class="chk"><input type="checkbox" name="copy" value="1" checked> Send a copy to <?= e_a(ENQUIRY_TO) ?></label>
+                </div>
+                <div class="actions-row">
+                    <button class="btn grad" type="submit">Send to <?= e_a($lead['email']) ?></button>
+                    <a class="btn ghost" href="/admin/?view=meeting&id=<?= e_a($lead['id']) ?>">Start again from a fresh draft</a>
+                </div>
+                <p class="note">When they open the email, look at their booking page and book, it shows on the lead under Meetings and in the timeline. The call lands on the <?= e_a(CONTACT_EMAIL) ?> calendar with a Google Meet link, and they are invited as a guest.</p>
+            </form>
+            <div>
+                <div class="panel">
+                    <h2>What the draft is based on</h2>
+                    <ul class="detected">
+                        <li><b>They asked about</b><?= $topic !== '' ? e_a($topic) : 'Not clear from the enquiry' ?></li>
+                        <li><b>Form choice</b><?= e_a($lead['service'] ?: 'Not chosen') ?><?= $topic !== '' && $lead['service'] !== '' && stripos($topic, (string) preg_replace('/,.*$/', '', (string) $lead['service'])) === false ? ' (does not match their words, so the email follows their words)' : '' ?></li>
+                        <?php if ($facts['note'] !== ''): ?><li><b>In their words</b>"<?= e_a(crm_clean_line($facts['note'], 220)) ?>"</li><?php endif; ?>
+                        <li><b>Host</b><?= e_a(booking_host_line($bk_cfg)) ?></li>
+                    </ul>
+                    <p class="note">No proposal and no prices: the call is where their requirements get understood.</p>
+                </div>
+                <div class="mail-preview">
+                    <div class="mp-head"><b id="mc-psubject"><?= e_a($m_subject) ?></b><br>From <?= e_a(booking_from($bk_cfg)) ?> to <?= e_a($lead['email']) ?></div>
+                    <div id="mc-preview"><?= crm_markup_html(crm_no_dashes($m_body)) ?></div>
+                    <p style="margin:6px 0 10px"><span style="display:inline-block;padding:13px 26px;border-radius:999px;background-color:#4338CA;color:#fff;font:bold 15px Arial">Pick a time for our call</span></p>
+                    <p style="margin:0 0 18px;font:13px/1.6 Arial,Helvetica,sans-serif;color:#6F6992"><?= e_a((int) $bk_cfg['length'] . ' minutes on Google Meet with ' . booking_host_line($bk_cfg) . '. Times are shown in your time zone.') ?></p>
+                    <?= crm_signature_html($crm_cfg, $facts['country']) ?>
+                </div>
+            </div>
+        </div>
+        <script>
+        (function () {
+            var body = document.getElementById('mc-body'), subject = document.getElementById('mc-subject');
+            var out = document.getElementById('mc-preview'), head = document.getElementById('mc-psubject'), warn = document.getElementById('mc-dash');
+            function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function inline(s) {
+                return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, function (u) { return '<a href="' + u + '" style="color:#4338CA">' + u + '</a>'; });
+            }
+            var P = 'margin:0 0 14px;font:15px/1.65 Arial,Helvetica,sans-serif;color:#1D1936', H = 'margin:22px 0 8px;font:bold 16px/1.4 Arial,Helvetica,sans-serif;color:#4338CA';
+            function render() {
+                var text = body.value.replace(/(\d)\s*[–—]\s*(\d)/g, '$1 to $2').replace(/\s*[—―]\s*/g, ', ').replace(/\s+–\s+/g, ', ');
+                var html = [], list = [], para = [];
+                function flush() {
+                    if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; }
+                    if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; }
+                }
+                text.split(/\r?\n/).forEach(function (line) {
+                    var t = line.replace(/\s+$/, '');
+                    var m = t.match(/^\s*[-*] (.+)$/);
+                    if (t.indexOf('## ') === 0) { flush(); html.push('<h2 style="' + H + '">' + inline(t.slice(3)) + '</h2>'); }
+                    else if (m) { if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; } list.push('<li style="margin:0 0 7px;font:15px/1.6 Arial">' + inline(m[1]) + '</li>'); }
+                    else if (!t.trim()) { flush(); }
+                    else { if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; } para.push(inline(t)); }
+                });
+                flush();
+                out.innerHTML = html.join('');
+                head.textContent = subject.value;
+                warn.style.display = /[–—]/.test(body.value + subject.value) ? 'block' : 'none';
+            }
+            body.addEventListener('input', render);
+            subject.addEventListener('input', render);
+            render();
+        })();
+        </script>
+        <?php endif; ?>
+
+    <?php elseif ($view === 'meetings'):
+        $all = booking_recent(200);
+        $now_ts = time();
+        $m_up = array_values(array_filter($all, fn($m) => $m['status'] === 'booked' && $m['end'] > $now_ts));
+        usort($m_up, fn($a, $b) => $a['start'] <=> $b['start']);
+        $m_wait = array_values(array_filter($all, fn($m) => $m['status'] === 'requested'));
+        $m_rest = array_values(array_filter($all, fn($m) => $m['status'] === 'cancelled' || ($m['status'] === 'booked' && $m['end'] <= $now_ts)));
+        $row = function (array $m, string $first): string {
+            $lead_link = $m['enquiry_id'] > 0 ? '<a class="btn ghost sm" href="/admin/?view=lead&id=' . (int) $m['enquiry_id'] . '">Open</a>' : '';
+            $meet = $m['status'] === 'booked' && $m['end'] > time() && $m['meet_url'] !== '' ? '<a class="btn sm grad" href="' . e_a($m['meet_url']) . '" target="_blank" rel="noopener">Join Meet</a> ' : '';
+            return '<tr><td style="white-space:nowrap">' . $first . '</td><td><strong>' . e_a($m['name']) . '</strong>' . ($m['company'] !== '' ? '<br><small>' . e_a(mb_substr($m['company'], 0, 44)) . '</small>' : '')
+                . '<br><small style="color:var(--muted)">' . e_a($m['email']) . '</small></td><td>' . meeting_badge($m) . '</td><td style="text-align:right;white-space:nowrap">' . $meet . $lead_link . '</td></tr>';
+        };
+    ?>
+        <h1>Meetings</h1>
+        <p class="sub">Calls booked on the <?= e_a(CONTACT_EMAIL) ?> calendar, each with a Google Meet link. <a href="/<?= BOOKING_PATH ?>/" target="_blank" rel="noopener" style="font-weight:800;color:var(--p)">Public booking page ↗</a> · <a href="/admin/?view=settings#booking" style="font-weight:800">Hours and settings</a></p>
+        <div class="panel">
+            <h2>Upcoming (<?= count($m_up) ?>)</h2>
+            <table><thead><tr><th>When</th><th>Who</th><th>Status</th><th></th></tr></thead><tbody>
+            <?php foreach ($m_up as $m): ?>
+                <?= $row($m, '<strong>' . e_a(booking_fmt($m['start'], BOOKING_HOST_TZ, 'short')) . ' IST</strong>' . ($m['time_zone'] !== '' && !booking_is_india($m['time_zone']) ? '<br><small style="color:var(--muted)">' . e_a(booking_fmt($m['start'], $m['time_zone'], 'time') . ' their time, ' . booking_zone_city($m['time_zone'])) . '</small>' : '')) ?>
+            <?php endforeach; if (!$m_up): ?><tr><td colspan="4">No calls booked yet. Use Book a Meeting on any lead, or share the public booking page.</td></tr><?php endif; ?>
+            </tbody></table>
+        </div>
+        <div class="panel">
+            <h2>Requests waiting for a booking (<?= count($m_wait) ?>)</h2>
+            <table><thead><tr><th>Sent</th><th>Who</th><th>Status</th><th></th></tr></thead><tbody>
+            <?php foreach ($m_wait as $m): ?>
+                <?= $row($m, e_a(date('j M, H:i', strtotime((string) ($m['requested_at'] ?? $m['created_at'] ?? 'now')))) . (!empty($m['viewed_at']) ? '<br><small style="color:#FF9100;font-weight:700">looked at the page</small>' : (!empty($m['opened_at']) ? '<br><small style="color:#00B8D9;font-weight:700">opened the email</small>' : ''))) ?>
+            <?php endforeach; if (!$m_wait): ?><tr><td colspan="4">None waiting.</td></tr><?php endif; ?>
+            </tbody></table>
+        </div>
+        <div class="panel">
+            <h2>Past and cancelled</h2>
+            <table><thead><tr><th>When</th><th>Who</th><th>Status</th><th></th></tr></thead><tbody>
+            <?php foreach (array_slice($m_rest, 0, 60) as $m): ?>
+                <?= $row($m, $m['start'] > 0 ? e_a(booking_fmt($m['start'], BOOKING_HOST_TZ, 'short')) . ' IST' : '-') ?>
+            <?php endforeach; if (!$m_rest): ?><tr><td colspan="4">Nothing yet.</td></tr><?php endif; ?>
+            </tbody></table>
+        </div>
 
     <?php elseif ($view === 'blogs'): ?>
         <h1>Blog Posts</h1>
@@ -2354,6 +2646,47 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             </div>
             <label style="margin-top:16px">Signature on every client email</label>
             <div class="mail-preview" style="max-height:none;padding:16px 18px"><?= crm_signature_html($crm_cfg, 'IN') ?></div>
+        </div>
+        <?php $bk_cfg = booking_settings(); ?>
+        <div class="panel" style="max-width:720px" id="booking">
+            <h2>Booking</h2>
+            <p class="note" style="margin:0 0 6px">Calls are booked on the <strong><?= e_a(CONTACT_EMAIL) ?></strong> Google Calendar with a Google Meet link, and anything already busy there is never offered. Leads get a personal link from <strong>Book a Meeting</strong> on their record; anyone can book at <a href="/<?= BOOKING_PATH ?>/" target="_blank" rel="noopener" style="color:var(--p);font-weight:800">vturnu.com/<?= BOOKING_PATH ?>/ ↗</a></p>
+            <p class="note" style="margin:0 0 6px">Google Calendar: <?= gcal_configured() ? '<strong style="color:#12A150">connected</strong> (the button below checks it live)' : '<strong style="color:#C22349">not connected</strong>. Run <span class="mono">node bin/google-connect.mjs</span> with the client file, then redeploy.' ?></p>
+            <form method="post">
+                <input type="hidden" name="action" value="booking_settings">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <label class="chk" style="margin-top:8px"><input type="checkbox" name="enabled" value="1"<?= $bk_cfg['enabled'] ? ' checked' : '' ?>> Booking is open (untick to pause: the pages then ask people to email instead)</label>
+                <div class="grid2">
+                    <div><label for="b-host">Host name</label><input id="b-host" name="host_name" maxlength="60" value="<?= e_a($bk_cfg['host_name']) ?>"></div>
+                    <div><label for="b-title">Host title</label><input id="b-title" name="host_title" maxlength="60" value="<?= e_a($bk_cfg['host_title']) ?>"></div>
+                </div>
+                <div class="grid2">
+                    <div><label for="b-core">Hours for everyone (India time)</label><input id="b-core" name="core" maxlength="120" value="<?= e_a($bk_cfg['core']) ?>" placeholder="09:30-18:30"></div>
+                    <div><label for="b-over">Extra hours, visitors outside India (India time)</label><input id="b-over" name="overseas" maxlength="120" value="<?= e_a($bk_cfg['overseas']) ?>" placeholder="19:00-23:00"></div>
+                </div>
+                <p class="note">Write hours as 09:30-13:00, 14:00-18:30 to leave a break. A range that ends after midnight, such as 19:00-01:00, runs into the next morning. Leave the second box empty to offer the same hours to everyone. Visitors see each time in their own zone, and times outside 7 AM to 9 PM their time sit behind "Show all times".</p>
+                <label>Days</label>
+                <div class="actions-row">
+                    <?php foreach ([1 => 'Mon', 2 => 'Tue', 3 => 'Wed', 4 => 'Thu', 5 => 'Fri', 6 => 'Sat', 7 => 'Sun'] as $dn => $dl): ?>
+                    <label class="chk"><input type="checkbox" name="days[]" value="<?= $dn ?>"<?= in_array($dn, $bk_cfg['days'], true) ? ' checked' : '' ?>> <?= $dl ?></label>
+                    <?php endforeach; ?>
+                </div>
+                <div class="grid3">
+                    <div><label for="b-len">Call length</label><select id="b-len" name="length"><?php foreach ([15, 20, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['length'] === $n ? ' selected' : '' ?>><?= $n ?> minutes</option><?php endforeach; ?></select></div>
+                    <div><label for="b-buf">Buffer around busy times</label><select id="b-buf" name="buffer"><?php foreach ([0, 5, 10, 15, 20, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['buffer'] === $n ? ' selected' : '' ?>><?= $n ?> minutes</option><?php endforeach; ?></select></div>
+                    <div><label for="b-notice">Minimum notice</label><select id="b-notice" name="notice_hours"><?php foreach ([0, 1, 2, 4, 8, 12, 24, 48] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['notice_hours'] === $n ? ' selected' : '' ?>><?= $n ?> <?= $n === 1 ? 'hour' : 'hours' ?></option><?php endforeach; ?></select></div>
+                </div>
+                <div class="grid3">
+                    <div><label for="b-win">Booking window</label><select id="b-win" name="window_days"><?php foreach ([7, 14, 21, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['window_days'] === $n ? ' selected' : '' ?>><?= $n ?> days ahead</option><?php endforeach; ?></select></div>
+                </div>
+                <label class="chk" style="margin-top:12px"><input type="checkbox" name="reminders" value="1"<?= $bk_cfg['reminders'] ? ' checked' : '' ?>> Email the lead a reminder a day before and an hour before each call</label>
+                <br><button class="btn grad" type="submit">Save booking settings</button>
+            </form>
+            <form method="post" style="margin-top:12px">
+                <input type="hidden" name="action" value="booking_check">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <button class="btn ghost" type="submit">Check the calendar connection</button>
+            </form>
         </div>
         <div class="panel" style="max-width:500px">
             <h2>Data & Backups</h2>

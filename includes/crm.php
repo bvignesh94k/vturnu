@@ -111,7 +111,7 @@ const CRM_SOURCE_NAMES = [
 const CRM_PLACEMENTS = [
     'home-quote' => 'home page form', 'contact-page' => 'contact page form', 'popup' => 'quote pop-up', 'service-page' => 'service page form',
     'landing-page' => 'landing page form', 'audit-consultation' => 'audit page form', 'resource' => 'e-book download',
-    'newsletter' => 'newsletter signup', 'seo-audit' => 'free SEO audit',
+    'newsletter' => 'newsletter signup', 'seo-audit' => 'free SEO audit', 'booking' => 'booking page',
 ];
 
 /** [channel, group] for a referring host, or null when it is not one we know. */
@@ -1405,7 +1405,7 @@ function crm_signature_html(array $settings, string $country = ''): string
         . '<td width="206" valign="top" style="width:206px;padding:4px 22px 4px 0;vertical-align:top">'
         . '<a href="' . $site . '/" title="VTurnU" style="text-decoration:none"><img src="' . $img . 'sig-logo.png" width="200" height="55" alt="VTurnU, together we turn heads" style="display:block;border:0;width:200px;height:55px"></a>'
         . ($socials ? '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:26px 0 0"><tr>' . implode($gap, $socials) . '</tr></table>' : '')
-        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:28px 0 0"><tr><td style="padding:0;border-radius:999px;background:#4F46E5">'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:28px 0 0"><tr><td bgcolor="#4F46E5" style="padding:0;border-radius:999px;background-color:#4F46E5">'
         . '<a href="' . $site . '/" style="display:inline-block;padding:13px 18px;font:bold 14px/16px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px;white-space:nowrap">&#127760;&nbsp; www.vturnu.com &nbsp;&rarr;</a>'
         . '</td></tr></table>'
         . '</td>'
@@ -1464,14 +1464,14 @@ function crm_email_html(string $subject, string $markup, array $settings, string
     $font = 'Arial,Helvetica,sans-serif';
     $sig = crm_signature_html($settings, $country);
     $cta = $button
-        ? '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 18px"><tr><td style="border-radius:999px;background:#4338CA">'
+        ? '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 18px"><tr><td bgcolor="#4338CA" style="border-radius:999px;background-color:#4338CA">'
             . '<a href="' . crm_proposal_url($linkToken) . '" style="display:inline-block;padding:12px 24px;font:bold 14px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px">Open your proposal</a>'
             . '</td></tr></table><p style="margin:0 0 18px;font:13px/1.6 ' . $font . ';color:#6F6992">The web version keeps every section in one place, and you can tell us you are ready to go ahead from there.</p>'
         : '';
     return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'
         . htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . '</title></head>'
-        . '<body style="margin:0;padding:0;background:#ffffff">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td align="center" style="padding:20px 14px">'
+        . '<body bgcolor="#ffffff" style="margin:0;padding:0;background-color:#ffffff">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td align="center" style="padding:20px 14px">'
         . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px"><tr><td style="text-align:left">'
         . crm_markup_html($markup) . $cta . $sig
         . '</td></tr></table></td></tr></table>'
@@ -2007,10 +2007,18 @@ function crm_daily_digest(bool $force = false): array
         'Accepted in the last 24 hours' => $q("SELECT e.id, e.name, e.company, e.service, e.channel, e.grade FROM proposals p JOIN enquiries e ON e.id = p.enquiry_id WHERE p.accepted_at > now() - interval '24 hours' AND e.deleted_at IS NULL ORDER BY p.accepted_at DESC LIMIT 25"),
     ];
     $counts = array_map('count', $sections);
+    /* Calls booked for today and tomorrow, checked against Google Calendar first. */
+    $meetings = function_exists('booking_digest_lines') ? booking_digest_lines() : [];
+    $counts['Meetings'] = count($meetings);
     if (array_sum($counts) === 0 && !$force) {
         return ['ok' => true, 'sent' => false, 'counts' => $counts];
     }
     $lines = ['Good morning. Here is what needs you today.', ''];
+    if ($meetings) {
+        $lines[] = 'MEETINGS TODAY AND TOMORROW (' . count($meetings) . ')';
+        array_push($lines, ...$meetings);
+        $lines[] = '';
+    }
     foreach ($sections as $title => $rows) {
         if (!$rows) {
             continue;
@@ -2028,6 +2036,7 @@ function crm_daily_digest(bool $force = false): array
     }
     $lines[] = 'Open the CRM: ' . SITE_URL . '/admin/';
     $parts = array_filter([
+        $counts['Meetings'] ? $counts['Meetings'] . ' ' . ($counts['Meetings'] === 1 ? 'meeting' : 'meetings') : '',
         $counts['New in the last 24 hours'] ? $counts['New in the last 24 hours'] . ' new' : '',
         $counts['Follow-ups due'] ? $counts['Follow-ups due'] . ' to follow up' : '',
         $counts['Accepted in the last 24 hours'] ? $counts['Accepted in the last 24 hours'] . ' accepted' : '',

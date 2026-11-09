@@ -27,3 +27,25 @@ $db->proposals = [
         'body' => "Hi Dan,\n\nChecking in.\n\nBest regards,\nKalpana V", 'to_email' => 'dan@brightcrm.com', 'sent_by' => 'admin', 'resend_id' => 're_2',
         'sent_at' => date('Y-m-d H:i:sP', strtotime('-2 days')), 'opened_at' => null, 'open_count' => 0, 'viewed_at' => null, 'view_count' => 0, 'read_seconds' => 0, 'accepted_at' => null, 'accept_note' => '', 'last_viewed_at' => null],
 ];
+
+/* Meetings: an upcoming call Dan moved once and accepted, a request Priya has not booked yet, and a call she cancelled. */
+$meeting = static function (array $o): array {
+    $now = date('Y-m-d H:i:sP');
+    return $o + ['enquiry_id' => null, 'token' => '', 'status' => 'requested', 'name' => '', 'email' => '', 'phone' => '', 'company' => '', 'notes' => '', 'time_zone' => '',
+        'start_at' => null, 'end_at' => null, 'event_id' => '', 'ical_uid' => '', 'event_link' => '', 'meet_url' => '', 'sequence' => 0, 'rsvp' => '', 'reschedules' => 0,
+        'reminder_ids' => '[]', 'request_subject' => '', 'request_body' => '', 'requested_by' => '', 'requested_at' => null, 'request_mail_id' => '', 'opened_at' => null,
+        'viewed_at' => null, 'booked_at' => null, 'cancelled_at' => null, 'cancelled_by' => '', 'cancel_reason' => '', 'created_at' => $now, 'updated_at' => $now];
+};
+$soon = intdiv(time() + 2 * 86400, 1800) * 1800;
+$db->meetings = [
+    $meeting(['id' => 1, 'enquiry_id' => 43, 'token' => str_repeat('c', 32), 'status' => 'booked', 'name' => 'Dan Cole', 'email' => 'dan@brightcrm.com', 'phone' => '+1 415 555 0132',
+        'company' => 'BrightCRM', 'notes' => 'Can we include LinkedIn too?', 'time_zone' => 'America/Los_Angeles', 'start_at' => date('Y-m-d H:i:sP', $soon), 'end_at' => date('Y-m-d H:i:sP', $soon + 1800),
+        'event_id' => 'ev9', 'ical_uid' => 'ev9@google.com', 'event_link' => 'https://www.google.com/calendar/event?eid=ev9', 'meet_url' => 'https://meet.google.com/xyz-abcd-efg', 'sequence' => 1,
+        'rsvp' => 'accepted', 'reschedules' => 1, 'request_subject' => 'Dan, a quick call about Google Ads?', 'requested_by' => 'admin', 'requested_at' => date('Y-m-d H:i:sP', strtotime('-3 days')),
+        'opened_at' => date('Y-m-d H:i:sP', strtotime('-3 days')), 'viewed_at' => date('Y-m-d H:i:sP', strtotime('-3 days')), 'booked_at' => date('Y-m-d H:i:sP', strtotime('-3 days'))]),
+    $meeting(['id' => 2, 'enquiry_id' => 42, 'token' => str_repeat('d', 32), 'status' => 'requested', 'name' => 'priya raman', 'email' => 'priya@acmelabels.in', 'company' => 'Acme Labels',
+        'request_subject' => 'Priya, a quick call about SEO?', 'requested_by' => 'admin', 'requested_at' => date('Y-m-d H:i:sP', strtotime('-1 days')), 'opened_at' => date('Y-m-d H:i:sP', strtotime('-20 hours'))]),
+    $meeting(['id' => 3, 'enquiry_id' => 42, 'token' => str_repeat('e', 32), 'status' => 'cancelled', 'name' => 'priya raman', 'email' => 'priya@acmelabels.in', 'company' => 'Acme Labels', 'time_zone' => 'Asia/Kolkata',
+        'start_at' => date('Y-m-d H:i:sP', strtotime('-5 days 11:00')), 'end_at' => date('Y-m-d H:i:sP', strtotime('-5 days 11:30')), 'cancelled_by' => 'lead', 'cancel_reason' => 'Found another agency',
+        'cancelled_at' => date('Y-m-d H:i:sP', strtotime('-6 days')), 'created_at' => date('Y-m-d H:i:sP', strtotime('-8 days'))]),
+];

@@ -2,9 +2,9 @@
  * Strategy:
  *   navigations   → network-first, fall back to cache, then the offline page
  *   static assets → stale-while-revalidate (instant, refreshed in background)
- * Never touches admin, form posts, or stored lead data.
+ * Never touches admin, form posts, stored lead data or private booking pages.
  */
-const VERSION = 'vturnu-v13';
+const VERSION = 'vturnu-v14';
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -37,7 +37,7 @@ self.addEventListener('activate', (event) => {
 
 /** Paths the worker must never cache or interfere with. */
 function isExcluded(url) {
-    return /^\/(admin|enquiry|storage|includes|currency)(\/|$)/.test(url.pathname);
+    return /^\/(admin|enquiry|storage|includes|currency|book-a-meeting)(\/|$)/.test(url.pathname);
 }
 
 function isAsset(url) {

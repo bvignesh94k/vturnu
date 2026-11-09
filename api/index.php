@@ -25,6 +25,7 @@ require dirname(__DIR__) . '/includes/security.php';
 require dirname(__DIR__) . '/includes/currency.php';
 require dirname(__DIR__) . '/includes/lead-guard.php';
 require dirname(__DIR__) . '/includes/crm.php';
+require dirname(__DIR__) . '/includes/booking.php';
 require dirname(__DIR__) . '/includes/page-kit.php';
 require dirname(__DIR__) . '/includes/lead-form.php';
 require dirname(__DIR__) . '/includes/hero-kit.php';
@@ -222,6 +223,11 @@ if ($slug === 'admin' || str_starts_with($slug, 'admin/')) {
 
 /* CRM: private web proposals, email open pixels and the morning digest. */
 if (crm_route($slug)) {
+    exit;
+}
+
+/* Book a Meeting: /book-a-meeting/ and each lead's personal booking link. */
+if (booking_route($slug)) {
     exit;
 }
 
