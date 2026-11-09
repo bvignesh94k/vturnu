@@ -12,6 +12,10 @@
 
 declare(strict_types=1);
 
+/* aic_ip_public() and aic_abs_url(): the AI Crawler Checker's rules for which
+   addresses are public and how a Location header resolves. */
+require_once __DIR__ . '/ai-crawlers.php';
+
 const AUDIT_TIMEOUT      = 12;        // seconds for the whole fetch
 const AUDIT_CONNECT      = 6;
 const AUDIT_MAX_BYTES    = 3145728;   // 3 MB, plenty for HTML
@@ -23,7 +27,9 @@ const AUDIT_RATE_WINDOW  = 3600;      // per hour
  *
  * Blocks anything that is not public http(s). Without this the endpoint would
  * happily fetch localhost, private LAN hosts or cloud metadata services on
- * behalf of a stranger, turning the site into an SSRF proxy.
+ * behalf of a stranger, turning the site into an SSRF proxy. This is the
+ * early check with the friendly messages; audit_get() checks the address
+ * again when it connects, and every redirect after it.
  *
  * @return array{0:?string,1:string} [safe_url|null, error]
  */
@@ -47,6 +53,9 @@ function audit_safe_url(string $raw): array
     if (!in_array($scheme, ['http', 'https'], true)) {
         return [null, 'Only http and https addresses can be audited.'];
     }
+    if (isset($parts['user']) || isset($parts['pass'])) {
+        return [null, 'Please enter the address without a username or password.'];
+    }
     if ($host === '' || !str_contains($host, '.')) {
         return [null, 'Please include the full domain, for example example.com.'];
     }
@@ -60,7 +69,7 @@ function audit_safe_url(string $raw): array
         return [null, 'We could not find that domain. Please check the spelling.'];
     }
     foreach ($ips as $ip) {
-        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+        if (!aic_ip_public($ip)) {
             return [null, 'That address resolves to a private network and cannot be audited.'];
         }
     }
@@ -99,46 +108,145 @@ function audit_rate_ok(string $ip): bool
     }
 }
 
-/** Fetch a URL with size and time caps. */
-function audit_fetch(string $url, ?int $timeout = null): array
+/**
+ * Fetch a URL for the audit: a GET, or a HEAD when $head is true.
+ *
+ * Redirects are followed by hand, at most five. Every address in the chain,
+ * the first one included, must be http or https on port 80 or 443 with no
+ * user name, and every IPv4 address its host resolves to must be public
+ * (aic_ip_public()). The connection then goes to the address that was
+ * checked (CURLOPT_CONNECT_TO), so curl never looks the name up again and
+ * neither a redirect nor a DNS answer that changes after the check can reach
+ * a private network or a cloud metadata service. Until 9 Nov 2026 curl
+ * followed redirects itself, so a public site could send the audit to an
+ * internal address and the report would show that page's title and H1.
+ *
+ * aic_get() pins with CURLOPT_RESOLVE instead. With php-wasm's curl (7.69.1)
+ * that pin is skipped for a host written with a trailing dot ("example.com.")
+ * and curl looks the name up itself. CURLOPT_CONNECT_TO has no such gap.
+ *
+ * $timeout covers the whole chain, as curl's own limit did. A body stops at
+ * AUDIT_MAX_BYTES and the audit reads what arrived. $resolve returns a host's
+ * IPv4 addresses, gethostbynamel() by default; tests pass their own because
+ * php-wasm fakes DNS.
+ *
+ * @return array{status:int, url:string, body:string, ms:int, size:int, error:string, blocked:bool}
+ *   status is 0 when no usable response arrived, and error says why. blocked
+ *   is true when the chain reached an address the audit does not fetch; error
+ *   is then a sentence for the visitor. size is the bytes received for the
+ *   final response before decompression, so size < strlen(body) means it
+ *   was compressed. url is the last address in the chain: the one that
+ *   answered, or the one refused.
+ */
+function audit_get(string $url, int $timeout, bool $head = false, ?callable $resolve = null): array
 {
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_MAXREDIRS      => 5,
-        CURLOPT_TIMEOUT        => $timeout ?? AUDIT_TIMEOUT,
-        CURLOPT_CONNECTTIMEOUT => AUDIT_CONNECT,
-        CURLOPT_ENCODING       => '',       // advertise gzip so we can detect it
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_USERAGENT      => 'VTurnU-SEO-Audit/1.0 (+' . SITE_URL . ')',
-        CURLOPT_NOPROGRESS     => false,
-        CURLOPT_PROGRESSFUNCTION => fn($r, $dl) => $dl > AUDIT_MAX_BYTES ? 1 : 0,
-    ]);
+    $resolve ??= 'gethostbynamel';
     $t0 = microtime(true);
-    $body = curl_exec($ch);
-    $ms = (int) round((microtime(true) - $t0) * 1000);
-    $info = curl_getinfo($ch);
-    $err = curl_error($ch);
-    // Deprecated in PHP 8.5 (the version Vercel runs) and a no-op since 8.0.
+    $deadline = $t0 + $timeout;
+    $ch = null;
+    $headers = [];
+    $body = '';
+    $capped = false;
+    $pins = [];   // host => the checked IP, so one chain never resolves a host twice
+    $redirectRefused = 'That site redirects to an address we cannot audit, such as a private network or a non-standard port.';
+    $done = static function (int $status, string $error = '', bool $blocked = false, int $size = 0) use (&$url, &$body, $t0): array {
+        return ['status' => $status, 'url' => $url, 'body' => $status === 0 ? '' : $body,
+                'ms' => (int) round((microtime(true) - $t0) * 1000), 'size' => $size, 'error' => $error, 'blocked' => $blocked];
+    };
 
-    return ['body' => $body === false ? '' : $body, 'ms' => $ms, 'info' => $info, 'error' => $err];
+    for ($hop = 0; $hop <= 5; $hop++) {
+        $refused = $hop === 0 ? 'That address resolves to a private network and cannot be audited.' : $redirectRefused;
+        $p = parse_url($url) ?: [];
+        $scheme = strtolower($p['scheme'] ?? '');
+        $host = strtolower(rtrim($p['host'] ?? '', '.'));
+        $port = (int) ($p['port'] ?? ($scheme === 'https' ? 443 : 80));
+        if (!in_array($scheme, ['http', 'https'], true) || !in_array($port, [80, 443], true)
+            || isset($p['user']) || isset($p['pass']) || $host === '' || str_starts_with($host, '[')) {
+            return $done(0, $hop === 0 ? 'Only public http and https addresses on standard ports can be audited.' : $refused, true);
+        }
+        if (!isset($pins[$host])) {
+            $ips = $resolve($host) ?: [];
+            if (!$ips) {
+                return $done(0, 'Could not resolve host: ' . $host);
+            }
+            foreach ($ips as $ip) {
+                if (!aic_ip_public((string) $ip)) {
+                    return $done(0, $refused, true);
+                }
+            }
+            $pins[$host] = (string) $ips[0];
+        }
+
+        $left = (int) floor(($deadline - microtime(true)) * 1000);
+        if ($left < 1) {
+            return $done(0, 'Timed out after ' . $timeout . ' seconds');
+        }
+        if ($ch === null) {
+            /* One handle for the chain, so a redirect to the same host reuses
+               the connection, as curl's own redirects did. */
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_NOBODY         => $head,
+                CURLOPT_ENCODING       => '',       // advertise gzip so we can detect it
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4,
+                CURLOPT_PROXY          => '',       // a proxy would resolve the name itself
+                CURLOPT_USERAGENT      => 'VTurnU-SEO-Audit/1.0 (+' . SITE_URL . ')',
+                CURLOPT_HEADERFUNCTION => static function ($c, string $h) use (&$headers): int {
+                    $kv = explode(':', $h, 2);
+                    if (count($kv) === 2) {
+                        $headers[strtolower(trim($kv[0]))][] = trim($kv[1]);
+                    }
+                    return strlen($h);
+                },
+                CURLOPT_WRITEFUNCTION  => static function ($c, string $chunk) use (&$body, &$capped): int {
+                    $body .= $chunk;
+                    if (strlen($body) > AUDIT_MAX_BYTES) {
+                        $capped = true;
+                        return 0;   // stop reading here
+                    }
+                    return strlen($chunk);
+                },
+            ]);
+        }
+        $headers = [];
+        $body = '';
+        $capped = false;
+        curl_setopt_array($ch, [
+            CURLOPT_URL               => $url,
+            /* Empty host and port match any request: connect only to the checked IP. */
+            CURLOPT_CONNECT_TO        => ['::' . $pins[$host] . ':' . $port],
+            CURLOPT_TIMEOUT_MS        => $left,
+            CURLOPT_CONNECTTIMEOUT_MS => min(AUDIT_CONNECT * 1000, $left),
+        ]);
+        $ok = curl_exec($ch);
+        if ($ok === false && !$capped) {
+            return $done(0, curl_error($ch) ?: 'No response');
+        }
+        $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        if ($status >= 300 && $status < 400 && !empty($headers['location'])) {
+            $loc = (string) end($headers['location']);
+            /* "ftp://..." or "mailto:..." is an address too, not a path on this site. */
+            if (preg_match('#^[a-z][a-z0-9+.-]*:#i', $loc) && !preg_match('#^https?://#i', $loc)) {
+                $url = $loc;
+                return $done(0, $redirectRefused, true);
+            }
+            $url = aic_abs_url($loc, $url);
+            continue;
+        }
+        return $done($status, '', false, (int) curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD_T));
+    }
+    return $done(0, 'Too many redirects');
 }
 
-/** Head-only check that a URL exists (used for the sitemap). */
-function audit_exists(string $url): bool
+/** Head-only check that a URL exists (used for the sitemap). Kept short: it is
+ *  a secondary check and must not stall the report. */
+function audit_exists(string $url, ?callable $get = null): bool
 {
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        // Kept short: these are secondary checks and must not stall the report.
-        CURLOPT_NOBODY => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 2,
-        CURLOPT_TIMEOUT => 4, CURLOPT_CONNECTTIMEOUT => 3, CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_USERAGENT => 'VTurnU-SEO-Audit/1.0',
-    ]);
-    curl_exec($ch);
-    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    // Deprecated in PHP 8.5 (the version Vercel runs) and a no-op since 8.0.
-    return $code >= 200 && $code < 400;
+    $r = ($get ?? 'audit_get')($url, 4, true);
+    return $r['status'] >= 200 && $r['status'] < 400;
 }
 
 /** One report line. $status is 'pass', 'warn' or 'fail', which are scored,
@@ -221,24 +329,32 @@ const AUDIT_ORG_TYPES = [
 /**
  * Run the audit.
  *
+ * $get fetches a URL and returns audit_get()'s shape. Tests pass their own,
+ * for example to audit local test sites, which audit_get() rightly refuses.
+ * The site always uses audit_get().
+ *
  * @return array{ok:bool,error:string,url:string,score:int,grade:string,groups:array,summary:array}
  */
-function run_site_audit(string $url): array
+function run_site_audit(string $url, ?callable $get = null): array
 {
+    $get ??= 'audit_get';
     $fail = fn(string $m) => ['ok' => false, 'error' => $m, 'url' => $url, 'score' => 0,
                               'grade' => '', 'groups' => [], 'summary' => []];
 
-    $res = audit_fetch($url);
+    $res = $get($url, AUDIT_TIMEOUT);
+    if ($res['blocked']) {
+        return $fail($res['error']);
+    }
+    /* No HTML escaping here: the page prints the error with e(). */
     if ($res['body'] === '') {
         return $fail($res['error'] !== ''
-            ? 'We could not load that site (' . htmlspecialchars($res['error'], ENT_QUOTES) . '). It may be offline or blocking automated requests.'
+            ? 'We could not load that site (' . $res['error'] . '). It may be offline or blocking automated requests.'
             : 'We could not load that site. It may be offline or blocking automated requests.');
     }
 
     $html  = $res['body'];
-    $info  = $res['info'];
-    $final = $info['url'] ?? $url;
-    $code  = (int) ($info['http_code'] ?? 0);
+    $final = $res['url'];
+    $code  = $res['status'];
 
     $scheme = parse_url($final, PHP_URL_SCHEME) ?: 'http';
     $host   = parse_url($final, PHP_URL_HOST) ?: '';
@@ -285,14 +401,14 @@ function run_site_audit(string $url): array
         : audit_check('warn', 'No canonical tag', 'This page has no canonical URL.', 'Canonicals prevent duplicate-content dilution when the same page is reachable at several URLs.');
 
     $robotsTxt = '';
-    $rt = audit_fetch($origin . '/robots.txt', 5);
-    if (($rt['info']['http_code'] ?? 0) === 200) { $robotsTxt = $rt['body']; }
+    $rt = $get($origin . '/robots.txt', 5);
+    if ($rt['status'] === 200) { $robotsTxt = $rt['body']; }
     $g[] = $robotsTxt !== ''
         ? audit_check('pass', 'robots.txt found', 'Crawlers have clear instructions.')
         : audit_check('warn', 'No robots.txt', 'No robots.txt at ' . $origin . '/robots.txt', 'Add one so you control what gets crawled and can point to your sitemap.');
 
     $sitemapRef = preg_match('/Sitemap:\s*(\S+)/i', $robotsTxt, $m) ? $m[1] : '';
-    $hasSitemap = $sitemapRef !== '' || audit_exists($origin . '/sitemap.xml');
+    $hasSitemap = $sitemapRef !== '' || audit_exists($origin . '/sitemap.xml', $get);
     $g[] = $hasSitemap
         ? audit_check('pass', 'XML sitemap found', $sitemapRef !== '' ? 'Referenced in robots.txt.' : 'Found at /sitemap.xml')
         : audit_check('warn', 'No XML sitemap', 'No sitemap found.', 'A sitemap helps search engines discover every page, especially on larger sites.');
@@ -309,7 +425,7 @@ function run_site_audit(string $url): array
         ? audit_check('pass', 'Reasonable page weight', sprintf('%.0f KB of HTML.', $kb))
         : audit_check('warn', 'Heavy HTML', sprintf('%.0f KB of HTML.', $kb), 'Large HTML delays first paint, especially on mobile networks.');
 
-    $compressed = ($info['size_download'] ?? 0) > 0 && ($info['size_download'] ?? 0) < strlen($html);
+    $compressed = $res['size'] > 0 && $res['size'] < strlen($html);
     $g[] = $compressed
         ? audit_check('pass', 'Compression enabled', 'Text is served gzip/brotli compressed.')
         : audit_check('warn', 'No compression detected', 'The HTML does not appear to be compressed.', 'Enabling gzip or brotli typically cuts text transfer by 60-80%.');
@@ -448,8 +564,8 @@ function run_site_audit(string $url): array
        the same: it notes the file and never counts it against a site. Found
        means what it means there (aic_check): HTTP 200 and not an HTML page,
        since many sites answer every unknown path with a normal page. */
-    $lt = audit_fetch($origin . '/llms.txt', 5);
-    $hasLlms = ($lt['info']['http_code'] ?? 0) === 200 && !preg_match('#<html#i', substr($lt['body'], 0, 2000));
+    $lt = $get($origin . '/llms.txt', 5);
+    $hasLlms = $lt['status'] === 200 && !preg_match('#<html#i', substr($lt['body'], 0, 2000));
     $llmsNote = 'llms.txt is a proposed convention, not a standard. It does not change your score.';
     $g[] = $hasLlms
         ? audit_check('info', 'llms.txt found', 'Published at ' . $origin . '/llms.txt.', $llmsNote)
