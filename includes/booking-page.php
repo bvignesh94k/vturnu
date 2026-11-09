@@ -385,7 +385,7 @@ function booking_render_page(?array $m, array $cfg, array $state): void
             'hours' => booking_hours((string) $cfg['hours']),
             'days' => array_map('intval', (array) $cfg['days']),
             'notice' => (int) $cfg['notice_minutes'],
-            'sameDay' => !empty($cfg['same_day']),
+            'todayHours' => booking_hours((string) $cfg['today_hours']),
             'ipCountry' => security_visitor_country(),
             'phoneExamples' => LEAD_PHONE_EXAMPLES,
             'tz' => $tz,

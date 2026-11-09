@@ -36,7 +36,8 @@ const cases = [
   ['2026-09-30T23:00:00Z', {}], ['2027-04-01T23:00:00Z', {}],
   ['2026-11-11T21:00:00Z', { notice_minutes: 60 }], ['2026-11-11T21:07:00Z', { hours: '09:30-13:00, 14:00-18:30', length: 45, buffer: 0 }],
   ['2026-11-11T21:00:00Z', { days: [1, 3, 6], window_days: 9 }],
-  ['2026-11-11T21:00:00Z', { same_day: true }], ['2026-11-11T20:59:00Z', { same_day: true }], ['2027-03-12T10:00:00Z', { same_day: true }],
+  ['2026-11-11T21:00:00Z', { today_hours: '' }], ['2026-11-11T20:59:00Z', { today_hours: '00:00-24:00' }], ['2027-03-12T10:00:00Z', { today_hours: '09:00-13:00, 15:00-22:00' }],
+  ['2026-11-11T02:30:00Z', {}], ['2026-11-11T13:10:00Z', {}], ['2026-11-11T17:45:00Z', {}], ['2026-07-15T03:00:00Z', {}],
 ];
 
 const r = await php.run({ code: `<?php
@@ -58,7 +59,7 @@ foreach ($cases as $i => [$at, $over]) {
     foreach ($zones as $z) {
         $slots[$z] = booking_zone_slots($cfg, $now, $grid, $z);
     }
-    $out[] = ['now' => $now, 'R' => ['grid' => $grid, 'len' => $cfg['length'], 'step' => BOOKING_STEP, 'hours' => booking_hours($cfg['hours']), 'days' => $cfg['days'], 'notice' => $cfg['notice_minutes'], 'sameDay' => $cfg['same_day']], 'slots' => $slots];
+    $out[] = ['now' => $now, 'R' => ['grid' => $grid, 'len' => $cfg['length'], 'step' => BOOKING_STEP, 'hours' => booking_hours($cfg['hours']), 'days' => $cfg['days'], 'notice' => $cfg['notice_minutes'], 'todayHours' => booking_hours($cfg['today_hours']), 'hostTz' => BOOKING_HOST_TZ], 'slots' => $slots];
 }
 echo json_encode($out);` });
 if (r.errors) console.error(r.errors);

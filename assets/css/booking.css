@@ -180,7 +180,10 @@ textarea.bk-input { resize: vertical; min-height: 84px; }
 /* Booked by someone else: still listed, struck through, not clickable. */
 .bk-time.is-taken .bk-time-btn, .bk-time.is-taken .bk-time-btn:hover { border: 1.5px dashed #E1DEF2; background: #FAFAFE; color: #A6A1C2; cursor: not-allowed; }
 .bk-time.is-taken s { text-decoration-thickness: 2px; text-decoration-color: #B9B4D3; }
-.bk-day.is-full { color: #B5B0CC; text-decoration: line-through; text-decoration-thickness: 1.5px; cursor: default; }
+/* Every time that day is taken: the date still opens, in a quiet tone, to show them struck through. */
+.bk-day.is-full { background: #F1F0F6; color: #8F8AAD; font-weight: 600; cursor: pointer; transition: background .12s; }
+.bk-day.is-full:hover { background: #E6E4F0; }
+.bk-day.is-full.is-sel { background: var(--ink-soft); color: #fff; box-shadow: none; }
 
 /* Details */
 .js .bk-card:not(.is-details) .bk-details { display: none; }

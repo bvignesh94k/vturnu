@@ -2661,9 +2661,10 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                     <div><label for="b-title">Host title</label><input id="b-title" name="host_title" maxlength="60" value="<?= e_a($bk_cfg['host_title']) ?>"></div>
                 </div>
                 <div class="grid2">
-                    <div><label for="b-hours">Hours, on each visitor's own clock</label><input id="b-hours" name="hours" maxlength="120" value="<?= e_a($bk_cfg['hours']) ?>" placeholder="09:30-18:30"></div>
+                    <div><label for="b-hours">Hours, on each visitor's own clock</label><input id="b-hours" name="hours" maxlength="120" value="<?= e_a($bk_cfg['hours']) ?>" placeholder="09:30-19:30"></div>
+                    <div><label for="b-today">Same-day calls, on our clock (India time)</label><input id="b-today" name="today_hours" maxlength="120" value="<?= e_a($bk_cfg['today_hours']) ?>" placeholder="08:00-23:00"></div>
                 </div>
-                <p class="note">Every visitor gets these hours in their own time zone: with 09:30-18:30, someone in San Jose sees 9:30 AM to 6:00 PM Pacific Time and someone in London sees 9:30 AM to 6:00 PM UK time, so the last call ends at 6:30 PM. There are no calls on the day itself: today shows as fully booked and the first time is the next working day at 9:30 AM in the visitor's zone, so there is always at least 9.5 hours' notice. Times someone has already booked stay in the list, struck through. Write 09:30-13:00, 14:00-18:30 to leave a break. The zone comes from the visitor's location and they can change it on the page.</p>
+                <p class="note">Every visitor gets these hours in their own time zone: with 09:30-19:30, someone in San Jose sees 9:30 AM to 7:00 PM Pacific Time and someone in London sees 9:30 AM to 7:00 PM UK time, so the last call ends at 7:30 PM. On the day itself only times whose whole call falls inside the same-day hours on our clock are open (08:00-23:00: from 8 AM to 11 PM India time); the rest of that day shows struck through, and from the next day every time is open. Leave the same-day box empty to allow no calls on the day itself. Today's list starts at the next half hour, and times someone has already booked stay in the list, struck through. Write 09:30-13:00, 14:00-19:30 to leave a break. The zone comes from the visitor's location and they can change it on the page.</p>
                 <label>Days (in the visitor's own time zone)</label>
                 <div class="actions-row">
                     <?php foreach ([1 => 'Mon', 2 => 'Tue', 3 => 'Wed', 4 => 'Thu', 5 => 'Fri', 6 => 'Sat', 7 => 'Sun'] as $dn => $dl): ?>
@@ -2678,7 +2679,6 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <div class="grid3">
                     <div><label for="b-win">Booking window</label><select id="b-win" name="window_days"><?php foreach ([7, 14, 21, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['window_days'] === $n ? ' selected' : '' ?>><?= $n ?> days ahead</option><?php endforeach; ?></select></div>
                 </div>
-                <label class="chk" style="margin-top:12px"><input type="checkbox" name="same_day" value="1"<?= $bk_cfg['same_day'] ? ' checked' : '' ?>> Allow calls on the same day (from the next half hour in the visitor's zone). Off: today shows as fully booked</label>
                 <label class="chk" style="margin-top:12px"><input type="checkbox" name="reminders" value="1"<?= $bk_cfg['reminders'] ? ' checked' : '' ?>> Email the lead a reminder a day before and an hour before each call</label>
                 <br><button class="btn grad" type="submit">Save booking settings</button>
             </form>

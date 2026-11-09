@@ -49,11 +49,13 @@ const BOOKING_LOCK = 724001;
 /* ------------------------------------------------------------------ */
 
 /**
- * The owner's choices: B. Vignesh hosts (9 Nov 2026). Since the evening of
- * 9 Nov 2026 every visitor gets 9:30 AM to 6:30 PM on their own clock, Monday
- * to Friday in their own zone, and no call on the day itself ("handling the
- * sudden meetings are very difficult"): today shows as fully booked and the
- * first time is the next working day at 9:30 AM their time.
+ * The owner's choices: B. Vignesh hosts (9 Nov 2026). Since the night of
+ * 9 Nov 2026 every visitor gets 9:30 AM to 7:30 PM on their own clock (the
+ * last call at 7:00 PM), Monday to Friday in their own zone. On the day itself
+ * a time is open only when the whole call falls between 8:00 AM and 11:00 PM
+ * on the host's clock (India time), when the team can take a call at short
+ * notice; the other times that day show struck through. From the next day on
+ * every time is open as usual.
  */
 function booking_setting_defaults(): array
 {
@@ -64,10 +66,10 @@ function booking_setting_defaults(): array
         'length' => 30,
         'buffer' => 15,
         'notice_minutes' => 0,
-        'same_day' => false,
+        'today_hours' => '08:00-23:00',
         'window_days' => 21,
         'days' => [1, 2, 3, 4, 5],
-        'hours' => '09:30-18:30',
+        'hours' => '09:30-19:30',
         'reminders' => true,
     ];
 }
@@ -95,6 +97,8 @@ function booking_clean_settings(array $s): array
     $days = array_values(array_unique(array_filter(array_map('intval', (array) ($s['days'] ?? [])), static fn(int $n): bool => $n >= 1 && $n <= 7)));
     sort($days);
     $hours = is_string($s['hours'] ?? null) && booking_hours($s['hours']) ? crm_clean_line($s['hours'], 120) : $d['hours'];
+    /* Empty means no calls on the day itself at all. */
+    $today = is_string($s['today_hours'] ?? null) ? (trim($s['today_hours']) === '' ? '' : (booking_hours($s['today_hours']) ? crm_clean_line($s['today_hours'], 120) : $d['today_hours'])) : $d['today_hours'];
     return [
         'enabled' => !empty($s['enabled']),
         'host_name' => crm_clean_line((string) ($s['host_name'] ?? ''), 60) ?: $d['host_name'],
@@ -102,7 +106,7 @@ function booking_clean_settings(array $s): array
         'length' => in_array((int) ($s['length'] ?? 0), [15, 20, 30, 45, 60], true) ? (int) $s['length'] : $d['length'],
         'buffer' => max(0, min(60, (int) ($s['buffer'] ?? $d['buffer']))),
         'notice_minutes' => max(0, min(2880, (int) ($s['notice_minutes'] ?? $d['notice_minutes']))),
-        'same_day' => !empty($s['same_day']),
+        'today_hours' => $today,
         'window_days' => max(1, min(60, (int) ($s['window_days'] ?? $d['window_days']))),
         'days' => $days ?: $d['days'],
         'hours' => $hours,
@@ -328,17 +332,36 @@ function booking_free_grid(array $cfg, int $now, array $busy): array
 }
 
 /**
+ * Whether a call starting at $t lies wholly inside $ranges on the host's
+ * clock (India time): with 08:00-23:00, a call from 10:30 PM to 11:00 PM does,
+ * one from 11:00 PM does not.
+ *
+ * @param list<array{0:int,1:int}> $ranges minutes after midnight on the host's clock
+ */
+function booking_host_window(int $t, int $len, array $ranges): bool
+{
+    $h = (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone(BOOKING_HOST_TZ));
+    $m = (int) $h->format('G') * 60 + (int) $h->format('i');
+    foreach ($ranges as [$a, $b]) {
+        if ($m >= $a && $m + $len <= $b) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * The start times offered to a visitor in $tz: the half hours of the working
- * hours on their own clock (9:30 AM to 6:30 PM by default, so the last call
- * starts at 6:00 PM), on their own working days, from the next day on (today
- * on their calendar only when same-day calls are allowed, then from the next
- * half hour), after the minimum notice, inside the window and free on the
- * grid. Days are walked as dates on the visitor's calendar and each time is
- * read on their clock, so daylight saving changes land where they should; a
- * time a clock change skips is left out. Without same-day calls the earliest
- * time in any zone is at least 9.5 hours away (8.5 across a night the clocks
- * go forward), whichever zone is picked. assets/js/booking.js repeats this
- * rule for the page; this one decides.
+ * hours on their own clock (9:30 AM to 7:30 PM by default, so the last call
+ * starts at 7:00 PM), on their own working days, after now and the minimum
+ * notice (so today's list starts at the next half hour), inside the window and
+ * free on the grid. On the visitor's today, a time is offered only when the
+ * whole call also falls inside the same-day hours on the host's clock (8:00 AM
+ * to 11:00 PM India time); from the next day on, every working-hours time is.
+ * Days are walked as dates on the visitor's calendar and each time is read on
+ * their clock, so daylight saving changes land where they should; a time a
+ * clock change skips is left out. assets/js/booking.js repeats this rule for
+ * the page (and strikes through what is not offered); this one decides.
  *
  * @param array{t0:int,step:int,until:int,bits:string} $grid from booking_free_grid()
  * @return list<int>
@@ -350,11 +373,10 @@ function booking_zone_slots(array $cfg, int $now, array $grid, string $tz): arra
     $from = $now + max(1, (int) $cfg['notice_minutes'] * 60);
     $days = array_map('intval', (array) $cfg['days']);
     $ranges = booking_hours((string) $cfg['hours']);
+    $todayRanges = booking_hours((string) ($cfg['today_hours'] ?? ''));
     $utc = new DateTimeZone('UTC');
     $day = new DateTimeImmutable((new DateTimeImmutable('@' . $now))->setTimezone($zone)->format('Y-m-d'), $utc);
-    if (empty($cfg['same_day'])) {
-        $day = $day->modify('+1 day');
-    }
+    $today = $day->format('Y-m-d');
     $last = new DateTimeImmutable((new DateTimeImmutable('@' . $grid['until']))->setTimezone($zone)->format('Y-m-d'), $utc);
     $out = [];
     for (; $day <= $last; $day = $day->modify('+1 day')) {
@@ -373,7 +395,8 @@ function booking_zone_slots(array $cfg, int $now, array $grid, string $tz): arra
                 if ($t < $from || $t < $grid['t0'] || $t >= $grid['until'] || ($t - $grid['t0']) % $grid['step'] !== 0) {
                     continue;
                 }
-                if (($grid['bits'][intdiv($t - $grid['t0'], $grid['step'])] ?? '0') === '1') {
+                if (($grid['bits'][intdiv($t - $grid['t0'], $grid['step'])] ?? '0') === '1'
+                    && ($date !== $today || booking_host_window($t, $len, $todayRanges))) {
                     $out[$t] = $t;
                 }
             }
@@ -1201,11 +1224,6 @@ function booking_book(?array $m, array $in, string $mode = 'book'): array
     /* A slow form can outlive its time. */
     if ($start <= booking_now()) {
         return $res(false, 'That time has already started. Please pick a later one.', '', true);
-    }
-    /* No calls on the day itself in the zone they book in; to them the day is simply full. */
-    $zoneDay = static fn(int $t): string => (new DateTimeImmutable('@' . $t))->setTimezone(booking_zone($tz))->format('Y-m-d');
-    if (empty($cfg['same_day']) && $zoneDay($start) === $zoneDay(booking_now())) {
-        return $res(false, 'All times on that day are taken. Please pick another day.', '', true);
     }
 
     /* Is the time still on offer to this visitor? */

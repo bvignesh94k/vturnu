@@ -69,24 +69,32 @@
     };
     var isoWeekday = function (day) { return (new Date(Date.UTC(day.y, day.m - 1, day.d)).getUTCDay() + 6) % 7 + 1; };
 
+    /* Whether a call starting at t lies wholly inside the same-day hours on the host's clock (India time). */
+    var inHostWindow = function (R, t) {
+        var w = wall(R.hostTz || 'Asia/Kolkata', t * 1000), m = w.h * 60 + w.mi, ranges = R.todayHours || [];
+        for (var i = 0; i < ranges.length; i++) { if (m >= ranges[i][0] && m + R.len <= ranges[i][1]) { return true; } }
+        return false;
+    };
+
     /**
      * Every start time in the working hours of zone z still ahead, as
      * [{t: unix seconds, free: bool}]: their own clock, their working days,
-     * after now and the notice, inside the window. free is false where the
-     * call would overlap something already on the calendar (someone booked
-     * it, or the host is busy), and the page shows those struck through;
-     * times kept clear only as the buffer around a call are left out.
-     * R = {grid, len, step, hours, days, notice, sameDay}.
+     * after now and the notice (so today starts at the next half hour),
+     * inside the window. free is false where the call would overlap something
+     * already on the calendar (someone booked it, or the host is busy), and,
+     * on the visitor's today only, where the call falls outside the same-day
+     * hours on the host's clock (8:00 AM to 11:00 PM India time); the page shows
+     * those struck through. Times kept clear only as the buffer around a call
+     * are left out. R = {grid, len, step, hours, days, notice, todayHours, hostTz}.
      */
     var zoneTimes = function (R, z, nowSec) {
         var g = R.grid, out = [], seen = {};
         var from = nowSec + Math.max(1, (R.notice || 0) * 60);
         var first = wall(z, nowSec * 1000), last = wall(z, g.until * 1000);
-        var lastKey = ymd(last.y, last.m, last.d);
-        /* No calls on the day itself unless same-day calls are allowed: the list starts tomorrow on their calendar. */
-        var startDay = R.sameDay ? { y: first.y, m: first.m, d: first.d } : addDays(first, 1);
-        for (var day = startDay, n = 0; ymd(day.y, day.m, day.d) <= lastKey && n < 400; day = addDays(day, 1), n++) {
+        var lastKey = ymd(last.y, last.m, last.d), todayKey = ymd(first.y, first.m, first.d);
+        for (var day = { y: first.y, m: first.m, d: first.d }, n = 0; ymd(day.y, day.m, day.d) <= lastKey && n < 400; day = addDays(day, 1), n++) {
             if (R.days.indexOf(isoWeekday(day)) === -1) { continue; }
+            var isToday = ymd(day.y, day.m, day.d) === todayKey;
             for (var r = 0; r < R.hours.length; r++) {
                 for (var mn = R.hours[r][0]; mn + R.len <= R.hours[r][1]; mn += R.step) {
                     var ms = zoned(z, day.y, day.m, day.d, Math.floor(mn / 60), mn % 60);
@@ -97,7 +105,7 @@
                     /* '2': only the buffer around another call is in the way; not offered and not shown. */
                     if (bit === '2') { continue; }
                     seen[t] = 1;
-                    out.push({ t: t, free: bit === '1' });
+                    out.push({ t: t, free: bit === '1' && (!isToday || inHostWindow(R, t)) });
                 }
             }
         }
@@ -275,7 +283,8 @@
     form.appendChild(slotField);
     if (fallback) { fallback.removeAttribute('name'); fallback.required = false; }
 
-    var R = { grid: D.grid, len: D.len, step: D.step || 30, hours: D.hours || [[570, 1110]], days: D.days || [1, 2, 3, 4, 5], notice: D.notice || 0, sameDay: !!D.sameDay };
+    var R = { grid: D.grid, len: D.len, step: D.step || 30, hours: D.hours || [[570, 1170]], days: D.days || [1, 2, 3, 4, 5], notice: D.notice || 0,
+        todayHours: D.todayHours || [], hostTz: D.hostTz || 'Asia/Kolkata' };
     var loadedAt = Date.now();
     var nowSec = function () { return D.now + Math.floor((Date.now() - loadedAt) / 1000); };
     var tz = D.tz && validZone(D.tz) ? canon(D.tz) : (deviceZone || D.hostTz || 'UTC');
@@ -384,7 +393,7 @@
         if (!month) { month = keys.length ? monthOf(keys[0]) : firstMonth; }
         if (month < firstMonth) { month = firstMonth; }
         if (month > lastMonth) { month = lastMonth; }
-        if (selDay && !hasFree(days[selDay])) { selDay = ''; selTime = 0; }
+        if (selDay && !days[selDay]) { selDay = ''; selTime = 0; }
         var y = +month.slice(0, 4), mo = +month.slice(5, 7);
         monthLabel.textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(y, mo - 1, 1)));
         prevBtn.disabled = month <= firstMonth;
@@ -394,24 +403,20 @@
         var lead = (new Date(Date.UTC(y, mo - 1, 1)).getUTCDay() + 6) % 7;
         for (var i = 0; i < lead; i++) { grid.appendChild(el('span', 'bk-blank')); }
         var count = new Date(Date.UTC(y, mo, 0)).getUTCDate();
-        /* Without same-day calls, a working day today looks like any fully booked day. */
-        var todayW = wall(tz, nowSec() * 1000);
-        var todayFull = !R.sameDay && R.days.indexOf(isoWeekday({ y: todayW.y, m: todayW.m, d: todayW.d })) !== -1;
         for (var d = 1; d <= count; d++) {
             var k = month + '-' + pad(d);
             var open = hasFree(days[k]);
-            var full = (!!days[k] && !open) || (k === today && todayFull);
-            var b = el(open ? 'button' : 'span', 'bk-day' + (open ? ' is-open' : '') + (full ? ' is-full' : '') + (k === selDay ? ' is-sel' : '') + (k === today ? ' is-today' : ''), String(d));
-            if (open) {
+            /* A day whose times are all taken still opens, to show them struck through (today often is, far from India). */
+            var full = !!days[k] && !open;
+            var b = el(open || full ? 'button' : 'span', 'bk-day' + (open ? ' is-open' : '') + (full ? ' is-full' : '') + (k === selDay ? ' is-sel' : '') + (k === today ? ' is-today' : ''), String(d));
+            if (open || full) {
                 var free = days[k].filter(function (x) { return x.free; }).length;
                 b.type = 'button';
                 b.setAttribute('aria-label', (k === today ? 'Today, ' : '') + new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(y, mo - 1, d)))
-                    + ', ' + free + (free === 1 ? ' time' : ' times') + ' open');
+                    + (open ? ', ' + free + (free === 1 ? ' time' : ' times') + ' open' : ', all times taken'));
                 b.setAttribute('aria-pressed', k === selDay ? 'true' : 'false');
                 b.setAttribute('data-day', k);
-            } else if (full) {
-                b.setAttribute('title', 'Fully booked');
-                b.setAttribute('aria-label', 'Fully booked');
+                if (full) { b.title = 'All times are taken'; }
             } else if (k === today) {
                 b.setAttribute('title', 'Today: no times left');
                 b.setAttribute('aria-label', 'Today, no times left');
@@ -444,7 +449,7 @@
     /* ---- the day's times: one column, Next beside the one picked ---- */
     var renderTimes = function () {
         var days = byDay();
-        var list = selDay && hasFree(days[selDay]) ? days[selDay] : [];
+        var list = selDay && days[selDay] ? days[selDay] : [];
         card.classList.toggle('has-day', !!list.length);
         timesList.innerHTML = '';
         if (!list.length) { return; }
@@ -526,7 +531,7 @@
         tzSource = source || 'picked';
         tzVal.value = z;
         var days = byDay();
-        if (selDay && !hasFree(days[selDay])) { selDay = ''; }
+        if (selDay && !days[selDay]) { selDay = ''; }
         if (selTime && slotsFor(tz).indexOf(selTime) === -1) { selTime = 0; }
         var keys = openKeys(days);
         if (!selDay && keys.length && (!month || !keys.some(function (k) { return monthOf(k) === month; }))) { month = monthOf(keys[0]); }
@@ -1049,7 +1054,7 @@
             choose(again, false);
         } else if (D.chosen && D.taken) {
             var k = dayKey(tz, D.chosen);
-            if (hasFree(byDay()[k])) { selDay = k; month = monthOf(k); render(); }
+            if (byDay()[k]) { selDay = k; month = monthOf(k); render(); }
         }
     } catch (err) {
         /* Something in this browser failed: back to the plain form, which works on its own. */
