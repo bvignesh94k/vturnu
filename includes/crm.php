@@ -1258,20 +1258,95 @@ function crm_inline_html(string $s, string $linkStyle = ''): string
 }
 
 /**
+ * Client emails are set in each reader's own interface font: San Francisco on
+ * iPhone and Mac, Segoe UI on Windows, Roboto on Android, Arial anywhere else.
+ * Sizes and line heights are written out property by property (never the
+ * `font` shorthand) because some mail apps drop the shorthand (owner, 9 Nov
+ * 2026: the type looked cramped on a phone).
+ */
+const CRM_EMAIL_FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
+
+/**
+ * Phone rules for client emails. The signature stays one horizontal row, as
+ * the owner designed it, but shrinks to the screen instead of forcing the
+ * whole email to 600px, which made Gmail shrink the message and then blow the
+ * paragraphs up again with cramped lines. Mail apps without media queries keep
+ * the desktop layout.
+ */
+const CRM_EMAIL_CSS = '@media only screen and (max-width:620px){'
+    . '.vt-p{font-size:16px!important;line-height:26px!important}'
+    . '.vt-h{font-size:18px!important;line-height:26px!important}'
+    . '.vt-note{font-size:14px!important;line-height:21px!important}'
+    . '.vt-btn a{display:block!important;text-align:center!important}'
+    . '.vt-sig{width:100%!important}'
+    . '.vt-sig-l{width:36%!important;padding-right:10px!important}'
+    . '.vt-sig-r{padding-left:12px!important}'
+    . '.vt-sig-logo{width:100%!important;max-width:150px!important;height:auto!important}'
+    . '.vt-sig-row{margin-top:14px!important}'
+    . '.vt-sig-soc{width:24px!important;height:24px!important}'
+    . '.vt-sig-socc{width:24px!important}'
+    . '.vt-sig-gap{width:4px!important}'
+    . '.vt-sig-pillrow{display:none!important}'
+    . '.vt-sig-co{font-size:14px!important;line-height:19px!important;white-space:normal!important}'
+    . '.vt-sig-svc{font-size:10px!important;line-height:16px!important}'
+    . '.vt-nw{white-space:normal!important}'
+    . '.vt-sig-icc{width:22px!important;padding-right:8px!important}'
+    . '.vt-sig-ic{width:22px!important;height:22px!important}'
+    . '.vt-sig-tx{font-size:12px!important;line-height:17px!important;white-space:normal!important}'
+    . '.vt-sig-wa{font-size:10px!important}'
+    . '.vt-sig-tag{font-size:10px!important;line-height:15px!important;white-space:normal!important}'
+    . '}';
+
+/** The start of every client email: no reflowing or auto-linking on phones, and the phone rules above. */
+function crm_email_open(string $subject): string
+{
+    return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+        . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<meta name="x-apple-disable-message-reformatting">'
+        . '<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">'
+        . '<title>' . htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . '</title>'
+        . '<style>' . CRM_EMAIL_CSS . '</style></head>'
+        . '<body bgcolor="#ffffff" style="margin:0;padding:0;background-color:#ffffff;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td align="center" style="padding:24px 16px">'
+        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px"><tr><td style="text-align:left">';
+}
+
+/** The end of every client email, with the open pixel when there is one. */
+function crm_email_close(string $pixel = ''): string
+{
+    return '</td></tr></table></td></tr></table>'
+        . ($pixel !== '' ? '<img src="' . htmlspecialchars($pixel, ENT_QUOTES, 'UTF-8') . '" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0">' : '')
+        . '</body></html>';
+}
+
+/** One email button: a coloured cell with the link inside (Gmail-safe), full width on phones. */
+function crm_email_button(string $label, string $url, string $note = ''): string
+{
+    $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    return '<table role="presentation" class="vt-btn" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 12px;border-collapse:separate"><tr>'
+        . '<td bgcolor="#4338CA" style="background-color:#4338CA;border-radius:999px;padding:0">'
+        . '<a href="' . $h($url) . '" style="display:inline-block;padding:14px 28px;font-family:' . CRM_EMAIL_FONT . ';font-size:16px;line-height:20px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px">' . $h($label) . '</a>'
+        . '</td></tr></table>'
+        . ($note !== '' ? '<p class="vt-note" style="margin:0 0 20px;font-family:' . CRM_EMAIL_FONT . ';font-size:13px;line-height:20px;color:#6F6992">' . $h($note) . '</p>' : '');
+}
+
+/**
  * The composer's markup as HTML. Styles are inline so mail clients keep them;
  * $style chooses the look (email or web page).
  */
 function crm_markup_html(string $markup, string $style = 'email'): string
 {
     $email = $style === 'email';
+    $text = 'font-family:' . CRM_EMAIL_FONT . ';font-size:15px;line-height:24px;color:#1D1936';
     $css = $email ? [
-        'p' => 'margin:0 0 14px;font:15px/1.65 Arial,Helvetica,sans-serif;color:#1D1936',
-        'h2' => 'margin:22px 0 8px;font:bold 16px/1.4 Arial,Helvetica,sans-serif;color:#4338CA',
-        'ul' => 'margin:0 0 14px;padding:0 0 0 20px',
-        'li' => 'margin:0 0 7px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#1D1936',
+        'p' => 'margin:0 0 16px;' . $text,
+        'h2' => 'margin:26px 0 10px;font-family:' . CRM_EMAIL_FONT . ';font-size:17px;line-height:24px;font-weight:bold;color:#4338CA',
+        'ul' => 'margin:0 0 16px;padding:0 0 0 22px',
+        'li' => 'margin:0 0 8px;' . $text,
         'a' => 'color:#4338CA;text-decoration:underline',
     ] : ['p' => '', 'h2' => '', 'ul' => '', 'li' => '', 'a' => ''];
-    $attr = static fn(string $tag): string => $css[$tag] !== '' ? ' style="' . $css[$tag] . '"' : '';
+    $class = $email ? ['p' => 'vt-p', 'h2' => 'vt-h', 'li' => 'vt-p'] : [];
+    $attr = static fn(string $tag): string => (isset($class[$tag]) ? ' class="' . $class[$tag] . '"' : '') . ($css[$tag] !== '' ? ' style="' . $css[$tag] . '"' : '');
     $out = [];
     $list = [];
     $para = [];
@@ -1357,16 +1432,18 @@ function crm_show_gstin(string $country): bool
  * The signature block under every client email, laid out the way the owner
  * designed it: logo, social profiles and the website button on the left, a
  * divider, then company, services, email, WhatsApp, GSTIN and the tagline on
- * the right. One fixed 600px row that never stacks, so it reads the same in
- * every inbox (phones scale it down whole). Images are PNG (mail apps do not
- * show SVG) and every link carries readable anchor text or alt text.
+ * the right. One horizontal row that never stacks: 600px on a desktop, and on
+ * a phone the same row shrinks to the screen (CRM_EMAIL_CSS) rather than
+ * forcing the whole email wide. Images are PNG (mail apps do not show SVG)
+ * and every link carries readable anchor text or alt text.
  */
 function crm_signature_html(array $settings, string $country = ''): string
 {
     $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     $site = defined('SITE_URL') ? SITE_URL : 'https://vturnu.com';
     $img = $site . '/assets/img/email/';
-    $font = 'Arial,Helvetica,sans-serif';
+    /* Arial keeps the widths the owner's layout was drawn for. */
+    $font = 'font-family:Arial,Helvetica,sans-serif';
     $link = 'color:#1A56DB;text-decoration:underline';
     $phone = (string) $settings['sender_phone'];
     $wa = crm_whatsapp_url($phone);
@@ -1378,15 +1455,15 @@ function crm_signature_html(array $settings, string $country = ''): string
             continue;
         }
         $label = $key === 'Twitter' ? 'X' : $key;
-        $socials[] = '<td style="padding:0;width:44px"><a href="' . $h($url) . '" title="VTurnU on ' . $h($label) . '" style="text-decoration:none">'
-            . '<img src="' . $img . $file . '" width="44" height="44" alt="' . $h($label) . '" style="display:block;border:0;width:44px;height:44px"></a></td>';
+        $socials[] = '<td class="vt-sig-socc" style="padding:0;width:44px"><a href="' . $h($url) . '" title="VTurnU on ' . $h($label) . '" style="text-decoration:none">'
+            . '<img class="vt-sig-soc" src="' . $img . $file . '" width="44" height="44" alt="' . $h($label) . '" style="display:block;border:0;width:44px;height:44px"></a></td>';
     }
-    $gap = '<td style="padding:0;width:8px;font-size:0;line-height:0">&nbsp;</td>';
+    $gap = '<td class="vt-sig-gap" style="padding:0;width:8px;font-size:0;line-height:0">&nbsp;</td>';
 
     $items = [['sig-email.png', '<a href="mailto:' . CONTACT_EMAIL . '" style="' . $link . ';font-weight:bold">' . $h(CONTACT_EMAIL) . '</a>']];
     if ($phone !== '') {
         $items[] = ['sig-whatsapp-logo.png', '<a href="' . $h($wa !== '' ? $wa : 'tel:' . preg_replace('/[^\d+]/', '', $phone)) . '" title="' . ($wa !== '' ? 'Chat on WhatsApp' : 'Call') . '" style="' . $link . '">' . $h($phone) . '</a>'
-            . ($wa !== '' ? '&nbsp; <a href="' . $h($wa) . '" style="font:bold 12px ' . $font . ';color:#22A55B;text-decoration:none">WhatsApp</a>' : '')];
+            . ($wa !== '' ? '&nbsp; <a class="vt-sig-wa" href="' . $h($wa) . '" style="' . $font . ';font-size:12px;font-weight:bold;color:#22A55B;text-decoration:none">WhatsApp</a>' : '')];
     }
     if (crm_show_gstin($country)) {
         $items[] = ['sig-gstin.png', '<strong>GSTIN: ' . $h(GSTIN) . '</strong>'];
@@ -1394,26 +1471,26 @@ function crm_signature_html(array $settings, string $country = ''): string
     $rows = '';
     foreach ($items as $i => [$icon, $content]) {
         $pad = $i === count($items) - 1 ? '0' : '10px';
-        $rows .= '<tr><td style="padding:0 12px ' . $pad . ' 0;width:32px;vertical-align:middle"><img src="' . $img . $icon . '" width="32" height="32" alt="" style="display:block;border:0;width:32px;height:32px"></td>'
-            . '<td style="padding:0 0 ' . $pad . ';vertical-align:middle;white-space:nowrap;font:15px/1.3 ' . $font . ';color:#1D1936">' . $content . '</td></tr>';
+        $rows .= '<tr><td class="vt-sig-icc" style="padding:0 12px ' . $pad . ' 0;width:32px;vertical-align:middle"><img class="vt-sig-ic" src="' . $img . $icon . '" width="32" height="32" alt="" style="display:block;border:0;width:32px;height:32px"></td>'
+            . '<td class="vt-sig-tx" style="padding:0 0 ' . $pad . ';vertical-align:middle;white-space:nowrap;' . $font . ';font-size:15px;line-height:20px;color:#1D1936">' . $content . '</td></tr>';
     }
-    /* Items separated by pipes, each line kept whole: the services sit on two lines, as designed. */
-    $line = static fn(array $parts): string => '<span style="white-space:nowrap">' . implode(' &nbsp;|&nbsp; ', array_map($h, $parts)) . '</span>';
+    /* Items separated by pipes, each line kept whole on a desktop: the services sit on two lines, as designed. */
+    $line = static fn(array $parts): string => '<span class="vt-nw" style="white-space:nowrap">' . implode(' &nbsp;|&nbsp; ', array_map($h, $parts)) . '</span>';
 
-    return '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;border-collapse:collapse;margin:18px 0 0">'
+    return '<table role="presentation" width="600" class="vt-sig" cellpadding="0" cellspacing="0" border="0" style="width:600px;border-collapse:collapse;margin:22px 0 0">'
         . '<tr>'
-        . '<td width="206" valign="top" style="width:206px;padding:4px 22px 4px 0;vertical-align:top">'
-        . '<a href="' . $site . '/" title="VTurnU" style="text-decoration:none"><img src="' . $img . 'sig-logo.png" width="200" height="55" alt="VTurnU, together we turn heads" style="display:block;border:0;width:200px;height:55px"></a>'
-        . ($socials ? '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:26px 0 0"><tr>' . implode($gap, $socials) . '</tr></table>' : '')
-        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:28px 0 0"><tr><td bgcolor="#4F46E5" style="padding:0;border-radius:999px;background-color:#4F46E5">'
-        . '<a href="' . $site . '/" style="display:inline-block;padding:13px 18px;font:bold 14px/16px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px;white-space:nowrap">&#127760;&nbsp; www.vturnu.com &nbsp;&rarr;</a>'
+        . '<td width="206" valign="top" class="vt-sig-l" style="width:206px;padding:4px 22px 4px 0;vertical-align:top">'
+        . '<a href="' . $site . '/" title="VTurnU" style="text-decoration:none"><img class="vt-sig-logo" src="' . $img . 'sig-logo.png" width="200" height="55" alt="VTurnU, together we turn heads" style="display:block;border:0;width:200px;height:55px"></a>'
+        . ($socials ? '<table role="presentation" class="vt-sig-row" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:26px 0 0"><tr>' . implode($gap, $socials) . '</tr></table>' : '')
+        . '<table role="presentation" class="vt-sig-pillrow" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:28px 0 0"><tr><td bgcolor="#4F46E5" style="padding:0;border-radius:999px;background-color:#4F46E5">'
+        . '<a href="' . $site . '/" style="display:inline-block;padding:13px 18px;' . $font . ';font-size:14px;line-height:16px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;white-space:nowrap">&#127760;&nbsp; www.vturnu.com &nbsp;&rarr;</a>'
         . '</td></tr></table>'
         . '</td>'
-        . '<td valign="top" style="padding:4px 0 4px 22px;border-left:2px solid #DCD9F2;vertical-align:top">'
-        . '<div style="font:bold 20px/1.25 ' . $font . ';color:#1D1936;margin:0 0 8px;white-space:nowrap">' . $h(defined('LEGAL_NAME') ? LEGAL_NAME : 'VTurnU') . '</div>'
-        . '<div style="font:12px/1.75 ' . $font . ';color:#6F6992;margin:0 0 14px">' . $line(array_slice(CRM_SIG_SERVICES, 0, 5)) . '<br>' . $line(array_slice(CRM_SIG_SERVICES, 5)) . '</div>'
+        . '<td valign="top" class="vt-sig-r" style="padding:4px 0 4px 22px;border-left:2px solid #DCD9F2;vertical-align:top">'
+        . '<div class="vt-sig-co" style="' . $font . ';font-size:20px;line-height:25px;font-weight:bold;color:#1D1936;margin:0 0 8px;white-space:nowrap">' . $h(defined('LEGAL_NAME') ? LEGAL_NAME : 'VTurnU') . '</div>'
+        . '<div class="vt-sig-svc" style="' . $font . ';font-size:12px;line-height:21px;color:#6F6992;margin:0 0 14px">' . $line(array_slice(CRM_SIG_SERVICES, 0, 5)) . '<br>' . $line(array_slice(CRM_SIG_SERVICES, 5)) . '</div>'
         . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">' . $rows . '</table>'
-        . '<div style="border-top:1px solid #DCD9F2;margin:14px 0 0;padding:10px 0 0;white-space:nowrap;font:12.5px/1.5 ' . $font . ';color:#6F6992">' . $line(CRM_SIG_TAGLINE) . '</div>'
+        . '<div class="vt-sig-tag" style="border-top:1px solid #DCD9F2;margin:14px 0 0;padding:10px 0 0;white-space:nowrap;' . $font . ';font-size:12.5px;line-height:19px;color:#6F6992">' . $line(CRM_SIG_TAGLINE) . '</div>'
         . '</td>'
         . '</tr></table>';
 }
@@ -1461,22 +1538,12 @@ function crm_preview_url(string $token): string
 function crm_email_html(string $subject, string $markup, array $settings, string $linkToken, string $pixelToken, bool $button = true, string $country = ''): string
 {
     $site = defined('SITE_URL') ? SITE_URL : 'https://vturnu.com';
-    $font = 'Arial,Helvetica,sans-serif';
-    $sig = crm_signature_html($settings, $country);
     $cta = $button
-        ? '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:6px 0 18px"><tr><td bgcolor="#4338CA" style="border-radius:999px;background-color:#4338CA">'
-            . '<a href="' . crm_proposal_url($linkToken) . '" style="display:inline-block;padding:12px 24px;font:bold 14px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px">Open your proposal</a>'
-            . '</td></tr></table><p style="margin:0 0 18px;font:13px/1.6 ' . $font . ';color:#6F6992">The web version keeps every section in one place, and you can tell us you are ready to go ahead from there.</p>'
+        ? crm_email_button('Open your proposal', crm_proposal_url($linkToken), 'The web version keeps every section in one place, and you can tell us you are ready to go ahead from there.')
         : '';
-    return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'
-        . htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . '</title></head>'
-        . '<body bgcolor="#ffffff" style="margin:0;padding:0;background-color:#ffffff">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td align="center" style="padding:20px 14px">'
-        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px"><tr><td style="text-align:left">'
-        . crm_markup_html($markup) . $cta . $sig
-        . '</td></tr></table></td></tr></table>'
-        . ($pixelToken !== '' ? '<img src="' . $site . '/p/o/' . $pixelToken . '.gif" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0">' : '')
-        . '</body></html>';
+    return crm_email_open($subject)
+        . crm_markup_html($markup) . $cta . crm_signature_html($settings, $country)
+        . crm_email_close($pixelToken !== '' ? $site . '/p/o/' . $pixelToken . '.gif' : '');
 }
 
 /* ------------------------------------------------------------------ */

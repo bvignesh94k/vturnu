@@ -1779,7 +1779,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <div class="mail-preview">
                     <div class="mp-head"><b id="pc-psubject"><?= e_a($c_subject) ?></b><br>From <?= e_a(crm_from($crm_cfg)) ?> to <?= e_a($lead['email']) ?></div>
                     <div id="pc-preview"><?= crm_markup_html(crm_no_dashes($c_body)) ?></div>
-                    <?php if ($kind === 'proposal' || $parent): ?><p style="margin:6px 0 14px"><span style="display:inline-block;padding:10px 20px;border-radius:999px;background:#4338CA;color:#fff;font:bold 13px Arial">Open your proposal</span></p><?php endif; ?>
+                    <?php if ($kind === 'proposal' || $parent): ?><p style="margin:6px 0 14px"><span style="display:inline-block;padding:14px 28px;border-radius:999px;background-color:#4338CA;color:#fff;font-family:<?= e_a(CRM_EMAIL_FONT) ?>;font-size:16px;line-height:20px;font-weight:bold">Open your proposal</span></p><?php endif; ?>
                     <?= crm_signature_html($crm_cfg, $facts['country']) ?>
                 </div>
             </div>
@@ -1793,21 +1793,21 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                     .replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, function (u) { return '<a href="' + u + '" style="color:#4338CA">' + u + '</a>'; });
             }
-            var P = 'margin:0 0 14px;font:15px/1.65 Arial,Helvetica,sans-serif;color:#1D1936', H = 'margin:22px 0 8px;font:bold 16px/1.4 Arial,Helvetica,sans-serif;color:#4338CA';
+            var F = <?= json_encode(CRM_EMAIL_FONT) ?>, P = 'margin:0 0 16px;font-family:' + F + ';font-size:15px;line-height:24px;color:#1D1936', H = 'margin:26px 0 10px;font-family:' + F + ';font-size:17px;line-height:24px;font-weight:bold;color:#4338CA', LI = 'margin:0 0 8px;font-family:' + F + ';font-size:15px;line-height:24px;color:#1D1936';
             function render() {
                 var text = body.value.replace(/(\d)\s*[–—]\s*(\d)/g, '$1 to $2').replace(/\s*[—―]\s*/g, ', ').replace(/\s+–\s+/g, ', ');
                 var html = [], list = [], para = [];
                 function flush() {
                     if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; }
-                    if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; }
+                    if (list.length) { html.push('<ul style="margin:0 0 16px;padding-left:22px">' + list.join('') + '</ul>'); list = []; }
                 }
                 text.split(/\r?\n/).forEach(function (line) {
                     var t = line.replace(/\s+$/, '');
                     var m = t.match(/^\s*[-*] (.+)$/);
                     if (t.indexOf('## ') === 0) { flush(); html.push('<h2 style="' + H + '">' + inline(t.slice(3)) + '</h2>'); }
-                    else if (m) { if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; } list.push('<li style="margin:0 0 7px;font:15px/1.6 Arial">' + inline(m[1]) + '</li>'); }
+                    else if (m) { if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; } list.push('<li style="' + LI + '">' + inline(m[1]) + '</li>'); }
                     else if (!t.trim()) { flush(); }
-                    else { if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; } para.push(inline(t)); }
+                    else { if (list.length) { html.push('<ul style="margin:0 0 16px;padding-left:22px">' + list.join('') + '</ul>'); list = []; } para.push(inline(t)); }
                 });
                 flush();
                 out.innerHTML = html.join('');
@@ -1883,8 +1883,8 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <div class="mail-preview">
                     <div class="mp-head"><b id="mc-psubject"><?= e_a($m_subject) ?></b><br>From <?= e_a(booking_from($bk_cfg)) ?> to <?= e_a($lead['email']) ?></div>
                     <div id="mc-preview"><?= crm_markup_html(crm_no_dashes($m_body)) ?></div>
-                    <p style="margin:6px 0 10px"><span style="display:inline-block;padding:13px 26px;border-radius:999px;background-color:#4338CA;color:#fff;font:bold 15px Arial">Pick a time for our call</span></p>
-                    <p style="margin:0 0 18px;font:13px/1.6 Arial,Helvetica,sans-serif;color:#6F6992"><?= e_a((int) $bk_cfg['length'] . ' minutes on Google Meet with ' . booking_host_line($bk_cfg) . '. Times are shown in your time zone.') ?></p>
+                    <p style="margin:6px 0 10px"><span style="display:inline-block;padding:14px 28px;border-radius:999px;background-color:#4338CA;color:#fff;font-family:<?= e_a(CRM_EMAIL_FONT) ?>;font-size:16px;line-height:20px;font-weight:bold">Pick a time for our call</span></p>
+                    <p style="margin:0 0 20px;font-family:<?= e_a(CRM_EMAIL_FONT) ?>;font-size:13px;line-height:20px;color:#6F6992"><?= e_a((int) $bk_cfg['length'] . ' minutes on Google Meet with ' . booking_host_line($bk_cfg) . '. Times are shown in your time zone.') ?></p>
                     <?= crm_signature_html($crm_cfg, $facts['country']) ?>
                 </div>
             </div>
@@ -1898,21 +1898,21 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                     .replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, function (u) { return '<a href="' + u + '" style="color:#4338CA">' + u + '</a>'; });
             }
-            var P = 'margin:0 0 14px;font:15px/1.65 Arial,Helvetica,sans-serif;color:#1D1936', H = 'margin:22px 0 8px;font:bold 16px/1.4 Arial,Helvetica,sans-serif;color:#4338CA';
+            var F = <?= json_encode(CRM_EMAIL_FONT) ?>, P = 'margin:0 0 16px;font-family:' + F + ';font-size:15px;line-height:24px;color:#1D1936', H = 'margin:26px 0 10px;font-family:' + F + ';font-size:17px;line-height:24px;font-weight:bold;color:#4338CA', LI = 'margin:0 0 8px;font-family:' + F + ';font-size:15px;line-height:24px;color:#1D1936';
             function render() {
                 var text = body.value.replace(/(\d)\s*[–—]\s*(\d)/g, '$1 to $2').replace(/\s*[—―]\s*/g, ', ').replace(/\s+–\s+/g, ', ');
                 var html = [], list = [], para = [];
                 function flush() {
                     if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; }
-                    if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; }
+                    if (list.length) { html.push('<ul style="margin:0 0 16px;padding-left:22px">' + list.join('') + '</ul>'); list = []; }
                 }
                 text.split(/\r?\n/).forEach(function (line) {
                     var t = line.replace(/\s+$/, '');
                     var m = t.match(/^\s*[-*] (.+)$/);
                     if (t.indexOf('## ') === 0) { flush(); html.push('<h2 style="' + H + '">' + inline(t.slice(3)) + '</h2>'); }
-                    else if (m) { if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; } list.push('<li style="margin:0 0 7px;font:15px/1.6 Arial">' + inline(m[1]) + '</li>'); }
+                    else if (m) { if (para.length) { html.push('<p style="' + P + '">' + para.join('<br>') + '</p>'); para = []; } list.push('<li style="' + LI + '">' + inline(m[1]) + '</li>'); }
                     else if (!t.trim()) { flush(); }
-                    else { if (list.length) { html.push('<ul style="margin:0 0 14px;padding-left:20px">' + list.join('') + '</ul>'); list = []; } para.push(inline(t)); }
+                    else { if (list.length) { html.push('<ul style="margin:0 0 16px;padding-left:22px">' + list.join('') + '</ul>'); list = []; } para.push(inline(t)); }
                 });
                 flush();
                 out.innerHTML = html.join('');

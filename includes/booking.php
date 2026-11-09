@@ -1377,38 +1377,26 @@ function booking_ics(array $m, array $cfg): string
  */
 function booking_letter_html(string $subject, string $markup, array $crm, string $country, ?array $cta = null, string $pixel = '', string $card = '', string $after = ''): string
 {
-    $font = 'Arial,Helvetica,sans-serif';
-    $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-    $button = $cta ? '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 10px;border-collapse:separate"><tr>'
-        . '<td bgcolor="#4338CA" style="background-color:#4338CA;border-radius:999px;padding:0">'
-        . '<a href="' . $h($cta['url']) . '" style="display:inline-block;padding:13px 26px;font:bold 15px/18px ' . $font . ';color:#ffffff;text-decoration:none;border-radius:999px">' . $h($cta['label']) . '</a>'
-        . '</td></tr></table>'
-        . (($cta['note'] ?? '') !== '' ? '<p style="margin:0 0 18px;font:13px/1.6 ' . $font . ';color:#6F6992">' . $h((string) $cta['note']) . '</p>' : '')
-        : '';
-    return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . $h($subject) . '</title></head>'
-        . '<body bgcolor="#ffffff" style="margin:0;padding:0;background-color:#ffffff">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="background-color:#ffffff"><tr><td align="center" style="padding:20px 14px">'
-        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px"><tr><td style="text-align:left">'
+    $button = $cta ? crm_email_button((string) $cta['label'], (string) $cta['url'], (string) ($cta['note'] ?? '')) : '';
+    return crm_email_open($subject)
         . crm_markup_html($markup) . $card . $button . ($after !== '' ? crm_markup_html($after) : '') . crm_signature_html($crm, $country)
-        . '</td></tr></table></td></tr></table>'
-        . ($pixel !== '' ? '<img src="' . $h($pixel) . '" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0">' : '')
-        . '</body></html>';
+        . crm_email_close($pixel);
 }
 
 /** The when-and-where card in the lead's emails: their time first, India time under it, the Meet link. */
 function booking_card_html(array $m, bool $struck = false): string
 {
-    $font = 'Arial,Helvetica,sans-serif';
+    $font = 'font-family:' . CRM_EMAIL_FONT;
     $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     $tz = $m['time_zone'] !== '' ? $m['time_zone'] : BOOKING_HOST_TZ;
     $deco = $struck ? 'text-decoration:line-through;' : '';
-    $rows = '<div style="font:bold 12px/1.4 ' . $font . ';letter-spacing:.06em;text-transform:uppercase;color:#4338CA;margin:0 0 6px">' . $h(booking_fmt($m['start'], $tz, 'day')) . '</div>'
-        . '<div style="' . $deco . 'font:bold 20px/1.35 ' . $font . ';color:#1D1936;margin:0 0 4px">' . $h(booking_fmt($m['start'], $tz, 'time') . ' to ' . booking_fmt($m['end'], $tz, 'time')) . '</div>'
-        . '<div style="font:14px/1.5 ' . $font . ';color:#4A4470;margin:0 0 4px">' . $h(booking_zone_label($tz, $m['start'])) . '</div>'
-        . (!booking_is_india($tz) ? '<div style="font:13px/1.5 ' . $font . ';color:#6F6992;margin:0 0 4px">' . $h(booking_fmt($m['start'], BOOKING_HOST_TZ, 'time') . ' in Chennai, India, where our team is') . '</div>' : '')
-        . ($m['meet_url'] !== '' && !$struck ? '<div style="font:14px/1.5 ' . $font . ';color:#1D1936;margin:10px 0 0">Google Meet: <a href="' . $h($m['meet_url']) . '" style="color:#4338CA;font-weight:bold;text-decoration:underline">' . $h(preg_replace('#^https?://#', '', $m['meet_url'])) . '</a></div>' : '');
-    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 16px;border-collapse:separate">'
-        . '<tr><td bgcolor="#F5F4FE" style="background-color:#F5F4FE;border:1px solid #E5E3F5;border-radius:14px;padding:18px 20px">' . $rows . '</td></tr></table>';
+    $rows = '<div style="' . $font . ';font-size:12px;line-height:16px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;color:#4338CA;margin:0 0 6px">' . $h(booking_fmt($m['start'], $tz, 'day')) . '</div>'
+        . '<div style="' . $deco . $font . ';font-size:22px;line-height:30px;font-weight:bold;color:#1D1936;margin:0 0 2px">' . $h(booking_fmt($m['start'], $tz, 'time') . ' to ' . booking_fmt($m['end'], $tz, 'time')) . '</div>'
+        . '<div style="' . $font . ';font-size:15px;line-height:22px;color:#4A4470;margin:0 0 2px">' . $h(booking_zone_label($tz, $m['start'])) . '</div>'
+        . (!booking_is_india($tz) ? '<div style="' . $font . ';font-size:14px;line-height:21px;color:#6F6992;margin:0 0 2px">' . $h(booking_fmt($m['start'], BOOKING_HOST_TZ, 'time') . ' in Chennai, India, where our team is') . '</div>' : '')
+        . ($m['meet_url'] !== '' && !$struck ? '<div style="' . $font . ';font-size:15px;line-height:22px;color:#1D1936;margin:12px 0 0">Google Meet: <a href="' . $h($m['meet_url']) . '" style="color:#4338CA;font-weight:bold;text-decoration:underline">' . $h(preg_replace('#^https?://#', '', $m['meet_url'])) . '</a></div>' : '');
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 18px;border-collapse:separate">'
+        . '<tr><td bgcolor="#F5F4FE" style="background-color:#F5F4FE;border:1px solid #E5E3F5;border-radius:14px;padding:20px 22px">' . $rows . '</td></tr></table>';
 }
 
 /**

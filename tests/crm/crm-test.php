@@ -102,8 +102,8 @@ check('openings vary between leads', count($variants) >= 2, (string) count($vari
 
 /* ---------------- rendering ---------------- */
 $html = crm_markup_html("## Plan\n- **Bold:** see https://vturnu.com/x.\n\nA <script> line");
-check('heading', str_contains($html, '<h2 style="'), $html);
-check('bullet with bold', str_contains($html, '<li style="') && str_contains($html, '<strong>Bold:</strong>'));
+check('heading', str_contains($html, '<h2 class="vt-h" style="'), $html);
+check('bullet with bold', str_contains($html, '<li class="vt-p" style="') && str_contains($html, '<strong>Bold:</strong>'));
 check('link keeps the period outside', str_contains($html, 'https://vturnu.com/x</a>.'), $html);
 check('escaped', str_contains($html, 'A &lt;script&gt; line'));
 $txt = crm_markup_text("## Investment\n- One\n**Two**");
