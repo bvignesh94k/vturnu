@@ -1,12 +1,15 @@
 <?php
 /**
  * Unit tests for includes/ai-crawlers.php: the robots.txt engine (RFC 9309),
- * address safety checks, HTML reading and the whole check with a fake fetcher.
- * No network. Run with: PHP_WASM_DIR=... node tests/aic/run.mjs
+ * address safety checks, HTML reading and the whole check with a fake fetcher,
+ * then aic_get() itself on the test network in tests/net (local test sites,
+ * a stand-in internal site behind every private address, no internet).
+ * Run with: PHP_WASM_DIR=... node tests/aic/run.mjs
  */
 declare(strict_types=1);
 
 require '/site/includes/ai-crawlers.php';
+require '/site/tests/net/test-net.php';
 
 $pass = 0;
 $fail = 0;
@@ -164,5 +167,40 @@ check('noscript message needs JS', aic_text_verdict($nos)[1] === 'Needs JavaScri
 $forbidden = aic_check('https://x.com/', fake(['https://x.com/' => ['status' => 403, 'body' => '<body><script src="/c.js"></script>Denied</body>']]));
 check('non-200 page is not judged for JavaScript', !$jsStep($forbidden) && aic_text_verdict($forbidden)[1] === 'Not measured');
 check('non-200 page gets a status step', (bool) array_filter(aic_next_steps($forbidden), static fn($s) => str_contains($s, 'HTTP 403')));
+
+/* ---------- aic_get(): every hop checked and pinned (tests/net) ---------- */
+$fetch = static fn(string $u, int $t = 5): array => aic_get($u, $t, 'test_dns');
+$NOT_CHECKED = 'The site redirected to an address we do not check.';
+$COULD_NOT = 'The site redirected to an address we could not check.';
+$r = $fetch('http://site-a.example/');
+check('fetch a public page', $r['status'] === 200 && str_contains($r['body'], 'Site A home'));
+$r = $fetch('http://site-a.example/to-b');
+check('follow a public redirect', $r['status'] === 200 && $r['url'] === 'http://site-b.example/landing' && $r['hops'] === [[301, 'http://site-a.example/to-b']]);
+/* Before 9 Nov 2026 this was the gap: curl looked "SITE-B.example." up itself. */
+$r = $fetch('http://site-a.example/to-b-dot');
+check('a trailing-dot host stays pinned', $r['status'] === 200 && str_contains($r['body'], 'Site B landing') && !test_leaked($r));
+foreach (['/to-private', '/to-metadata', '/to-loopback', '/to-port', '/to-userinfo', '/to-ipv6'] as $path) {
+    $r = $fetch('http://site-a.example' . $path);
+    check("refuse redirect $path", $r['status'] === 0 && $r['error'] === $NOT_CHECKED && !test_leaked($r));
+}
+foreach (['/to-intranet', '/to-localhost', '/to-mixed', '/to-cgnat'] as $path) {
+    $r = $fetch('http://site-a.example' . $path);
+    check("refuse redirect $path", $r['status'] === 0 && $r['error'] === $COULD_NOT && !test_leaked($r));
+}
+$r = $fetch('http://site-a.example/loop');
+check('stop after five redirects', $r['status'] === 0 && $r['error'] === 'Too many redirects.');
+$GLOBALS['test_dns_flips'] = 0;
+$r = $fetch('http://flip.example/to-flip');
+check('a host that turns private mid-chain is refused', $r['status'] === 0 && $r['error'] === $COULD_NOT && !test_leaked($r));
+foreach (['/to-ftp', '/to-mailto', '/relative', '/to-b-relative'] as $path) {
+    check("no leak via $path", !test_leaked($fetch('http://site-a.example' . $path)));
+}
+$c = aic_check('http://site-a.example/', $fetch);
+check('check runs on the test network', $c['ok'] && $c['robots']['mode'] === 'parsed' && $c['llms'] === false);
+$c = aic_check('http://site-a.example/to-b', $fetch);
+check('robots.txt and llms.txt redirects to private addresses refused', $c['ok'] && $c['url'] === 'http://site-b.example/landing'
+    && $c['robots']['mode'] === 'unknown' && $c['llms'] === false && !test_leaked($c));
+$c = aic_check('http://site-a.example/to-metadata', $fetch);
+check('check refuses a redirect to the metadata address', !$c['ok'] && str_contains($c['error'], $NOT_CHECKED));
 
 echo "\n$pass passed, $fail failed\n";

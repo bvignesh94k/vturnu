@@ -1,5 +1,5 @@
-// Test sites for tests/audit/run.mjs: plain HTTP servers on 127.0.0.1.
-// run.mjs routes the pretend public addresses to "a" and "b", and every
+// Test sites for tests/net/harness.mjs: plain HTTP servers on 127.0.0.1.
+// The harness routes the pretend public addresses to "a" and "b", and every
 // private address to "internal", whose pages carry INTERNAL SECRET so a
 // guard that failed shows up in the results. Prints the ports as JSON once
 // every server listens.

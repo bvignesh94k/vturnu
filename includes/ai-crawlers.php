@@ -254,10 +254,12 @@ function aic_ip_public(string $ip): bool
     return true;
 }
 
-/** One public IPv4 address for a host, or null when it has none or any of its addresses is private. */
-function aic_resolve(string $host): ?string
+/** One public IPv4 address for a host, or null when it has none or any of its
+ *  addresses is private. $resolve returns the host's IPv4 addresses,
+ *  gethostbynamel() by default; tests pass their own because php-wasm fakes DNS. */
+function aic_resolve(string $host, ?callable $resolve = null): ?string
 {
-    $ips = gethostbynamel($host) ?: [];
+    $ips = ($resolve ?? 'gethostbynamel')($host) ?: [];
     if (!$ips) {
         return null;
     }
@@ -346,12 +348,17 @@ function aic_abs_url(string $loc, string $base): string
 
 /**
  * GET a URL, following up to five redirects by hand. Every hop is checked
- * again and the connection is pinned to the public IPv4 address that was
- * checked, so neither a redirect nor a DNS change can reach a private host.
+ * again and the connection goes only to the public IPv4 address that was
+ * checked (CURLOPT_CONNECT_TO), so neither a redirect nor a DNS change can
+ * reach a private host. The CURLOPT_RESOLVE pin used here until 9 Nov 2026
+ * was skipped for a host written with a trailing dot ("example.com.") in
+ * php-wasm's curl (7.69.1), which then looked the name up itself.
+ *
+ * $resolve: see aic_resolve().
  *
  * @return array{status:int, url:string, hops:list<array{0:int,1:string}>, headers:array<string,list<string>>, body:string, error:string}
  */
-function aic_get(string $url, int $timeout): array
+function aic_get(string $url, int $timeout, ?callable $resolve = null): array
 {
     $hops = [];
     for ($i = 0; $i <= 5; $i++) {
@@ -364,7 +371,7 @@ function aic_get(string $url, int $timeout): array
             || isset($p['user']) || $host === '' || filter_var(trim($host, '[]'), FILTER_VALIDATE_IP)) {
             return $fail('The site redirected to an address we do not check.');
         }
-        $ip = aic_resolve($host);
+        $ip = aic_resolve($host, $resolve);
         if ($ip === null) {
             return $fail('The site redirected to an address we could not check.');
         }
@@ -372,8 +379,10 @@ function aic_get(string $url, int $timeout): array
         $body = '';
         $ch = curl_init($url);
         curl_setopt_array($ch, [
-            CURLOPT_RESOLVE => [$host . ':' . $port . ':' . $ip],
+            /* Empty host and port match any request: connect only to the checked IP. */
+            CURLOPT_CONNECT_TO => ['::' . $ip . ':' . $port],
             CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+            CURLOPT_PROXY => '',   // a proxy would resolve the name itself
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_TIMEOUT => $timeout,
             CURLOPT_CONNECTTIMEOUT => AIC_CONNECT,

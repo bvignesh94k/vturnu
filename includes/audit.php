@@ -121,9 +121,9 @@ function audit_rate_ok(string $ip): bool
  * followed redirects itself, so a public site could send the audit to an
  * internal address and the report would show that page's title and H1.
  *
- * aic_get() pins with CURLOPT_RESOLVE instead. With php-wasm's curl (7.69.1)
- * that pin is skipped for a host written with a trailing dot ("example.com.")
- * and curl looks the name up itself. CURLOPT_CONNECT_TO has no such gap.
+ * Not CURLOPT_RESOLVE: in php-wasm's curl (7.69.1) that pin is skipped for a
+ * host written with a trailing dot ("example.com.") and curl looks the name
+ * up itself. aic_get() pins the same way.
  *
  * $timeout covers the whole chain, as curl's own limit did. A body stops at
  * AUDIT_MAX_BYTES and the audit reads what arrived. $resolve returns a host's
