@@ -76,14 +76,16 @@
      * call would overlap something already on the calendar (someone booked
      * it, or the host is busy), and the page shows those struck through;
      * times kept clear only as the buffer around a call are left out.
-     * R = {grid, len, step, hours, days, notice}.
+     * R = {grid, len, step, hours, days, notice, sameDay}.
      */
     var zoneTimes = function (R, z, nowSec) {
         var g = R.grid, out = [], seen = {};
         var from = nowSec + Math.max(1, (R.notice || 0) * 60);
         var first = wall(z, nowSec * 1000), last = wall(z, g.until * 1000);
         var lastKey = ymd(last.y, last.m, last.d);
-        for (var day = { y: first.y, m: first.m, d: first.d }, n = 0; ymd(day.y, day.m, day.d) <= lastKey && n < 400; day = addDays(day, 1), n++) {
+        /* No calls on the day itself unless same-day calls are allowed: the list starts tomorrow on their calendar. */
+        var startDay = R.sameDay ? { y: first.y, m: first.m, d: first.d } : addDays(first, 1);
+        for (var day = startDay, n = 0; ymd(day.y, day.m, day.d) <= lastKey && n < 400; day = addDays(day, 1), n++) {
             if (R.days.indexOf(isoWeekday(day)) === -1) { continue; }
             for (var r = 0; r < R.hours.length; r++) {
                 for (var mn = R.hours[r][0]; mn + R.len <= R.hours[r][1]; mn += R.step) {
@@ -273,7 +275,7 @@
     form.appendChild(slotField);
     if (fallback) { fallback.removeAttribute('name'); fallback.required = false; }
 
-    var R = { grid: D.grid, len: D.len, step: D.step || 30, hours: D.hours || [[570, 1110]], days: D.days || [1, 2, 3, 4, 5], notice: D.notice || 0 };
+    var R = { grid: D.grid, len: D.len, step: D.step || 30, hours: D.hours || [[570, 1110]], days: D.days || [1, 2, 3, 4, 5], notice: D.notice || 0, sameDay: !!D.sameDay };
     var loadedAt = Date.now();
     var nowSec = function () { return D.now + Math.floor((Date.now() - loadedAt) / 1000); };
     var tz = D.tz && validZone(D.tz) ? canon(D.tz) : (deviceZone || D.hostTz || 'UTC');
@@ -392,10 +394,13 @@
         var lead = (new Date(Date.UTC(y, mo - 1, 1)).getUTCDay() + 6) % 7;
         for (var i = 0; i < lead; i++) { grid.appendChild(el('span', 'bk-blank')); }
         var count = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+        /* Without same-day calls, a working day today looks like any fully booked day. */
+        var todayW = wall(tz, nowSec() * 1000);
+        var todayFull = !R.sameDay && R.days.indexOf(isoWeekday({ y: todayW.y, m: todayW.m, d: todayW.d })) !== -1;
         for (var d = 1; d <= count; d++) {
             var k = month + '-' + pad(d);
             var open = hasFree(days[k]);
-            var full = !!days[k] && !open;
+            var full = (!!days[k] && !open) || (k === today && todayFull);
             var b = el(open ? 'button' : 'span', 'bk-day' + (open ? ' is-open' : '') + (full ? ' is-full' : '') + (k === selDay ? ' is-sel' : '') + (k === today ? ' is-today' : ''), String(d));
             if (open) {
                 var free = days[k].filter(function (x) { return x.free; }).length;

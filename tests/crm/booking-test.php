@@ -41,7 +41,7 @@ check('range past midnight', booking_ranges('19:00-01:00') === [[1140, 1500]]);
 check('bad ranges dropped', booking_ranges('9-5, 25:00-26:00, nonsense') === []);
 $cfg = booking_clean_settings(booking_setting_defaults());
 check('owner defaults', $cfg['host_name'] === 'B. Vignesh' && $cfg['host_title'] === 'Founder & CEO' && $cfg['hours'] === '09:30-18:30' && $cfg['notice_minutes'] === 0
-    && $cfg['days'] === [1, 2, 3, 4, 5] && $cfg['length'] === 30 && !isset($cfg['core']) && !isset($cfg['overseas']), json_encode($cfg));
+    && $cfg['same_day'] === false && $cfg['days'] === [1, 2, 3, 4, 5] && $cfg['length'] === 30 && !isset($cfg['core']) && !isset($cfg['overseas']), json_encode($cfg));
 $bad = booking_clean_settings(['enabled' => '1', 'length' => 33, 'buffer' => 500, 'notice_minutes' => -3, 'window_days' => 0, 'days' => ['9', 'x'], 'hours' => 'all day', 'core' => '01:00-02:00', 'host_name' => '']);
 check('settings are checked', $bad['length'] === 30 && $bad['buffer'] === 60 && $bad['notice_minutes'] === 0 && $bad['window_days'] === 1 && $bad['days'] === [1, 2, 3, 4, 5]
     && $bad['hours'] === '09:30-18:30' && !isset($bad['core']) && $bad['host_name'] === 'B. Vignesh', json_encode($bad));
@@ -52,16 +52,48 @@ $at = static fn(string $s, string $tz = 'Asia/Kolkata'): int => (new DateTimeImm
 /* Each slot as the visitor reads it: "Wed 13:30" on their own clock. */
 $local = static fn(array $slots, string $tz, string $f = 'D H:i'): array => array_map(static fn(int $t): string => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone($tz))->format($f), $slots);
 
-/* The owner's example: someone in Pacific Time at 1:00 PM sees 1:30 PM to the last call at 6:00 PM, then the next working day from 9:30 AM. */
+/* No calls on the day itself (owner, 9 Nov 2026): Pacific at 1:00 PM on Wednesday sees Thursday from 9:30 AM to the last call at 6:00 PM. */
 $la = 'America/Los_Angeles';
 $pt = $local(booking_slots($cfg, $at('2026-11-11 13:00', $la), [], $la), $la);
-check('Pacific at 1:00 PM: from 1:30 PM', $pt[0] === 'Wed 13:30', implode(' ', array_slice($pt, 0, 3)));
-check('Pacific: the last call starts at 6:00 PM', in_array('Wed 18:00', $pt, true) && !in_array('Wed 18:30', $pt, true) && $pt[9] === 'Wed 18:00' && $pt[10] === 'Thu 09:30', implode(' ', array_slice($pt, 8, 5)));
-check('Pacific at 12:59 PM: from 1:00 PM', $local(booking_slots($cfg, $at('2026-11-11 12:59', $la), [], $la), $la)[0] === 'Wed 13:00');
-check('Pacific at 1:10 PM: from 1:30 PM', $local(booking_slots($cfg, $at('2026-11-11 13:10', $la), [], $la), $la)[0] === 'Wed 13:30');
-check('Pacific after 6:00 PM: the next working morning', $local(booking_slots($cfg, $at('2026-11-13 18:05', $la), [], $la), $la)[0] === 'Mon 09:30');
+check('no same day: Pacific at 1:00 PM Wednesday starts Thursday 9:30 AM', $pt[0] === 'Thu 09:30'
+    && !in_array('2026-11-11', $local(booking_slots($cfg, $at('2026-11-11 13:00', $la), [], $la), $la, 'Y-m-d'), true), implode(' ', array_slice($pt, 0, 3)));
+check('Pacific: the last call starts at 6:00 PM', in_array('Thu 18:00', $pt, true) && !in_array('Thu 18:30', $pt, true) && $pt[17] === 'Thu 18:00' && $pt[18] === 'Fri 09:30', implode(' ', array_slice($pt, 16, 4)));
+check('no same day: just after midnight still waits for the next day', $local(booking_slots($cfg, $at('2026-11-11 00:05', $la), [], $la), $la)[0] === 'Thu 09:30');
+check('Pacific on Friday evening: Monday 9:30 AM', $local(booking_slots($cfg, $at('2026-11-13 18:05', $la), [], $la), $la)[0] === 'Mon 09:30');
 check('weekdays on the visitor clock: Friday afternoon Pacific yes, weekends no', in_array('Fri 17:30', $pt, true) && !array_filter($pt, static fn(string $t): bool => str_starts_with($t, 'Sat') || str_starts_with($t, 'Sun')));
-check('a minimum notice pushes the first time', $local(booking_slots(array_merge($cfg, ['notice_minutes' => 60]), $at('2026-11-11 13:00', $la), [], $la), $la)[0] === 'Wed 14:00');
+/* With same-day calls switched on in Settings, today starts at the next half hour (the earlier rule). */
+$same = array_merge($cfg, ['same_day' => true]);
+check('same day on: Pacific at 1:00 PM from 1:30 PM', $local(booking_slots($same, $at('2026-11-11 13:00', $la), [], $la), $la)[0] === 'Wed 13:30');
+check('same day on: at 12:59 PM from 1:00 PM, at 1:10 PM from 1:30 PM', $local(booking_slots($same, $at('2026-11-11 12:59', $la), [], $la), $la)[0] === 'Wed 13:00'
+    && $local(booking_slots($same, $at('2026-11-11 13:10', $la), [], $la), $la)[0] === 'Wed 13:30');
+check('a minimum notice pushes the first time', $local(booking_slots(array_merge($same, ['notice_minutes' => 60]), $at('2026-11-11 13:00', $la), [], $la), $la)[0] === 'Wed 14:00');
+
+/* Whatever zone is picked, the first time is at least 9.5 hours away: checked every 47 minutes for two weeks, over every zone PHP knows. */
+$allZones = DateTimeZone::listIdentifiers();
+$minLead = PHP_INT_MAX;
+$minAt = '';
+for ($m = $at('2026-11-09 00:00', 'UTC'); $m < $at('2026-11-23 00:00', 'UTC'); $m += 47 * 60) {
+    $g = booking_free_grid($cfg, $m, []);
+    foreach (['Pacific/Kiritimati', 'Pacific/Pago_Pago', 'Pacific/Honolulu', 'America/Los_Angeles', 'America/New_York', 'America/St_Johns', 'Europe/London', 'Asia/Dubai', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Singapore', 'Australia/Sydney', 'Pacific/Chatham', 'Pacific/Auckland'] as $z) {
+        $first = booking_zone_slots($cfg, $m, $g, $z)[0] ?? null;
+        if ($first !== null && $first - $m < $minLead) {
+            $minLead = $first - $m;
+            $minAt = $z . ' ' . gmdate('c', $m);
+        }
+    }
+}
+$leadAll = PHP_INT_MAX;
+$gAll = booking_free_grid($cfg, $at('2026-11-10 23:50', 'Asia/Kolkata'), []);
+foreach ($allZones as $z) {
+    $first = booking_zone_slots($cfg, $at('2026-11-10 23:50', 'Asia/Kolkata'), $gAll, $z)[0] ?? null;
+    if ($first !== null) {
+        $leadAll = min($leadAll, $first - $at('2026-11-10 23:50', 'Asia/Kolkata'));
+    }
+}
+check('switching zones never gives less than 9.5 hours of notice', $minLead >= 34200 && $leadAll >= 34200, round($minLead / 3600, 2) . 'h at ' . $minAt . ', all zones ' . round($leadAll / 3600, 2) . 'h');
+/* The one exception: a night the clocks go forward before a working day (Egypt, last Friday of April at midnight) leaves 8.5 hours. */
+$cairo = booking_slots(array_merge($cfg, ['window_days' => 3]), $at('2027-04-29 23:59', 'Africa/Cairo'), [], 'Africa/Cairo');
+check('a spring-forward night still leaves 8.5 hours', ($cairo[0] ?? 0) - $at('2027-04-29 23:59', 'Africa/Cairo') >= 8.5 * 3600 - 60, gmdate('c', $cairo[0] ?? 0));
 
 /* Every zone gets 9:30 AM to 6:00 PM starts on its own clock: 18 a day, on its half hours. */
 $now = $at('2026-11-09 06:00');           // a Monday morning in Chennai
@@ -76,14 +108,14 @@ foreach (['Pacific/Honolulu', 'America/Los_Angeles', 'America/Denver', 'America/
         && !array_filter($s, static fn(int $t): bool => $t % 900 !== 0) && max($s) < $now + 21 * 86400 && min($s) > $now,
         $z . ' ' . min($hm) . '..' . max($hm) . ' days ' . count($full));
 }
-check('India Monday morning: from 9:30 AM', $local(booking_slots($cfg, $now, [], 'Asia/Kolkata'), 'Asia/Kolkata')[0] === 'Mon 09:30');
+check('India on Monday morning: Tuesday from 9:30 AM', $local(booking_slots($cfg, $now, [], 'Asia/Kolkata'), 'Asia/Kolkata')[0] === 'Tue 09:30');
 
 /* Daylight saving: 9:30 AM stays 9:30 AM on the visitor's clock across the change. */
-$dst = booking_slots(array_merge($cfg, ['window_days' => 7]), $at('2026-10-30 08:00', $la), [], $la);
+$dst = booking_slots(array_merge($cfg, ['window_days' => 7]), $at('2026-10-29 08:00', $la), [], $la);
 $fri = array_values(array_filter($dst, static fn(int $t): bool => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('America/Los_Angeles'))->format('Y-m-d H:i') === '2026-10-30 09:30'))[0] ?? 0;
 $mon = array_values(array_filter($dst, static fn(int $t): bool => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('America/Los_Angeles'))->format('Y-m-d H:i') === '2026-11-02 09:30'))[0] ?? 0;
 check('US fall back: 9:30 AM PDT then 9:30 AM PST', $fri > 0 && $mon - $fri === 3 * 86400 + 3600 && gmdate('H:i', $fri) === '16:30' && gmdate('H:i', $mon) === '17:30', gmdate('c', $fri) . ' ' . gmdate('c', $mon));
-$uk = booking_slots(array_merge($cfg, ['window_days' => 7]), $at('2027-03-26 08:00', 'Europe/London'), [], 'Europe/London');
+$uk = booking_slots(array_merge($cfg, ['window_days' => 7]), $at('2027-03-25 08:00', 'Europe/London'), [], 'Europe/London');
 $ukFri = $local([$uk[0]], 'UTC', 'D H:i')[0] ?? '';
 $ukMon = array_values(array_filter($uk, static fn(int $t): bool => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('Europe/London'))->format('D H:i') === 'Mon 09:30'))[0] ?? 0;
 check('UK spring forward: 9:30 GMT then 9:30 BST', $ukFri === 'Fri 09:30' && gmdate('D H:i', $ukMon) === 'Mon 08:30', $ukFri . ' / ' . gmdate('D H:i', $ukMon));
@@ -149,7 +181,7 @@ $html = $page('book-a-meeting/' . $token);
 check('personal page greets and prefills', str_contains($html, 'Bauer, pick a date and time') && str_contains($html, 'value="Bauer"') && str_contains($html, 'value="bauer@cocopat.us"'), substr($html, 0, 300));
 check('personal page agenda from their words', str_contains($html, 'Your goals for Google Ads and Meta Ads'));
 check('page carries the free grid and the IP zone', str_contains($html, 'id="bk-data"') && str_contains($html, '"tz":"America/Chicago","tzSource":"ip"') && str_contains($html, '"mode":"book"')
-    && str_contains($html, '"recaptcha":""') && str_contains($html, '"grid":{"t0":') && str_contains($html, '"hours":[[570,1110]]') && str_contains($html, '"America/Los_Angeles":"US"'));
+    && str_contains($html, '"recaptcha":""') && str_contains($html, '"sameDay":false') && str_contains($html, '"grid":{"t0":') && str_contains($html, '"hours":[[570,1110]]') && str_contains($html, '"America/Los_Angeles":"US"'));
 check('no "times shown in your time zone" wording', !str_contains($html, 'Times shown in your time zone'));
 check('no-JS list in the visitor zone', str_contains($html, '<select id="bk-slot" name="slot"') && str_contains($html, 'Time (Chicago time (GMT-'));
 $tzPage = $page('book-a-meeting/' . $token, ['tz' => 'Europe/London']);
@@ -233,7 +265,19 @@ foreach (booking_zone_slots($cfgNow, $avail['now'], $avail['grid'], 'America/Chi
 $asIndia = booking_book(null, ['slot' => (string) $morning, 'tz' => 'Asia/Kolkata', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
 check('a time outside the visitor zone hours is refused', $morning !== null && !$asIndia['ok'] && $asIndia['taken'], (string) $morning);
 $soon = booking_book(null, ['slot' => (string) (intdiv(time(), 1800) * 1800), 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
-check('a time already started is refused', !$soon['ok']);
+check('a time already started is refused, and says so', !$soon['ok'] && $soon['taken'] && str_contains($soon['error'], 'already started'), $soon['error']);
+/* A crafted request for later today, in a zone where today still has working hours ahead: refused as a full day, never as a rule. */
+$sameZone = null;
+foreach (['Pacific/Kiritimati', 'Asia/Tokyo', 'Asia/Kolkata', 'Europe/London', 'America/New_York', 'America/Los_Angeles', 'Pacific/Honolulu', 'Pacific/Pago_Pago'] as $z) {
+    $loc = (new DateTimeImmutable('now', new DateTimeZone($z)));
+    if ((int) $loc->format('G') < 20) {
+        $sameZone = $z;
+        break;
+    }
+}
+$later = intdiv(time() + 3600, 1800) * 1800;
+$sameDay = booking_book(null, ['slot' => (string) $later, 'tz' => (string) $sameZone, 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+check('a same-day time is refused as a full day', $sameZone !== null && !$sameDay['ok'] && $sameDay['taken'] && str_contains($sameDay['error'], 'All times on that day are taken') && !preg_match('/same.day/i', $sameDay['error']), $sameZone . ' ' . $sameDay['error']);
 check('nothing sent for refused bookings', count($GLOBALS['captured_mail']) === 0);
 /* Two people press Book at the same moment: both pages offered the time; the database's no-overlap rule stops the second, and its calendar event is taken back. */
 $db->hideBusy = true;

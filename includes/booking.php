@@ -51,7 +51,9 @@ const BOOKING_LOCK = 724001;
 /**
  * The owner's choices: B. Vignesh hosts (9 Nov 2026). Since the evening of
  * 9 Nov 2026 every visitor gets 9:30 AM to 6:30 PM on their own clock, Monday
- * to Friday in their own zone, from the next half hour on.
+ * to Friday in their own zone, and no call on the day itself ("handling the
+ * sudden meetings are very difficult"): today shows as fully booked and the
+ * first time is the next working day at 9:30 AM their time.
  */
 function booking_setting_defaults(): array
 {
@@ -62,6 +64,7 @@ function booking_setting_defaults(): array
         'length' => 30,
         'buffer' => 15,
         'notice_minutes' => 0,
+        'same_day' => false,
         'window_days' => 21,
         'days' => [1, 2, 3, 4, 5],
         'hours' => '09:30-18:30',
@@ -99,6 +102,7 @@ function booking_clean_settings(array $s): array
         'length' => in_array((int) ($s['length'] ?? 0), [15, 20, 30, 45, 60], true) ? (int) $s['length'] : $d['length'],
         'buffer' => max(0, min(60, (int) ($s['buffer'] ?? $d['buffer']))),
         'notice_minutes' => max(0, min(2880, (int) ($s['notice_minutes'] ?? $d['notice_minutes']))),
+        'same_day' => !empty($s['same_day']),
         'window_days' => max(1, min(60, (int) ($s['window_days'] ?? $d['window_days']))),
         'days' => $days ?: $d['days'],
         'hours' => $hours,
@@ -326,11 +330,15 @@ function booking_free_grid(array $cfg, int $now, array $busy): array
 /**
  * The start times offered to a visitor in $tz: the half hours of the working
  * hours on their own clock (9:30 AM to 6:30 PM by default, so the last call
- * starts at 6:00 PM), on their own working days, after now and the minimum
- * notice, inside the window and free on the grid. Days are walked as dates on
- * the visitor's calendar and each time is read on their clock, so daylight
- * saving changes land where they should; a time a clock change skips is left
- * out. assets/js/booking.js repeats this rule for the page; this one decides.
+ * starts at 6:00 PM), on their own working days, from the next day on (today
+ * on their calendar only when same-day calls are allowed, then from the next
+ * half hour), after the minimum notice, inside the window and free on the
+ * grid. Days are walked as dates on the visitor's calendar and each time is
+ * read on their clock, so daylight saving changes land where they should; a
+ * time a clock change skips is left out. Without same-day calls the earliest
+ * time in any zone is at least 9.5 hours away (8.5 across a night the clocks
+ * go forward), whichever zone is picked. assets/js/booking.js repeats this
+ * rule for the page; this one decides.
  *
  * @param array{t0:int,step:int,until:int,bits:string} $grid from booking_free_grid()
  * @return list<int>
@@ -344,6 +352,9 @@ function booking_zone_slots(array $cfg, int $now, array $grid, string $tz): arra
     $ranges = booking_hours((string) $cfg['hours']);
     $utc = new DateTimeZone('UTC');
     $day = new DateTimeImmutable((new DateTimeImmutable('@' . $now))->setTimezone($zone)->format('Y-m-d'), $utc);
+    if (empty($cfg['same_day'])) {
+        $day = $day->modify('+1 day');
+    }
     $last = new DateTimeImmutable((new DateTimeImmutable('@' . $grid['until']))->setTimezone($zone)->format('Y-m-d'), $utc);
     $out = [];
     for (; $day <= $last; $day = $day->modify('+1 day')) {
@@ -1092,6 +1103,15 @@ function booking_book(?array $m, array $in, string $mode = 'book'): array
     }
     if ($errors) {
         return $res(false, 'Please check the highlighted fields.', '', false, $errors);
+    }
+    /* A slow form can outlive its time. */
+    if ($start <= booking_now()) {
+        return $res(false, 'That time has already started. Please pick a later one.', '', true);
+    }
+    /* No calls on the day itself in the zone they book in; to them the day is simply full. */
+    $zoneDay = static fn(int $t): string => (new DateTimeImmutable('@' . $t))->setTimezone(booking_zone($tz))->format('Y-m-d');
+    if (empty($cfg['same_day']) && $zoneDay($start) === $zoneDay(booking_now())) {
+        return $res(false, 'All times on that day are taken. Please pick another day.', '', true);
     }
 
     /* Is the time still on offer to this visitor? */

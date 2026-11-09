@@ -349,6 +349,7 @@ function booking_render_page(?array $m, array $cfg, array $state): void
             'hours' => booking_hours((string) $cfg['hours']),
             'days' => array_map('intval', (array) $cfg['days']),
             'notice' => (int) $cfg['notice_minutes'],
+            'sameDay' => !empty($cfg['same_day']),
             'tz' => $tz,
             'tzSource' => $tzSource,
             'hostTz' => BOOKING_HOST_TZ,
