@@ -181,10 +181,18 @@ function lead_screen(array $entry, string $source, bool $network = true, array $
             $flag(25, 'Form filled without typing or clicking');
         }
     }
-    if (($signals['captcha'] ?? null) === 'missing') {
+    /* reCAPTCHA never refuses a form (owner, 9 Nov 2026); its score is weighed
+       here instead, so a likely bot lands in the Junk view, one click from
+       being restored if it was a person. */
+    $captcha = $signals['captcha'] ?? null;
+    if ($captcha === 'missing') {
         $flag(20, 'No reCAPTCHA token');
-    } elseif (is_float($signals['captcha'] ?? null) && $signals['captcha'] < 0.7) {
-        $flag(20, 'Low reCAPTCHA score');
+    } elseif (is_float($captcha) && $captcha < 0.3) {
+        $flag(60, 'reCAPTCHA score ' . $captcha . ', likely a bot');
+    } elseif (is_float($captcha) && $captcha < 0.5) {
+        $flag(30, 'Low reCAPTCHA score (' . $captcha . ')');
+    } elseif (is_float($captcha) && $captcha < 0.7) {
+        $flag(20, 'Low reCAPTCHA score (' . $captcha . ')');
     }
 
     /* ---- Did they say what they need? ---- */

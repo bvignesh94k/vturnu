@@ -295,7 +295,19 @@ check('public booking: London times', str_contains(($byTo('dana.smith@gmail.com'
 $pub2 = booking_book(null, ['slot' => (string) $pick(booking_availability($cfgNow), 'Europe/London', 6)[0], 'tz' => 'Europe/London', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
 check('the same person again joins their lead', $pub2['ok'] && booking_by_token($pub2['token'])['enquiry_id'] === $pm['enquiry_id']);
 $junk = booking_book(null, ['slot' => (string) $pick(booking_availability($cfgNow), 'Europe/London', 9)[0], 'tz' => 'Europe/London', 'name' => 'ABCDEFGHIJKL', 'email' => 'x@mailinator.com', 'notes' => 'SEO backlinks guest post da 90+ casino']);
-check('junk refused', !$junk['ok'] && !$junk['taken']);
+check('junk gets no call', !$junk['ok'] && !$junk['taken'] && str_contains($junk['error'], 'we will email you'), $junk['error']);
+$junkLead = array_values(array_filter($db->leads, static fn(array $l): bool => $l['email'] === 'x@mailinator.com'))[0] ?? null;
+check('junk booking kept in the Junk view with the time they wanted', $junkLead && $junkLead['status'] === 'junk' && $junkLead['tags'] === 'auto-junk'
+    && str_contains((string) $junkLead['message'], 'Tried to book a call for ') && str_contains((string) $junkLead['message'], 'no call was booked'), json_encode($junkLead));
+check('junk booking made no calendar event', !array_filter($G->events, static fn(array $e): bool => ($e['attendees'][0]['email'] ?? '') === 'x@mailinator.com'));
+
+/* reCAPTCHA never refuses a form (owner, 9 Nov 2026): the score is weighed by the junk filter. */
+$clean = ['name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'company' => 'Northwind', 'mobile' => '', 'message' => 'We want more qualified leads from search.'];
+$scored = static fn($signal): array => lead_screen($clean, 'contact-page', false, ['captcha' => $signal]);
+check('reCAPTCHA below 0.3 lands in Junk', $scored(0.1)['verdict'] === 'junk', json_encode($scored(0.1)));
+check('reCAPTCHA below 0.5 is flagged for review', $scored(0.4)['verdict'] === 'review', json_encode($scored(0.4)));
+check('a good reCAPTCHA score passes clean', $scored(0.9) === ['verdict' => 'ok', 'score' => 0, 'reasons' => []], json_encode($scored(0.9)));
+check('a missing token is only noted', $scored('missing')['verdict'] === 'ok' && in_array('No reCAPTCHA token', $scored('missing')['reasons'], true));
 $missing = booking_book(null, ['slot' => '0', 'tz' => 'Europe/London', 'name' => 'A', 'email' => 'nope']);
 check('field errors', !$missing['ok'] && isset($missing['errors']['name'], $missing['errors']['email'], $missing['errors']['slot']));
 
@@ -394,6 +406,6 @@ check('CRM signature and proposal button are Gmail-safe', $gmailSafe($sig) && st
 check('signature shows the WhatsApp logo (owner, 9 Nov 2026)', str_contains($sig, '/assets/img/email/sig-whatsapp-logo.png'));
 check('booking page shows the professional photo, not the selfie', str_contains($page('book-a-meeting'), '/assets/img/booking/host-b-vignesh-192.jpg') && !is_file('/site/assets/img/booking/host-vignesh-192.jpg'));
 $logged = (string) @file_get_contents('/tmp/booking-test-errors.log');
-check('failures were logged for the owner', str_contains($logged, 'exclusion constraint') && str_contains($logged, 'refused as junk') && str_contains($logged, 'free/busy failed'));
+check('failures were logged for the owner', str_contains($logged, 'exclusion constraint') && str_contains($logged, 'held back as junk') && str_contains($logged, 'free/busy failed'));
 
 done();

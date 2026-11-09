@@ -927,27 +927,32 @@ function booking_send_request(array $lead, string $subject, string $body, array 
 
 /**
  * The lead behind a booking from the public page: the latest enquiry from the
- * same address, or a new one filed as a lead from the booking page.
+ * same address, or a new one filed as a lead from the booking page. A booking
+ * the quality screen calls junk is always filed on its own, in the Junk view,
+ * so nothing a person typed is lost.
  */
-function booking_lead_for(array $in, string $email, string $name, string $phone, string $company, string $service, string $notes, string $verdict, array $screen): int
+function booking_lead_for(array $in, string $email, string $name, string $phone, string $company, string $service, string $notes, string $verdict, array $screen, string $headline = 'Booked a call from the booking page'): int
 {
-    $st = db()->prepare("SELECT id FROM enquiries WHERE lower(email) = ? AND deleted_at IS NULL AND status <> 'junk' ORDER BY created_at DESC LIMIT 1");
-    $st->execute([$email]);
-    $found = $st->fetch();
-    if ($found) {
-        return (int) $found['id'];
+    $junk = $verdict === 'junk';
+    if (!$junk) {
+        $st = db()->prepare("SELECT id FROM enquiries WHERE lower(email) = ? AND deleted_at IS NULL AND status <> 'junk' ORDER BY created_at DESC LIMIT 1");
+        $st->execute([$email]);
+        $found = $st->fetch();
+        if ($found) {
+            return (int) $found['id'];
+        }
     }
     $attr = crm_attribution($in + ['from_page' => '/' . BOOKING_PATH . '/', 'lead_source' => 'booking']);
-    $message = "Booked a call from the booking page\n\n" . ($notes !== '' ? $notes : 'No message.');
+    $message = $headline . "\n\n" . ($notes !== '' ? $notes : 'No message.');
     $activity = json_encode([['date' => date('Y-m-d H:i'), 'text' => 'Quality check: ' . $verdict . ' (' . $screen['score'] . ')' . ($screen['reasons'] ? ': ' . implode('; ', $screen['reasons']) : '')]], JSON_UNESCAPED_UNICODE);
     $st = db()->prepare(
         "INSERT INTO enquiries (source, name, email, mobile, company, designation, service, budget, message, status, tags, activity,
                                 channel, channel_group, attribution, form_page, country, grade, score)
-         VALUES ('booking', ?, ?, ?, ?, '', ?, '', ?, 'new', ?, CAST(? AS jsonb), ?, ?, CAST(? AS jsonb), ?, ?, '', NULL)
+         VALUES ('booking', ?, ?, ?, ?, '', ?, '', ?, ?, ?, CAST(? AS jsonb), ?, ?, CAST(? AS jsonb), ?, ?, '', NULL)
          RETURNING id"
     );
     $st->execute([
-        $name, $email, $phone, $company, $service, $message, $verdict === 'ok' ? '' : 'check-first', $activity,
+        $name, $email, $phone, $company, $service, $message, $junk ? 'junk' : 'new', $junk ? 'auto-junk' : ($verdict === 'ok' ? '' : 'check-first'), $activity,
         (string) $attr['channel'], (string) $attr['group'], json_encode($attr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), (string) $attr['form_page'], (string) $attr['country'],
     ]);
     return (int) $st->fetchColumn();
@@ -1042,8 +1047,16 @@ function booking_book(?array $m, array $in, string $mode = 'book'): array
             'captcha' => $GLOBALS['recaptcha_signal'] ?? null,
         ]);
         if ($screen['verdict'] === 'junk') {
-            error_log('booking_book: refused as junk: ' . $email . ' ' . implode('; ', $screen['reasons']));
-            return $res(false, 'We could not book that call. Please email ' . CONTACT_EMAIL . ' and we will set it up with you.');
+            /* No calendar event for a likely bot, but the details are kept in the Junk view, with the time they wanted. */
+            error_log('booking_book: held back as junk: ' . $email . ' ' . implode('; ', $screen['reasons']));
+            try {
+                booking_lead_for($in, $email, $name, $phone, $company, $service, $notes, 'junk', $screen,
+                    'Tried to book a call for ' . booking_ist($start) . (!booking_is_india($tz) ? ' (' . booking_fmt($start, $tz, 'time') . ' ' . booking_zone_label($tz, $start) . ')' : '')
+                    . ' from the booking page. The junk filter held it back, so no call was booked.');
+            } catch (Throwable $e) {
+                error_log('booking_book junk lead: ' . $e->getMessage());
+            }
+            return $res(false, 'Thank you. We could not confirm this time automatically, so we will email you within one working day to set up the call. You can also write to ' . CONTACT_EMAIL . '.');
         }
     }
 

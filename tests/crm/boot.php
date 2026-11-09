@@ -205,11 +205,11 @@ final class FakeDb
             return [];
         }
         if (str_starts_with($t, "INSERT INTO enquiries") && str_contains($t, "VALUES ('booking'")) {
-            [$name, $email, $phone, $company, $service, $message, $tags, $activity, $channel, $group, $attr, $page, $country] = $p;
+            [$name, $email, $phone, $company, $service, $message, $status, $tags, $activity, $channel, $group, $attr, $page, $country] = $p;
             $id = (string) (600 + count($this->leads));
             $this->leads[] = fixture_lead(['id' => $id, 'source' => 'booking', 'name' => $name, 'email' => $email, 'mobile' => $phone, 'company' => $company, 'service' => $service,
                 'message' => $message, 'tags' => $tags, 'channel' => $channel, 'channel_group' => $group, 'attribution' => json_decode($attr, true), 'form_page' => $page, 'country' => $country,
-                'grade' => '', 'score' => null, 'status' => 'new', 'created_at' => date('Y-m-d H:i:sP')]);
+                'grade' => '', 'score' => null, 'status' => $status, 'activity' => json_decode($activity, true), 'created_at' => date('Y-m-d H:i:sP')]);
             return [['id' => $id]];
         }
         if (str_contains($sql, 'FROM admin_users')) return [['username' => 'admin', 'password_hash' => '$2y$10$abcdefghijklmnopqrstuuMPx0S6m7iUwBwRYeP/Vnb2ZZqbgFfK6']];

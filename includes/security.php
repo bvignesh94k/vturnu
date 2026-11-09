@@ -176,11 +176,13 @@ function security_ua_is_bot(): bool
  * through untouched until real keys replace the placeholders, so the
  * site never silently blocks real customers on an unconfigured key.
  *
- * Fails OPEN on anything that is not an explicit, positive "this is a bot"
- * signal from Google: a missing token, a network/cURL failure talking to
- * Google, a malformed response, or an error code on Google's side (wrong
- * secret, expired token, etc.) all let the submission through. Only a real
- * response with success=true and a low score blocks it.
+ * Never blocks (owner, 9 Nov 2026). A missing token, a network/cURL failure
+ * talking to Google, a malformed response or an error code on Google's side
+ * (wrong secret, expired token, etc.) all let the submission through, and so
+ * does a genuine low score: the score goes to lead_screen() through
+ * $GLOBALS['recaptcha_signal'], where a likely bot (below 0.3) lands in the
+ * admin's Junk view instead of being refused, so a real person who scores low
+ * (a VPN, a privacy browser) is one click from being restored, never lost.
  *
  * This matters because reCAPTCHA is one of five independent layers here
  * (honeypot, CSRF+timing, User-Agent blocklist, rate limiting, this). If
@@ -246,12 +248,12 @@ function security_recaptcha_ok(string $token): bool
     }
 
     // Genuine signal at this point: Google validated the token and returned
-    // a score. 0.5 is Google's own suggested default cutoff.
+    // a score (0.5 is Google's suggested cutoff). It is scored by
+    // lead_screen(), not enforced here.
     $score = (float) ($data['score'] ?? 0);
     $GLOBALS['recaptcha_signal'] = $score;
     if ($score < 0.5) {
         security_recaptcha_log('low score: ' . $score);
-        return false;
     }
     return true;
 }
