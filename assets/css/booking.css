@@ -193,6 +193,21 @@ textarea.bk-input { resize: vertical; min-height: 84px; }
 .bk-sumline .bk-ico { background-color: var(--v); }
 .bk-h--details { margin-bottom: 16px; }
 .bk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+/* The phone: country code (flag and calling code) beside the number */
+.bk-phone { display: flex; gap: 8px; align-items: stretch; }
+.bk-cc { position: relative; flex: none; display: flex; }
+.bk-cc-btn { display: inline-flex; align-items: center; gap: 7px; padding: 0 10px 0 11px; border: 1px solid #D9D6EF; border-radius: 10px; background: #fff; color: var(--ink); font: inherit; font-size: .92rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: border-color .15s, box-shadow .15s; }
+.bk-cc-btn:hover, .bk-cc-btn[aria-expanded="true"] { border-color: var(--v); }
+.bk-cc-btn:focus-visible { outline: none; border-color: var(--v); box-shadow: 0 0 0 4px rgba(67, 56, 202, .14); }
+.bk-cc-btn .bk-caret { margin-left: 2px; }
+.bk-flag { display: block; flex: none; width: 22px; height: 15px; border-radius: 2px; object-fit: cover; box-shadow: 0 0 0 1px rgba(29, 25, 54, .1); }
+.bk-phone-input { flex: 1; min-width: 0; }
+.bk-cc-select { width: auto; max-width: 190px; }
+.js .bk-cc-select { position: absolute; left: 0; top: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+.bk-cc-pop { width: 360px; }
+.bk-ccopt { justify-content: flex-start; }
+.bk-ccopt-name { flex: 1; min-width: 0; text-align: left; }
+.bk-input[aria-invalid="true"] { border-color: var(--danger); }
 .bk-field--wide { grid-column: 1 / -1; }
 .bk-submit { margin-top: 22px; }
 .bk-fine { max-width: 520px; }

@@ -134,6 +134,22 @@ check('one free grid serves every zone', $grid['t0'] > $now && $grid['t0'] % 900
     && booking_zone_slots($cfg, $now, $grid, 'Europe/London') === booking_slots($cfg, $now, $busy, 'Europe/London'));
 $cc = booking_zone_countries();
 check('zone countries for the picker', ($cc['America/Los_Angeles'] ?? '') === 'US' && ($cc['Asia/Kolkata'] ?? '') === 'IN' && ($cc['UTC'] ?? 'x') === '' && count($cc) > 300);
+
+/* ---------------- the phone: every country, its code from the IP, required ---------------- */
+check('every country has a calling code, a name and a flag', count(COUNTRY_DIAL_CODES) === 245 && !array_diff_key(COUNTRY_DIAL_CODES, country_names())
+    && COUNTRY_DIAL_CODES['SG'] === '+65' && COUNTRY_DIAL_CODES['AU'] === '+61' && COUNTRY_DIAL_CODES['XK'] === '+383'
+    && !array_filter(array_keys(COUNTRY_DIAL_CODES), static fn(string $c): bool => !is_file('/site/assets/img/flags/' . strtolower($c) . '.svg')));
+check('phone: Singapore', booking_phone('SG', '8123 4567') === ['+65 81234567', 'SG', '']);
+check('phone: the trunk 0 goes (UK), Italy keeps it', booking_phone('GB', '07400 123456')[0] === '+44 7400123456' && booking_phone('IT', '06 1234 5678')[0] === '+39 0612345678');
+check('phone: an international number picks its own country', booking_phone('IN', '+65 8123 4567') === ['+65 81234567', 'SG', ''] && booking_phone('US', '0044 7400 123456')[0] === '+44 7400123456');
+check('phone: a US leading 1 and a Russian leading 8 go', booking_phone('US', '1 (415) 555-0132')[0] === '+1 4155550132' && booking_phone('RU', '8 912 345 67 89')[0] === '+7 9123456789');
+check('phone: India takes 10 digits from 6 to 9', booking_phone('IN', '98765 43210')[0] === '+91 9876543210' && booking_phone('IN', '12345')[2] !== '' && booking_phone('IN', '99999 99999')[2] !== '');
+check('phone: required, with a real code', booking_phone('SG', '')[2] !== '' && booking_phone('ZZ', '8123 4567')[2] !== '' && booking_phone('SG', '+999 1234')[2] !== '');
+check('phone: a shared code keeps the right country', booking_dial_country('+1', 'CA') === 'CA' && booking_dial_country('+1', 'IN') === 'US' && booking_dial_country('+44', 'JE') === 'JE' && booking_dial_country('+7', 'KZ') === 'KZ');
+check('phone: stored numbers split for the form', booking_phone_split('+1 2103294540', 'IN') === ['US', '2103294540'] && booking_phone_split('98765 43210', 'IN') === ['IN', '98765 43210'] && booking_phone_split('', 'SG') === ['SG', '']);
+$field = booking_phone_field('SG', '', '');
+check('phone field: every country, the visitor one selected with its flag and example, required', str_contains($field, '<option value="SG" data-dial="+65" selected>Singapore (+65)</option>')
+    && substr_count($field, 'data-dial="') === 245 && str_contains($field, 'placeholder="8123 4567"') && str_contains($field, ' required ') && str_contains($field, 'src="/assets/img/flags/sg.svg"'));
 check('zones', booking_zone_name('Asia/Calcutta') === 'Asia/Calcutta' && booking_zone_name('America/Argentina/Buenos_Aires') === 'America/Argentina/Buenos_Aires'
     && booking_zone_name('../etc/passwd') === '' && booking_zone_name('Mars/Olympus') === '' && booking_zone_name('UTC') === 'UTC');
 check('zone labels', booking_zone_label('America/Chicago', $at('2026-11-10 20:00')) === 'Chicago time (GMT-6)' && booking_zone_label('Asia/Kolkata', $now) === 'India time (IST)'
@@ -180,8 +196,9 @@ $_SERVER['HTTP_X_VERCEL_IP_TIMEZONE'] = 'America/Chicago';
 $html = $page('book-a-meeting/' . $token);
 check('personal page greets and prefills', str_contains($html, 'Bauer, pick a date and time') && str_contains($html, 'value="Bauer"') && str_contains($html, 'value="bauer@cocopat.us"'), substr($html, 0, 300));
 check('personal page agenda from their words', str_contains($html, 'Your goals for Google Ads and Meta Ads'));
+check('personal page: their number, in their country', str_contains($html, '<option value="US" data-dial="+1" selected>United States (+1)</option>') && str_contains($html, 'value="2103294540"'));
 check('page carries the free grid and the IP zone', str_contains($html, 'id="bk-data"') && str_contains($html, '"tz":"America/Chicago","tzSource":"ip"') && str_contains($html, '"mode":"book"')
-    && str_contains($html, '"recaptcha":""') && str_contains($html, '"sameDay":false') && str_contains($html, '"grid":{"t0":') && str_contains($html, '"hours":[[570,1110]]') && str_contains($html, '"America/Los_Angeles":"US"'));
+    && str_contains($html, '"recaptcha":""') && str_contains($html, '"sameDay":false') && str_contains($html, '"ipCountry":"IN"') && str_contains($html, '"grid":{"t0":') && str_contains($html, '"hours":[[570,1110]]') && str_contains($html, '"America/Los_Angeles":"US"'));
 check('no "times shown in your time zone" wording', !str_contains($html, 'Times shown in your time zone'));
 check('no-JS list in the visitor zone', str_contains($html, '<select id="bk-slot" name="slot"') && str_contains($html, 'Time (Chicago time (GMT-'));
 $tzPage = $page('book-a-meeting/' . $token, ['tz' => 'Europe/London']);
@@ -252,7 +269,7 @@ check('follow-up date set to the call, tag added', $fup && $fup[0][1][0] === boo
 
 /* ---------------- nobody is double booked ---------------- */
 $GLOBALS['captured_mail'] = [];
-$again = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$again = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 check('same time refused to the next person', !$again['ok'] && $again['taken'], json_encode($again));
 /* Hours are the visitor's own: a Chicago morning is late evening in India, so it is refused to someone booking in India time. */
 $morning = null;
@@ -262,9 +279,9 @@ foreach (booking_zone_slots($cfgNow, $avail['now'], $avail['grid'], 'America/Chi
         break;
     }
 }
-$asIndia = booking_book(null, ['slot' => (string) $morning, 'tz' => 'Asia/Kolkata', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$asIndia = booking_book(null, ['slot' => (string) $morning, 'tz' => 'Asia/Kolkata', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 check('a time outside the visitor zone hours is refused', $morning !== null && !$asIndia['ok'] && $asIndia['taken'], (string) $morning);
-$soon = booking_book(null, ['slot' => (string) (intdiv(time(), 1800) * 1800), 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$soon = booking_book(null, ['slot' => (string) (intdiv(time(), 1800) * 1800), 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 check('a time already started is refused, and says so', !$soon['ok'] && $soon['taken'] && str_contains($soon['error'], 'already started'), $soon['error']);
 /* A crafted request for later today, in a zone where today still has working hours ahead: refused as a full day, never as a rule. */
 $sameZone = null;
@@ -276,14 +293,14 @@ foreach (['Pacific/Kiritimati', 'Asia/Tokyo', 'Asia/Kolkata', 'Europe/London', '
     }
 }
 $later = intdiv(time() + 3600, 1800) * 1800;
-$sameDay = booking_book(null, ['slot' => (string) $later, 'tz' => (string) $sameZone, 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$sameDay = booking_book(null, ['slot' => (string) $later, 'tz' => (string) $sameZone, 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 check('a same-day time is refused as a full day', $sameZone !== null && !$sameDay['ok'] && $sameDay['taken'] && str_contains($sameDay['error'], 'All times on that day are taken') && !preg_match('/same.day/i', $sameDay['error']), $sameZone . ' ' . $sameDay['error']);
 check('nothing sent for refused bookings', count($GLOBALS['captured_mail']) === 0);
 /* Two people press Book at the same moment: both pages offered the time; the database's no-overlap rule stops the second, and its calendar event is taken back. */
 $db->hideBusy = true;
 $G->hideOwn = true;
 $eventsBefore = count($G->events);
-$race = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$race = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 $db->hideBusy = false;
 $G->hideOwn = false;
 check('race lost to the no-overlap rule', !$race['ok'] && $race['taken'], json_encode($race));
@@ -302,16 +319,17 @@ $G->busy = [];
 /* ---------------- a public booking files a lead ---------------- */
 $GLOBALS['captured_mail'] = [];
 $ps = $pick(booking_availability($cfgNow), 'Europe/London', 3);
-$pub = booking_book(null, ['slot' => (string) $ps[0], 'tz' => 'Europe/London', 'name' => 'Dana Smith', 'email' => 'Dana.Smith@gmail.com', 'company' => 'Northwind', 'service' => 'SEO',
+$pub = booking_book(null, ['slot' => (string) $ps[0], 'tz' => 'Europe/London', 'name' => 'Dana Smith', 'email' => 'Dana.Smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '+44 7400 123456', 'company' => 'Northwind', 'service' => 'SEO',
     'notes' => 'We want more qualified leads from search.', 'attribution' => json_encode(['first' => ['at' => gmdate('Y-m-d\TH:i:s.000\Z'), 'landing' => '/book-a-meeting/', 'ref' => 'https://www.linkedin.com/', 'q' => []], 'pages' => 1])]);
 check('public booking', $pub['ok'], json_encode($pub));
 $pm = booking_by_token($pub['token']);
 $newLead = crm_lead((int) $pm['enquiry_id']);
 check('public booking creates a lead', $newLead && $newLead['source'] === 'booking' && $newLead['email'] === 'dana.smith@gmail.com' && $newLead['service'] === 'SEO' && $newLead['channel'] === 'LinkedIn', json_encode($newLead));
+check('the phone is stored in international form', $pm['phone'] === '+44 7400123456' && ($newLead['mobile'] ?? '') === '+44 7400123456', $pm['phone'] . ' / ' . ($newLead['mobile'] ?? ''));
 check('public booking: London times', str_contains(($byTo('dana.smith@gmail.com', 'Booked:')[0]['html'] ?? ''), 'London time (GMT)'));
-$pub2 = booking_book(null, ['slot' => (string) $pick(booking_availability($cfgNow), 'Europe/London', 6)[0], 'tz' => 'Europe/London', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$pub2 = booking_book(null, ['slot' => (string) $pick(booking_availability($cfgNow), 'Europe/London', 6)[0], 'tz' => 'Europe/London', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 check('the same person again joins their lead', $pub2['ok'] && booking_by_token($pub2['token'])['enquiry_id'] === $pm['enquiry_id']);
-$junk = booking_book(null, ['slot' => (string) $pick(booking_availability($cfgNow), 'Europe/London', 9)[0], 'tz' => 'Europe/London', 'name' => 'ABCDEFGHIJKL', 'email' => 'x@mailinator.com', 'notes' => 'SEO backlinks guest post da 90+ casino']);
+$junk = booking_book(null, ['slot' => (string) $pick(booking_availability($cfgNow), 'Europe/London', 9)[0], 'tz' => 'Europe/London', 'name' => 'ABCDEFGHIJKL', 'email' => 'x@mailinator.com', 'phone_cc' => 'US', 'phone' => '212 555 0199', 'notes' => 'SEO backlinks guest post da 90+ casino']);
 check('junk gets no call', !$junk['ok'] && !$junk['taken'] && str_contains($junk['error'], 'we will email you'), $junk['error']);
 $junkLead = array_values(array_filter($db->leads, static fn(array $l): bool => $l['email'] === 'x@mailinator.com'))[0] ?? null;
 check('junk booking kept in the Junk view with the time they wanted', $junkLead && $junkLead['status'] === 'junk' && $junkLead['tags'] === 'auto-junk'
@@ -326,7 +344,7 @@ check('reCAPTCHA below 0.5 is flagged for review', $scored(0.4)['verdict'] === '
 check('a good reCAPTCHA score passes clean', $scored(0.9) === ['verdict' => 'ok', 'score' => 0, 'reasons' => []], json_encode($scored(0.9)));
 check('a missing token is only noted', $scored('missing')['verdict'] === 'ok' && in_array('No reCAPTCHA token', $scored('missing')['reasons'], true));
 $missing = booking_book(null, ['slot' => '0', 'tz' => 'Europe/London', 'name' => 'A', 'email' => 'nope']);
-check('field errors', !$missing['ok'] && isset($missing['errors']['name'], $missing['errors']['email'], $missing['errors']['slot']));
+check('field errors', !$missing['ok'] && isset($missing['errors']['name'], $missing['errors']['email'], $missing['errors']['slot'], $missing['errors']['phone']));
 
 /* ---------------- moving the call ---------------- */
 $GLOBALS['captured_mail'] = [];
@@ -388,7 +406,7 @@ check('both sides told', (bool) $byTo('bauer@cocopat.us', 'Cancelled:') && (bool
 check('timeline: cancelled with the reason', $has($timeline(), 'Cancelled the meeting (') && $has($timeline(), 'The timing changed on our side.'));
 $html = $page('book-a-meeting/' . $token, ['done' => 'cancelled']);
 check('after cancelling, the link offers new times', str_contains($html, 'Your call is cancelled') && str_contains($html, 'Schedule the call'));
-$re = booking_book(booking_by_token($token), ['slot' => (string) $pick(booking_availability($cfgNow), 'America/Chicago', 2)[0], 'tz' => 'America/Chicago', 'name' => 'Bauer', 'email' => 'bauer@cocopat.us']);
+$re = booking_book(booking_by_token($token), ['slot' => (string) $pick(booking_availability($cfgNow), 'America/Chicago', 2)[0], 'tz' => 'America/Chicago', 'name' => 'Bauer', 'email' => 'bauer@cocopat.us', 'phone' => '+1 2103294540']);
 check('book again on the same link', $re['ok'] && $re['token'] === $token && booking_by_token($token)['status'] === 'booked');
 unset($G->events[booking_by_token($token)['event_id']]);
 check('deleted in Google Calendar', booking_sync(booking_by_token($token))['status'] === 'cancelled' && booking_by_token($token)['cancelled_by'] === 'calendar' && $has($timeline(), 'Meeting removed from the Google Calendar'));
@@ -406,7 +424,7 @@ check('a calendar that cannot be read throws rather than offering times', $faile
 $html = $page('book-a-meeting');
 check('the page says so and offers email and WhatsApp', str_contains($html, 'We could not read our calendar just now.') && str_contains($html, 'wa.me/919363731498') && !str_contains($html, 'id="bk-data"'));
 check('the owner is alerted', (bool) array_filter($GLOBALS['captured_mail'], static fn(array $x): bool => ($x['to'] ?? []) === ['connect@vturnu.com'] && str_starts_with((string) $x['subject'], 'Booking page problem')));
-$failBook = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+$failBook = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com', 'phone_cc' => 'GB', 'phone' => '07400 123456']);
 check('booking refuses politely while the calendar is unreadable', !$failBook['ok'] && str_contains($failBook['error'], 'could not check the calendar'));
 $G->failFreeBusy = false;
 

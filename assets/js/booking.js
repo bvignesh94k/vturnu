@@ -775,6 +775,191 @@
         }
     }, 20000);
 
+    /* ---- the phone: a searchable country code picker, the visitor's country preselected from their IP ---- */
+    var ccSelect = document.getElementById('bk-phone-cc');
+    var phoneInput = document.getElementById('bk-phone');
+    var ccBtn = ccSelect ? ccSelect.parentNode.querySelector('.bk-cc-btn') : null;
+    if (ccSelect && ccBtn && phoneInput) {
+        var countries = Array.prototype.map.call(ccSelect.options, function (o) {
+            return { iso: o.value, dial: o.getAttribute('data-dial'), name: o.textContent.replace(/\s*\(\+\d+\)$/, '') };
+        });
+        var byIso = {}, dials = {};
+        countries.forEach(function (c) { byIso[c.iso] = c; dials[c.dial] = 1; });
+        /* Where several countries share a code, the main one unless the visitor's own shares it. */
+        var MAIN = { '+1': 'US', '+7': 'RU', '+44': 'GB', '+61': 'AU', '+39': 'IT', '+47': 'NO', '+212': 'MA', '+262': 'RE', '+290': 'SH', '+358': 'FI', '+590': 'GP', '+599': 'CW' };
+        var ALIAS = { US: 'usa america united states', GB: 'uk britain england scotland wales', AE: 'uae emirates dubai abu dhabi', SA: 'ksa', KR: 'korea',
+            KP: 'korea', TR: 'turkiye', CI: 'ivory coast', CZ: 'czech republic', NL: 'holland', MK: 'macedonia', SZ: 'swaziland', CV: 'cabo verde',
+            MM: 'burma', TL: 'east timor', VA: 'holy see', CD: 'drc kinshasa', CG: 'brazzaville', LA: 'lao', VN: 'viet nam', RU: 'russian federation',
+            IN: 'bharat', HK: 'hongkong', CN: 'prc', TW: 'taipei', PS: 'palestinian', FM: 'micronesia', VI: 'usvi', VG: 'bvi', BQ: 'bonaire saba eustatius' };
+        ccBtn.hidden = false;
+        ccSelect.tabIndex = -1;
+        ccSelect.setAttribute('aria-hidden', 'true');
+        var setCc = function (iso) {
+            var c = byIso[iso];
+            if (!c) { return; }
+            ccSelect.value = iso;
+            ccBtn.querySelector('.bk-flag').src = '/assets/img/flags/' + iso.toLowerCase() + '.svg';
+            ccBtn.querySelector('.bk-cc-dial').textContent = c.dial;
+            ccBtn.setAttribute('aria-label', 'Country code: ' + c.name + ' ' + c.dial + '. Change');
+            phoneInput.placeholder = (D.phoneExamples || {})[iso] || 'Phone number';
+        };
+        var dialCountry = function (dial) {
+            var pref = [ccSelect.value, D.ipCountry];
+            for (var i = 0; i < pref.length; i++) { if (byIso[pref[i]] && byIso[pref[i]].dial === dial) { return pref[i]; } }
+            if (MAIN[dial]) { return MAIN[dial]; }
+            for (var j = 0; j < countries.length; j++) { if (countries[j].dial === dial) { return countries[j].iso; } }
+            return '';
+        };
+        /* A number typed or pasted in international form picks its country, and only the national part stays in the box. */
+        var takeIntl = function () {
+            var v = phoneInput.value.trim();
+            if (!/^(\+|00)/.test(v)) { return; }
+            var digits = v.replace(/\D/g, '');
+            if (v.charAt(0) !== '+') { digits = digits.slice(2); }
+            for (var len = 3; len >= 1; len--) {
+                var code = '+' + digits.slice(0, len);
+                if (digits.length > len && dials[code]) {
+                    var iso = dialCountry(code);
+                    if (!iso) { return; }
+                    setCc(iso);
+                    var rest = v.replace(/^(\+|00)\s*/, ''), n = len, k = 0;
+                    while (n > 0 && k < rest.length) { if (/\d/.test(rest.charAt(k))) { n--; } k++; }
+                    phoneInput.value = rest.slice(k).replace(/^[\s\-.()]+/, '');
+                    return;
+                }
+            }
+        };
+        phoneInput.addEventListener('blur', takeIntl);
+        phoneInput.addEventListener('paste', function () { setTimeout(takeIntl, 0); });
+
+        var ccPop = null, ccInput = null, ccList = null, ccScrim = null, ccShown = [], ccActive = -1;
+        var ccKey = function (c) { return norm([c.name, c.iso, c.dial, c.dial.slice(1), ALIAS[c.iso] || ''].join(' ')); };
+        var ccOption = function (c) {
+            var o = el('button', 'bk-zopt bk-ccopt' + (c.iso === ccSelect.value ? ' is-cur' : ''));
+            o.type = 'button';
+            o.id = 'bkc-' + ccShown.length;
+            o.setAttribute('role', 'option');
+            o.setAttribute('aria-selected', c.iso === ccSelect.value ? 'true' : 'false');
+            o.setAttribute('data-iso', c.iso);
+            var img = el('img', 'bk-flag');
+            img.src = '/assets/img/flags/' + c.iso.toLowerCase() + '.svg';
+            img.width = 22;
+            img.height = 15;
+            img.alt = '';
+            img.loading = 'lazy';
+            o.appendChild(img);
+            o.appendChild(el('span', 'bk-zopt-name bk-ccopt-name', c.name));
+            o.appendChild(el('span', 'bk-zopt-time', c.dial));
+            ccShown.push(o);
+            return o;
+        };
+        var ccFill = function () {
+            var q = norm(ccInput.value.trim()).replace(/^\+/, '');
+            ccList.innerHTML = '';
+            ccShown = [];
+            ccActive = -1;
+            if (q) {
+                var hits = countries.filter(function (c) { return ccKey(c).indexOf(q) !== -1; });
+                var rank = function (c) {
+                    var n = norm(c.name);
+                    return c.dial.slice(1) === q || c.iso.toLowerCase() === q ? 0 : n.indexOf(q) === 0 ? 1 : (' ' + ccKey(c) + ' ').indexOf(' ' + q) !== -1 ? 2 : 3;
+                };
+                /* On a shared code the main country leads: +44 is the United Kingdom before Guernsey. */
+                var lead = function (c) { return MAIN[c.dial] === c.iso ? 0 : 1; };
+                hits.sort(function (a, b) { return rank(a) - rank(b) || lead(a) - lead(b) || (a.name < b.name ? -1 : 1); });
+                if (!hits.length) {
+                    ccList.appendChild(el('p', 'bk-zempty', 'No country matches "' + ccInput.value.trim() + '". Try its name or its code, such as +65.'));
+                    return;
+                }
+                hits.forEach(function (c) { ccList.appendChild(ccOption(c)); });
+                return;
+            }
+            var sug = [];
+            [ccSelect.value, D.ipCountry, ZONES[deviceZone], ZONES[tz]].forEach(function (iso) { if (iso && byIso[iso] && sug.indexOf(iso) === -1) { sug.push(iso); } });
+            ccList.appendChild(el('p', 'bk-zgroup', 'Suggested'));
+            sug.forEach(function (iso) { ccList.appendChild(ccOption(byIso[iso])); });
+            ccList.appendChild(el('p', 'bk-zgroup', 'All countries'));
+            countries.forEach(function (c) { if (sug.indexOf(c.iso) === -1) { ccList.appendChild(ccOption(c)); } });
+        };
+        var ccSetActive = function (i) {
+            if (!ccShown.length) { return; }
+            if (ccActive >= 0 && ccShown[ccActive]) { ccShown[ccActive].classList.remove('is-active'); }
+            ccActive = (i + ccShown.length) % ccShown.length;
+            ccShown[ccActive].classList.add('is-active');
+            ccShown[ccActive].scrollIntoView({ block: 'nearest' });
+            ccInput.setAttribute('aria-activedescendant', ccShown[ccActive].id);
+        };
+        var ccOutside = function (e) { if (ccPop && !ccPop.contains(e.target) && !ccBtn.contains(e.target)) { ccClose(false); } };
+        var ccClose = function (focusBack) {
+            if (!ccPop || ccPop.hidden) { return; }
+            ccPop.hidden = true;
+            ccScrim.hidden = true;
+            ccBtn.setAttribute('aria-expanded', 'false');
+            document.removeEventListener('mousedown', ccOutside, true);
+            if (focusBack) { ccBtn.focus(); }
+        };
+        var ccBuild = function () {
+            ccScrim = el('div', 'bk-scrim');
+            ccScrim.hidden = true;
+            document.body.appendChild(ccScrim);
+            ccPop = el('div', 'bk-zone-pop bk-cc-pop');
+            ccPop.hidden = true;
+            var top = el('div', 'bk-zone-top');
+            top.appendChild(el('p', 'bk-zone-title', 'Country code'));
+            var x = el('button', 'bk-zone-close');
+            x.type = 'button';
+            x.setAttribute('aria-label', 'Close');
+            x.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+            x.addEventListener('click', function () { ccClose(true); });
+            top.appendChild(x);
+            var search = el('div', 'bk-zone-search');
+            search.appendChild(ico('search'));
+            ccInput = el('input', 'bk-zone-input');
+            ccInput.type = 'search';
+            ccInput.placeholder = 'Search country or code';
+            ccInput.setAttribute('aria-label', 'Search countries');
+            ccInput.setAttribute('autocomplete', 'off');
+            ccInput.setAttribute('spellcheck', 'false');
+            search.appendChild(ccInput);
+            ccList = el('div', 'bk-zone-list');
+            ccList.setAttribute('role', 'listbox');
+            ccList.setAttribute('aria-label', 'Country codes');
+            ccPop.appendChild(top);
+            ccPop.appendChild(search);
+            ccPop.appendChild(ccList);
+            ccBtn.parentNode.appendChild(ccPop);
+            ccInput.addEventListener('input', ccFill);
+            ccInput.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowDown') { e.preventDefault(); ccSetActive(ccActive + 1); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); ccSetActive(ccActive - 1); }
+                else if (e.key === 'Enter') { e.preventDefault(); var o = ccShown[ccActive >= 0 ? ccActive : 0]; if (o) { o.click(); } }
+                else if (e.key === 'Escape') { e.preventDefault(); ccClose(true); }
+            });
+            ccPop.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); ccClose(true); } });
+            ccList.addEventListener('click', function (e) {
+                var o = e.target.closest ? e.target.closest('[data-iso]') : null;
+                if (!o) { return; }
+                setCc(o.getAttribute('data-iso'));
+                ccClose(false);
+                phoneInput.focus();
+            });
+        };
+        ccBtn.addEventListener('click', function () {
+            if (ccPop && !ccPop.hidden) { ccClose(true); return; }
+            if (!ccPop) { ccBuild(); }
+            ccInput.value = '';
+            ccFill();
+            var r = ccBtn.getBoundingClientRect();
+            ccPop.classList.toggle('is-up', !phone.matches && window.innerHeight - r.bottom < 470 && r.top > 470);
+            ccPop.hidden = false;
+            ccScrim.hidden = false;
+            ccBtn.setAttribute('aria-expanded', 'true');
+            document.addEventListener('mousedown', ccOutside, true);
+            setTimeout(function () { try { ccInput.focus({ preventScroll: true }); } catch (x) { ccInput.focus(); } }, 30);
+        });
+        setCc(ccSelect.value);
+    }
+
     /* ---- sending ---- */
     var rcLoading = false;
     var loadRecaptcha = function () {
@@ -802,6 +987,8 @@
     var sending = false;
     form.addEventListener('submit', function (e) {
         if (sending) { e.preventDefault(); return; }
+        /* A number typed in international form and sent with Enter still picks its country. */
+        if (phoneInput) { phoneInput.dispatchEvent(new Event('blur')); }
         if (!slotField.value) {
             e.preventDefault();
             card.classList.remove('is-details');
@@ -810,9 +997,10 @@
             return;
         }
         var bad = null;
-        ['bk-name', 'bk-email'].forEach(function (id) {
+        ['bk-name', 'bk-email', 'bk-phone'].forEach(function (id) {
             var f = document.getElementById(id);
-            if (f && !bad && (!f.value.trim() || (f.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value.trim())))) { bad = f; }
+            if (f && !bad && (!f.value.trim() || (f.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value.trim()))
+                || (f.type === 'tel' && f.value.replace(/\D/g, '').length < 6))) { bad = f; }
         });
         if (bad) {
             e.preventDefault();

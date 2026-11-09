@@ -90,6 +90,37 @@ function booking_zone_select(string $id, string $name, string $selected, array $
 }
 
 /**
+ * The phone field: a country code picker (flag and calling code, every country
+ * and territory, the visitor's own preselected from their IP) beside the
+ * number. A real <select> stays underneath, so the form works without
+ * JavaScript; assets/js/booking.js turns it into a searchable list.
+ */
+function booking_phone_field(string $iso, string $value, string $error): string
+{
+    $names = country_names();
+    $rows = [];
+    foreach (COUNTRY_DIAL_CODES as $code => $dial) {
+        $rows[] = [$names[$code] ?? $code, $code, $dial];
+    }
+    usort($rows, static fn(array $a, array $b): int => strcmp($a[0], $b[0]));
+    $dial = COUNTRY_DIAL_CODES[$iso] ?? '+91';
+    $opts = '';
+    foreach ($rows as [$name, $code, $d]) {
+        $opts .= '<option value="' . e($code) . '" data-dial="' . e($d) . '"' . ($code === $iso ? ' selected' : '') . '>' . e($name . ' (' . $d . ')') . '</option>';
+    }
+    return '<div class="bk-phone" data-phone>'
+        . '<div class="bk-cc">'
+        . '<button type="button" class="bk-cc-btn" hidden aria-haspopup="listbox" aria-expanded="false" aria-label="Country code: ' . e(($names[$iso] ?? $iso) . ' ' . $dial) . '. Change">'
+        . '<img class="bk-flag" src="/assets/img/flags/' . e(strtolower($iso)) . '.svg" width="22" height="15" alt="" decoding="async">'
+        . '<span class="bk-cc-dial">' . e($dial) . '</span><span class="bk-caret" aria-hidden="true"></span></button>'
+        . '<select class="bk-select bk-cc-select" id="bk-phone-cc" name="phone_cc" aria-label="Country code">' . $opts . '</select>'
+        . '</div>'
+        . '<input class="bk-input bk-phone-input" id="bk-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" required maxlength="24"'
+        . ' placeholder="' . e(LEAD_PHONE_EXAMPLES[$iso] ?? 'Phone number') . '" value="' . e($value) . '" aria-describedby="bk-phone-err"' . ($error !== '' ? ' aria-invalid="true"' : '') . '>'
+        . '</div>';
+}
+
+/**
  * The plain list of times for one zone, grouped by day: the form's fallback.
  *
  * @param list<int> $slots
@@ -250,6 +281,11 @@ function booking_render_page(?array $m, array $cfg, array $state): void
     <?php else:
         $slots = booking_zone_slots($cfg, $avail['now'], $avail['grid'], $tzShown);
         $chosen = (int) ($old['slot'] ?? 0);
+        /* The phone: what they sent last time, else the lead's number, in the country their IP is in. */
+        [$leadIso, $leadNational] = booking_phone_split((string) ($m['phone'] ?? ''), security_visitor_country());
+        $oldIso = strtoupper((string) ($old['phone_cc'] ?? ''));
+        $phoneIso = isset(COUNTRY_DIAL_CODES[$oldIso]) ? $oldIso : (isset(COUNTRY_DIAL_CODES[$leadIso]) ? $leadIso : 'IN');
+        $phoneValue = array_key_exists('phone', $old) ? (string) $old['phone'] : $leadNational;
         $public = $m === null;
         $current = $mode === 'move' ? $m : null;
         $tzm = $current && $current['time_zone'] !== '' ? $current['time_zone'] : $tzShown;
@@ -305,13 +341,13 @@ function booking_render_page(?array $m, array $cfg, array $state): void
                         <?= $err('email') ?>
                     </div>
                     <div class="bk-field">
-                        <label class="bk-label" for="bk-company">Company <span>(optional)</span></label>
-                        <input class="bk-input" id="bk-company" name="company" type="text" maxlength="80" autocomplete="organization" value="<?= $val('company', $m['company'] ?? '') ?>">
+                        <label class="bk-label" for="bk-phone">Phone or WhatsApp</label>
+                        <?= booking_phone_field($phoneIso, $phoneValue, (string) ($state['errors']['phone'] ?? '')) ?>
+                        <?= $err('phone') ?>
                     </div>
                     <div class="bk-field">
-                        <label class="bk-label" for="bk-phone">Phone or WhatsApp <span>(optional)</span></label>
-                        <input class="bk-input" id="bk-phone" name="phone" type="tel" maxlength="30" autocomplete="tel" value="<?= $val('phone', $m['phone'] ?? '') ?>" aria-describedby="bk-phone-err" placeholder="With country code, e.g. +1 415 555 0132">
-                        <?= $err('phone') ?>
+                        <label class="bk-label" for="bk-company">Company <span>(optional)</span></label>
+                        <input class="bk-input" id="bk-company" name="company" type="text" maxlength="80" autocomplete="organization" value="<?= $val('company', $m['company'] ?? '') ?>">
                     </div>
                     <?php if ($public): ?>
                     <div class="bk-field bk-field--wide">
@@ -350,6 +386,8 @@ function booking_render_page(?array $m, array $cfg, array $state): void
             'days' => array_map('intval', (array) $cfg['days']),
             'notice' => (int) $cfg['notice_minutes'],
             'sameDay' => !empty($cfg['same_day']),
+            'ipCountry' => security_visitor_country(),
+            'phoneExamples' => LEAD_PHONE_EXAMPLES,
             'tz' => $tz,
             'tzSource' => $tzSource,
             'hostTz' => BOOKING_HOST_TZ,

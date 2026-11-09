@@ -870,6 +870,100 @@ function booking_url(string $token = ''): string
     return (defined('SITE_URL') ? SITE_URL : 'https://vturnu.com') . '/' . BOOKING_PATH . '/' . ($token !== '' ? $token . '/' : '');
 }
 
+/**
+ * The country for a calling code: the one already picked, or the visitor's own
+ * when it shares the code, else the main country for it (+1 is the United
+ * States, +44 the United Kingdom, +7 Russia, +61 Australia).
+ */
+function booking_dial_country(string $dial, string $prefer): string
+{
+    $main = ['+1' => 'US', '+7' => 'RU', '+44' => 'GB', '+61' => 'AU', '+39' => 'IT', '+47' => 'NO', '+212' => 'MA', '+262' => 'RE',
+        '+290' => 'SH', '+358' => 'FI', '+590' => 'GP', '+599' => 'CW'];
+    foreach ([$prefer, security_visitor_country()] as $c) {
+        if ($c !== '' && (COUNTRY_DIAL_CODES[$c] ?? '') === $dial) {
+            return $c;
+        }
+    }
+    return $main[$dial] ?? (string) (array_search($dial, COUNTRY_DIAL_CODES, true) ?: $prefer);
+}
+
+/** The calling code a number in international form starts with ("+44 7400..." gives "44"), or ''. Longest code first. */
+function booking_dial_prefix(string $digits): string
+{
+    for ($len = 3; $len >= 1; $len--) {
+        $code = substr($digits, 0, $len);
+        if (strlen($code) === $len && in_array('+' . $code, COUNTRY_DIAL_CODES, true)) {
+            return $code;
+        }
+    }
+    return '';
+}
+
+/**
+ * The phone number as the CRM stores it ("+65 81234567"), from the country
+ * picked ($iso) and what was typed. A number typed in international form
+ * ("+44 7400 123456" or "0044...") wins over the picker. The national number
+ * loses its trunk prefix (a leading 0; a 1 in the US and Canada; an 8 in
+ * Russia and Kazakhstan), except in Italy, San Marino and the Vatican, where
+ * the 0 is part of the number, and is checked with the lead form's length
+ * rules. Returns [number, country, error]; the number is required.
+ *
+ * @return array{0:string,1:string,2:string}
+ */
+function booking_phone(string $iso, string $raw): array
+{
+    $iso = strtoupper(trim($iso));
+    $raw = trim($raw);
+    $digits = (string) preg_replace('/\D/', '', $raw);
+    if ($digits === '') {
+        return ['', $iso, 'Please enter a phone or WhatsApp number we can reach you on.'];
+    }
+    if (str_starts_with($raw, '+') || str_starts_with($raw, '00')) {
+        $intl = str_starts_with($raw, '+') ? $digits : substr($digits, 2);
+        $code = booking_dial_prefix($intl);
+        if ($code === '') {
+            return ['', $iso, 'Please check the country code at the start of that number.'];
+        }
+        $iso = booking_dial_country('+' . $code, $iso);
+        $digits = substr($intl, strlen($code));
+    } elseif (!isset(COUNTRY_DIAL_CODES[$iso])) {
+        return ['', $iso, 'Please choose your country code.'];
+    }
+    $dial = COUNTRY_DIAL_CODES[$iso];
+    if ($dial === '+1' && strlen($digits) === 11 && $digits[0] === '1') {
+        $digits = substr($digits, 1);
+    } elseif ($dial === '+7' && strlen($digits) === 11 && $digits[0] === '8') {
+        $digits = substr($digits, 1);
+    } elseif (!in_array($iso, ['IT', 'SM', 'VA'], true)) {
+        $digits = ltrim($digits, '0');
+    }
+    [$min, $max, $first] = lead_phone_rule($dial);
+    if (strlen($digits) < $min || strlen($digits) > $max || ($first && !preg_match($first, $digits)) || preg_match('/^(\d)\1{5,}$/', $digits)) {
+        return ['', $iso, $dial === '+91' ? 'Please enter a 10 digit mobile number starting with 6, 7, 8 or 9.' : 'That phone number does not look right for ' . $dial . '. Please check it.'];
+    }
+    return [$dial . ' ' . $digits, $iso, ''];
+}
+
+/**
+ * A stored number split for the form: [country, national number]. "+1 2103294540"
+ * gives ['US', '2103294540'] (or Canada for a Canadian visitor); a number
+ * without a calling code keeps the $fallback country.
+ *
+ * @return array{0:string,1:string}
+ */
+function booking_phone_split(string $stored, string $fallback): array
+{
+    $stored = trim($stored);
+    if (str_starts_with($stored, '+')) {
+        $d = (string) preg_replace('/\D/', '', $stored);
+        $code = booking_dial_prefix($d);
+        if ($code !== '') {
+            return [booking_dial_country('+' . $code, $fallback), substr($d, strlen($code))];
+        }
+    }
+    return [$fallback, trim((string) preg_replace('/[^\d ]/', '', $stored))];
+}
+
 /** A short, safe text field from a form. */
 function booking_field(array $in, string $key, int $max): string
 {
@@ -1084,7 +1178,7 @@ function booking_book(?array $m, array $in, string $mode = 'book'): array
     } else {
         $name = booking_field($in, 'name', 80);
         $email = strtolower(trim((string) ($in['email'] ?? '')));
-        $phone = booking_field($in, 'phone', 30);
+        [$phone, , $phoneError] = booking_phone((string) ($in['phone_cc'] ?? ''), mb_substr((string) ($in['phone'] ?? ''), 0, 40));
         $company = booking_field($in, 'company', 80);
         $notes = trim(mb_substr(crm_no_dashes(str_replace("\r\n", "\n", (string) ($in['notes'] ?? ''))), 0, 1500));
         if (mb_strlen($name) < 2) {
@@ -1093,8 +1187,8 @@ function booking_book(?array $m, array $in, string $mode = 'book'): array
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 120) {
             $errors['email'] = 'Please enter a valid email address, so we can send the invitation.';
         }
-        if ($phone !== '' && !preg_match('/^\+?[0-9 ()\-.]{6,24}$/', $phone)) {
-            $errors['phone'] = 'Please check the phone number, or leave it empty.';
+        if ($phoneError !== '') {
+            $errors['phone'] = $phoneError;
         }
     }
     $service = in_array((string) ($in['service'] ?? ''), lead_service_values(), true) ? (string) $in['service'] : '';

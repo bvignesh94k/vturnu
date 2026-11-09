@@ -33,6 +33,22 @@ if ($ipTz !== '') {
     setcookie('_ip_tz', $ipTz, ['path' => '/']);
     $_SERVER['HTTP_X_VERCEL_IP_TIMEZONE'] = $ipTz;
 }
+/* The IP country goes with it (?_ip_country=SG to set it alone), as Vercel's X-Vercel-IP-Country would. */
+$ipCountry = strtoupper((string) ($_GET['_ip_country'] ?? ($_COOKIE['_ip_country'] ?? '')));
+if (isset($_GET['_ip_country'])) {
+    setcookie('_ip_country', $ipCountry, ['path' => '/']);
+} elseif (isset($_GET['_ip_tz'])) {
+    try {
+        $loc = (new DateTimeZone($ipTz))->getLocation();
+        $ipCountry = is_array($loc) ? (string) ($loc['country_code'] ?? '') : '';
+    } catch (Throwable $e) {
+        $ipCountry = '';
+    }
+    setcookie('_ip_country', $ipCountry, ['path' => '/']);
+}
+if (preg_match('/^[A-Z]{2}$/', $ipCountry)) {
+    $_SERVER['HTTP_X_VERCEL_IP_COUNTRY'] = $ipCountry;
+}
 
 /* Pretend it is another moment: ?_now=2026-11-10T06:00:00Z (that page view only). */
 if (isset($_GET['_now']) && strtotime((string) $_GET['_now'])) {
