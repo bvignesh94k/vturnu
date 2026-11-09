@@ -31,7 +31,6 @@ function booking_head(string $title): void
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="referrer" content="no-referrer">
 <title><?= e($title) ?></title>
 <link rel="icon" type="image/svg+xml" href="/assets/img/vturnu-icon-mark.svg">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-400.woff2" crossorigin>

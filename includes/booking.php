@@ -832,11 +832,11 @@ function booking_request_draft(array $lead, ?array $cfg = null): array
     $cfg ??= booking_settings();
     $f = crm_lead_facts($lead);
     $topic = booking_topic($lead);
-    $for = $f['company'] !== '' ? ' for ' . $f['company'] : '';
+    $thanks = $topic !== '' ? 'Thank you for reaching out about ' . $topic . ($f['company'] !== '' ? ' for ' . $f['company'] : '') . '.' : 'Thank you for getting in touch.';
     $L = [
         'Hi ' . $f['first'] . ',',
         '',
-        'Thank you for reaching out' . ($topic !== '' ? ' about ' . $topic : '') . $for . '. Before we suggest anything, I would like to understand what you are aiming for: who your customers are, what is working today and what a good result would look like for you.',
+        $thanks . ' Before we suggest anything, I would like to understand what you are aiming for: who your customers are, what is working today and what a good result would look like for you.',
         '',
         'Could we have a 30-minute video call? Pick any time that suits you below. The invitation and a Google Meet link go straight to your calendar, and the times are shown in your own time zone.',
         '',
@@ -1645,9 +1645,10 @@ function booking_route(string $slug): bool
     if ($slug !== BOOKING_PATH && !str_starts_with($slug, BOOKING_PATH . '/')) {
         return false;
     }
+    /* The site's own Referrer-Policy (strict-origin-when-cross-origin) already keeps the
+       personal link's path from other sites; no-referrer would also upset reCAPTCHA. */
     header('X-Robots-Tag: noindex, nofollow');
     header('Cache-Control: private, no-store');
-    header('Referrer-Policy: no-referrer');
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $uri = (string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
     if (!preg_match('#^' . BOOKING_PATH . '(?:/([a-f0-9]{32}))?(?:/(invite\.ics|seen))?$#', $slug, $r)) {

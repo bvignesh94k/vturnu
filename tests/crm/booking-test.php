@@ -166,7 +166,9 @@ $d = booking_request_draft(crm_lead(70));
 check('request subject', $d['subject'] === 'Bauer, a quick call about Google Ads and Meta Ads?', $d['subject']);
 check('request body', str_contains($d['body'], 'Thank you for reaching out about Google Ads and Meta Ads for Cocopat.') && str_contains($d['body'], 'anything else you would like help with')
     && str_contains($d['body'], '30-minute video call'), $d['body']);
-check('no prices, no ERPNext, no dashes, no superlatives', !preg_match('/pric|cost|\$|₹|rate|ERPNext|\b(best|leading|top|#1|world.class|unmatched)\b/i', $d['subject'] . $d['body']) && !$dash($d['subject'] . $d['body']), $d['body']);
+$plain = booking_request_draft(fixture_lead(['id' => '71', 'name' => 'Sam Lee', 'company' => 'Northwind', 'service' => 'I need advice on where to start', 'message' => 'Hello, please call me.']));
+check('a request without a clear topic stays natural', $plain['subject'] === 'Sam, a quick call?' && str_contains($plain['body'], 'Thank you for getting in touch. Before we suggest anything') && !str_contains($plain['body'], 'for Northwind'), $plain['subject'] . ' / ' . $plain['body']);
+check('no prices, no ERPNext, no dashes, no superlatives',!preg_match('/pric|cost|\$|₹|rate|ERPNext|\b(best|leading|top|#1|world.class|unmatched)\b/i', $d['subject'] . $d['body']) && !$dash($d['subject'] . $d['body']), $d['body']);
 
 $GLOBALS['captured_mail'] = [];
 $r = booking_send_request(crm_lead(70), $d['subject'], $d['body'], ['copy' => true, 'by' => 'admin', 'stage' => true]);
