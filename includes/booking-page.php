@@ -159,7 +159,7 @@ function booking_render_page(?array $m, array $cfg, array $state): void
 <main class="bk">
 <section class="bk-card<?= $view === 'pick' ? '' : ' bk-card--two' ?>">
     <aside class="bk-host">
-        <img class="bk-photo" src="/assets/img/booking/host-vignesh-192.jpg" alt="<?= e($cfg['host_name']) ?>" width="96" height="96">
+        <img class="bk-photo" src="/assets/img/booking/host-b-vignesh-192.jpg" alt="<?= e($cfg['host_name']) ?>" width="96" height="96">
         <p class="bk-eyebrow">30-minute video call</p>
         <h1 class="bk-h1"><?= $view === 'pick' && $mode === 'book' && $first !== '' && $first !== 'there' ? e($first) . ', let us find a time' : 'Talk with ' . e($cfg['host_name']) ?></h1>
         <p class="bk-role"><?= e(booking_host_line($cfg)) ?>, VTurnU</p>

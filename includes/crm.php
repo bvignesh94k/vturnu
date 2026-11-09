@@ -1385,7 +1385,7 @@ function crm_signature_html(array $settings, string $country = ''): string
 
     $items = [['sig-email.png', '<a href="mailto:' . CONTACT_EMAIL . '" style="' . $link . ';font-weight:bold">' . $h(CONTACT_EMAIL) . '</a>']];
     if ($phone !== '') {
-        $items[] = ['sig-whatsapp.png', '<a href="' . $h($wa !== '' ? $wa : 'tel:' . preg_replace('/[^\d+]/', '', $phone)) . '" title="' . ($wa !== '' ? 'Chat on WhatsApp' : 'Call') . '" style="' . $link . '">' . $h($phone) . '</a>'
+        $items[] = ['sig-whatsapp-logo.png', '<a href="' . $h($wa !== '' ? $wa : 'tel:' . preg_replace('/[^\d+]/', '', $phone)) . '" title="' . ($wa !== '' ? 'Chat on WhatsApp' : 'Call') . '" style="' . $link . '">' . $h($phone) . '</a>'
             . ($wa !== '' ? '&nbsp; <a href="' . $h($wa) . '" style="font:bold 12px ' . $font . ';color:#22A55B;text-decoration:none">WhatsApp</a>' : '')];
     }
     if (crm_show_gstin($country)) {

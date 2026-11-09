@@ -391,6 +391,8 @@ $from = static fn(string $s): string => trim(substr($s, (int) strpos($s, 'create
 check('includes/booking-schema.sql matches db/schema.sql', $from($schema) === $from($own) && str_contains($own, 'exclude using gist'));
 $sig = crm_signature_html(crm_settings(), 'IN') . crm_email_html('x', 'Hi there,', crm_settings(), str_repeat('a', 32), str_repeat('a', 32));
 check('CRM signature and proposal button are Gmail-safe', $gmailSafe($sig) && str_contains($sig, 'bgcolor="#4338CA"'));
+check('signature shows the WhatsApp logo (owner, 9 Nov 2026)', str_contains($sig, '/assets/img/email/sig-whatsapp-logo.png'));
+check('booking page shows the professional photo, not the selfie', str_contains($page('book-a-meeting'), '/assets/img/booking/host-b-vignesh-192.jpg') && !is_file('/site/assets/img/booking/host-vignesh-192.jpg'));
 $logged = (string) @file_get_contents('/tmp/booking-test-errors.log');
 check('failures were logged for the owner', str_contains($logged, 'exclusion constraint') && str_contains($logged, 'refused as junk') && str_contains($logged, 'free/busy failed'));
 
