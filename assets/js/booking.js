@@ -330,11 +330,14 @@
     zoneBtn.setAttribute('aria-haspopup', 'listbox');
     zoneBtn.setAttribute('aria-expanded', 'false');
     var zoneNameEl = el('span', 'bk-zone-name');
-    var zoneTimeEl = el('span', 'bk-zone-time');
+    /* The clock and the arrow stay together when the name wraps on a phone. */
+    var zoneTimeBox = el('span', 'bk-zone-time');
+    var zoneTimeEl = el('span', 'bk-zone-clock');
+    zoneTimeBox.appendChild(zoneTimeEl);
+    zoneTimeBox.appendChild(el('span', 'bk-caret'));
     zoneBtn.appendChild(ico('globe'));
     zoneBtn.appendChild(zoneNameEl);
-    zoneBtn.appendChild(zoneTimeEl);
-    zoneBtn.appendChild(el('span', 'bk-caret'));
+    zoneBtn.appendChild(zoneTimeBox);
     var hint = el('p', 'bk-zone-hint');
     hint.hidden = true;
     zoneBox.appendChild(zoneBtn);
