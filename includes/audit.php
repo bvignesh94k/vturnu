@@ -366,17 +366,38 @@ function run_site_audit(string $url): array
             ? audit_check('warn', 'Content is thin', '~' . number_format($words) . ' words.', 'Pages under about 600 words rarely compete for commercial terms.')
             : audit_check('fail', 'Very little content', '~' . number_format($words) . ' words.', 'There is not enough here for search engines to judge relevance. This may also mean the content is rendered by JavaScript, which limits how AI engines read it.'));
 
-    $imgs = $nodes('//img');
-    $noAlt = 0;
-    foreach ($imgs as $img) { if (trim($img->getAttribute('alt')) === '') $noAlt++; }
-    if ($imgs->length === 0) {
+    /* alt="" is not missing alt text. It marks a decorative image, which is
+       what the site's own accessibility checklist tells people to do. Only an
+       img with no alt attribute at all is missing it. Images inside
+       <noscript> are left out: browsers running JavaScript never show them,
+       and they are often tracking pixels or copies of lazy-loaded images. */
+    $imgs = $nodes('//img[not(ancestor::noscript)]');
+    $imgCount = $imgs->length;
+    $missing = 0;
+    $decorative = 0;
+    foreach ($imgs as $img) {
+        if (!$img->hasAttribute('alt')) {
+            $missing++;
+        } elseif (trim($img->getAttribute('alt')) === '') {
+            $decorative++;
+        }
+    }
+    $described = $imgCount - $missing - $decorative;
+    $imagesWord = $imgCount === 1 ? '1 image' : $imgCount . ' images';
+    if ($imgCount === 0) {
         $g[] = audit_check('warn', 'No images found', 'This page has no images.', 'Images improve engagement and give you another route into image search.');
-    } elseif ($noAlt === 0) {
-        $g[] = audit_check('pass', 'All images have alt text', $imgs->length . ' images, all described.');
+    } elseif ($missing > 0) {
+        $g[] = audit_check($missing > $imgCount / 2 ? 'fail' : 'warn', 'Images missing alt text',
+            $missing . ' of ' . $imagesWord . ($missing === 1 ? ' has' : ' have') . ' no alt attribute.',
+            'Alt text is needed for accessibility and is a ranking signal for image search. Describe images that carry meaning, and give decorative ones an empty alt="".');
+    } elseif ($described === 0) {
+        $g[] = audit_check('warn', 'No descriptive alt text',
+            ($imgCount === 1 ? 'The one image has empty alt text, which marks it' : 'All ' . $imgCount . ' images have empty alt text, which marks them') . ' as decorative.',
+            'If an image shows your products, people or work, describe it. Keep empty alt text for decorative images only.');
     } else {
-        $g[] = audit_check($noAlt > $imgs->length / 2 ? 'fail' : 'warn', 'Images missing alt text',
-            $noAlt . ' of ' . $imgs->length . ' images have no alt attribute.',
-            'Alt text is needed for accessibility and is a ranking signal for image search.');
+        $g[] = audit_check('pass', 'All images have alt text', $decorative === 0
+            ? $imagesWord . ', all described.'
+            : $imagesWord . ': ' . $described . ' described, ' . $decorative . ' marked decorative with empty alt text.');
     }
 
     $g[] = $attr('//meta[@name="viewport"]') !== ''
