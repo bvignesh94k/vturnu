@@ -2,10 +2,13 @@
 /**
  * The booking pages: pick a time, see your booking, move it or cancel it.
  *
- * Everything works as plain HTML forms (a drop-down of times, grouped by day);
- * assets/js/booking.js turns that into a calendar with times in the visitor's
- * own zone, checks the zone against the browser's clock and adds the small
- * conveniences (soonest times, a live clock, a countdown).
+ * Everything works as plain HTML forms (a zone drop-down and a drop-down of
+ * times, grouped by day). assets/js/booking.js turns the picking page into a
+ * Calendly-style flow: the meeting on the left, a month calendar with the
+ * active time zone under it, the chosen day's times in a third column, then
+ * the details. The zone starts as the one the visitor's IP points to and can
+ * be changed in a searchable picker; every zone gets the working hours on its
+ * own clock, worked out from the free grid the server sends.
  */
 
 declare(strict_types=1);
@@ -59,7 +62,7 @@ function booking_foot(?array $data): void
 <?php
 }
 
-/** The time zone drop-down: the zones that matter first, then every zone by region. */
+/** The time zone drop-down for browsers without the script: the zones that matter first, then every zone by region. */
 function booking_zone_select(string $id, string $name, string $selected, array $suggest, int $now): string
 {
     $label = static fn(string $tz): string => (booking_is_india($tz) ? 'India' : booking_zone_city($tz)) . ' (' . booking_gmt($tz, $now) . ')';
@@ -86,21 +89,22 @@ function booking_zone_select(string $id, string $name, string $selected, array $
     return $out . '</select>';
 }
 
-/** The plain list of times for one zone, grouped by day: the form's fallback and the script's starting point. */
-function booking_slot_select(array $slots, string $tz, int $len, int $chosen): string
+/**
+ * The plain list of times for one zone, grouped by day: the form's fallback.
+ *
+ * @param list<int> $slots
+ */
+function booking_slot_select(array $slots, string $tz, int $chosen): string
 {
     $out = '<select id="bk-slot" name="slot" class="bk-select" required><option value="">Choose a time</option>';
     $day = '';
-    foreach ($slots as $s) {
-        if (!booking_slot_for($s, $tz)) {
-            continue;
-        }
-        $d = booking_fmt($s[0], $tz, 'day');
+    foreach ($slots as $t) {
+        $d = booking_fmt($t, $tz, 'day');
         if ($d !== $day) {
             $out .= ($day !== '' ? '</optgroup>' : '') . '<optgroup label="' . e($d) . '">';
             $day = $d;
         }
-        $out .= '<option value="' . $s[0] . '"' . ($s[0] === $chosen ? ' selected' : '') . '>' . e(booking_fmt($s[0], $tz, 'time') . (booking_daytime($s[0], $len, $tz) ? '' : ' (outside usual hours)')) . '</option>';
+        $out .= '<option value="' . $t . '"' . ($t === $chosen ? ' selected' : '') . '>' . e(booking_fmt($t, $tz, 'time')) . '</option>';
     }
     return $out . ($day !== '' ? '</optgroup>' : '') . '</select>';
 }
@@ -111,7 +115,7 @@ function booking_slot_select(array $slots, string $tz, int $len, int $chosen): s
  */
 function booking_render_page(?array $m, array $cfg, array $state): void
 {
-    $now = time();
+    $now = booking_now();
     $done = (string) ($_GET['done'] ?? '');
     $lead = $m && $m['enquiry_id'] > 0 ? crm_lead($m['enquiry_id']) : null;
     if ($m && $m['status'] === 'booked' && $m['end'] > $now && $done === '') {
@@ -126,11 +130,16 @@ function booking_render_page(?array $m, array $cfg, array $state): void
         $mode = $view === 'pick' ? 'move' : 'book';
     }
     $first = $m ? crm_lead_facts(['name' => $m['name']])['first'] : '';
+    $greet = $first !== '' && $first !== 'there' ? $first : '';
     $topic = $lead ? booking_topic($lead) : '';
     $agenda = booking_agenda(['topic' => $topic]);
+
+    /* The zone: one the visitor chose (the link or their last try) first, then where their IP is, then where they booked before. */
     $tzParam = booking_zone_name((string) ($_GET['tz'] ?? ($state['old']['tz'] ?? '')));
     $ipTz = booking_ip_zone();
-    $tz = $tzParam !== '' ? $tzParam : ($m && $m['time_zone'] !== '' ? $m['time_zone'] : ($ipTz !== '' ? $ipTz : BOOKING_HOST_TZ));
+    $stored = $m && $m['time_zone'] !== '' ? booking_zone_name($m['time_zone']) : '';
+    [$tz, $tzSource] = $tzParam !== '' ? [$tzParam, 'url'] : ($ipTz !== '' ? [$ipTz, 'ip'] : ($stored !== '' ? [$stored, 'stored'] : ['', '']));
+    $tzShown = $tz !== '' ? $tz : BOOKING_HOST_TZ;
 
     $avail = null;
     $unavailable = '';
@@ -148,25 +157,29 @@ function booking_render_page(?array $m, array $cfg, array $state): void
         }
     }
 
-    $title = $view === 'booked' ? 'Your call with VTurnU' : ($view === 'cancel' ? 'Cancel your call' : ($mode === 'move' ? 'Move your call' : ($first !== '' && $first !== 'there' ? $first . ', pick a time to talk' : 'Book a call with VTurnU')));
+    $title = $view === 'booked' ? 'Your call with VTurnU' : ($view === 'cancel' ? 'Cancel your call' : ($mode === 'move' ? 'Move your call' : ($greet !== '' ? $greet . ', pick a time to talk' : 'Book a call with VTurnU')));
     header('Content-Type: text/html; charset=UTF-8');
     booking_head($title . ' | VTurnU');
     $action = $m ? '/' . BOOKING_PATH . '/' . $m['token'] . '/' : '/' . BOOKING_PATH . '/';
     $old = $state['old'];
     $val = static fn(string $k, string $fallback = ''): string => e((string) ($old[$k] ?? $fallback));
     $err = static fn(string $k): string => isset($state['errors'][$k]) ? '<p class="bk-err" id="bk-' . $k . '-err">' . e($state['errors'][$k]) . '</p>' : '';
+    $pickHeading = $mode === 'move' ? 'Pick a new date and time' : ($greet !== '' ? $greet . ', pick a date and time' : 'Select a date and time');
     ?>
 <main class="bk">
-<section class="bk-card<?= $view === 'pick' ? '' : ' bk-card--two' ?>">
-    <aside class="bk-host">
-        <img class="bk-photo" src="/assets/img/booking/host-b-vignesh-192.jpg" alt="<?= e($cfg['host_name']) ?>" width="96" height="96">
-        <p class="bk-eyebrow">30-minute video call</p>
-        <h1 class="bk-h1"><?= $view === 'pick' && $mode === 'book' && $first !== '' && $first !== 'there' ? e($first) . ', let us find a time' : 'Talk with ' . e($cfg['host_name']) ?></h1>
-        <p class="bk-role"><?= e(booking_host_line($cfg)) ?>, VTurnU</p>
+<section class="bk-card bk-card--<?= e($view) ?>" id="bk-card">
+    <aside class="bk-info">
+        <div class="bk-host">
+            <img class="bk-photo" src="/assets/img/booking/host-b-vignesh-192.jpg" alt="<?= e($cfg['host_name']) ?>" width="64" height="64">
+            <div>
+                <p class="bk-host-name"><?= e($cfg['host_name']) ?></p>
+                <p class="bk-host-role"><?= e($cfg['host_title'] !== '' ? $cfg['host_title'] . ', VTurnU' : 'VTurnU') ?></p>
+            </div>
+        </div>
+        <h1 class="bk-title"><?= (int) $cfg['length'] ?>-minute video call</h1>
         <ul class="bk-facts">
-            <li><span class="bk-ico bk-ico--clock" aria-hidden="true"></span><?= (int) $cfg['length'] ?> minutes</li>
+            <li><span class="bk-ico bk-ico--clock" aria-hidden="true"></span><?= (int) $cfg['length'] ?> min</li>
             <li><span class="bk-ico bk-ico--video" aria-hidden="true"></span>Google Meet, the link comes with your invitation</li>
-            <li><span class="bk-ico bk-ico--globe" aria-hidden="true"></span>Times shown in your time zone</li>
         </ul>
         <div class="bk-agenda">
             <h2 class="bk-h3">What we will cover</h2>
@@ -188,7 +201,7 @@ function booking_render_page(?array $m, array $cfg, array $state): void
             <h2 class="bk-h"><?= $done === 'moved' ? 'Your call is moved' : 'You are booked' ?></h2>
             <p class="bk-p">A confirmation is on its way to <strong><?= e($m['email']) ?></strong>, and Google is <?= $done === 'moved' ? 'updating the calendar invitation' : 'sending the calendar invitation' ?> from <?= e(CONTACT_EMAIL) ?>.</p>
             <?php else: ?>
-            <h2 class="bk-h">Your call<?= $first !== '' && $first !== 'there' ? ', ' . e($first) : '' ?></h2>
+            <h2 class="bk-h">Your call<?= $greet !== '' ? ', ' . e($greet) : '' ?></h2>
             <?php endif; ?>
             <div class="bk-when" data-start="<?= $m['start'] ?>" data-end="<?= $m['end'] ?>" data-tz="<?= e($tzm) ?>">
                 <p class="bk-when-day"><?= e(booking_fmt($m['start'], $tzm, 'day')) ?></p>
@@ -235,11 +248,11 @@ function booking_render_page(?array $m, array $cfg, array $state): void
         </div>
 
     <?php else:
-        $slots = $avail['slots'];
+        $slots = booking_zone_slots($cfg, $avail['now'], $avail['grid'], $tzShown);
         $chosen = (int) ($old['slot'] ?? 0);
         $public = $m === null;
         $current = $mode === 'move' ? $m : null;
-        $tzm = $current && $current['time_zone'] !== '' ? $current['time_zone'] : $tz;
+        $tzm = $current && $current['time_zone'] !== '' ? $current['time_zone'] : $tzShown;
         ?>
         <?php if ($done === 'cancelled'): ?><div class="bk-alert bk-alert--ok" role="status">Your call is cancelled and the invitation is withdrawn. If you would like to talk at another time, pick one below.</div><?php endif; ?>
         <?php if ($m && $m['status'] === 'cancelled' && $done !== 'cancelled'): ?><div class="bk-alert bk-alert--ok">Your earlier call was cancelled. Pick a new time below whenever it suits you.</div><?php endif; ?>
@@ -248,41 +261,38 @@ function booking_render_page(?array $m, array $cfg, array $state): void
         <div class="bk-current">Now booked: <strong><?= e(booking_fmt($current['start'], $tzm, 'day') . ', ' . booking_fmt($current['start'], $tzm, 'time')) ?></strong> <?= e(booking_zone_label($tzm, $current['start'])) ?>. Pick the new time; the Meet link stays the same. <a class="bk-link" href="./">Keep this time</a></div>
         <?php endif; ?>
 
-        <form class="bk-tzform" method="get" action="<?= e($action) ?>">
+        <form class="bk-tzform bk-nojs" method="get" action="<?= e($action) ?>">
             <?php if ($mode === 'move'): ?><input type="hidden" name="change" value="1"><?php endif; ?>
-            <label class="bk-label" for="bk-tz">Your time zone</label>
+            <label class="bk-label" for="bk-tz">Time zone</label>
             <div class="bk-tzrow">
-                <?= booking_zone_select('bk-tz', 'tz', $tz, array_filter([$ipTz, $m['time_zone'] ?? '', BOOKING_HOST_TZ]), $now) ?>
-                <button class="bk-btn bk-btn--ghost bk-nojs" type="submit">Show times</button>
+                <?= booking_zone_select('bk-tz', 'tz', $tzShown, array_filter([$ipTz, $stored, BOOKING_HOST_TZ]), $now) ?>
+                <button class="bk-btn bk-btn--ghost" type="submit">Show times</button>
             </div>
-            <p class="bk-small bk-tznote" id="bk-tznote" hidden></p>
         </form>
 
         <form id="bk-form" class="bk-form" method="post" action="<?= e($action) ?>" novalidate>
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="<?= $mode === 'move' ? 'move' : 'book' ?>">
-            <input type="hidden" name="tz" id="bk-tzval" value="<?= e($tz) ?>">
+            <input type="hidden" name="tz" id="bk-tzval" value="<?= e($tzShown) ?>">
             <input type="hidden" name="recaptcha_token" id="bk-rc" value="">
             <input type="hidden" name="attribution" id="bk-attr" value="">
             <div class="bk-hp" aria-hidden="true"><label for="bk-website">Leave this empty</label><input id="bk-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
 
-            <div class="bk-step" id="bk-pick">
-                <h2 class="bk-h"><?= $mode === 'move' ? 'Pick a new time' : 'Pick a day and time' ?></h2>
+            <div id="bk-app" class="bk-app" hidden></div>
+            <div class="bk-fallback bk-nojs">
+                <h2 class="bk-h"><?= e($pickHeading) ?></h2>
                 <?php if (!$slots): ?>
                 <p class="bk-p">There are no open times in the next <?= (int) $cfg['window_days'] ?> days. Please email <a class="bk-link" href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a> and we will find one.</p>
                 <?php endif; ?>
-                <div id="bk-app" class="bk-app" hidden></div>
-                <div class="bk-fallback">
-                    <label class="bk-label" for="bk-slot">Time (<?= e(booking_zone_label($tz, $now)) ?>)</label>
-                    <?= booking_slot_select($slots, $tz, (int) $cfg['length'], $chosen) ?>
-                    <?= $err('slot') ?>
-                </div>
+                <label class="bk-label" for="bk-slot">Time (<?= e(booking_zone_label($tzShown, $now)) ?>)</label>
+                <?= booking_slot_select($slots, $tzShown, $chosen) ?>
+                <?= $err('slot') ?>
             </div>
 
-            <div class="bk-step bk-details" id="bk-details">
-                <p class="bk-picked" id="bk-picked" hidden></p>
+            <div class="bk-details" id="bk-details">
+                <div class="bk-summary" id="bk-summary" hidden></div>
                 <?php if ($mode === 'book'): ?>
-                <h2 class="bk-h bk-h--details">Your details</h2>
+                <h2 class="bk-h bk-h--details">Enter your details</h2>
                 <div class="bk-grid">
                     <div class="bk-field">
                         <label class="bk-label" for="bk-name">Full name</label>
@@ -320,7 +330,7 @@ function booking_render_page(?array $m, array $cfg, array $state): void
                     </div>
                 </div>
                 <?php endif; ?>
-                <button class="bk-btn bk-btn--big bk-submit" type="submit" id="bk-submit"><?= $mode === 'move' ? 'Move my call to this time' : 'Confirm the booking' ?></button>
+                <button class="bk-btn bk-btn--big bk-submit" type="submit" id="bk-submit"><?= $mode === 'move' ? 'Move my call to this time' : 'Schedule the call' ?></button>
                 <p class="bk-small bk-fine"><?= $mode === 'move' ? 'Google updates the invitation in your calendar, and the Google Meet link stays the same.' : 'You will get a calendar invitation with a Google Meet link, and you can reschedule or cancel at any time from your confirmation email.' ?></p>
             </div>
         </form>
@@ -332,17 +342,22 @@ function booking_render_page(?array $m, array $cfg, array $state): void
     $data = null;
     if ($avail !== null && $view === 'pick') {
         $data = [
-            'slots' => $avail['slots'],
+            'now' => $avail['now'],
+            'grid' => $avail['grid'],
             'len' => (int) $cfg['length'],
+            'step' => BOOKING_STEP,
+            'hours' => booking_hours((string) $cfg['hours']),
+            'days' => array_map('intval', (array) $cfg['days']),
+            'notice' => (int) $cfg['notice_minutes'],
             'tz' => $tz,
-            'tzFromUrl' => $tzParam !== '',
-            'ipTz' => $ipTz,
+            'tzSource' => $tzSource,
             'hostTz' => BOOKING_HOST_TZ,
-            'india' => BOOKING_INDIA_TZ,
-            'day' => BOOKING_DAY_HOURS,
+            'zones' => booking_zone_countries(),
             'mode' => $mode,
-            'chosen' => (int) ($old['slot'] ?? 0),
+            'heading' => $pickHeading,
+            'chosen' => $chosen,
             'taken' => !empty($state['taken']),
+            'fieldErrors' => !empty($state['errors']) && empty($state['errors']['slot']),
             'recaptcha' => $m === null ? RECAPTCHA_SITE_KEY : '',
             'seen' => $m && $m['status'] === 'requested' ? '/' . BOOKING_PATH . '/' . $m['token'] . '/seen' : '',
         ];

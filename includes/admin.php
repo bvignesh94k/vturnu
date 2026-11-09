@@ -2661,11 +2661,10 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                     <div><label for="b-title">Host title</label><input id="b-title" name="host_title" maxlength="60" value="<?= e_a($bk_cfg['host_title']) ?>"></div>
                 </div>
                 <div class="grid2">
-                    <div><label for="b-core">Hours for everyone (India time)</label><input id="b-core" name="core" maxlength="120" value="<?= e_a($bk_cfg['core']) ?>" placeholder="09:30-18:30"></div>
-                    <div><label for="b-over">Extra hours, visitors outside India (India time)</label><input id="b-over" name="overseas" maxlength="120" value="<?= e_a($bk_cfg['overseas']) ?>" placeholder="19:00-23:00"></div>
+                    <div><label for="b-hours">Hours, on each visitor's own clock</label><input id="b-hours" name="hours" maxlength="120" value="<?= e_a($bk_cfg['hours']) ?>" placeholder="09:30-18:30"></div>
                 </div>
-                <p class="note">Write hours as 09:30-13:00, 14:00-18:30 to leave a break. A range that ends after midnight, such as 19:00-01:00, runs into the next morning. Leave the second box empty to offer the same hours to everyone. Visitors see each time in their own zone, and times outside 7 AM to 9 PM their time sit behind "Show all times".</p>
-                <label>Days</label>
+                <p class="note">Every visitor gets these hours in their own time zone: with 09:30-18:30, someone in San Jose sees 9:30 AM to 6:00 PM Pacific Time and someone in London sees 9:30 AM to 6:00 PM UK time, so the last call ends at 6:30 PM. Today's list starts at the next half hour, and times someone has already booked stay in the list, struck through. Write 09:30-13:00, 14:00-18:30 to leave a break. The zone comes from the visitor's location and they can change it on the page.</p>
+                <label>Days (in the visitor's own time zone)</label>
                 <div class="actions-row">
                     <?php foreach ([1 => 'Mon', 2 => 'Tue', 3 => 'Wed', 4 => 'Thu', 5 => 'Fri', 6 => 'Sat', 7 => 'Sun'] as $dn => $dl): ?>
                     <label class="chk"><input type="checkbox" name="days[]" value="<?= $dn ?>"<?= in_array($dn, $bk_cfg['days'], true) ? ' checked' : '' ?>> <?= $dl ?></label>
@@ -2674,7 +2673,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <div class="grid3">
                     <div><label for="b-len">Call length</label><select id="b-len" name="length"><?php foreach ([15, 20, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['length'] === $n ? ' selected' : '' ?>><?= $n ?> minutes</option><?php endforeach; ?></select></div>
                     <div><label for="b-buf">Buffer around busy times</label><select id="b-buf" name="buffer"><?php foreach ([0, 5, 10, 15, 20, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['buffer'] === $n ? ' selected' : '' ?>><?= $n ?> minutes</option><?php endforeach; ?></select></div>
-                    <div><label for="b-notice">Minimum notice</label><select id="b-notice" name="notice_hours"><?php foreach ([0, 1, 2, 4, 8, 12, 24, 48] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['notice_hours'] === $n ? ' selected' : '' ?>><?= $n ?> <?= $n === 1 ? 'hour' : 'hours' ?></option><?php endforeach; ?></select></div>
+                    <div><label for="b-notice">Minimum notice</label><select id="b-notice" name="notice_minutes"><?php foreach ([0 => 'None, from the next half hour', 15 => '15 minutes', 30 => '30 minutes', 60 => '1 hour', 120 => '2 hours', 240 => '4 hours', 480 => '8 hours', 1440 => '24 hours'] as $n => $nl): ?><option value="<?= $n ?>"<?= $bk_cfg['notice_minutes'] === $n ? ' selected' : '' ?>><?= e_a($nl) ?></option><?php endforeach; ?></select></div>
                 </div>
                 <div class="grid3">
                     <div><label for="b-win">Booking window</label><select id="b-win" name="window_days"><?php foreach ([7, 14, 21, 30, 45, 60] as $n): ?><option value="<?= $n ?>"<?= $bk_cfg['window_days'] === $n ? ' selected' : '' ?>><?= $n ?> days ahead</option><?php endforeach; ?></select></div>

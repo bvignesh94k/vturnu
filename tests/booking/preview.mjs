@@ -2,12 +2,15 @@
 // run by PHP in WebAssembly with the in-memory database of tests/crm (kept in a
 // JSON file between requests) and emails saved as files, not sent.
 //
-//   node tests/booking/preview.mjs [port] [--env=<file>] [--state=<folder>]
+//   node tests/booking/preview.mjs [port] [--env=<file> | --fake-google] [--state=<folder>]
 //
 // --env is a file of GOOGLE_CLIENT_ID=..., GOOGLE_CLIENT_SECRET=..., GOOGLE_REFRESH_TOKEN=...
 // lines (bin/google-connect.mjs --env-out writes one). With it, times come from
 // the real connect@vturnu.com calendar and bookings create real events with
-// Google Meet links. Without it the pages show booking as paused.
+// Google Meet links. --fake-google answers with the stand-in calendar of
+// tests/crm/fake-google.php instead (a few busy blocks, invented Meet links),
+// for trying the pages without touching the real calendar. With neither, the
+// pages show booking as paused.
 // Open /book-a-meeting/, /admin/ and /mail/ (the captured emails). Add
 // ?_ip_tz=America/Chicago to any page to pose as a visitor in another zone.
 import fs from 'node:fs';
@@ -26,6 +29,9 @@ const stateDir = opt('state') || path.join(os.tmpdir(), 'vturnu-booking-preview'
 fs.mkdirSync(path.join(stateDir, 'mail'), { recursive: true });
 
 const env = { MAIL_TRANSPORT: 'capture' };
+if (args.includes('--fake-google')) {
+  Object.assign(env, { FAKE_GOOGLE: '1', GOOGLE_CLIENT_ID: 'fake', GOOGLE_CLIENT_SECRET: 'fake', GOOGLE_REFRESH_TOKEN: 'fake' });
+}
 if (opt('env')) {
   for (const line of fs.readFileSync(opt('env'), 'utf8').split(/\r?\n/)) {
     const m = line.match(/^(GOOGLE_[A-Z_]+)=(.*)$/);
@@ -84,4 +90,4 @@ http.createServer((req, res) => {
       }
     });
   });
-}).listen(port, () => console.log(`Booking preview on http://localhost:${port}/book-a-meeting/ (state in ${stateDir})${env.GOOGLE_REFRESH_TOKEN ? ', real Google Calendar' : ', no Google'}`));
+}).listen(port, () => console.log(`Booking preview on http://localhost:${port}/book-a-meeting/ (state in ${stateDir})${env.FAKE_GOOGLE ? ', stand-in Google Calendar' : env.GOOGLE_REFRESH_TOKEN ? ', real Google Calendar' : ', no Google'}`));

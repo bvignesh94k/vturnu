@@ -8,13 +8,15 @@
  *   (/book-a-meeting/<token>/) that already knows who they are;
  * - anyone can book at /book-a-meeting/, and the booking is filed as a lead.
  *
- * Times are offered in the visitor's own time zone (the edge's geo-IP guess,
- * checked against the browser's clock by assets/js/booking.js), only where the
- * connect@ calendar is free, with a buffer around every busy block, a minimum
- * notice and a booking window (Settings > Booking in the admin). The chosen
- * time is checked with Google again at the moment of booking, under a database
- * lock, and the meetings table refuses two overlapping calls outright, so
- * nobody is ever double booked.
+ * Times are offered in the visitor's own time zone: the zone the edge's geo-IP
+ * puts them in, which they can change on the page. Every zone gets the same
+ * working hours on its own clock (9:30 AM to 6:30 PM, Monday to Friday, the
+ * owner's rule of 9 Nov 2026), from the next half hour on, only where the
+ * connect@ calendar is free, with a buffer around every busy block and a
+ * booking window (Settings > Booking in the admin). The chosen time is checked
+ * again for the visitor's zone and with Google at the moment of booking, under
+ * a database lock, and the meetings table refuses two overlapping calls
+ * outright, so nobody is ever double booked.
  *
  * A booking creates the event with a Meet link and the lead as a guest, so
  * Google sends them the invitation and it blocks their calendar too. Both
@@ -31,12 +33,14 @@
 declare(strict_types=1);
 
 const BOOKING_PATH = 'book-a-meeting';
-/** Where the hours in Settings are counted. */
+/** The host's own zone: the CRM, the owner's emails and the fallback when a visitor's zone is unknown. */
 const BOOKING_HOST_TZ = 'Asia/Kolkata';
-/** Zones that count as India: they are offered the main hours only. */
+/** Zones that count as India, for how times are labelled. */
 const BOOKING_INDIA_TZ = ['Asia/Kolkata', 'Asia/Calcutta'];
-/** Local hours shown by default; times outside them sit behind "Show all times". */
-const BOOKING_DAY_HOURS = [7, 21];
+/** Calls start on the half hours of the visitor's own clock. */
+const BOOKING_STEP = 30;
+/** Free times are worked out on a 15-minute grid: every zone's half hours fall on it. */
+const BOOKING_GRID = 900;
 /** One booking at a time takes this lock while it checks the slot and writes the event. */
 const BOOKING_LOCK = 724001;
 
@@ -44,7 +48,11 @@ const BOOKING_LOCK = 724001;
 /* Settings                                                            */
 /* ------------------------------------------------------------------ */
 
-/** The owner's choices, 9 Nov 2026: B. Vignesh hosts; 9:30 to 6:30 IST for everyone, 7 to 11 PM IST for visitors outside India. */
+/**
+ * The owner's choices: B. Vignesh hosts (9 Nov 2026). Since the evening of
+ * 9 Nov 2026 every visitor gets 9:30 AM to 6:30 PM on their own clock, Monday
+ * to Friday in their own zone, from the next half hour on.
+ */
 function booking_setting_defaults(): array
 {
     return [
@@ -53,11 +61,10 @@ function booking_setting_defaults(): array
         'host_title' => 'Founder & CEO',
         'length' => 30,
         'buffer' => 15,
-        'notice_hours' => 4,
+        'notice_minutes' => 0,
         'window_days' => 21,
         'days' => [1, 2, 3, 4, 5],
-        'core' => '09:30-18:30',
-        'overseas' => '19:00-23:00',
+        'hours' => '09:30-18:30',
         'reminders' => true,
     ];
 }
@@ -84,18 +91,17 @@ function booking_clean_settings(array $s): array
     $d = booking_setting_defaults();
     $days = array_values(array_unique(array_filter(array_map('intval', (array) ($s['days'] ?? [])), static fn(int $n): bool => $n >= 1 && $n <= 7)));
     sort($days);
-    $range = static fn($v, string $key): string => is_string($v) && booking_ranges($v) ? crm_clean_line($v, 120) : ($key === 'overseas' && is_string($v) && trim($v) === '' ? '' : $d[$key]);
+    $hours = is_string($s['hours'] ?? null) && booking_hours($s['hours']) ? crm_clean_line($s['hours'], 120) : $d['hours'];
     return [
         'enabled' => !empty($s['enabled']),
         'host_name' => crm_clean_line((string) ($s['host_name'] ?? ''), 60) ?: $d['host_name'],
         'host_title' => crm_clean_line((string) ($s['host_title'] ?? ''), 60),
         'length' => in_array((int) ($s['length'] ?? 0), [15, 20, 30, 45, 60], true) ? (int) $s['length'] : $d['length'],
         'buffer' => max(0, min(60, (int) ($s['buffer'] ?? $d['buffer']))),
-        'notice_hours' => max(0, min(168, (int) ($s['notice_hours'] ?? $d['notice_hours']))),
+        'notice_minutes' => max(0, min(2880, (int) ($s['notice_minutes'] ?? $d['notice_minutes']))),
         'window_days' => max(1, min(60, (int) ($s['window_days'] ?? $d['window_days']))),
         'days' => $days ?: $d['days'],
-        'core' => $range($s['core'] ?? null, 'core'),
-        'overseas' => $range($s['overseas'] ?? null, 'overseas'),
+        'hours' => $hours,
         'reminders' => !empty($s['reminders']),
     ];
 }
@@ -137,6 +143,18 @@ function booking_ranges(string $spec): array
         }
     }
     return $out;
+}
+
+/**
+ * The working hours as ranges within one day, counted on each visitor's own
+ * clock: "09:30-18:30" is [[570, 1110]]. Ranges that run past midnight do not
+ * fit a working day and are left out.
+ *
+ * @return list<array{0:int,1:int}>
+ */
+function booking_hours(string $spec): array
+{
+    return array_values(array_filter(booking_ranges($spec), static fn(array $r): bool => $r[1] <= 1440));
 }
 
 /** Who the lead meets, as one line: "B. Vignesh, Founder & CEO". */
@@ -237,84 +255,132 @@ function booking_ist(int $ts): string
     return booking_fmt($ts, BOOKING_HOST_TZ, 'full') . ' IST';
 }
 
+/**
+ * Every zone in PHP's time zone database with its country code ('' where it
+ * has none, such as UTC), so the page's zone picker can list and search them
+ * by country as well as by city.
+ *
+ * @return array<string,string>
+ */
+function booking_zone_countries(): array
+{
+    static $out = null;
+    if ($out !== null) {
+        return $out;
+    }
+    $out = [];
+    foreach (DateTimeZone::listIdentifiers() as $id) {
+        $cc = '';
+        try {
+            $loc = (new DateTimeZone($id))->getLocation();
+            $cc = is_array($loc) ? (string) ($loc['country_code'] ?? '') : '';
+        } catch (Throwable $e) {
+            $cc = '';
+        }
+        $out[$id] = preg_match('/^[A-Z]{2}$/', $cc) ? $cc : '';
+    }
+    return $out;
+}
+
 /* ------------------------------------------------------------------ */
 /* Availability                                                        */
 /* ------------------------------------------------------------------ */
 
 /**
- * Every free start time between the minimum notice and the end of the booking
- * window. A time is free when the call plus the buffer on both sides touches
- * no busy block. The second value is 1 for a time from the overseas hours,
- * which only visitors outside India are offered.
+ * Which call start times are free, on a 15-minute grid from just after now to
+ * the end of the booking window: '1' where the call plus the buffer on both
+ * sides touches no busy block, '0' where the call itself would overlap one
+ * (someone booked it, or the host is busy: the page shows it struck through),
+ * '2' where only the buffer is in the way (not offered, not shown). Every
+ * zone's half hours land on this grid (all offsets in use are whole quarter
+ * hours), so one grid serves every visitor, and the page can redraw the times
+ * for any zone without asking again.
  *
  * @param list<array{0:int,1:int}> $busy busy blocks as unix [start, end)
- * @return list<array{0:int,1:int}>
+ * @return array{t0:int,step:int,until:int,bits:string}
  */
-function booking_slots(array $cfg, int $now, array $busy): array
+function booking_free_grid(array $cfg, int $now, array $busy): array
 {
+    $step = BOOKING_GRID;
     $len = (int) $cfg['length'] * 60;
     $buf = (int) $cfg['buffer'] * 60;
-    $from = $now + (int) $cfg['notice_hours'] * 3600;
+    $t0 = intdiv($now, $step) * $step + $step;
     $until = $now + (int) $cfg['window_days'] * 86400;
-    $tz = new DateTimeZone(BOOKING_HOST_TZ);
-    $windows = [];
-    foreach (booking_ranges((string) $cfg['core']) as [$a, $b]) {
-        $windows[] = [$a, $b, 0];
+    $bits = '';
+    for ($t = $t0; $t < $until; $t += $step) {
+        $state = '1';
+        foreach ($busy as [$bs, $be]) {
+            if ($t < $be && $t + $len > $bs) {
+                $state = '0';
+                break;
+            }
+            if ($t - $buf < $be && $t + $len + $buf > $bs) {
+                $state = '2';
+            }
+        }
+        $bits .= $state;
     }
-    foreach (booking_ranges((string) $cfg['overseas']) as [$a, $b]) {
-        $windows[] = [$a, $b, 1];
-    }
+    return ['t0' => $t0, 'step' => $step, 'until' => $until, 'bits' => $bits];
+}
+
+/**
+ * The start times offered to a visitor in $tz: the half hours of the working
+ * hours on their own clock (9:30 AM to 6:30 PM by default, so the last call
+ * starts at 6:00 PM), on their own working days, after now and the minimum
+ * notice, inside the window and free on the grid. Days are walked as dates on
+ * the visitor's calendar and each time is read on their clock, so daylight
+ * saving changes land where they should; a time a clock change skips is left
+ * out. assets/js/booking.js repeats this rule for the page; this one decides.
+ *
+ * @param array{t0:int,step:int,until:int,bits:string} $grid from booking_free_grid()
+ * @return list<int>
+ */
+function booking_zone_slots(array $cfg, int $now, array $grid, string $tz): array
+{
+    $zone = booking_zone($tz);
+    $len = (int) $cfg['length'];
+    $from = $now + max(1, (int) $cfg['notice_minutes'] * 60);
     $days = array_map('intval', (array) $cfg['days']);
+    $ranges = booking_hours((string) $cfg['hours']);
+    $utc = new DateTimeZone('UTC');
+    $day = new DateTimeImmutable((new DateTimeImmutable('@' . $now))->setTimezone($zone)->format('Y-m-d'), $utc);
+    $last = new DateTimeImmutable((new DateTimeImmutable('@' . $grid['until']))->setTimezone($zone)->format('Y-m-d'), $utc);
     $out = [];
-    /* Start a day early: a window that runs past midnight spills into today. */
-    $day = (new DateTimeImmutable('@' . $now))->setTimezone($tz)->setTime(0, 0)->modify('-1 day');
-    $last = (new DateTimeImmutable('@' . $until))->setTimezone($tz)->setTime(0, 0);
     for (; $day <= $last; $day = $day->modify('+1 day')) {
         if (!in_array((int) $day->format('N'), $days, true)) {
             continue;
         }
-        foreach ($windows as [$a, $b, $overseas]) {
-            for ($m = $a; $m + (int) $cfg['length'] <= $b; $m += (int) $cfg['length']) {
-                $t = $day->modify('+' . $m . ' minutes')->getTimestamp();
-                if ($t < $from || $t >= $until) {
+        $date = $day->format('Y-m-d');
+        foreach ($ranges as [$a, $b]) {
+            for ($m = $a; $m + $len <= $b; $m += BOOKING_STEP) {
+                $hm = sprintf('%02d:%02d', intdiv($m, 60), $m % 60);
+                $local = new DateTimeImmutable($date . ' ' . $hm, $zone);
+                if ($local->format('Y-m-d H:i') !== $date . ' ' . $hm) {
                     continue;
                 }
-                $free = true;
-                foreach ($busy as [$bs, $be]) {
-                    if ($t - $buf < $be && $t + $len + $buf > $bs) {
-                        $free = false;
-                        break;
-                    }
+                $t = $local->getTimestamp();
+                if ($t < $from || $t < $grid['t0'] || $t >= $grid['until'] || ($t - $grid['t0']) % $grid['step'] !== 0) {
+                    continue;
                 }
-                if ($free && (!isset($out[$t]) || $out[$t] === 1)) {
-                    $out[$t] = $overseas;
+                if (($grid['bits'][intdiv($t - $grid['t0'], $grid['step'])] ?? '0') === '1') {
+                    $out[$t] = $t;
                 }
             }
         }
     }
     ksort($out);
-    $list = [];
-    foreach ($out as $t => $o) {
-        $list[] = [(int) $t, $o];
-    }
-    return $list;
+    return array_values($out);
 }
 
-/** Whether a time from booking_slots() is offered to someone in this zone. */
-function booking_slot_for(array $slot, string $tz): bool
+/**
+ * The free start times for a visitor in $tz, straight from busy blocks.
+ *
+ * @param list<array{0:int,1:int}> $busy busy blocks as unix [start, end)
+ * @return list<int>
+ */
+function booking_slots(array $cfg, int $now, array $busy, string $tz): array
 {
-    return $slot[1] === 0 || !booking_is_india($tz);
-}
-
-/** Within the visitor's usual day (7 AM to 9 PM their time)? Other times show on request. */
-function booking_daytime(int $ts, int $len, string $tz): bool
-{
-    $z = booking_zone($tz);
-    $s = (new DateTimeImmutable('@' . $ts))->setTimezone($z);
-    $e = (new DateTimeImmutable('@' . ($ts + $len * 60)))->setTimezone($z);
-    $sm = (int) $s->format('G') * 60 + (int) $s->format('i');
-    $em = (int) $e->format('G') * 60 + (int) $e->format('i');
-    return $sm >= BOOKING_DAY_HOURS[0] * 60 && $em <= BOOKING_DAY_HOURS[1] * 60 && $em > $sm;
+    return booking_zone_slots($cfg, $now, booking_free_grid($cfg, $now, $busy), $tz);
 }
 
 /** Remove one interval from busy blocks (a call being moved should not block itself). */
@@ -336,6 +402,12 @@ function booking_subtract(array $busy, int $s, int $e): array
     return $out;
 }
 
+/** The time the booking pages work from: the clock, or a fixed moment in the local preview and tests ($GLOBALS['BOOKING_NOW']). */
+function booking_now(): int
+{
+    return isset($GLOBALS['BOOKING_NOW']) ? (int) $GLOBALS['BOOKING_NOW'] : time();
+}
+
 /** Calls already booked through the site, as busy blocks. */
 function booking_db_busy(int $from, int $to, int $exceptId = 0): array
 {
@@ -350,22 +422,23 @@ function booking_db_busy(int $from, int $to, int $exceptId = 0): array
 }
 
 /**
- * What can be booked right now: the free times plus what the page needs to
- * draw them. Throws when Google cannot be asked, because guessing would offer
- * times that are not free.
+ * What can be booked right now, for any zone: the free grid, with the moment
+ * it was worked out. booking_zone_slots() turns it into one visitor's times.
+ * Throws when Google cannot be asked, because guessing would offer times that
+ * are not free.
  *
- * @return array{slots:list<array{0:int,1:int}>,now:int}
+ * @return array{now:int,grid:array{t0:int,step:int,until:int,bits:string}}
  */
 function booking_availability(array $cfg, ?array $moving = null): array
 {
-    $now = time();
+    $now = booking_now();
     $to = $now + (int) $cfg['window_days'] * 86400 + 86400;
     $busy = gcal_freebusy($now, $to);
     if ($moving && !empty($moving['start'])) {
         $busy = booking_subtract($busy, (int) $moving['start'], (int) $moving['end']);
     }
     $busy = array_merge($busy, booking_db_busy($now, $to, (int) ($moving['id'] ?? 0)));
-    return ['slots' => booking_slots($cfg, $now, $busy), 'now' => $now];
+    return ['now' => $now, 'grid' => booking_free_grid($cfg, $now, $busy)];
 }
 
 /* ------------------------------------------------------------------ */
@@ -1029,14 +1102,8 @@ function booking_book(?array $m, array $in, string $mode = 'book'): array
         booking_alert_owner('Booking page could not read the calendar', $e->getMessage());
         return $res(false, 'We could not check the calendar just now. Please try again in a minute, or email ' . CONTACT_EMAIL . '.');
     }
-    $offered = false;
-    foreach ($avail['slots'] as $s) {
-        if ($s[0] === $start && booking_slot_for($s, $tz)) {
-            $offered = true;
-            break;
-        }
-    }
-    if (!$offered) {
+    /* The same rule the page used: inside the working hours on the visitor's own clock, and still free. */
+    if (!in_array($start, booking_zone_slots($cfg, $avail['now'], $avail['grid'], $tz), true)) {
         return $res(false, 'That time has just been taken. Please pick another one.', '', true);
     }
 

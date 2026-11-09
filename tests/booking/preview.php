@@ -3,7 +3,7 @@
    real code with the in-memory database from tests/crm/boot.php, kept in a
    JSON file between requests, emails saved as files instead of sent, and the
    admin signed in. Google Calendar is the real one when the GOOGLE_* variables
-   are passed in. Never deployed (tests/ is in .vercelignore). */
+   are passed in, or a stand-in with --fake-google. Never deployed (tests/ is in .vercelignore). */
 declare(strict_types=1);
 
 $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
@@ -34,6 +34,11 @@ if ($ipTz !== '') {
     $_SERVER['HTTP_X_VERCEL_IP_TIMEZONE'] = $ipTz;
 }
 
+/* Pretend it is another moment: ?_now=2026-11-10T06:00:00Z (that page view only). */
+if (isset($_GET['_now']) && strtotime((string) $_GET['_now'])) {
+    $GLOBALS['BOOKING_NOW'] = strtotime((string) $_GET['_now']);
+}
+
 $db = $GLOBALS['FAKE_DB'];
 $stateFile = '/state/db.json';
 $state = is_file($stateFile) ? (json_decode((string) file_get_contents($stateFile), true) ?: []) : [];
@@ -50,11 +55,37 @@ if (!$state) {
         $db->$k = $state[$k] ?? [];
     }
 }
+/* --fake-google: the stand-in calendar of tests/crm/fake-google.php, with something
+   already booked most weekdays so the page shows real gaps, and its events kept
+   in the state file between requests. */
+$fakeG = null;
+if ((string) getenv('FAKE_GOOGLE') === '1') {
+    require_once '/t/fake-google.php';
+    $fakeG = new FakeGoogle();
+    $fakeG->events = $state['google']['events'] ?? [];
+    $fakeG->n = (int) ($state['google']['n'] ?? 0);
+    $day = new DateTimeImmutable('today', new DateTimeZone('UTC'));
+    for ($i = 0; $i < 28; $i++) {
+        $d = $day->modify('+' . $i . ' days');
+        $n = (int) $d->format('N');
+        if ($n === 2) {
+            $fakeG->busy[] = [$d->setTime(17, 0)->getTimestamp(), $d->setTime(18, 0)->getTimestamp()];
+        } elseif ($n === 3) {
+            $fakeG->busy[] = [$d->setTime(5, 0)->getTimestamp(), $d->setTime(6, 30)->getTimestamp()];
+        } elseif ($n === 4) {
+            $fakeG->busy[] = [$d->setTime(14, 0)->getTimestamp(), $d->setTime(15, 0)->getTimestamp()];
+        }
+    }
+    $GLOBALS['GCAL_FAKE'] = $fakeG;
+}
 $GLOBALS['captured_mail'] = [];
-register_shutdown_function(static function () use ($db, $stateFile): void {
+register_shutdown_function(static function () use ($db, $stateFile, $fakeG): void {
     $state = [];
     foreach (['leads', 'meetings', 'proposals', 'settings', 'bookingSettings'] as $k) {
         $state[$k] = $db->$k;
+    }
+    if ($fakeG) {
+        $state['google'] = ['events' => $fakeG->events, 'n' => $fakeG->n];
     }
     file_put_contents($stateFile, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     /* Every email the code would have sent, as a file to open in a browser. */

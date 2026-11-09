@@ -11,90 +11,7 @@ ini_set('error_log', '/tmp/booking-test-errors.log');
 $dash = static fn(string $s): bool => (bool) preg_match('/[\x{2013}\x{2014}]/u', $s);
 $gmailSafe = static fn(string $html): bool => !preg_match('/background\s*:\s*(#|url|linear|rgb)/i', $html) && !str_contains($html, 'gradient');
 
-/** Google Calendar, as far as the booking code talks to it. Records every call. */
-final class FakeGoogle
-{
-    public array $calls = [];
-    public array $busy = [];
-    public array $events = [];
-    public int $n = 0;
-    public bool $hideOwn = false;
-    public bool $failFreeBusy = false;
-    public function __invoke(string $method, string $url, ?array $body): array
-    {
-        $this->calls[] = [$method, $url, $body];
-        $path = (string) parse_url($url, PHP_URL_PATH);
-        parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
-        if (str_contains($url, 'oauth2.googleapis.com/token')) {
-            return ($body['refresh_token'] ?? '') === 'revoked' ? [400, ['error' => 'invalid_grant', 'error_description' => 'Token has been expired or revoked.']] : [200, ['access_token' => 'ya29.test', 'expires_in' => 3599]];
-        }
-        if ($path === '/calendar/v3/freeBusy' && $this->failFreeBusy) {
-            return [503, ['error' => ['message' => 'Backend Error']]];
-        }
-        if ($path === '/calendar/v3/freeBusy') {
-            $from = strtotime($body['timeMin']);
-            $to = strtotime($body['timeMax']);
-            $busy = [];
-            foreach (array_merge($this->busy, $this->hideOwn ? [] : $this->blocks()) as [$s, $e]) {
-                if ($s < $to && $e > $from) {
-                    $busy[] = ['start' => gmdate('Y-m-d\TH:i:s\Z', max($s, $from)), 'end' => gmdate('Y-m-d\TH:i:s\Z', min($e, $to))];
-                }
-            }
-            return [200, ['calendars' => ['primary' => ['busy' => $busy]]]];
-        }
-        if ($path === '/calendar/v3/calendars/primary/events' && $method === 'POST') {
-            $id = 'ev' . (++$this->n);
-            $ev = $body + ['id' => $id, 'status' => 'confirmed', 'iCalUID' => $id . '@google.com', 'htmlLink' => 'https://www.google.com/calendar/event?eid=' . $id, 'sequence' => 0,
-                'hangoutLink' => 'https://meet.google.com/abc-defg-' . str_pad((string) $this->n, 3, '0', STR_PAD_LEFT)];
-            $ev['attendees'] = array_map(static fn(array $a): array => $a + ['responseStatus' => 'needsAction'], $body['attendees'] ?? []);
-            $this->events[$id] = $ev;
-            return [200, $ev];
-        }
-        if ($path === '/calendar/v3/calendars/primary/events' && $method === 'GET') {
-            $from = strtotime($q['timeMin']);
-            $to = strtotime($q['timeMax']);
-            $items = $this->hideOwn ? [] : array_values(array_filter($this->events, static fn(array $e): bool => strtotime($e['start']['dateTime']) < $to && strtotime($e['end']['dateTime']) > $from));
-            foreach ($this->busy as [$s, $e]) {
-                if ($s < $to && $e > $from) {
-                    $items[] = ['id' => 'other', 'status' => 'confirmed', 'start' => ['dateTime' => gmdate('c', $s)], 'end' => ['dateTime' => gmdate('c', $e)]];
-                }
-            }
-            return [200, ['timeZone' => 'Asia/Kolkata', 'items' => $items]];
-        }
-        if (preg_match('#^/calendar/v3/calendars/primary/events/([^/]+)$#', $path, $m)) {
-            $id = rawurldecode($m[1]);
-            if (!isset($this->events[$id])) {
-                return [404, ['error' => ['message' => 'Not Found']]];
-            }
-            if ($method === 'GET') {
-                return [200, $this->events[$id]];
-            }
-            if ($method === 'PATCH') {
-                $this->events[$id] = array_merge($this->events[$id], $body);
-                $this->events[$id]['sequence']++;
-                return [200, $this->events[$id]];
-            }
-            if ($method === 'DELETE') {
-                unset($this->events[$id]);
-                return [204, []];
-            }
-        }
-        return [500, ['error' => ['message' => 'FakeGoogle does not know ' . $method . ' ' . $url]]];
-    }
-    private function blocks(): array
-    {
-        return array_map(static fn(array $e): array => [strtotime($e['start']['dateTime']), strtotime($e['end']['dateTime'])], array_values($this->events));
-    }
-    public function last(string $method, string $needle = ''): ?array
-    {
-        foreach (array_reverse($this->calls) as $c) {
-            if ($c[0] === $method && ($needle === '' || str_contains($c[1], $needle))) {
-                return $c;
-            }
-        }
-        return null;
-    }
-}
+require "/t/fake-google.php";
 
 $db = $GLOBALS['FAKE_DB'];
 $timeline = static function () use ($db): array {
@@ -123,29 +40,68 @@ check('ranges', booking_ranges('09:30-18:30') === [[570, 1110]] && booking_range
 check('range past midnight', booking_ranges('19:00-01:00') === [[1140, 1500]]);
 check('bad ranges dropped', booking_ranges('9-5, 25:00-26:00, nonsense') === []);
 $cfg = booking_clean_settings(booking_setting_defaults());
-check('owner defaults', $cfg['host_name'] === 'B. Vignesh' && $cfg['host_title'] === 'Founder & CEO' && $cfg['core'] === '09:30-18:30' && $cfg['overseas'] === '19:00-23:00' && $cfg['days'] === [1, 2, 3, 4, 5] && $cfg['length'] === 30);
-$bad = booking_clean_settings(['enabled' => '1', 'length' => 33, 'buffer' => 500, 'notice_hours' => -3, 'window_days' => 0, 'days' => ['9', 'x'], 'core' => 'all day', 'overseas' => '', 'host_name' => '']);
-check('settings are checked', $bad['length'] === 30 && $bad['buffer'] === 60 && $bad['notice_hours'] === 0 && $bad['window_days'] === 1 && $bad['days'] === [1, 2, 3, 4, 5] && $bad['core'] === '09:30-18:30' && $bad['overseas'] === '' && $bad['host_name'] === 'B. Vignesh', json_encode($bad));
+check('owner defaults', $cfg['host_name'] === 'B. Vignesh' && $cfg['host_title'] === 'Founder & CEO' && $cfg['hours'] === '09:30-18:30' && $cfg['notice_minutes'] === 0
+    && $cfg['days'] === [1, 2, 3, 4, 5] && $cfg['length'] === 30 && !isset($cfg['core']) && !isset($cfg['overseas']), json_encode($cfg));
+$bad = booking_clean_settings(['enabled' => '1', 'length' => 33, 'buffer' => 500, 'notice_minutes' => -3, 'window_days' => 0, 'days' => ['9', 'x'], 'hours' => 'all day', 'core' => '01:00-02:00', 'host_name' => '']);
+check('settings are checked', $bad['length'] === 30 && $bad['buffer'] === 60 && $bad['notice_minutes'] === 0 && $bad['window_days'] === 1 && $bad['days'] === [1, 2, 3, 4, 5]
+    && $bad['hours'] === '09:30-18:30' && !isset($bad['core']) && $bad['host_name'] === 'B. Vignesh', json_encode($bad));
+check('working hours stay inside one day', booking_hours('09:30-18:30') === [[570, 1110]] && booking_hours('19:00-01:00') === [] && booking_hours('09:30-13:00, 14:00-18:30') === [[570, 780], [840, 1110]]);
 
 $ist = new DateTimeZone('Asia/Kolkata');
-$at = static fn(string $s): int => (new DateTimeImmutable($s, $ist))->getTimestamp();
+$at = static fn(string $s, string $tz = 'Asia/Kolkata'): int => (new DateTimeImmutable($s, new DateTimeZone($tz)))->getTimestamp();
+/* Each slot as the visitor reads it: "Wed 13:30" on their own clock. */
+$local = static fn(array $slots, string $tz, string $f = 'D H:i'): array => array_map(static fn(int $t): string => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone($tz))->format($f), $slots);
+
+/* The owner's example: someone in Pacific Time at 1:00 PM sees 1:30 PM to the last call at 6:00 PM, then the next working day from 9:30 AM. */
+$la = 'America/Los_Angeles';
+$pt = $local(booking_slots($cfg, $at('2026-11-11 13:00', $la), [], $la), $la);
+check('Pacific at 1:00 PM: from 1:30 PM', $pt[0] === 'Wed 13:30', implode(' ', array_slice($pt, 0, 3)));
+check('Pacific: the last call starts at 6:00 PM', in_array('Wed 18:00', $pt, true) && !in_array('Wed 18:30', $pt, true) && $pt[9] === 'Wed 18:00' && $pt[10] === 'Thu 09:30', implode(' ', array_slice($pt, 8, 5)));
+check('Pacific at 12:59 PM: from 1:00 PM', $local(booking_slots($cfg, $at('2026-11-11 12:59', $la), [], $la), $la)[0] === 'Wed 13:00');
+check('Pacific at 1:10 PM: from 1:30 PM', $local(booking_slots($cfg, $at('2026-11-11 13:10', $la), [], $la), $la)[0] === 'Wed 13:30');
+check('Pacific after 6:00 PM: the next working morning', $local(booking_slots($cfg, $at('2026-11-13 18:05', $la), [], $la), $la)[0] === 'Mon 09:30');
+check('weekdays on the visitor clock: Friday afternoon Pacific yes, weekends no', in_array('Fri 17:30', $pt, true) && !array_filter($pt, static fn(string $t): bool => str_starts_with($t, 'Sat') || str_starts_with($t, 'Sun')));
+check('a minimum notice pushes the first time', $local(booking_slots(array_merge($cfg, ['notice_minutes' => 60]), $at('2026-11-11 13:00', $la), [], $la), $la)[0] === 'Wed 14:00');
+
+/* Every zone gets 9:30 AM to 6:00 PM starts on its own clock: 18 a day, on its half hours. */
 $now = $at('2026-11-09 06:00');           // a Monday morning in Chennai
-$slots = booking_slots($cfg, $now, []);
-$times = array_map(static fn(array $s): string => (new DateTimeImmutable('@' . $s[0]))->setTimezone($ist)->format('D H:i'), $slots);
-check('first slot after 4 hours notice', $times[0] === 'Mon 10:00', $times[0]);
-check('last core slot ends at 18:30', in_array('Mon 18:00', $times, true) && !in_array('Mon 18:30', $times, true));
-check('overseas evening slots', in_array('Mon 19:00', $times, true) && in_array('Mon 22:30', $times, true) && !in_array('Mon 23:00', $times, true));
-check('weekends off', !array_filter($times, static fn(string $t): bool => str_starts_with($t, 'Sat') || str_starts_with($t, 'Sun')));
-$overFlag = array_values(array_filter($slots, static fn(array $s): bool => (new DateTimeImmutable('@' . $s[0]))->setTimezone($ist)->format('H:i') === '19:00'))[0][1] ?? null;
-check('evening slots marked overseas', $overFlag === 1 && $slots[0][1] === 0);
-check('window of 21 days', max(array_column($slots, 0)) < $now + 21 * 86400);
-check('30 minute grid', !array_filter($slots, static fn(array $s): bool => $s[0] % 1800 !== 0));
+foreach (['Pacific/Honolulu', 'America/Los_Angeles', 'America/Denver', 'America/Phoenix', 'America/Chicago', 'America/New_York', 'America/St_Johns', 'Europe/London', 'Asia/Dubai', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Singapore', 'Australia/Sydney', 'Pacific/Chatham'] as $z) {
+    $s = booking_slots($cfg, $now, [], $z);
+    $hm = $local($s, $z, 'H:i');
+    $perDay = array_count_values($local($s, $z, 'Y-m-d'));
+    $full = array_filter($perDay, static fn(int $n): bool => $n === 18);
+    check('zone ' . $z . ': 9:30 to 6:00 PM starts, weekdays, 18 a full day',
+        min($hm) === '09:30' && max($hm) === '18:00' && !array_filter($hm, static fn(string $x): bool => !str_ends_with($x, ':00') && !str_ends_with($x, ':30'))
+        && !array_filter($local($s, $z, 'N'), static fn(string $n): bool => (int) $n > 5) && count($full) >= 10 && max($perDay) === 18
+        && !array_filter($s, static fn(int $t): bool => $t % 900 !== 0) && max($s) < $now + 21 * 86400 && min($s) > $now,
+        $z . ' ' . min($hm) . '..' . max($hm) . ' days ' . count($full));
+}
+check('India Monday morning: from 9:30 AM', $local(booking_slots($cfg, $now, [], 'Asia/Kolkata'), 'Asia/Kolkata')[0] === 'Mon 09:30');
+
+/* Daylight saving: 9:30 AM stays 9:30 AM on the visitor's clock across the change. */
+$dst = booking_slots(array_merge($cfg, ['window_days' => 7]), $at('2026-10-30 08:00', $la), [], $la);
+$fri = array_values(array_filter($dst, static fn(int $t): bool => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('America/Los_Angeles'))->format('Y-m-d H:i') === '2026-10-30 09:30'))[0] ?? 0;
+$mon = array_values(array_filter($dst, static fn(int $t): bool => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('America/Los_Angeles'))->format('Y-m-d H:i') === '2026-11-02 09:30'))[0] ?? 0;
+check('US fall back: 9:30 AM PDT then 9:30 AM PST', $fri > 0 && $mon - $fri === 3 * 86400 + 3600 && gmdate('H:i', $fri) === '16:30' && gmdate('H:i', $mon) === '17:30', gmdate('c', $fri) . ' ' . gmdate('c', $mon));
+$uk = booking_slots(array_merge($cfg, ['window_days' => 7]), $at('2027-03-26 08:00', 'Europe/London'), [], 'Europe/London');
+$ukFri = $local([$uk[0]], 'UTC', 'D H:i')[0] ?? '';
+$ukMon = array_values(array_filter($uk, static fn(int $t): bool => (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('Europe/London'))->format('D H:i') === 'Mon 09:30'))[0] ?? 0;
+check('UK spring forward: 9:30 GMT then 9:30 BST', $ukFri === 'Fri 09:30' && gmdate('D H:i', $ukMon) === 'Mon 08:30', $ukFri . ' / ' . gmdate('D H:i', $ukMon));
+$gap = booking_slots(array_merge($cfg, ['hours' => '01:00-04:00', 'days' => [7], 'window_days' => 3]), $at('2027-03-13 12:00', $la), [], $la);
+check('a time the clock skips is left out', $local($gap, $la, 'H:i') === ['01:00', '01:30', '03:00', '03:30'], implode(' ', $local($gap, $la, 'H:i')));
+
 $busy = [[$at('2026-11-10 12:00'), $at('2026-11-10 13:00')]];
-$tue = array_values(array_map(static fn(array $s): string => (new DateTimeImmutable('@' . $s[0]))->setTimezone($ist)->format('H:i'),
-    array_filter(booking_slots($cfg, $now, $busy), static fn(array $s): bool => (new DateTimeImmutable('@' . $s[0]))->setTimezone($ist)->format('Y-m-d') === '2026-11-10')));
+$tue = array_values(array_filter($local(booking_slots($cfg, $now, $busy, 'Asia/Kolkata'), 'Asia/Kolkata', 'Y-m-d H:i'), static fn(string $t): bool => str_starts_with($t, '2026-11-10')));
+$tue = array_map(static fn(string $t): string => substr($t, 11), $tue);
 check('15 minute buffer around busy time', in_array('11:00', $tue, true) && !in_array('11:30', $tue, true) && !in_array('12:00', $tue, true) && !in_array('13:00', $tue, true) && in_array('13:30', $tue, true), implode(' ', $tue));
-check('overseas only outside India', booking_slot_for([1, 1], 'America/Chicago') && !booking_slot_for([1, 1], 'Asia/Kolkata') && !booking_slot_for([1, 1], 'Asia/Calcutta') && booking_slot_for([1, 0], 'Asia/Kolkata'));
-check('Chicago morning is daytime', booking_daytime($at('2026-11-10 19:30'), 30, 'America/Chicago') && !booking_daytime($at('2026-11-10 10:00'), 30, 'America/Chicago'));
+$grid = booking_free_grid($cfg, $now, $busy);
+$bitAt = static fn(string $hm): string => $grid['bits'][intdiv($at('2026-11-10 ' . $hm) - $grid['t0'], 900)] ?? '?';
+check('booked times are marked for striking, buffer-only times for hiding', $bitAt('11:00') === '1' && $bitAt('11:30') === '2' && $bitAt('12:00') === '0' && $bitAt('12:30') === '0'
+    && $bitAt('13:00') === '2' && $bitAt('13:30') === '1', implode(' ', array_map($bitAt, ['11:00', '11:30', '12:00', '12:30', '13:00', '13:30'])));
+check('one free grid serves every zone', $grid['t0'] > $now && $grid['t0'] % 900 === 0 && strlen($grid['bits']) === intdiv($grid['until'] - $grid['t0'] + 899, 900)
+    && booking_zone_slots($cfg, $now, $grid, 'Europe/London') === booking_slots($cfg, $now, $busy, 'Europe/London'));
+$cc = booking_zone_countries();
+check('zone countries for the picker', ($cc['America/Los_Angeles'] ?? '') === 'US' && ($cc['Asia/Kolkata'] ?? '') === 'IN' && ($cc['UTC'] ?? 'x') === '' && count($cc) > 300);
 check('zones', booking_zone_name('Asia/Calcutta') === 'Asia/Calcutta' && booking_zone_name('America/Argentina/Buenos_Aires') === 'America/Argentina/Buenos_Aires'
     && booking_zone_name('../etc/passwd') === '' && booking_zone_name('Mars/Olympus') === '' && booking_zone_name('UTC') === 'UTC');
 check('zone labels', booking_zone_label('America/Chicago', $at('2026-11-10 20:00')) === 'Chicago time (GMT-6)' && booking_zone_label('Asia/Kolkata', $now) === 'India time (IST)'
@@ -190,10 +146,14 @@ check('email open lands on the timeline once', $has($timeline(), 'Opened the mee
 /* ---------------- the personal page ---------------- */
 $_SERVER['HTTP_X_VERCEL_IP_TIMEZONE'] = 'America/Chicago';
 $html = $page('book-a-meeting/' . $token);
-check('personal page greets and prefills', str_contains($html, 'Bauer, let us find a time') && str_contains($html, 'value="Bauer"') && str_contains($html, 'value="bauer@cocopat.us"'), substr($html, 0, 300));
+check('personal page greets and prefills', str_contains($html, 'Bauer, pick a date and time') && str_contains($html, 'value="Bauer"') && str_contains($html, 'value="bauer@cocopat.us"'), substr($html, 0, 300));
 check('personal page agenda from their words', str_contains($html, 'Your goals for Google Ads and Meta Ads'));
-check('page carries slots and the IP zone', str_contains($html, 'id="bk-data"') && str_contains($html, '"ipTz":"America/Chicago"') && str_contains($html, '"mode":"book"') && str_contains($html, '"recaptcha":""'));
+check('page carries the free grid and the IP zone', str_contains($html, 'id="bk-data"') && str_contains($html, '"tz":"America/Chicago","tzSource":"ip"') && str_contains($html, '"mode":"book"')
+    && str_contains($html, '"recaptcha":""') && str_contains($html, '"grid":{"t0":') && str_contains($html, '"hours":[[570,1110]]') && str_contains($html, '"America/Los_Angeles":"US"'));
+check('no "times shown in your time zone" wording', !str_contains($html, 'Times shown in your time zone'));
 check('no-JS list in the visitor zone', str_contains($html, '<select id="bk-slot" name="slot"') && str_contains($html, 'Time (Chicago time (GMT-'));
+$tzPage = $page('book-a-meeting/' . $token, ['tz' => 'Europe/London']);
+check('a zone in the link wins over the IP', str_contains($tzPage, '"tz":"Europe/London","tzSource":"url"') && str_contains($tzPage, 'Time (London time (GMT'));
 check('page is private', str_contains($html, '<meta name="robots" content="noindex, nofollow">'));
 check('no dashes on the page', !$dash($html));
 booking_track_view($token);
@@ -202,16 +162,18 @@ check('page view on the timeline', $has($timeline(), 'Opened the booking page'))
 /* ---------------- booking ---------------- */
 $cfgNow = booking_settings();
 $avail = booking_availability($cfgNow);
-$pick = static function (array $avail, string $tz, int $skip = 0, ?int $after = null) {
-    foreach ($avail['slots'] as $s) {
-        if (booking_slot_for($s, $tz) && booking_daytime($s[0], 30, $tz) && ($after === null || $s[0] > $after) && $skip-- <= 0) {
-            return $s;
+/* The nth time offered to a visitor in $tz (after $after), as [unix]. */
+$pick = static function (array $avail, string $tz, int $skip = 0, ?int $after = null) use ($cfgNow): ?array {
+    foreach (booking_zone_slots($cfgNow, $avail['now'], $avail['grid'], $tz) as $t) {
+        if (($after === null || $t > $after) && $skip-- <= 0) {
+            return [$t];
         }
     }
     return null;
 };
 $slot = $pick($avail, 'America/Chicago');
-check('a Chicago morning slot is offered', $slot !== null && $slot[1] === 1, json_encode($slot));
+$chiAt = $slot ? (new DateTimeImmutable('@' . $slot[0]))->setTimezone(new DateTimeZone('America/Chicago')) : null;
+check('a Chicago working-hours slot is offered', $chiAt !== null && $chiAt->format('H:i') >= '09:30' && $chiAt->format('H:i') <= '18:00' && (int) $chiAt->format('N') <= 5, $chiAt ? $chiAt->format('c') : 'none');
 $GLOBALS['captured_mail'] = [];
 $post = ['action' => 'book', 'slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Bauer', 'email' => 'bauer@cocopat.us', 'company' => 'Cocopat', 'phone' => '+1 2103294540',
     'notes' => 'We also run LinkedIn ads, happy to cover those too.'];
@@ -260,11 +222,18 @@ check('follow-up date set to the call, tag added', $fup && $fup[0][1][0] === boo
 $GLOBALS['captured_mail'] = [];
 $again = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
 check('same time refused to the next person', !$again['ok'] && $again['taken'], json_encode($again));
-$india = $pick($avail, 'America/Chicago', 1);
-$asIndia = booking_book(null, ['slot' => (string) $india[0], 'tz' => 'Asia/Kolkata', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
-check('evening hours refused to an India time zone', !$asIndia['ok'] && $asIndia['taken']);
-$soon = booking_book(null, ['slot' => (string) (intdiv(time(), 1800) * 1800 + 1800), 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
-check('inside the minimum notice refused', !$soon['ok']);
+/* Hours are the visitor's own: a Chicago morning is late evening in India, so it is refused to someone booking in India time. */
+$morning = null;
+foreach (booking_zone_slots($cfgNow, $avail['now'], $avail['grid'], 'America/Chicago') as $t) {
+    if ($t !== $slot[0] && (new DateTimeImmutable('@' . $t))->setTimezone(new DateTimeZone('America/Chicago'))->format('H:i') < '12:00') {
+        $morning = $t;
+        break;
+    }
+}
+$asIndia = booking_book(null, ['slot' => (string) $morning, 'tz' => 'Asia/Kolkata', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+check('a time outside the visitor zone hours is refused', $morning !== null && !$asIndia['ok'] && $asIndia['taken'], (string) $morning);
+$soon = booking_book(null, ['slot' => (string) (intdiv(time(), 1800) * 1800), 'tz' => 'America/Chicago', 'name' => 'Dana Smith', 'email' => 'dana.smith@gmail.com']);
+check('a time already started is refused', !$soon['ok']);
 check('nothing sent for refused bookings', count($GLOBALS['captured_mail']) === 0);
 /* Two people press Book at the same moment: both pages offered the time; the database's no-overlap rule stops the second, and its calendar event is taken back. */
 $db->hideBusy = true;
@@ -279,7 +248,11 @@ check('race: the first booking is untouched', booking_by_token($token)['status']
 $busyNow = $slot[0] + 7200;
 $G->busy = [[$busyNow - 600, $busyNow + 600]];
 $avail2 = booking_availability($cfgNow);
-check('a busy calendar block is never offered', !array_filter($avail2['slots'], static fn(array $s): bool => $s[0] >= $busyNow - 1800 - 900 && $s[0] < $busyNow + 600 + 900));
+$offered2 = [];
+foreach (['America/Chicago', 'Asia/Kolkata', 'Europe/London', 'Asia/Kathmandu'] as $z) {
+    $offered2 = array_merge($offered2, booking_zone_slots($cfgNow, $avail2['now'], $avail2['grid'], $z));
+}
+check('a busy calendar block is never offered', $offered2 && !array_filter($offered2, static fn(int $t): bool => $t >= $busyNow - 1800 - 900 && $t < $busyNow + 600 + 900));
 $G->busy = [];
 
 /* ---------------- a public booking files a lead ---------------- */
@@ -316,9 +289,11 @@ $GLOBALS['captured_mail'] = [];
 $GLOBALS['cancelled_mail'] = [];
 $oldReminders = booking_by_token($token)['reminder_ids'];
 $next = $slot[0] + 1800;
-$offeredNext = (bool) array_filter(booking_availability($cfgNow, booking_by_token($token))['slots'], static fn(array $s): bool => $s[0] === $next);
-$moveTo = $offeredNext ? $next : $pick(booking_availability($cfgNow, booking_by_token($token)), 'America/Chicago', 0, $slot[0])[0];
-check('the half hour after its own call is offered when moving', $offeredNext || booking_ranges('19:00-23:00') === [], (string) $offeredNext);
+$availMove = booking_availability($cfgNow, booking_by_token($token));
+$offeredNext = in_array($next, booking_zone_slots($cfgNow, $availMove['now'], $availMove['grid'], 'America/Chicago'), true);
+$moveTo = $offeredNext ? $next : $pick($availMove, 'America/Chicago', 0, $slot[0])[0];
+$nextLocal = (new DateTimeImmutable('@' . $next))->setTimezone(new DateTimeZone('America/Chicago'))->format('H:i');
+check('the half hour after its own call is offered when moving', $offeredNext || $nextLocal > '18:00', $nextLocal . ' ' . (int) $offeredNext);
 $mv = booking_book(booking_by_token($token), ['slot' => (string) $moveTo, 'tz' => 'America/Chicago'], 'move');
 check('moved', $mv['ok'], json_encode($mv));
 $patch = $G->last('PATCH', '/events/ev1');
@@ -345,7 +320,7 @@ check('ics download', str_starts_with($icsOut, 'BEGIN:VCALENDAR') && str_contain
 $html = $page('book-a-meeting/' . str_repeat('0', 32));
 check('unknown link', str_contains($html, 'This booking link is not valid'));
 $html = $page('book-a-meeting');
-check('public page', str_contains($html, '<title>Book a call with VTurnU | VTurnU</title>') && str_contains($html, 'Talk with B. Vignesh') && str_contains($html, 'Choose a topic')
+check('public page', str_contains($html, '<title>Book a call with VTurnU | VTurnU</title>') && str_contains($html, '30-minute video call') && str_contains($html, 'Select a date and time') && str_contains($html, 'Choose a topic')
     && str_contains($html, '"recaptcha":"' . RECAPTCHA_SITE_KEY . '"') && !$dash($html));
 
 /* ---------------- Google Calendar changes come back ---------------- */
@@ -368,7 +343,7 @@ check('Google withdraws the invitation', $del !== null && ($dq['sendUpdates'] ??
 check('both sides told', (bool) $byTo('bauer@cocopat.us', 'Cancelled:') && (bool) array_filter($GLOBALS['captured_mail'], static fn(array $x): bool => str_starts_with((string) $x['subject'], 'Meeting cancelled: Bauer')));
 check('timeline: cancelled with the reason', $has($timeline(), 'Cancelled the meeting (') && $has($timeline(), 'The timing changed on our side.'));
 $html = $page('book-a-meeting/' . $token, ['done' => 'cancelled']);
-check('after cancelling, the link offers new times', str_contains($html, 'Your call is cancelled') && str_contains($html, 'Confirm the booking'));
+check('after cancelling, the link offers new times', str_contains($html, 'Your call is cancelled') && str_contains($html, 'Schedule the call'));
 $re = booking_book(booking_by_token($token), ['slot' => (string) $pick(booking_availability($cfgNow), 'America/Chicago', 2)[0], 'tz' => 'America/Chicago', 'name' => 'Bauer', 'email' => 'bauer@cocopat.us']);
 check('book again on the same link', $re['ok'] && $re['token'] === $token && booking_by_token($token)['status'] === 'booked');
 unset($G->events[booking_by_token($token)['event_id']]);
@@ -392,9 +367,12 @@ check('booking refuses politely while the calendar is unreadable', !$failBook['o
 $G->failFreeBusy = false;
 
 /* ---------------- settings, schema, signature ---------------- */
-booking_save_settings(['enabled' => '1', 'host_name' => 'B. Vignesh', 'host_title' => 'Founder & CEO', 'core' => '10:00-13:00, 14:00-18:00', 'overseas' => '', 'days' => ['1', '3'], 'length' => '30', 'buffer' => '10', 'notice_hours' => '2', 'window_days' => '14', 'reminders' => '1']);
+booking_save_settings(['enabled' => '1', 'host_name' => 'B. Vignesh', 'host_title' => 'Founder & CEO', 'hours' => '10:00-13:00, 14:00-18:00', 'days' => ['1', '3'], 'length' => '30', 'buffer' => '10', 'notice_minutes' => '30', 'window_days' => '14', 'reminders' => '1']);
 $saved = booking_settings(true);
-check('settings saved', $saved['core'] === '10:00-13:00, 14:00-18:00' && $saved['overseas'] === '' && $saved['days'] === [1, 3] && $saved['buffer'] === 10 && $saved['window_days'] === 14, json_encode($saved));
+check('settings saved', $saved['hours'] === '10:00-13:00, 14:00-18:00' && $saved['notice_minutes'] === 30 && $saved['days'] === [1, 3] && $saved['buffer'] === 10 && $saved['window_days'] === 14, json_encode($saved));
+$db->bookingSettings = ['hours' => '09:30-18:30', 'core' => '09:30-18:30', 'overseas' => '19:00-23:00', 'notice_hours' => 4, 'days' => [1, 2, 3, 4, 5]];
+$legacy = booking_settings(true);
+check('settings saved under the old rule fall back to the new defaults', $legacy['notice_minutes'] === 0 && !isset($legacy['core']) && !isset($legacy['overseas']) && !isset($legacy['notice_hours']), json_encode($legacy));
 $db->bookingSettings = [];
 booking_settings(true);
 $schema = (string) file_get_contents('/site/db/schema.sql');
