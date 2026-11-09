@@ -125,7 +125,7 @@ function audit_fetch(string $url, ?int $timeout = null): array
     return ['body' => $body === false ? '' : $body, 'ms' => $ms, 'info' => $info, 'error' => $err];
 }
 
-/** Head-only check that a URL exists (used for sitemap / llms.txt). */
+/** Head-only check that a URL exists (used for the sitemap). */
 function audit_exists(string $url): bool
 {
     $ch = curl_init($url);
@@ -141,7 +141,8 @@ function audit_exists(string $url): bool
     return $code >= 200 && $code < 400;
 }
 
-/** One report line. */
+/** One report line. $status is 'pass', 'warn' or 'fail', which are scored,
+ *  or 'info', a note that is shown but never scored or counted. */
 function audit_check(string $status, string $label, string $detail, string $fix = ''): array
 {
     return ['status' => $status, 'label' => $label, 'detail' => $detail, 'fix' => $fix];
@@ -165,6 +166,57 @@ function audit_schema_types(string $json): array
     }
     return $types;
 }
+
+/**
+ * Every schema.org type that is a kind of Organization: Organization itself
+ * and its 187 subtypes in schema.org 30.1 (16 Sep 2026), the LocalBusiness
+ * families included. The business-entity check accepts any of them, so a site
+ * typed Dentist, NGO or OnlineStore is not told it has no Organization schema.
+ * Each family starts on its own line. When schema.org adds a subtype, add it
+ * to its family.
+ */
+const AUDIT_ORG_TYPES = [
+    // Organization and its direct subtypes
+    'Organization', 'Airline', 'Consortium', 'Cooperative', 'Corporation', 'FundingScheme', 'GovernmentOrganization',
+    'LibrarySystem', 'NGO', 'NewsMediaOrganization', 'PoliticalParty', 'ResearchOrganization', 'SearchRescueOrganization',
+    'WorkersUnion',
+    'EducationalOrganization', 'CollegeOrUniversity', 'ElementarySchool', 'HighSchool', 'MiddleSchool', 'Preschool', 'School',
+    'MedicalOrganization', 'DiagnosticLab', 'VeterinaryCare',
+    'OnlineBusiness', 'OnlineStore', 'OnlineMarketplace',
+    'PerformingGroup', 'DanceGroup', 'MusicGroup', 'TheaterGroup',
+    'Project', 'FundingAgency', 'ResearchProject',
+    'SportsOrganization', 'SportsTeam',
+    // LocalBusiness and its direct subtypes
+    'LocalBusiness', 'AnimalShelter', 'ArchiveOrganization', 'ChildCare', 'Dentist', 'DryCleaningOrLaundry',
+    'EmploymentAgency', 'InternetCafe', 'Library', 'ProfessionalService', 'RadioStation', 'RealEstateAgent',
+    'RecyclingCenter', 'SelfStorage', 'ShoppingCenter', 'TelevisionStation', 'TouristInformationCenter', 'TravelAgency',
+    // LocalBusiness families
+    'AutomotiveBusiness', 'AutoBodyShop', 'AutoDealer', 'AutoPartsStore', 'AutoRental', 'AutoRepair', 'AutoWash',
+    'GasStation', 'MotorcycleDealer', 'MotorcycleRepair',
+    'EmergencyService', 'FireStation', 'Hospital', 'PoliceStation',
+    'EntertainmentBusiness', 'AdultEntertainment', 'AmusementPark', 'ArtGallery', 'Casino', 'ComedyClub', 'MovieTheater',
+    'NightClub',
+    'FinancialService', 'AccountingService', 'AutomatedTeller', 'BankOrCreditUnion', 'InsuranceAgency',
+    'FoodEstablishment', 'Bakery', 'BarOrPub', 'Brewery', 'CafeOrCoffeeShop', 'Distillery', 'FastFoodRestaurant',
+    'IceCreamShop', 'Restaurant', 'Winery',
+    'GovernmentOffice', 'PostOffice',
+    'HealthAndBeautyBusiness', 'BeautySalon', 'DaySpa', 'HairSalon', 'HealthClub', 'NailSalon', 'TattooParlor',
+    'HomeAndConstructionBusiness', 'Electrician', 'GeneralContractor', 'HVACBusiness', 'HousePainter', 'Locksmith',
+    'MovingCompany', 'Plumber', 'RoofingContractor',
+    'LegalService', 'Attorney', 'Notary',
+    'LodgingBusiness', 'BedAndBreakfast', 'Campground', 'Hostel', 'Hotel', 'Motel', 'Resort', 'SkiResort', 'VacationRental',
+    'MedicalBusiness', 'Audiology', 'CommunityHealth', 'CovidTestingFacility', 'Dermatology', 'DietNutrition', 'Emergency',
+    'Geriatric', 'Gynecologic', 'IndividualPhysician', 'MedicalClinic', 'Midwifery', 'Nursing', 'Obstetric', 'Oncologic',
+    'Ophthalmology', 'Optician', 'Optometric', 'Otolaryngologic', 'Pediatric', 'Pharmacy', 'Physician', 'PhysiciansOffice',
+    'Physiotherapy', 'PlasticSurgery', 'Podiatric', 'PrimaryCare', 'Psychiatric', 'PublicHealth',
+    'SportsActivityLocation', 'BowlingAlley', 'ExerciseGym', 'GolfCourse', 'PublicSwimmingPool', 'SportsClub',
+    'StadiumOrArena', 'TennisComplex',
+    'Store', 'BikeStore', 'BookStore', 'ClothingStore', 'ComputerStore', 'ConvenienceStore', 'DepartmentStore',
+    'ElectronicsStore', 'Florist', 'FurnitureStore', 'GardenStore', 'GroceryStore', 'HardwareStore', 'HobbyShop',
+    'HomeGoodsStore', 'JewelryStore', 'LiquorStore', 'MensClothingStore', 'MobilePhoneStore', 'MovieRentalStore',
+    'MusicStore', 'OfficeEquipmentStore', 'OutletStore', 'PawnShop', 'PetStore', 'ShoeStore', 'SportingGoodsStore',
+    'TireShop', 'ToyStore', 'WholesaleStore',
+];
 
 /**
  * Run the audit.
@@ -346,11 +398,14 @@ function run_site_audit(string $url): array
         ? audit_check('pass', 'Structured data present', implode(', ', array_slice($schemaTypes, 0, 8)) . (count($schemaTypes) > 8 ? '...' : ''))
         : audit_check('fail', 'No structured data', 'No JSON-LD schema found.', 'Schema is how you tell Google and AI engines what your business is and does. Without it you are relying on them guessing.');
 
-    /* ProfessionalService stays on the list. schema.org now marks it as
+    /* Any kind of Organization describes the business (AUDIT_ORG_TYPES).
+       ProfessionalService stays on that list. schema.org now marks it as
        deprecated, but a site that still uses it has described its business. */
-    $hasOrg = (bool) array_intersect($schemaTypes, ['Organization', 'LocalBusiness', 'ProfessionalService', 'Corporation']);
-    $g[] = $hasOrg
-        ? audit_check('pass', 'Business entity defined', 'Organization schema found.')
+    $orgTypes = array_values(array_intersect($schemaTypes, AUDIT_ORG_TYPES));
+    $g[] = $orgTypes
+        ? audit_check('pass', 'Business entity defined', in_array('Organization', $orgTypes, true)
+            ? 'Organization schema found.'
+            : 'Organization schema found (as ' . $orgTypes[0] . ').')
         : audit_check('warn', 'No Organization schema', 'Your business entity is not described in structured data.', 'This is what links your brand to an entity AI engines can recognise and cite.');
 
     /* There is no FAQ schema check. Google stopped showing FAQ rich results
@@ -367,9 +422,17 @@ function run_site_audit(string $url): array
         ? audit_check('fail', 'Blocking AI search engines', 'robots.txt blocks: ' . implode(', ', $blockedAi) . '.', 'These crawlers feed ChatGPT, Perplexity and Google AI Overviews. While they are blocked your brand cannot be cited in AI answers at all.')
         : audit_check('pass', 'AI crawlers allowed', 'ChatGPT, Claude, Perplexity and Google AI can read this site.');
 
-    $g[] = audit_exists($origin . '/llms.txt')
-        ? audit_check('pass', 'llms.txt published', 'An AI-readable site summary is available.')
-        : audit_check('warn', 'No llms.txt', 'No AI-readable summary of the site.', 'An emerging standard that gives AI engines a clean map of what you offer and which pages matter.');
+    /* llms.txt is a note, not a scored check (owner, 9 Nov 2026). It is a
+       proposed convention, not a standard, and the AI Crawler Checker says
+       the same: it notes the file and never counts it against a site. Found
+       means what it means there (aic_check): HTTP 200 and not an HTML page,
+       since many sites answer every unknown path with a normal page. */
+    $lt = audit_fetch($origin . '/llms.txt', 5);
+    $hasLlms = ($lt['info']['http_code'] ?? 0) === 200 && !preg_match('#<html#i', substr($lt['body'], 0, 2000));
+    $llmsNote = 'llms.txt is a proposed convention, not a standard. It does not change your score.';
+    $g[] = $hasLlms
+        ? audit_check('info', 'llms.txt found', 'Published at ' . $origin . '/llms.txt.', $llmsNote)
+        : audit_check('info', 'No llms.txt (optional)', 'No llms.txt file at ' . $origin . '/llms.txt.', $llmsNote);
 
     $ogCount = $num('//meta[starts-with(@property,"og:")]');
     $g[] = $ogCount >= 4
@@ -379,10 +442,14 @@ function run_site_audit(string $url): array
     $groups['AI search readiness'] = $g;
 
     /* ---------- Score ---------- */
+    /* Only pass, warn and fail are scored and counted. Notes ('info') are not. */
     $weights = ['pass' => 1.0, 'warn' => 0.5, 'fail' => 0.0];
     $total = 0; $max = 0; $counts = ['pass' => 0, 'warn' => 0, 'fail' => 0];
     foreach ($groups as $checks) {
         foreach ($checks as $c) {
+            if (!isset($weights[$c['status']])) {
+                continue;
+            }
             $total += $weights[$c['status']];
             $max++;
             $counts[$c['status']]++;
@@ -415,11 +482,11 @@ function audit_send_mail(array $audit, string $name, string $email): bool
         $lines[] = strtoupper($heading);
         $lines[] = str_repeat('-', strlen($heading));
         foreach ($checks as $c) {
-            $mark = ['pass' => '[OK]  ', 'warn' => '[!]   ', 'fail' => '[FIX] '][$c['status']];
+            $mark = ['pass' => '[OK]  ', 'warn' => '[!]   ', 'fail' => '[FIX] ', 'info' => '[i]   '][$c['status']];
             $lines[] = $mark . $c['label'];
             $lines[] = '      ' . $c['detail'];
             if ($c['fix'] !== '' && $c['status'] !== 'pass') {
-                $lines[] = '      Why it matters: ' . $c['fix'];
+                $lines[] = '      ' . ($c['status'] === 'info' ? 'Note: ' : 'Why it matters: ') . $c['fix'];
             }
             $lines[] = '';
         }

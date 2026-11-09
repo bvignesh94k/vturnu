@@ -149,7 +149,7 @@ render_hero([
             <aside class="post-cta-inline" aria-label="Check your own site">
                 <div>
                     <strong>Curious how your own site scores on this?</strong>
-                    <span>Run the free checker. 21 checks, results in seconds, no call required.</span>
+                    <span>Run the free checker. 20 checks, results in seconds, no call required.</span>
                 </div>
                 <a class="btn btn-grad" href="/free-seo-audit/">Check My Site</a>
             </aside>

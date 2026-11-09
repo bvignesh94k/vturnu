@@ -1,9 +1,12 @@
 <?php /** Free SEO audit tool. Expects: $page, $audit_result, $audit_error, $audit_input */
 
+/* status => [screen-reader word, CSS class, mark]. 'info' is a note that is
+   never scored, such as llms.txt. */
 $labels = [
-    'pass' => ['Passed', 'ok'],
-    'warn' => ['Needs attention', 'warn'],
-    'fail' => ['Critical', 'bad'],
+    'pass' => ['Passed', 'ok', '✓'],
+    'warn' => ['Needs attention', 'warn', '!'],
+    'fail' => ['Critical', 'bad', '✕'],
+    'info' => ['Note, not scored', 'info', 'i'],
 ];
 ?>
 <?php render_hero([
@@ -95,9 +98,9 @@ $labels = [
             <div class="audit-group">
                 <h3><?= e($heading) ?></h3>
                 <ul class="audit-list">
-                    <?php foreach ($checks as $c): [$word, $cls] = $labels[$c['status']]; ?>
+                    <?php foreach ($checks as $c): [$word, $cls, $mark] = $labels[$c['status']]; ?>
                     <li class="audit-item audit-<?= $cls ?>">
-                        <span class="audit-mark" aria-hidden="true"><?= $c['status'] === 'pass' ? '✓' : ($c['status'] === 'warn' ? '!' : '✕') ?></span>
+                        <span class="audit-mark" aria-hidden="true"><?= $mark ?></span>
                         <div>
                             <p class="audit-label"><?= e($c['label']) ?> <span class="sr-only">(<?= e($word) ?>)</span></p>
                             <p class="audit-detail"><?= e($c['detail']) ?></p>

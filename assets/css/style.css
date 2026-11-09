@@ -1201,6 +1201,7 @@ a.card:hover, .card:hover {
 .audit-ok   { border-left-color: #2E9E5B; }
 .audit-warn { border-left-color: var(--brand); }
 .audit-bad  { border-left-color: var(--g-pink); }
+.audit-info { border-left-color: var(--muted); }   /* a note, not scored */
 .audit-mark {
     flex: none; width: 24px; height: 24px; border-radius: 50%;
     display: grid; place-items: center; font-size: .8rem; font-weight: 800; color: #fff;
@@ -1208,6 +1209,7 @@ a.card:hover, .card:hover {
 .audit-ok   .audit-mark { background: #2E9E5B; }
 .audit-warn .audit-mark { background: var(--brand); color: var(--ink); }
 .audit-bad  .audit-mark { background: var(--g-pink); }
+.audit-info .audit-mark { background: var(--muted); }
 .audit-label { font-weight: 800; font-size: .95rem; }
 .audit-detail { font-size: .88rem; color: var(--ink-soft); margin-top: 2px; }
 .audit-fix { font-size: .84rem; color: var(--muted); margin-top: 6px; padding-left: 11px; border-left: 2px solid var(--line); }
