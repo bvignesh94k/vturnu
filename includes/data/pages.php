@@ -118,7 +118,7 @@ $PAGES = [
         'meta'  => 'Run a free instant SEO audit of your website. Check indexing, speed, on-page tags and whether ChatGPT, Perplexity and Google AI can even read your site.',
         'faqs' => [
             ['Is the audit really free?', 'Yes. It runs instantly and there is no charge and no sales call required.'],
-            ['What does the audit check?', 'Twenty-two checks across indexing, on-page tags, speed signals, structured data and whether AI crawlers can read your site.'],
+            ['What does the audit check?', 'Twenty-one checks across indexing, on-page tags, speed signals, structured data and whether AI crawlers can read your site.'],
             ['How accurate is it?', 'It reads what your homepage serves right now, so it is a reliable snapshot of that page. A full audit covers the whole site.'],
             ['What should I do with the results?', 'Fix the critical items first. If you would like help, send us the report and we will suggest the next steps.'],
         ],

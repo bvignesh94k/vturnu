@@ -93,7 +93,7 @@ echo jsonld_script([
             <aside class="post-cta-inline" aria-label="Check your own site">
                 <div>
                     <strong>See how your own site measures up</strong>
-                    <span>Run the free checker. 22 checks, results in seconds, no call required.</span>
+                    <span>Run the free checker. 21 checks, results in seconds, no call required.</span>
                 </div>
                 <a class="btn btn-grad" href="/free-seo-audit/">Check My Site</a>
             </aside>

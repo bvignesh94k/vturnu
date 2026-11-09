@@ -148,6 +148,25 @@ function audit_check(string $status, string $label, string $detail, string $fix 
 }
 
 /**
+ * The schema.org type names in one JSON-LD block. "@type" can be one name or
+ * a list such as ["Organization", "LocalBusiness"]. Reading only the single
+ * form missed every business typed with a list.
+ *
+ * @return list<string>
+ */
+function audit_schema_types(string $json): array
+{
+    $types = [];
+    if (preg_match_all('/"@type"\s*:\s*("[^"]*"|\[[^\]]*\])/', $json, $mm)) {
+        foreach ($mm[1] as $value) {
+            preg_match_all('/"([A-Za-z]+)"/', $value, $names);
+            $types = array_merge($types, $names[1]);
+        }
+    }
+    return $types;
+}
+
+/**
  * Run the audit.
  *
  * @return array{ok:bool,error:string,url:string,score:int,grade:string,groups:array,summary:array}
@@ -319,9 +338,7 @@ function run_site_audit(string $url): array
 
     $schemaTypes = [];
     foreach ($nodes('//script[@type="application/ld+json"]') as $s) {
-        if (preg_match_all('/"@type"\s*:\s*"([A-Za-z]+)"/', $s->textContent, $mm)) {
-            $schemaTypes = array_merge($schemaTypes, $mm[1]);
-        }
+        $schemaTypes = array_merge($schemaTypes, audit_schema_types($s->textContent));
     }
     $schemaTypes = array_values(array_unique($schemaTypes));
 
@@ -329,15 +346,15 @@ function run_site_audit(string $url): array
         ? audit_check('pass', 'Structured data present', implode(', ', array_slice($schemaTypes, 0, 8)) . (count($schemaTypes) > 8 ? '...' : ''))
         : audit_check('fail', 'No structured data', 'No JSON-LD schema found.', 'Schema is how you tell Google and AI engines what your business is and does. Without it you are relying on them guessing.');
 
+    /* ProfessionalService stays on the list. schema.org now marks it as
+       deprecated, but a site that still uses it has described its business. */
     $hasOrg = (bool) array_intersect($schemaTypes, ['Organization', 'LocalBusiness', 'ProfessionalService', 'Corporation']);
     $g[] = $hasOrg
         ? audit_check('pass', 'Business entity defined', 'Organization schema found.')
         : audit_check('warn', 'No Organization schema', 'Your business entity is not described in structured data.', 'This is what links your brand to an entity AI engines can recognise and cite.');
 
-    $hasFaq = (bool) array_intersect($schemaTypes, ['FAQPage', 'QAPage', 'Question']);
-    $g[] = $hasFaq
-        ? audit_check('pass', 'FAQ schema found', 'Question and answer content is marked up.')
-        : audit_check('warn', 'No FAQ schema', 'No question-and-answer markup.', 'FAQ blocks are among the most frequently quoted formats in AI Overviews and ChatGPT answers.');
+    /* There is no FAQ schema check. Google stopped showing FAQ rich results
+       on 7 May 2026, so a page without FAQ markup has nothing to fix. */
 
     $blockedAi = [];
     foreach (['GPTBot' => 'ChatGPT', 'ClaudeBot' => 'Claude', 'PerplexityBot' => 'Perplexity',
