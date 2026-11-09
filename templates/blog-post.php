@@ -30,8 +30,15 @@ if ($rich) {
     $rich['closing']();
     $rich_closing = (string) ob_get_clean();
     $post_words = str_word_count(strip_tags($rich_body . ' ' . $rich_closing));
-    /* Hyphenated words in headings stay on one line. */
-    $rich_body = preg_replace_callback('~(<h2[^>]*>)(.*?)(</h2>)~', static fn ($m) => $m[1] . preg_replace('/[^ ]+-[^ ]+/', '<span class="nb">$0</span>', $m[2]) . $m[3], $rich_body);
+    /* Hyphenated words in headings stay on one line. Only the text between
+       tags is touched, so markup inside a heading (a hidden "2." label in a
+       listicle, say) keeps its attributes intact. */
+    $nb = static fn (string $html): string => preg_replace_callback(
+        '~(<[^>]*>)|([^<]+)~',
+        static fn ($p) => isset($p[2]) ? preg_replace('/[^ ]+-[^ ]+/', '<span class="nb">$0</span>', $p[2]) : $p[1],
+        $html
+    );
+    $rich_body = preg_replace_callback('~(<h2[^>]*>)(.*?)(</h2>)~s', static fn ($m) => $m[1] . $nb($m[2]) . $m[3], $rich_body);
 }
 
 echo jsonld_script([
@@ -194,4 +201,7 @@ render_hero([
         </div>
     </div>
 </section>
+<?php if (!empty($post['listicle'])): /* progress, filters, copy buttons and tools (includes/listicle-kit.php) */ ?>
+<script src="/assets/js/listicle.js?v=<?= e(asset_v('/assets/js/listicle.js')) ?>" defer></script>
+<?php endif; ?>
 </article>

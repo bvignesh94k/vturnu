@@ -220,6 +220,56 @@ const ART = {
         s += `</g><path d="M38 318a66 66 0 0 0 132 0" fill="none" stroke="#1d1936" stroke-width="10" stroke-linecap="round"/><path d="M104 386v48M66 440h76" stroke="#1d1936" stroke-width="10" stroke-linecap="round"/>`;
         return s + sparkle(436, 440, 24) + sparkle(104, 132, 22, 'url(#gV)') + sparkle(196, 452, 14);
     },
+    langs() {
+        /* A globe with three language versions that point to each other. */
+        let s = `<g filter="url(#sh)"><circle cx="220" cy="250" r="150" fill="url(#gL)" stroke="url(#gV)" stroke-width="5"/></g>`;
+        s += `<g fill="none" stroke="#c9c5f0" stroke-width="2"><ellipse cx="220" cy="250" rx="150" ry="54"/><ellipse cx="220" cy="250" rx="54" ry="150"/><ellipse cx="220" cy="250" rx="108" ry="150"/><path d="M70 250h300M220 100v300"/></g>`;
+        s += `<path d="M336 92Q440 190 372 300M336 92Q220 30 108 120M108 120Q70 330 372 300" fill="none" stroke="url(#gB)" stroke-width="4" stroke-dasharray="8 8"/>`;
+        const chip = (x, y, w, txt, fill) => `<g filter="url(#sh)"><rect x="${x}" y="${y}" width="${w}" height="56" rx="28" fill="${fill}"/><text x="${x + w / 2}" y="${y + 38}" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="26" fill="#fff">${txt}</text></g>`;
+        s += chip(290, 64, 100, 'en', 'url(#gV)') + chip(30, 92, 140, 'en-GB', '#5b56c9') + chip(320, 272, 100, 'fr', 'url(#gU)');
+        s += `<g filter="url(#sh)"><rect x="120" y="408" width="236" height="62" rx="18" fill="#1d1936"/><text x="238" y="448" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="24" fill="#fff">hreflang</text></g>`;
+        return s + sparkle(446, 150, 20) + sparkle(54, 300, 16, 'url(#gV)');
+    },
+    schema() {
+        /* A JSON-LD card feeding a small graph of connected entities. */
+        let s = panel(30, 60, 270, 300, 24, '#1d1936');
+        s += `<text x="56" y="124" font-family="Poppins" font-weight="800" font-size="56" fill="#ff9100">{</text><text x="56" y="342" font-family="Poppins" font-weight="800" font-size="56" fill="#ff9100">}</text>`;
+        [[92, 150, 150, '#7be8f7'], [112, 182, 120, '#8f8cf0'], [112, 214, 160, '#ff8db8'], [92, 246, 130, '#ffc777'], [112, 278, 100, '#7be8f7']].forEach(([x, y, w, c]) => { s += bar(x, y, w, c, 12); });
+        s += `<path d="M300 210H350M350 210L404 128M350 210L412 300M404 128L412 300" stroke="#b8b4ee" stroke-width="5" fill="none"/>`;
+        s += `<g filter="url(#sh)"><circle cx="350" cy="210" r="30" fill="url(#gB)"/><circle cx="404" cy="128" r="26" fill="url(#gV)"/><circle cx="412" cy="300" r="26" fill="url(#gU)"/></g>`;
+        s += `<g filter="url(#sh)"><rect x="150" y="392" width="250" height="66" rx="20" fill="#fff" stroke="#e1dff6" stroke-width="2"/><text x="275" y="434" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="26" fill="#1d1936">JSON-LD</text></g>`;
+        return s + sparkle(444, 58, 22) + sparkle(60, 424, 16, 'url(#gV)');
+    },
+    brief() {
+        /* A clipboard brief with questions ticked off, and a pencil. */
+        let s = `<g filter="url(#sh)"><rect x="60" y="60" width="300" height="390" rx="26" fill="url(#gL)" stroke="#e1dff6" stroke-width="2"/></g>`;
+        s += `<g filter="url(#sh)"><rect x="140" y="38" width="140" height="50" rx="16" fill="url(#gU)"/></g><circle cx="210" cy="62" r="9" fill="#fff"/>`;
+        [130, 196, 262, 328].forEach((y, i) => {
+            const done = i < 3;
+            s += `<rect x="92" y="${y}" width="40" height="40" rx="11" fill="${done ? PAL[i % 2 ? 2 : 1][1] : '#fff'}" stroke="${done ? 'none' : '#cfcaf0'}" stroke-width="3"/>`;
+            if (done) s += tick(112, y + 21, 0.95);
+            s += bar(150, y + 8, 170 - i * 18, '#d9d6f4', 10) + bar(150, y + 26, 120 - i * 10, '#eceaf9', 8);
+        });
+        s += `<g filter="url(#sh)" transform="rotate(32 400 290)"><rect x="380" y="150" width="40" height="220" rx="10" fill="url(#gV)"/><path d="M380 370h40l-20 46z" fill="#ffc777"/><path d="M393 400h14l-7 16z" fill="#1d1936"/><rect x="380" y="150" width="40" height="30" rx="10" fill="#ff8db8"/></g>`;
+        return s + sparkle(440, 70, 22) + sparkle(40, 380, 16, 'url(#gV)');
+    },
+    refresh() {
+        /* A page being refreshed: two arrows circling a document whose line turns up. */
+        let s = `<g filter="url(#sh)"><rect x="130" y="110" width="220" height="280" rx="22" fill="url(#gL)" stroke="#e1dff6" stroke-width="2"/></g>`;
+        s += bar(158, 146, 140, '#1d1936', 14) + bar(158, 180, 160) + bar(158, 204, 130) + bar(158, 228, 150);
+        s += `<path d="M160 340l40-30 30 18 50-52 34 16" fill="none" stroke="url(#gB)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;
+        s += `<path d="M204.4 48.1A205 205 0 0 1 441.9 285.6" fill="none" stroke="url(#gV)" stroke-width="16" stroke-linecap="round"/><path d="M457.7 288.4L437.4 311.2 426.1 282.8Z" fill="#4338ca"/>`;
+        s += `<path d="M275.6 451.9A205 205 0 0 1 38.1 214.4" fill="none" stroke="url(#gU)" stroke-width="16" stroke-linecap="round"/><path d="M22.3 211.6L42.6 188.8 53.9 217.2Z" fill="#ff3d8a"/>`;
+        return s + sparkle(430, 440, 22) + sparkle(70, 90, 18, 'url(#gV)');
+    },
+    access() {
+        /* The accessibility figure, a contrast swatch that passes, and a Tab key. */
+        let s = `<g filter="url(#sh)"><circle cx="190" cy="200" r="130" fill="url(#gV)"/></g>`;
+        s += `<circle cx="190" cy="130" r="20" fill="#fff"/><path d="M118 168l72 18 72-18" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M190 186v52M190 238l-30 64M190 238l30 64" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>`;
+        s += `<g filter="url(#sh)"><rect x="286" y="250" width="164" height="120" rx="20" fill="#fff" stroke="#e1dff6" stroke-width="2"/></g><text x="314" y="332" font-family="Poppins" font-weight="800" font-size="58" fill="#1d1936">Aa</text><circle cx="420" cy="284" r="20" fill="#12805c"/>${tick(420, 286, 0.8)}`;
+        s += `<g filter="url(#sh)"><rect x="70" y="374" width="170" height="78" rx="18" fill="url(#gU)"/><text x="155" y="424" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="32" fill="#fff">Tab</text></g>`;
+        return s + sparkle(430, 92, 24) + sparkle(330, 450, 16, 'url(#gV)');
+    },
     social() {
         let s = panel(120, 40, 240, 400, 34);
         s += `<rect x="142" y="86" width="196" height="150" rx="16" fill="url(#gB)"/>` + bar(142, 254, 170) + bar(142, 278, 130);
@@ -231,6 +281,8 @@ const ART = {
 
 /* Concept per blog post, chosen for what the article is about. */
 const BLOG_ART = {
+    'international-seo-checklist': 'langs', 'schema-markup-for-b2b-websites': 'schema', 'website-design-brief-questions': 'brief',
+    'content-refresh-checklist': 'refresh', 'website-accessibility-checklist': 'access',
     'selectedfirms-interview-qualified-leads-beat-traffic': 'interview',
     'ai-first-vs-data-first-marketing': 'aidata', 'how-to-stop-junk-leads-on-your-website': 'filter', 'seo-vs-aeo-vs-geo-explained-for-business-leaders': 'compare', 'how-to-measure-ai-search-visibility': 'dashboard',
     'what-is-sap-cpq-and-when-do-you-need-it': 'quote', 'odoo-vs-erpnext-which-erp-fits-your-business': 'modules', 'salesforce-implementation-checklist-for-growing-teams': 'orbit',

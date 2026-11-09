@@ -7,6 +7,109 @@
 
 return [
 
+/* November 2026 listicles: numbered, interactive checklists. 'listicle' loads
+   assets/js/listicle.js; the markup helpers are in includes/listicle-kit.php. */
+'international-seo-checklist' => [
+    'rich'  => 'international-seo-checklist',
+    'listicle' => true,
+    'title' => 'International SEO Checklist: 10 Steps to Rank in New Markets',
+    'meta'  => 'Expanding abroad? Follow this 10-step international SEO checklist, with a free hreflang tag builder, URL structure advice and the mistakes to avoid.',
+    'h1'    => 'International SEO Checklist: 10 Steps Before You Launch in a New Market',
+    'lede'  => 'International SEO means giving each language or country version of your site its own URL, connecting the versions with hreflang tags, and writing for the way people search in each market. Settle the structure before you translate: the costly problems start with versions Google cannot tell apart, tags that do not point back to each other, and redirects that hide pages.',
+    'kicker' => 'International SEO',
+    'category' => 'SEO', 'intent' => 'Checklist', 'date' => '2026-11-09', 'read' => '11 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['What is hreflang, and does my site need it?', 'Hreflang is a tag that tells Google which language or regional version of a page to show each searcher. You need it when the same page exists in more than one language, or in versions for different countries. A site in one language for one market does not.'],
+        ['Should I use a country domain, a subdomain or a subfolder?', 'Google lists strengths and trade-offs for each, and none of them is a ranking shortcut. Subfolders on one domain are the simplest to run for most B2B companies. A country-code domain makes sense when you have a local entity, a local team and a budget for a separate site.'],
+        ['Does Google use the lang attribute to tell what language a page is in?', 'No. Google reads the visible content to work out the language, not the lang attribute or the URL, so keep one language per page. The lang attribute still matters to screen readers, so set it correctly anyway.'],
+        ['Can I redirect visitors to their language version automatically?', 'Google advises against automatic redirects between language versions, because they can stop visitors and crawlers from reaching every version. Suggest the local version in a small banner and offer a language switcher with plain links instead.'],
+    ],
+    'cta' => ['Planning to Launch in a New Market?', 'Tell us where you want to grow. We check your structure, hreflang and keyword plan before you spend on translation.', 'Plan My International SEO'],
+],
+
+'schema-markup-for-b2b-websites' => [
+    'rich'  => 'schema-markup-for-b2b-websites',
+    'listicle' => true,
+    'title' => 'Schema Markup for B2B Websites: 9 Types Worth Adding',
+    'meta'  => 'Which schema markup does a B2B website need? Nine structured data types with copy-ready JSON-LD, a page finder, and the types Google no longer shows.',
+    'h1'    => 'Schema Markup for B2B Websites: 9 Types Worth Adding (With Code to Copy)',
+    'lede'  => 'Most B2B websites need nine schema types at most: Organization, WebSite and BreadcrumbList across the site, Article and Person for content, Service for service pages, and LocalBusiness, VideoObject or SoftwareApplication only where a page fits them. Use JSON-LD, mark up only what visitors can see, and skip FAQ markup: Google stopped showing FAQ rich results on 7 May 2026.',
+    'kicker' => 'Structured data',
+    'category' => 'SEO', 'intent' => 'Checklist', 'date' => '2026-11-09', 'read' => '12 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['Does schema markup improve rankings?', 'Not directly. Google uses structured data to understand a page and to show some rich results, such as a logo, breadcrumbs or video details. It helps your existing pages get read and presented correctly; it does not make a weak page rank.'],
+        ['Which format should I use for schema markup?', 'JSON-LD. Google marks it as the recommended format because a single script block is easier to maintain than markup spread through your HTML. Build it into each page template from the same data the page displays.'],
+        ['Do FAQ rich results still appear in Google?', 'No. Google stopped showing FAQ rich results on 7 May 2026 and removed the documentation in June 2026. FAQ markup you already have does no harm, but adding it now brings no rich result in Google.'],
+        ['How do I test my structured data?', 'Use the Rich Results Test for types that can show a rich result, and the Schema Markup Validator for everything else, including the WebSite markup behind site names. After release, watch the enhancement reports in Search Console.'],
+        ['Can I mark up my own testimonials to get review stars?', 'No. Reviews that a business shows about itself are self-serving, so pages with LocalBusiness or Organization markup are not eligible for review stars, even when the reviews come from an embedded widget.'],
+    ],
+    'cta' => ['Want Structured Data Done Properly?', 'We audit your markup, fix the errors and build the right types into each page template.', 'Audit My Schema'],
+],
+
+'website-design-brief-questions' => [
+    'rich'  => 'website-design-brief-questions',
+    'listicle' => true,
+    'title' => 'Website Design Brief Template: 12 Questions to Answer',
+    'meta'  => 'Write a website design brief agencies can quote like for like. Answer 12 questions in our free brief builder, then copy or download your finished brief.',
+    'h1'    => 'Website Design Brief: 12 Questions to Answer Before You Hire Anyone',
+    'lede'  => 'A useful website design brief answers twelve questions: the goal and how you will measure it, who your buyers are, what visitors should do, what works today, what content you need and who writes it, what proof you have, how the site should look, what it connects to, who runs it later, what rules apply, your budget range and timeline, and how you will decide.',
+    'kicker' => 'Website brief',
+    'category' => 'Web', 'intent' => 'Template', 'date' => '2026-11-09', 'read' => '10 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['What should a website design brief include?', 'Your goal and how you will measure it, your buyers, the action you want visitors to take, what works on your current site, the pages and content you need, your proof, brand direction, integrations, who runs the site after launch, technical and legal requirements, a budget range and timeline, and how you will choose an agency.'],
+        ['How long should a website brief be?', 'Long enough to answer the twelve questions, which usually means a few pages. Detail on goals, content and integrations matters more for an accurate quote than detail on visual taste.'],
+        ['Should I share my budget in a website brief?', 'Yes, as a range. Without one, agencies have to guess and their proposals cannot be compared. A range lets each agency show what it would do for that money, or tell you early that it will not stretch.'],
+        ['Is my brief saved or sent anywhere?', 'Your answers are stored only in your own browser, on this device, so you can come back to them. Nothing is sent to VTurnU or anyone else until you copy or download the brief and send it yourself.'],
+    ],
+    'cta' => ['Ready to Brief Your Website Project?', 'Send us your brief, or talk it through with us first. We reply within one working day.', 'Send My Brief'],
+],
+
+'content-refresh-checklist' => [
+    'rich'  => 'content-refresh-checklist',
+    'listicle' => true,
+    'title' => 'Content Refresh Checklist: 9 Signs a Page Needs Updating',
+    'meta'  => 'Not every old page needs a rewrite. Check 9 signs to decide whether to refresh, rewrite, merge or retire a page, with a free decision helper to guide you.',
+    'h1'    => 'Content Refresh Checklist: 9 Signs a Page Needs Updating (and What to Do)',
+    'lede'  => 'Refresh a page when it still earns attention but has gone stale: clicks falling while impressions hold, rankings slipping, facts out of date. Rewrite it when the format no longer matches what searchers want, merge it when two of your pages compete for the same search, and retire it when it serves nobody. Changing the date on its own does nothing.',
+    'kicker' => 'Content refresh',
+    'category' => 'Content', 'intent' => 'Checklist', 'date' => '2026-11-09', 'read' => '10 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['How often should you refresh website content?', 'Review the pages that bring enquiries every quarter and the rest at least once a year. Refresh a page when one of the signs appears, rather than on a fixed date.'],
+        ['Does updating the date of a post help it rank?', 'Not on its own. Google\'s guidance warns against changing dates to make a page look fresh when the content has not substantially changed. Update the date after real changes, and keep the visible date and the date in your markup the same.'],
+        ['Should I merge or delete old blog posts?', 'Merge when two pages target the same search, and redirect the weaker URL to the stronger one with a permanent redirect. Delete only pages with no visits, links or purpose, and redirect them to the closest relevant page if one exists.'],
+        ['What is the difference between a content refresh and a rewrite?', 'A refresh updates facts, examples, links and calls to action within the same structure. A rewrite changes the structure or the angle, because the page no longer answers the search the way people now expect.'],
+    ],
+    'cta' => ['Want Your Content Library Reviewed?', 'We find the pages worth refreshing, merging or retiring, then update them for search and AI answers.', 'Review My Content'],
+],
+
+'website-accessibility-checklist' => [
+    'rich'  => 'website-accessibility-checklist',
+    'listicle' => true,
+    'title' => 'Website Accessibility Checklist: 11 Tests Anyone Can Run',
+    'meta'  => 'Test your website\'s accessibility in about an hour: 11 quick checks for keyboard use, contrast, zoom, forms and more, with a free contrast checker.',
+    'h1'    => 'Website Accessibility Checklist: 11 Tests You Can Run Without a Developer',
+    'lede'  => 'You can find many accessibility problems yourself in about an hour: use the page with a keyboard only, check text contrast, zoom to 200 percent, read the alt text and headings, and test your links, forms, videos, page language and tap targets. The tests map to WCAG 2.2, the W3C standard. They will not prove a site is accessible, but they show you where to start.',
+    'kicker' => 'Accessibility',
+    'category' => 'Web', 'intent' => 'Checklist', 'date' => '2026-11-09', 'read' => '12 min',
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['What accessibility standard should a business website meet?', 'WCAG 2.2 at level AA is the usual target. It is the current W3C Recommendation, first published in October 2023 and updated in December 2024.'],
+        ['Can an automated tool tell me my site is accessible?', 'No. W3C notes that evaluation tools can only assist people in judging accessibility; they cannot determine it on their own. Use a tool alongside manual tests like the ones on this page.'],
+        ['Does accessibility law apply to my business?', 'It depends on where you operate and what you sell. In the EU, for example, the European Accessibility Act has applied since 28 June 2025 to certain products and services, including e-commerce services for consumers, with an exemption for microenterprises that provide services. Check the rules for your markets with a specialist.'],
+        ['What contrast ratio does text need?', 'At level AA, at least 4.5 to 1 for normal text and 3 to 1 for large text, which means 18 point, or 14 point bold. Icons, input borders and other interface parts need at least 3 to 1.'],
+    ],
+    'cta' => ['Building or Redesigning Your Website?', 'We design and build websites with accessibility checked from the first template.', 'Talk to Our Web Team'],
+],
+
 'selectedfirms-interview-qualified-leads-beat-traffic' => [
     'rich'  => 'selectedfirms-interview-qualified-leads-beat-traffic',
     'title' => 'Qualified Leads Beat Traffic: Lessons From Our CEO Interview',
