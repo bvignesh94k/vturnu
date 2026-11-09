@@ -136,7 +136,7 @@ if ($slug === ""):
 <?php if (($page['template'] ?? '') === 'blog-post' && is_file(BASE_PATH . '/assets/img/blog/' . $page['post'] . '.webp')): ?>
 <link rel="preload" as="image" type="image/webp" imagesrcset="/assets/img/blog/<?= e($page['post']) ?>-sm.webp 640w, /assets/img/blog/<?= e($page['post']) ?>.webp 1200w" imagesizes="(max-width: 920px) 100vw, 560px">
 <?php endif; ?>
-<?php /* The homepage emits its own richer Organization graph (ProfessionalService,
+<?php /* The homepage emits its own richer Organization graph (the city address,
          a service catalogue and the FAQ), so the shared one is skipped there
          rather than defining the same @id twice. Every other page keeps it. */
 if ($slug !== ''): ?>

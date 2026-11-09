@@ -375,7 +375,11 @@ echo jsonld_script([
     '@context' => 'https://schema.org',
     '@graph' => [
         [
-            '@type' => ['Organization', 'ProfessionalService'],
+            /* Plain Organization, the type every other page uses (owner, 9 Nov
+               2026). Not ProfessionalService, which schema.org deprecated, and
+               not LocalBusiness, which would need the street address. That is
+               also why there is no priceRange: it belongs to LocalBusiness. */
+            '@type' => 'Organization',
             '@id' => $org_id,
             'name' => SITE_NAME,
             'url' => abs_url('/'),
@@ -385,7 +389,6 @@ echo jsonld_script([
             'slogan' => SITE_TAGLINE,
             'email' => CONTACT_EMAIL,
             'telephone' => CONTACT_PHONE,
-            'priceRange' => '₹50,000+',
             'areaServed' => array_map(static fn($c) => ['@type' => 'Country', 'name' => $c], TARGET_MARKETS),
             'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Chennai', 'addressRegion' => 'Tamil Nadu', 'addressCountry' => 'IN'],
             'contactPoint' => [[
