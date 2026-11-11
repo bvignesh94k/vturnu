@@ -51,9 +51,11 @@ final class FakeDb
     public function query(string $sql): FakeStmt { $s = new FakeStmt($this, $sql); $s->execute(); return $s; }
     public function prepare(string $sql): FakeStmt { return new FakeStmt($this, $sql); }
     public function exec(string $sql): int { $this->log[] = [$sql, []]; return 0; }
-    public function beginTransaction(): bool { $this->tx = true; $this->snapshot = [$this->meetings, $this->leads]; return true; }
+    public function beginTransaction(): bool { $this->tx = true; $this->snapshot = [$this->meetings, $this->leads, $this->proposals]; return true; }
     public function commit(): bool { $this->tx = false; return true; }
-    public function rollBack(): bool { $this->tx = false; [$this->meetings, $this->leads] = $this->snapshot; return true; }
+    public function rollBack(): bool { $this->tx = false; [$this->meetings, $this->leads, $this->proposals] = $this->snapshot; return true; }
+    /** Make the next DELETE fail, to prove an erase changes nothing when it breaks half way. */
+    public ?string $failOn = null;
     public function inTransaction(): bool { return $this->tx; }
 
     /** Split "a = ?, b = to_timestamp(?), c = 'x, y'" at the commas that are not inside brackets or quotes. */
@@ -165,6 +167,14 @@ final class FakeDb
             return [];
         }
         if (str_contains($t, 'WHERE token = ?')) { return array_values(array_filter($rows, static fn($r) => $r['token'] === $p[0])); }
+        if (str_starts_with($t, 'DELETE FROM meetings WHERE enquiry_id = ?')) {
+            if ($this->failOn === 'meetings') { throw new RuntimeException('simulated failure'); }
+            $this->meetings = array_values(array_filter($this->meetings, static fn($r) => (int) $r['enquiry_id'] !== (int) $p[0]));
+            return [];
+        }
+        if (str_contains($t, "WHERE enquiry_id = ? AND status = 'booked' AND end_at > now()")) {
+            return array_values(array_filter($rows, static fn($r) => (int) $r['enquiry_id'] === (int) $p[0] && $r['status'] === 'booked' && strtotime((string) $r['end_at']) > time()));
+        }
         if (str_contains($t, 'WHERE enquiry_id = ?')) {
             $out = array_values(array_filter($rows, static fn($r) => (int) $r['enquiry_id'] === (int) $p[0]));
             usort($out, static fn($a, $b) => strcmp($b['created_at'], $a['created_at']) ?: $b['id'] <=> $a['id']);
@@ -200,6 +210,15 @@ final class FakeDb
         if (str_contains($sql, "to_regclass('public.meetings')")) return [['t' => 'meetings']];
         if (str_contains($sql, 'pg_advisory_xact_lock')) return [['pg_advisory_xact_lock' => '']];
         if (preg_match('/\bmeetings\b/', $t) && !str_contains($t, 'FROM enquiries') && !str_starts_with($t, 'UPDATE enquiries')) return $this->meetingsRun($t, $p);
+        if (str_starts_with($t, 'DELETE FROM proposals WHERE enquiry_id = ?')) {
+            if ($this->failOn === 'proposals') { throw new RuntimeException('simulated failure'); }
+            $this->proposals = array_values(array_filter($this->proposals, static fn($x) => (int) $x['enquiry_id'] !== (int) $p[0]));
+            return [];
+        }
+        if (str_starts_with($t, 'DELETE FROM enquiries WHERE id = ? AND deleted_at IS NOT NULL')) {
+            $this->leads = array_values(array_filter($this->leads, static fn($l) => (int) $l['id'] !== (int) $p[0] || empty($l['deleted_at'])));
+            return [];
+        }
         if (str_contains($sql, 'FROM enquiries WHERE lower(email) = ?')) {
             foreach (array_reverse($this->leads) as $l) { if (strtolower((string) $l['email']) === $p[0] && $l['status'] !== 'junk') return [['id' => $l['id']]]; }
             return [];
@@ -242,7 +261,16 @@ final class FakeDb
             foreach ($this->leads as $l) { if ((string) $l['id'] === (string) $p[0]) return [['activity' => json_encode($l['activity'] ?? [])]]; }
             return [['activity' => '[]']];
         }
-        if (preg_match('/^UPDATE enquiries SET (.+) WHERE id = \?( AND deleted_at IS NULL)?$/s', $t, $um)) { $this->updateLead($um[1], $p); return []; }
+        if (preg_match('/^UPDATE enquiries SET (.+) WHERE id = \?( AND deleted_at IS (?:NOT )?NULL)?$/s', $t, $um)) { $this->updateLead($um[1], $p); return []; }
+        if (str_contains($t, 'FROM enquiries WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC')) {
+            $out = array_values(array_filter($this->leads, static fn($l) => !empty($l['deleted_at'])));
+            usort($out, static fn($a, $b) => strtotime((string) $b['deleted_at']) <=> strtotime((string) $a['deleted_at']));
+            return array_map(static fn(array $l): array => array_map(static fn($v) => is_array($v) ? json_encode($v) : $v, $l), $out);
+        }
+        if (str_starts_with($t, 'SELECT id FROM enquiries WHERE id = ? AND deleted_at IS NOT NULL')) {
+            foreach ($this->leads as $l) { if ((int) $l['id'] === (int) $p[0] && !empty($l['deleted_at'])) return [['id' => $l['id']]]; }
+            return [];
+        }
         if (str_contains($sql, 'SELECT notes FROM enquiries')) return [['notes' => '[]']];
         if (str_contains($sql, 'SELECT status FROM enquiries')) return [['status' => 'new']];
         if (str_starts_with($t, 'INSERT INTO enquiries')) return [['id' => 501]];

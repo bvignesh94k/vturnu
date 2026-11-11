@@ -1559,6 +1559,74 @@ function crm_lead(int $id): ?array
     return $row ?: null;
 }
 
+/**
+ * Leads taken out of the lists. Deleting a lead only hides it (deleted_at is
+ * set), so test leads and mistakes stay in the database until someone erases
+ * them here. Newest deletion first.
+ *
+ * @return list<array<string,mixed>>
+ */
+function crm_deleted_leads(): array
+{
+    try {
+        return db()->query('SELECT id, created_at, deleted_at, source, name, email, mobile, company, service
+                              FROM enquiries WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC LIMIT 500')->fetchAll();
+    } catch (Throwable $e) {
+        error_log('crm_deleted_leads: ' . $e->getMessage());
+        return [];
+    }
+}
+
+/** Put a deleted lead back in the lists. */
+function crm_undelete_lead(int $id): void
+{
+    db()->prepare('UPDATE enquiries SET deleted_at = NULL WHERE id = ? AND deleted_at IS NOT NULL')->execute([$id]);
+}
+
+/**
+ * Erase a deleted lead for good: the lead with its timeline, its meetings and
+ * its proposals. It cannot be undone. Only a lead that was deleted first can
+ * be erased, so a live lead is never lost by one click, and a call still ahead
+ * must be cancelled first (cancelling asks Google to withdraw the invitation
+ * and calls off the reminders). Everything goes in one transaction, so a
+ * failure changes nothing.
+ *
+ * @return string '' when erased, otherwise why it was not
+ */
+function crm_purge_lead(int $id): string
+{
+    $pdo = db();
+    try {
+        $st = $pdo->prepare('SELECT id FROM enquiries WHERE id = ? AND deleted_at IS NOT NULL');
+        $st->execute([$id]);
+        if (!$st->fetch()) {
+            return 'Only a lead that was deleted first can be erased for good.';
+        }
+        $meetings = function_exists('booking_ready') && booking_ready();
+        if ($meetings) {
+            $st = $pdo->prepare("SELECT id FROM meetings WHERE enquiry_id = ? AND status = 'booked' AND end_at > now() LIMIT 1");
+            $st->execute([$id]);
+            if ($st->fetch()) {
+                return 'This lead still has a call booked. Restore the lead, cancel the call from its page, delete the lead again, then erase it.';
+            }
+        }
+        $pdo->beginTransaction();
+        if ($meetings) {
+            $pdo->prepare('DELETE FROM meetings WHERE enquiry_id = ?')->execute([$id]);
+        }
+        $pdo->prepare('DELETE FROM proposals WHERE enquiry_id = ?')->execute([$id]);
+        $pdo->prepare('DELETE FROM enquiries WHERE id = ? AND deleted_at IS NOT NULL')->execute([$id]);
+        $pdo->commit();
+        return '';
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log('crm_purge_lead ' . $id . ': ' . $e->getMessage());
+        return 'The lead could not be erased just now. Nothing was changed.';
+    }
+}
+
 /** Proposals and follow-ups sent to one lead, newest first. */
 function crm_proposals(int $leadId): array
 {

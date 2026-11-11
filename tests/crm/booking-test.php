@@ -432,6 +432,51 @@ $failBook = booking_book(null, ['slot' => (string) $slot[0], 'tz' => 'America/Ch
 check('booking refuses politely while the calendar is unreadable', !$failBook['ok'] && str_contains($failBook['error'], 'could not check the calendar'));
 $G->failFreeBusy = false;
 
+/* ---------------- deleted leads: hidden first, erased only on request ---------------- */
+$db->bookingSettings = [];
+booking_settings(true);
+$when = static fn(string $s): string => date('Y-m-d H:i:sP', strtotime($s));
+$db->leads = [
+    fixture_lead(['id' => '801', 'name' => 'Vignesh', 'email' => 'vignesh@singapore.com', 'mobile' => '+61 98338383', 'source' => 'booking', 'deleted_at' => $when('-2 hours')]),
+    fixture_lead(['id' => '802', 'name' => 'Live Person', 'email' => 'live@example.com', 'deleted_at' => null]),
+    fixture_lead(['id' => '803', 'name' => 'Upcoming Test', 'email' => 'upcoming@example.com', 'deleted_at' => $when('-1 hour')]),
+];
+$db->proposals = [
+    ['id' => 1, 'enquiry_id' => 801, 'parent_id' => null, 'token' => 'p1', 'kind' => 'proposal'], ['id' => 2, 'enquiry_id' => 801, 'parent_id' => 1, 'token' => 'p2', 'kind' => 'followup'],
+    ['id' => 3, 'enquiry_id' => 802, 'parent_id' => null, 'token' => 'p3', 'kind' => 'proposal'],
+];
+$meetingRow = static function (array $o) use ($db): array {
+    $r = ['id' => count($db->meetings) + 1, 'enquiry_id' => null, 'token' => bin2hex(random_bytes(16)), 'status' => 'cancelled', 'name' => '', 'email' => '', 'phone' => '', 'company' => '', 'notes' => '',
+        'time_zone' => '', 'start_at' => $o['start_at'] ?? null, 'end_at' => $o['end_at'] ?? null, 'event_id' => '', 'ical_uid' => '', 'event_link' => '', 'meet_url' => '', 'sequence' => 0, 'rsvp' => '',
+        'reschedules' => 0, 'reminder_ids' => '[]', 'request_subject' => '', 'request_body' => '', 'requested_by' => '', 'requested_at' => null, 'request_mail_id' => '', 'opened_at' => null,
+        'viewed_at' => null, 'booked_at' => null, 'cancelled_at' => null, 'cancelled_by' => '', 'cancel_reason' => '', 'created_at' => date('Y-m-d H:i:sP'), 'updated_at' => date('Y-m-d H:i:sP')];
+    return array_merge($r, $o);
+};
+$db->meetings = [
+    $meetingRow(['id' => 1, 'enquiry_id' => 801, 'email' => 'vignesh@singapore.com', 'status' => 'cancelled', 'start_at' => $when('+9 days'), 'end_at' => $when('+9 days +30 minutes')]),
+    $meetingRow(['id' => 2, 'enquiry_id' => 802, 'email' => 'live@example.com', 'status' => 'cancelled', 'start_at' => $when('+8 days'), 'end_at' => $when('+8 days +30 minutes')]),
+    $meetingRow(['id' => 3, 'enquiry_id' => 803, 'email' => 'upcoming@example.com', 'status' => 'booked', 'start_at' => $when('+3 days'), 'end_at' => $when('+3 days +30 minutes')]),
+];
+$listed = array_map(static fn(array $l): string => (string) $l['id'], crm_deleted_leads());
+check('deleted leads list: only the hidden ones, newest deletion first', $listed === ['803', '801'], implode(',', $listed));
+check('a live lead cannot be erased', crm_purge_lead(802) !== '' && count($db->leads) === 3 && count($db->meetings) === 3 && count($db->proposals) === 3);
+check('a lead with a call still booked cannot be erased', str_contains(crm_purge_lead(803), 'still has a call booked') && count($db->leads) === 3 && count($db->meetings) === 3);
+check('an unknown lead cannot be erased', crm_purge_lead(999) !== '' && count($db->leads) === 3);
+$db->failOn = 'proposals';
+check('a failure half way changes nothing', str_contains(crm_purge_lead(801), 'Nothing was changed') && count($db->leads) === 3 && count($db->meetings) === 3 && count($db->proposals) === 3);
+$db->failOn = null;
+check('erasing a deleted lead removes it, its meetings and its proposals', crm_purge_lead(801) === ''
+    && !array_filter($db->leads, static fn(array $l): bool => (int) $l['id'] === 801)
+    && !array_filter($db->meetings, static fn(array $m): bool => (int) $m['enquiry_id'] === 801)
+    && !array_filter($db->proposals, static fn(array $p): bool => (int) $p['enquiry_id'] === 801));
+check('everything of other leads is untouched', count($db->leads) === 2 && count($db->meetings) === 2 && count($db->proposals) === 1 && $db->proposals[0]['enquiry_id'] === 802);
+crm_undelete_lead(803);
+$listed = array_map(static fn(array $l): string => (string) $l['id'], crm_deleted_leads());
+check('a deleted lead can be put back', $listed === [] && empty(array_values(array_filter($db->leads, static fn(array $l): bool => (int) $l['id'] === 803))[0]['deleted_at']));
+$db->leads = [];
+$db->meetings = [];
+$db->proposals = [];
+
 /* ---------------- settings, schema, signature ---------------- */
 booking_save_settings(['enabled' => '1', 'host_name' => 'B. Vignesh', 'host_title' => 'Founder & CEO', 'hours' => '10:00-13:00, 14:00-18:00', 'days' => ['1', '3'], 'length' => '30', 'buffer' => '10', 'notice_minutes' => '30', 'window_days' => '14', 'reminders' => '1']);
 $saved = booking_settings(true);

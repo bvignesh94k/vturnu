@@ -473,6 +473,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 admin_delete_lead($_POST['id'] ?? '');
                 header('Location: /admin/?view=leads'); exit;
 
+            /* Deleted leads are only hidden. These two work on the Deleted leads list:
+               put one back, or erase it (with its meetings and proposals) for good. */
+            case 'lead_undelete':
+                if (ctype_digit((string) ($_POST['id'] ?? ''))) {
+                    crm_undelete_lead((int) $_POST['id']);
+                    $flash = 'Lead put back in the lists.';
+                }
+                break;
+
+            case 'lead_purge':
+                if (!ctype_digit((string) ($_POST['id'] ?? ''))) {
+                    break;
+                }
+                $why = crm_purge_lead((int) $_POST['id']);
+                $flash = $why === '' ? 'Erased for good, together with its meetings and proposals.' : $why;
+                break;
+
             case 'blog_save':
                 $custom = admin_get_overrides('blog');
                 $orig = $_POST['orig_slug'] ?? '';
@@ -1325,6 +1342,41 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                         </td>
                     </tr>
                 <?php endforeach; if (!$junk_leads): ?><tr><td colspan="5">Nothing held back. Junk will appear here when the filter catches it.</td></tr><?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+    <?php elseif ($view === 'deleted'):
+        $deleted_leads = crm_deleted_leads(); ?>
+        <h1>Deleted leads</h1>
+        <p class="sub">Deleting a lead only hides it from the lists; it stays stored until you erase it here. <strong>Erase for good</strong> removes the lead, its timeline, its meetings and its proposals permanently and cannot be undone. <a href="/admin/?view=settings" style="color:var(--p);font-weight:800">← Settings</a></p>
+        <div class="card">
+            <table>
+                <thead><tr><th>Deleted</th><th>Contact</th><th>Came from</th><th></th></tr></thead>
+                <tbody>
+                <?php foreach ($deleted_leads as $l): ?>
+                    <tr>
+                        <td><?= e_a(date('j M Y, g:ia', strtotime((string) $l['deleted_at']))) ?></td>
+                        <td><strong><?= e_a($l['name']) ?></strong><br><?= e_a($l['email']) ?><?= (string) $l['mobile'] !== '' ? '<br>' . e_a($l['mobile']) : '' ?><?= (string) $l['company'] !== '' ? '<br>' . e_a($l['company']) : '' ?></td>
+                        <td><?= e_a((string) $l['source']) ?><?= (string) $l['service'] !== '' ? '<br>' . e_a((string) $l['service']) : '' ?><br><span style="color:var(--muted)">Created <?= e_a(date('j M Y', strtotime((string) $l['created_at']))) ?></span></td>
+                        <td>
+                            <div class="actions-row">
+                                <form method="post">
+                                    <input type="hidden" name="action" value="lead_undelete">
+                                    <input type="hidden" name="id" value="<?= e_a((string) $l['id']) ?>">
+                                    <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                                    <button class="btn ghost" type="submit">Put back</button>
+                                </form>
+                                <form method="post" onsubmit="return confirm('Erase <?= e_a(addslashes((string) $l['name'])) ?> for good? The lead, its meetings and its proposals are removed permanently and cannot be recovered.')">
+                                    <input type="hidden" name="action" value="lead_purge">
+                                    <input type="hidden" name="id" value="<?= e_a((string) $l['id']) ?>">
+                                    <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                                    <button class="btn ghost" type="submit" style="color:#C22349;border-color:#C22349">Erase for good</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; if (!$deleted_leads): ?><tr><td colspan="4">No deleted leads.</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -2692,6 +2744,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             <h2>Data & Backups</h2>
             <p style="font-size:.84rem;color:var(--muted);margin-bottom:12px">Leads, CRM state and custom content are all stored in Postgres (the <span class="mono">enquiries</span>, <span class="mono">admin_users</span> and <span class="mono">content_overrides</span> tables). Export leads to CSV below for an offline copy.</p>
             <a class="btn ghost" href="/admin/?view=export">Download Leads (CSV)</a>
+            <a class="btn ghost" href="/admin/?view=deleted">Deleted leads</a>
         </div>
 
     <?php else: ?>
