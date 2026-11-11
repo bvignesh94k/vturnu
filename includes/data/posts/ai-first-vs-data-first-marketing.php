@@ -84,7 +84,7 @@ return [
     <li><strong>Inbound response:</strong> AI summarizes each enquiry and drafts a reply for a rep to approve.</li>
 </ul>
 <p>The advantage is capacity. A small team can research, produce and respond at a pace that once needed more people.</p>
-<p>The risks are just as practical. Models can sound confident and still be wrong, costs grow with use, and unedited output sounds like everyone else's. About one in five McKinsey respondents say AI operating costs already constrain their use. In <?= ext_link('https://www.forrester.com/blogs/what-factors-are-driving-b2b-marketings-ai-adoption/', 'Forrester\'s survey of over 1,000 B2B marketing leaders') ?>, two-thirds believe generative AI is overhyped, including a majority of the leading adopters.</p>
+<p>The risks are just as practical. Models can sound confident and still be wrong, costs grow with use, and unedited output sounds like everyone else's. What that means for search is covered in our guide to <a href="/blog/does-google-penalise-ai-content/">whether Google penalises AI content</a>. About one in five McKinsey respondents say AI operating costs already constrain their use. In <?= ext_link('https://www.forrester.com/blogs/what-factors-are-driving-b2b-marketings-ai-adoption/', 'Forrester\'s survey of over 1,000 B2B marketing leaders') ?>, two-thirds believe generative AI is overhyped, including a majority of the leading adopters.</p>
 
 <h2 id="what-is-data-first">What Is Data-First Marketing?</h2>
 <p>Data-first marketing is an approach in which decisions start from reliable evidence about customers, channels and revenue. AI may or may not be involved. The priority is knowing what is true before deciding what to do.</p>

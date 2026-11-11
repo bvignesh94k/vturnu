@@ -65,7 +65,7 @@ $ENGINES = [
         'desc' => 'Paid search, paid social, outbound and email built around your ideal customer profile, with every rupee and dollar traced to qualified pipeline.',
         'links' => $hp_existing([
             ['google-ads', 'Google Ads management'], ['enterprise-ppc', 'Enterprise PPC'], ['outbound-marketing', 'Outbound marketing'],
-            ['email-marketing', 'Email marketing'], ['content-marketing', 'B2B content marketing'], ['social-media-marketing', 'Social media marketing'],
+            ['email-marketing', 'Email marketing'], ['content-marketing', 'B2B content marketing'], ['content-writing-services', 'Content writing services'], ['social-media-marketing', 'Social media marketing'],
         ]),
     ],
     [

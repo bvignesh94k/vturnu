@@ -40,5 +40,8 @@ render_lead_form($page['h1'], $offer_title, $offer_sub, 'enquire', $offer_btn);
         <li><a href="<?= e(page_url($rslug)) ?>"><?= e($rpage['h1']) ?></a></li>
         <?php endforeach; ?>
     </ul>
+    <?php if ($extra = related_extra($PAGES, $slug)): /* the writing this service usually needs */ ?>
+    <p class="mp-rel-x">Related content services: <?php foreach ($extra as $i => $xslug): ?><?= $i ? ' · ' : '' ?><a href="<?= e(page_url($xslug)) ?>"><?= e($PAGES[$xslug]['h1']) ?></a><?php endforeach; ?></p>
+    <?php endif; ?>
 </div>
 <?php endif; ?>

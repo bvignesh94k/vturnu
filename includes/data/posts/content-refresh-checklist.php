@@ -139,7 +139,7 @@ return [
 <?php lx_split('How to check',
     '<ul><li>Ask sales and support for the last ten questions they heard on this topic.</li><li>Search the page for each one.</li></ul>',
     'What to do',
-    '<ul><li>Add a short section, or a question and answer, for each one that comes up again and again.</li><li>Use the buyer\'s own words in the heading.</li></ul>'); ?>
+    '<ul><li>Add a short section, or a question and answer, for each one that comes up again and again.</li><li>Use the buyer\'s own words in the heading.</li><li>If the answers need a page of their own, start with a <a href="/blog/how-to-brief-a-content-writer/">one-page content brief</a>.</li></ul>'); ?>
 <?php }); ?>
 
 <?php lx_item(9, 'technical-decay', 'Broken links, slow media or missing internal links', ['type' => 'page', 'tags' => ['On the page', 'Quick to fix'], 'mark' => 'I see this'], static function (): void { ?>

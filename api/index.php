@@ -32,6 +32,7 @@ require dirname(__DIR__) . '/includes/hero-kit.php';
 require dirname(__DIR__) . '/includes/money-kit.php';
 require dirname(__DIR__) . '/includes/trust-kit.php';
 require dirname(__DIR__) . '/includes/listicle-kit.php';
+require dirname(__DIR__) . '/includes/content-kit.php';
 
 /* parse_url() returns false, not null, on a malformed URI, so ?? never caught
    it and trim(false) was a fatal under strict_types: a request to "//" or any
@@ -74,6 +75,8 @@ $REDIRECTS = [
     'currency' => '/',
     'ai-visibility-tool' => '/ai-seo/',
     'email-marketing-services' => '/email-marketing/',
+    /* The old site sent /content-writing/ to the services page; keep that working. */
+    'content-writing' => '/content-writing-services/',
 ];
 if (isset($REDIRECTS[$slug])) {
     header('Location: ' . $REDIRECTS[$slug], true, 301);
@@ -197,7 +200,7 @@ if ($slug === 'llms.txt') {
             $groups['Case Studies'][] = $line;
         } elseif (in_array($s, ['about-us', 'how-we-work', 'our-clients', 'contact-us', 'ai-policy'], true)) {
             $groups['Company'][] = $line;
-        } elseif (in_array($tpl, ['service', 'hub'], true)) {
+        } elseif (in_array($tpl, ['service', 'hub', 'content-landing'], true)) {
             $groups['Digital Marketing and AI Search'][] = $line;
         }
     }

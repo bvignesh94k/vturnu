@@ -267,7 +267,7 @@
             dlBtn.addEventListener('click', () => {
                 const state = getState();
                 const base = (typeof state._f_project === 'string' ? state._f_project : '')
-                    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'website';
+                    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || board.dataset.lxFile || 'website';
                 const blob = new Blob([text().replace(/\n/g, '\r\n')], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = doc.createElement('a');

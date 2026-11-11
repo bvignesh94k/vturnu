@@ -505,6 +505,7 @@ $BLOG = [
     'h1'    => 'Content Marketing Use Cases That Drive Revenue',
     'lede'  => 'Content earns budget when it maps to revenue, not readership. These seven use cases have the shortest, most provable lines from publish to pipeline, and they are the ones we build first for clients.',
     'category' => 'Content', 'intent' => 'Use Cases', 'date' => '2026-04-10', 'read' => '9 min',
+    'service' => ['/content-marketing-services/', 'content marketing services'],
     'sections' => [
         ['Bottom-funnel decision content', [], [
             'Comparison pages ("X vs Y", "best X for Y"): captures buyers mid-shortlist; converts at multiples of blog traffic',

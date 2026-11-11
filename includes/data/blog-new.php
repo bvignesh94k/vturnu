@@ -7,6 +7,118 @@
 
 return [
 
+/* November 2026 content articles, published with the content writing landing
+   pages (includes/data/content-landings.php), which link to each of them.
+   'service' names the landing page shown as the related service under the
+   article, in place of the category default. */
+'content-writing-vs-copywriting-vs-content-marketing' => [
+    'rich'  => 'content-writing-vs-copywriting-vs-content-marketing',
+    'title' => 'Content Writing vs Copywriting vs Content Marketing Explained',
+    'meta'  => 'Content writing informs, copywriting persuades and content marketing plans both. Compare them in one table, with examples, and find which one you need.',
+    'h1'    => 'Content Writing vs Copywriting vs Content Marketing: Which Do You Need?',
+    'lede'  => 'Content writing explains: it produces the articles, guides and case studies that answer a buyer\'s question. Copywriting persuades: it produces the headlines, landing pages, ads and emails that ask for one action. Content marketing is the plan around both: what to publish, for whom, where it goes and how it is measured. Most businesses need all three, in different amounts at different times.',
+    'kicker' => 'Content basics',
+    'category' => 'Content', 'intent' => 'Comparison', 'date' => '2026-11-11', 'read' => '8 min',
+    'service' => ['/content-writing-services/', 'content writing services'],
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['Is copywriting the same as content writing?', 'No. Content writing explains a subject so the reader understands it. Copywriting asks the reader to do one thing, such as fill in a form. The skills overlap, but a strong writer in one is not automatically strong in the other.'],
+        ['Is content marketing the same as content writing?', 'No. Content writing is the production of the pieces. Content marketing is the plan around them: which topics to cover, who they are for, where they are sent and how results are measured.'],
+        ['Which should a small business start with?', 'Start with the problem you can see. If visitors arrive and do not enquire, fix the copy on your main pages first. If buyers cannot find you, or keep asking the same questions, start with content writing. Add a content marketing plan once you are publishing regularly.'],
+        ['Can one writer do both content writing and copywriting?', 'Some can. Ask for samples of the exact format you need, because a strong landing page and a strong white paper call for different habits. For a website, look for someone who has written whole sites, where both skills are used on the same page.'],
+        ['Is SEO writing content writing or copywriting?', 'Mostly content writing. SEO content answers a question people search for, with a brief built from real queries and an answer near the top. Titles and descriptions are where copywriting comes in, because they have to earn the click.'],
+    ],
+    'cta' => ['Not Sure Which One You Need?', 'Tell us what you sell and what is not working. We will tell you which kind of writing fixes it.', 'Get My Content Plan'],
+],
+
+'how-to-brief-a-content-writer' => [
+    'rich'  => 'how-to-brief-a-content-writer',
+    'listicle' => true,
+    'title' => 'How to Brief a Content Writer: Free Content Brief Template',
+    'meta'  => 'Brief a content writer in 10 questions: reader, question, angle, expert, proof and more. Fill in the free brief builder, then copy or download your brief.',
+    'h1'    => 'How to Brief a Content Writer: 10 Questions, With a Free Brief Builder',
+    'lede'  => 'A good content brief answers ten questions: who the reader is, what question the piece answers, what the reader should do next, what you know that others do not, who the writer can interview, what proof can be used, what must be included or avoided, the format and length, how it should sound, and who approves it by when. One page is enough.',
+    'kicker' => 'Content brief',
+    'category' => 'Content', 'intent' => 'Template', 'date' => '2026-11-11', 'read' => '9 min',
+    'service' => ['/blog-writing-services/', 'blog writing services'],
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['What is a content brief?', 'A content brief is a short document that tells a writer who the piece is for, what question it answers, what the reader should do next and what material to use. It is written before the piece, and one page is usually enough.'],
+        ['How long should a content brief be?', 'About one page. Ten short answers are enough for an article. A white paper or a set of website pages needs more detail on sources and approvals, but the same ten questions apply.'],
+        ['Who should write the brief, the client or the writer?', 'Whoever knows the buyer. Often the client answers the questions about reader, angle, expert and proof, and the writer or agency adds the format, structure and search research. What matters is that both agree on it before writing starts.'],
+        ['Should a content brief include keywords?', 'Include the question the reader would ask, in their words, and a main search phrase if you have one. A long list of keywords to insert makes the writing worse. The research belongs in the brief, and the stuffing does not.'],
+        ['Is my brief saved or sent anywhere?', 'Your answers are stored only in your own browser, on this device, so you can come back to them. Nothing is sent to VTurnU or anyone else until you copy or download the brief and send it yourself.'],
+    ],
+    'cta' => ['Want Us to Write From Your Brief?', 'Send us the brief, or talk it through first. A senior strategist replies within one working day.', 'Send My Brief'],
+],
+
+'how-to-write-a-b2b-case-study' => [
+    'rich'  => 'how-to-write-a-b2b-case-study',
+    'listicle' => true,
+    'title' => 'How to Write a B2B Case Study: Structure, Questions, Example',
+    'meta'  => 'Write a B2B case study in 8 steps: choose the customer, get permission, interview them, find one sourced number and structure the story. Questions included.',
+    'h1'    => 'How to Write a B2B Case Study: 8 Steps, With Interview Questions',
+    'lede'  => 'To write a B2B case study, choose a customer your next buyer will recognise, get written permission, interview the customer and find one number you can source. Tell the story in four parts: situation, problem, what was done and result. Say where each number came from and what you could not measure. Then publish it as a web page, a PDF and a short version for sales.',
+    'kicker' => 'Case studies',
+    'category' => 'Content', 'intent' => 'How-to', 'date' => '2026-11-11', 'read' => '9 min',
+    'service' => ['/case-study-writing-services/', 'case study writing services'],
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['How long should a B2B case study be?', 'Usually 600 to 1,200 words on the web page, with a short version of four or five lines for emails and slides. Length matters less than having one clear number and a problem the reader recognises.'],
+        ['What if the customer will not let us use their name?', 'Publish an anonymous version: the industry, the size of the company, the problem and the result. It is weaker than a named story and still useful. Ask again later, because approval can get easier once the results are older.'],
+        ['What if we have no numbers?', 'Use the strongest evidence you do have and label it honestly. A before and after measured the same way, a count of work delivered, or the customer\'s own words are all valid. Do not present work delivered as a business result.'],
+        ['How many case studies does a B2B company need?', 'Enough that each main service and each main type of customer has one. One strong, current story for each service is more useful than a dozen old ones.'],
+        ['Can AI write a case study?', 'AI tools can help organise an interview transcript, but the facts come from the customer conversation and the customer\'s data. Every number needs a person to check it against its source, and the customer has to approve the final text.'],
+    ],
+    'cta' => ['Want Case Studies Your Sales Team Will Send?', 'We interview your customer, check every number and deliver a web page, a PDF and a short version.', 'Plan My Case Studies'],
+],
+
+'does-google-penalise-ai-content' => [
+    'rich'  => 'does-google-penalise-ai-content',
+    'title' => 'Does Google Penalise AI Content? What the Rules Really Say',
+    'meta'  => 'Google does not penalise content for being written with AI. It acts on pages mass-produced to rank. See what its rules say, and 7 checks before you publish.',
+    'h1'    => 'Does Google Penalise AI Content? What Google\'s Own Rules Say',
+    'lede'  => 'No. Google does not penalise content because AI helped write it. Its guidance says appropriate use of AI is not against its guidelines, and that its systems judge the quality of a page, not how it was produced. What Google acts on is scale without value: many pages generated mainly to rank, with nothing new for the reader. That breaks its spam policy however the pages were made.',
+    'kicker' => 'AI and content',
+    'category' => 'Content', 'intent' => 'Explainer', 'date' => '2026-11-11', 'read' => '8 min',
+    'service' => ['/content-writing-services/', 'content writing services'],
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['Does Google penalize AI-generated content?', 'Not for being AI-generated. Google says appropriate use of AI or automation is not against its guidelines. It acts on content produced at scale mainly to manipulate rankings, whether a person or a tool produced it.'],
+        ['Can Google tell if content was written by AI?', 'Google has not published a detection method, and its policies do not depend on one. The rules are about whether a page helps the reader and whether pages were mass-produced to rank, not about which tool typed the words.'],
+        ['Do I have to label AI content on my website?', 'Google Search does not require it. Its guidance says a disclosure is useful where readers might wonder how something was made. Google Merchant Center has its own rules: AI-generated product images need specific metadata, and AI-generated titles and descriptions must be labelled.'],
+        ['Is it safe to use AI for blog posts?', 'Yes, as an assistant. Using AI to research, outline and edit carries little risk when a person checks every fact and adds what only your company knows. Publishing generated articles that nobody has read is where the risk starts.'],
+        ['What is scaled content abuse?', 'It is Google\'s name for producing many pages mainly to manipulate search rankings, with little or no value for readers. The policy was announced on 5 March 2024 and applies whether the pages are made by automation, people or both.'],
+    ],
+    'cta' => ['Want Content With Something New in It?', 'We interview your experts and write from what they know. A person checks every fact.', 'Get My Content Plan'],
+],
+
+'what-to-write-on-every-page-of-a-b2b-website' => [
+    'rich'  => 'what-to-write-on-every-page-of-a-b2b-website',
+    'listicle' => true,
+    'title' => 'What to Write on Every Page of a B2B Website: A Page Guide',
+    'meta'  => 'What belongs on the home, service, industry, pricing, about, case study and contact pages of a B2B website, with example openings and what to leave out.',
+    'h1'    => 'What to Write on Every Page of a B2B Website',
+    'lede'  => 'Each page of a B2B website has one job. The home page says who you help and sends visitors onward. Service pages explain what the buyer gets and how it works. Industry pages show you know their sector. The pricing page sets expectations, the about page proves real people stand behind the claims, case studies supply proof, and the contact page makes the next step easy.',
+    'kicker' => 'Website content',
+    'category' => 'Content', 'intent' => 'Guide', 'date' => '2026-11-11', 'read' => '11 min',
+    'service' => ['/website-content-writing-services/', 'website content writing services'],
+    'sections' => [],
+    'takeaways' => [],
+    'faqs' => [
+        ['How many pages does a B2B website need?', 'As many as you have distinct things to say. A small company can start with a home page, one page for each service, an about page, two or three case studies and a contact page. Add industry pages and articles when you can fill them properly.'],
+        ['How long should a service page be?', 'Long enough to answer what a buyer asks on a sales call: what is included, how it works, how pricing works and who it has worked for. That is often 500 to 900 words. Cut anything a competitor could also say.'],
+        ['Should a B2B website show prices?', 'Show what you can. If exact prices are not possible, explain what drives the price, give a starting point or a range, and say how a quote is prepared. Saying nothing makes some buyers leave before they ask.'],
+        ['Who should write the website content?', 'Someone who can interview your team and write for buyers. Your own experts hold the knowledge but rarely have the time, and an outside writer has the time but not the knowledge. The interview is what brings the two together.'],
+        ['Which page should we write first?', 'The service or product pages. They force you to define what you sell, and every other page borrows from them. Write the home page after them, because it is a summary of the rest.'],
+    ],
+    'cta' => ['Have a Site Map and Empty Pages?', 'Send us the page list. We plan, write and load every page, and check it on a phone first.', 'Get My Website Content Quote'],
+],
+
 /* November 2026 listicles: numbered, interactive checklists. 'listicle' loads
    assets/js/listicle.js; the markup helpers are in includes/listicle-kit.php. */
 'international-seo-checklist' => [
@@ -79,6 +191,7 @@ return [
     'lede'  => 'Refresh a page when it still earns attention but has gone stale: clicks falling while impressions hold, rankings slipping, facts out of date. Rewrite it when the format no longer matches what searchers want, merge it when two of your pages compete for the same search, and retire it when it serves nobody. Changing the date on its own does nothing.',
     'kicker' => 'Content refresh',
     'category' => 'Content', 'intent' => 'Checklist', 'date' => '2026-11-09', 'read' => '10 min',
+    'service' => ['/seo-content-writing/', 'SEO content writing'],
     'sections' => [],
     'takeaways' => [],
     'faqs' => [

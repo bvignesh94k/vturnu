@@ -43,14 +43,29 @@ $NAV = [
                     ['Enterprise PPC', '/enterprise-ppc/', 'Big budgets, managed tightly'],
                 ],
             ],
+            /* Content writing has its own column since November 2026: the heading
+               opens the lead page, and each format below has a landing page. */
             [
-                'heading' => 'Brand & Content',
-                'url'     => '/content-marketing/',
+                'heading' => 'Content Writing Services',
+                'url'     => '/content-writing-services/',
                 'items'   => [
-                    ['Branding', '/branding-services/', 'Positioning and identity'],
-                    ['Social Media Marketing', '/social-media-marketing/', 'Audience into pipeline'],
+                    ['Blog Writing', '/blog-writing-services/', 'Expert-led articles, monthly'],
+                    ['Website Content', '/website-content-writing-services/', 'Every page, planned and written'],
                     ['SEO Content Writing', '/seo-content-writing/', 'Content that ranks and sells'],
                     ['Copywriting', '/copywriting-services/', 'Words that sell'],
+                    ['White Papers & E-books', '/white-paper-writing-services/', 'Evidence for big decisions'],
+                    ['Case Study Writing', '/case-study-writing-services/', 'Proof your sales team sends'],
+                    ['Product Descriptions', '/product-description-writing-services/', 'Catalogue copy that sells'],
+                    ['Technical Content', '/technical-content-writing-services/', 'Accurate and readable'],
+                ],
+            ],
+            [
+                'heading' => 'Content Marketing & Brand',
+                'url'     => '/content-marketing/',
+                'items'   => [
+                    ['Content Marketing Services', '/content-marketing-services/', 'Strategy to distribution'],
+                    ['Branding', '/branding-services/', 'Positioning and identity'],
+                    ['Social Media Marketing', '/social-media-marketing/', 'Audience into pipeline'],
                     ['Email Marketing', '/email-marketing/', 'Owned-audience revenue'],
                     ['Reputation Management', '/reputation-management/', 'Protect what Google says'],
                     ['Outbound Marketing', '/outbound-marketing/', 'Pipeline on demand'],
@@ -241,6 +256,16 @@ $FOOTER = [
         ['Branding', '/branding-services/'],
         ['Social Media Marketing', '/social-media-marketing/'],
         ['Email Marketing', '/email-marketing/'],
+    ],
+    'Content Writing' => [
+        ['Content Writing Services', '/content-writing-services/'],
+        ['Content Marketing Services', '/content-marketing-services/'],
+        ['Blog Writing', '/blog-writing-services/'],
+        ['Website Content', '/website-content-writing-services/'],
+        ['White Papers & E-books', '/white-paper-writing-services/'],
+        ['Case Study Writing', '/case-study-writing-services/'],
+        ['Product Descriptions', '/product-description-writing-services/'],
+        ['Technical Content', '/technical-content-writing-services/'],
     ],
     'AI Search' => [
         ['AI SEO', '/ai-seo/'],

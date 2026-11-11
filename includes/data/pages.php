@@ -168,7 +168,7 @@ $PAGES = [
         'meta'  => 'Full-funnel digital marketing and branding from Chennai for businesses worldwide: SEO, paid ads, social, content and consulting. Get a free growth plan.',
         'h1'    => 'Digital Marketing Services',
         'lede'  => 'One partner for search, paid media, content and brand: strategy, execution and reporting under one roof.',
-        'children' => ['seo', 'paid-advertising', 'content-marketing', 'branding-services', 'online-marketing', 'digital-marketing-consulting'],
+        'children' => ['seo', 'paid-advertising', 'content-marketing', 'content-writing-services', 'branding-services', 'online-marketing', 'digital-marketing-consulting'],
         'faqs' => [
             ['What is included in digital marketing services?', 'Typically SEO, paid advertising, content, social media, email and conversion work. We plan them together, so each channel supports the others.'],
             ['Which channel should I start with?', 'If people already search for what you sell, start with search. If they do not know it exists yet, paid social creates the demand. We recommend a mix after an audit.'],
@@ -219,7 +219,15 @@ $PAGES = [
         'meta'  => 'Partner with a trusted content marketing team: SEO content writing, copywriting, translation, email and outbound, ROI-driven content that attracts and converts.',
         'h1'    => 'Content Marketing That Earns Attention',
         'lede'  => 'Strategy, writing, distribution and measurement: content programs built to attract, nurture and convert your audience.',
-        'children' => ['branding-services', 'seo-content-writing', 'copywriting-services', 'translation-services', 'email-marketing', 'outbound-marketing'],
+        /* Content first, in the order a buyer narrows it down: the program, the
+           writing, then each format. The landing pages are registered in
+           content-landings.php, after this array, and exist by the time a hub renders. */
+        'children' => [
+            'content-marketing-services', 'content-writing-services', 'blog-writing-services', 'website-content-writing-services',
+            'seo-content-writing', 'copywriting-services', 'white-paper-writing-services', 'case-study-writing-services',
+            'product-description-writing-services', 'technical-content-writing-services', 'translation-services',
+            'branding-services', 'email-marketing', 'outbound-marketing',
+        ],
     ],
 
     'web-services' => [
@@ -236,7 +244,7 @@ $PAGES = [
             ['Is SEO included?', 'Yes. Clean structure, schema, speed and mobile layout are built into every project.'],
             ['Can you rebuild my site without losing rankings?', 'Yes. We map every URL and set redirects, so ranking signals carry over.'],
         ],
-        'children' => ['web-design', 'ecommerce-web-design', 'lead-gen-web-design', 'headless-web-design', 'ai-development', 'bigcommerce-web-design', 'shopify-web-design', 'woocommerce-web-design', 'magento-web-design', 'wordpress-web-design', 'magento-development', 'custom-design-and-development'],
+        'children' => ['web-design', 'ecommerce-web-design', 'lead-gen-web-design', 'headless-web-design', 'ai-development', 'bigcommerce-web-design', 'shopify-web-design', 'woocommerce-web-design', 'magento-web-design', 'wordpress-web-design', 'magento-development', 'custom-design-and-development', 'website-content-writing-services'],
     ],
 
     'case-studies' => [
@@ -826,6 +834,7 @@ require __DIR__ . '/blog.php';
 require __DIR__ . '/cases.php';
 require __DIR__ . '/resources.php';
 require __DIR__ . '/landings.php';
+require __DIR__ . '/content-landings.php';
 
 /* Slugs that ship with the site. Admin uses these to tell an edited built-in
    (which can be reverted) apart from a post created from scratch. */

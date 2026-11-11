@@ -32,8 +32,14 @@ foreach ($PAGES as $s => $p) {
             'resource' => $RESOURCES[$p['resource']]['type'] === 'ebook' ? 'Free e-book' : 'Complete guide',
             'case-detail' => 'Case study',
             'landing' => 'Enterprise & IT',
+            'content-landing' => 'Content services',
             default => '',
         };
+        /* These pages keep a short name for breadcrumbs and cards; the banner
+           carries the headline a visitor sees. */
+        if ($tpl === 'content-landing') {
+            $row['title'] = $CONTENT_LANDINGS[$s]['hero'];
+        }
     }
     $out[] = $row;
 }

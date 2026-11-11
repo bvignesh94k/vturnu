@@ -277,10 +277,104 @@ const ART = {
         s += `<g filter="url(#sh)"><rect x="310" y="130" width="130" height="70" rx="22" fill="url(#gU)"/>${bar(332, 158, 86, 'rgba(255,255,255,.85)', 12)}</g><g filter="url(#sh)"><rect x="40" y="250" width="120" height="66" rx="22" fill="url(#gV)"/>${bar(62, 276, 76, 'rgba(255,255,255,.85)', 12)}</g>`;
         return s;
     },
+
+    /* ---- Content writing pages and articles (November 2026). They share one
+       idea with the pages themselves: show the edit, not a stack of books. ---- */
+    edit() {
+        /* A weak line struck out, the rewrite highlighted, and the pencil that did it. */
+        let s = panel(50, 64, 330, 392, 26) + bar(82, 100, 150, '#1d1936', 16);
+        [[150, 236, 190], [252, 214, 226]].forEach(([y, cut, kept]) => {
+            s += bar(82, y, cut, '#d9d6f4', 12) + `<path d="M76 ${y + 6}h${cut + 12}" stroke="#ff3d8a" stroke-width="5" stroke-linecap="round"/>`;
+            s += `<rect x="76" y="${y + 26}" width="${kept + 34}" height="40" rx="11" fill="#ffe2a8"/>` + bar(90, y + 40, kept, '#1d1936', 12);
+        });
+        s += bar(82, 362, 232) + bar(82, 388, 180) + bar(82, 414, 206);
+        s += `<g filter="url(#sh)" transform="rotate(32 400 290)"><rect x="380" y="150" width="40" height="220" rx="10" fill="url(#gV)"/><path d="M380 370h40l-20 46z" fill="#ffc777"/><path d="M393 400h14l-7 16z" fill="#1d1936"/><rect x="380" y="150" width="40" height="30" rx="10" fill="#ff8db8"/></g>`;
+        return s + sparkle(438, 76, 22) + sparkle(30, 430, 16, 'url(#gV)');
+    },
+    calendar() {
+        /* An editorial calendar: four weeks, each with its planned pieces. */
+        let s = panel(36, 76, 408, 348, 26) + bar(66, 108, 136, '#1d1936', 16);
+        s += `<circle cx="398" cy="116" r="12" fill="url(#gU)"/><circle cx="364" cy="116" r="12" fill="url(#gV)"/>`;
+        [0, 1, 2, 3].forEach((c) => {
+            const x = 62 + c * 92;
+            s += `<rect x="${x}" y="152" width="80" height="244" rx="14" fill="#f3f1fc"/>` + bar(x + 12, 166, 40, '#b9b4e6', 8);
+            ['url(#gV)', 'url(#gU)', '#ffc777'].forEach((f, i) => {
+                if (i && (c + i) % 3 === 2) return;
+                s += `<rect x="${x + 8}" y="${190 + i * 66}" width="64" height="54" rx="12" fill="${f}"/>` + bar(x + 18, 211 + i * 66, 38, 'rgba(255,255,255,.88)', 9);
+            });
+        });
+        s += `<g filter="url(#sh)"><circle cx="418" cy="414" r="46" fill="#1d1936"/>${tick(418, 416, 1.7, '#ffc94d')}</g>`;
+        return s + sparkle(52, 44, 20, 'url(#gV)') + sparkle(444, 52, 16);
+    },
+    article() {
+        /* A blog article: label, headline, the answer picked out, text and a picture. */
+        let s = panel(64, 44, 320, 420, 26);
+        s += `<rect x="92" y="72" width="78" height="20" rx="10" fill="url(#gV)"/>` + bar(92, 110, 252, '#1d1936', 18) + bar(92, 138, 176, '#1d1936', 18);
+        s += `<rect x="92" y="176" width="264" height="76" rx="14" fill="#fff1d6"/><rect x="92" y="176" width="9" height="76" rx="4" fill="#ff9100"/>` + bar(116, 197, 212, '#e2b25f', 11) + bar(116, 220, 160, '#e2b25f', 11);
+        s += bar(92, 278, 264) + bar(92, 300, 236) + bar(92, 322, 252);
+        s += `<rect x="92" y="350" width="118" height="86" rx="14" fill="url(#gB)"/>` + bar(228, 360, 128) + bar(228, 382, 104) + bar(228, 404, 120);
+        s += `<g filter="url(#sh)"><rect x="336" y="250" width="124" height="74" rx="24" fill="url(#gU)"/>${bar(360, 272, 76, 'rgba(255,255,255,.9)', 11)}${bar(360, 294, 50, 'rgba(255,255,255,.9)', 11)}</g>`;
+        return s + sparkle(430, 90, 24, 'url(#gV)') + sparkle(34, 420, 16);
+    },
+    pages() {
+        /* Four pages of one website, each with its own job and its own button. */
+        let s = '';
+        [[30, 56, 'url(#gV)'], [244, 30, 'url(#gU)'], [52, 270, '#ffb347'], [266, 244, '#5b56c9']].forEach(([x, y, f]) => {
+            s += panel(x, y, 192, 200, 20) + `<rect x="${x + 18}" y="${y + 20}" width="56" height="12" rx="6" fill="${f}"/>`;
+            s += bar(x + 18, y + 48, 150, '#1d1936', 14) + bar(x + 18, y + 72, 104, '#1d1936', 14) + bar(x + 18, y + 106, 156) + bar(x + 18, y + 126, 128);
+            s += `<rect x="${x + 18}" y="${y + 152}" width="86" height="28" rx="14" fill="${f}"/>`;
+        });
+        return s + sparkle(238, 250, 20) + sparkle(456, 470, 16, 'url(#gV)');
+    },
+    story() {
+        /* A customer story in three steps, ending on a number that was checked. */
+        let s = '';
+        [[30, 60, 262, 'url(#gV)'], [78, 186, 262, 'url(#gU)'], [126, 312, 300, '#ffc94d']].forEach(([x, y, w, f], i) => {
+            const dark = i === 2;
+            s += `<g filter="url(#sh)"><rect x="${x}" y="${y}" width="${w}" height="104" rx="22" fill="${dark ? '#1d1936' : 'url(#gL)'}" stroke="${dark ? 'none' : '#e1dff6'}" stroke-width="1.5"/></g>`;
+            s += `<rect x="${x + 24}" y="${y + 22}" width="62" height="12" rx="6" fill="${f}"/>` + bar(x + 24, y + 48, w - 118, dark ? '#ffffff' : '#1d1936', 15) + bar(x + 24, y + 74, w - 160, dark ? 'rgba(255,255,255,.45)' : '#d9d6f4', 10);
+        });
+        s += `<g filter="url(#sh)"><circle cx="404" cy="318" r="52" fill="url(#gU)"/>${tick(404, 321, 1.9)}</g>`;
+        return s + sparkle(396, 104, 26, 'url(#gV)') + sparkle(54, 430, 16);
+    },
+    pdp() {
+        /* A product page: the picture, a precise title, three points and the specification. */
+        let s = panel(36, 66, 408, 368, 26);
+        s += `<rect x="62" y="94" width="152" height="172" rx="18" fill="url(#gB)"/>` + sparkle(138, 180, 36, '#ffffff');
+        s += bar(234, 100, 176, '#1d1936', 16) + bar(234, 128, 124, '#1d1936', 16);
+        ['#00b8d9', '#ff3d8a', '#ff9100'].forEach((c, i) => { s += `<circle cx="242" cy="${181 + i * 30}" r="7" fill="${c}"/>` + bar(260, 176 + i * 30, 148 - i * 20); });
+        s += `<rect x="62" y="290" width="356" height="2" fill="#e1dff6"/>`;
+        [62, 184, 306].forEach((x) => { s += `<rect x="${x}" y="312" width="112" height="92" rx="14" fill="#f3f1fc"/>` + bar(x + 14, 330, 46, '#b9b4e6', 8) + bar(x + 14, 354, 78, '#1d1936', 12) + bar(x + 14, 378, 54); });
+        s += `<g filter="url(#sh)"><circle cx="420" cy="74" r="44" fill="url(#gU)"/>${tick(420, 76, 1.6)}</g>`;
+        return s + sparkle(30, 456, 18, 'url(#gV)');
+    },
+    pair() {
+        /* The engineer's note on the left becomes the buyer's page on the right. */
+        let s = `<g filter="url(#sh)"><rect x="24" y="84" width="206" height="262" rx="22" fill="#1d1936"/></g>`;
+        s += `<circle cx="52" cy="112" r="6" fill="#ff3d8a"/><circle cx="72" cy="112" r="6" fill="#ffc94d"/><circle cx="92" cy="112" r="6" fill="#00b8d9"/>`;
+        [[148, 0, 124, '#7be8f7'], [176, 16, 138, '#ffffff'], [204, 16, 92, '#ff8db8'], [232, 32, 110, '#ffffff'], [260, 16, 126, '#ffc777'], [288, 0, 84, '#ffffff']].forEach(([y, dx, w, c]) => { s += bar(52 + dx, y, w, c, 10); });
+        s += panel(250, 150, 206, 262, 22) + `<rect x="274" y="176" width="64" height="12" rx="6" fill="url(#gU)"/>`;
+        s += bar(274, 204, 156, '#1d1936', 14) + bar(274, 228, 112, '#1d1936', 14) + bar(274, 264, 160) + bar(274, 286, 132) + bar(274, 308, 150);
+        s += `<rect x="274" y="346" width="100" height="34" rx="17" fill="url(#gV)"/>`;
+        s += `<g filter="url(#sh)"><circle cx="240" cy="248" r="36" fill="url(#gU)"/><path d="M225 248h28m-11-12 12 12-12 12" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+        return s + sparkle(424, 84, 24, 'url(#gV)') + sparkle(60, 420, 16);
+    },
+    review() {
+        /* A page drafted with AI, then read and approved by a person. */
+        let s = panel(70, 54, 304, 400, 26);
+        s += `<g filter="url(#sh)"><rect x="98" y="82" width="76" height="38" rx="19" fill="url(#gV)"/></g><text x="136" y="108" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="21" fill="#fff">AI</text>`;
+        s += bar(98, 146, 232, '#1d1936', 16) + bar(98, 186, 248) + bar(98, 210, 216) + bar(98, 234, 238);
+        s += `<rect x="92" y="262" width="262" height="36" rx="10" fill="#ffe2a8"/>` + bar(106, 275, 200, '#1d1936', 10);
+        s += bar(98, 322, 240) + bar(98, 346, 196) + bar(98, 370, 222);
+        s += `<g filter="url(#sh)"><circle cx="372" cy="384" r="64" fill="url(#gU)"/>${tick(372, 388, 2.3)}</g>`;
+        return s + sparkle(432, 96, 24) + sparkle(40, 424, 16, 'url(#gV)');
+    },
 };
 
 /* Concept per blog post, chosen for what the article is about. */
 const BLOG_ART = {
+    'content-writing-vs-copywriting-vs-content-marketing': 'compare', 'how-to-brief-a-content-writer': 'brief', 'how-to-write-a-b2b-case-study': 'story',
+    'does-google-penalise-ai-content': 'review', 'what-to-write-on-every-page-of-a-b2b-website': 'pages',
     'international-seo-checklist': 'langs', 'schema-markup-for-b2b-websites': 'schema', 'website-design-brief-questions': 'brief',
     'content-refresh-checklist': 'refresh', 'website-accessibility-checklist': 'access',
     'selectedfirms-interview-qualified-leads-beat-traffic': 'interview',
@@ -303,8 +397,15 @@ const SLUG_ART = [
     [/analytics|attribution|cafy/, 'dashboard'], [/web|speed|lead-gen-website|floweazy/, 'browser'], [/contact|about|clients|how-we-work/, 'globe'], [/case-studies|sai-impression/, 'rank'],
     [/ebooks|guides|content|writing|copy|translation/, 'book'], [/seo/, 'rank'], [/digital-marketing|consulting|online/, 'target'],
 ];
+/* Pages with a concept of their own, checked before the patterns above. */
+const PAGE_ART = {
+    'content-writing-services': 'edit', 'content-marketing-services': 'calendar', 'blog-writing-services': 'article',
+    'website-content-writing-services': 'pages', 'white-paper-writing-services': 'book', 'case-study-writing-services': 'story',
+    'product-description-writing-services': 'pdp', 'technical-content-writing-services': 'pair',
+};
 function concept(p) {
     if (p.post && BLOG_ART[p.post]) return BLOG_ART[p.post];
+    if (PAGE_ART[p.slug]) return PAGE_ART[p.slug];
     for (const [rx, a] of SLUG_ART) if (rx.test(p.slug)) return a;
     return { ai: 'answer', web: 'browser', ppc: 'funnel', social: 'social', content: 'book', consulting: 'target' }[p.cat] || 'rank';
 }

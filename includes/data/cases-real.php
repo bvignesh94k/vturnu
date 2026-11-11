@@ -23,7 +23,7 @@ return [
     'client' => 'Sai Impression and Packaging Solutions', 'industry' => 'Manufacturing · Labels and Packaging', 'cs_type' => 'manufacturing',
     'site' => 'https://saiimpression.com/', 'site_label' => 'saiimpression.com',
     'logo' => 'sai-impression.webp',
-    'services' => [['Website Development', '/custom-design-and-development/'], ['SEO Services', '/seo-services/'], ['AI SEO', '/ai-seo/'], ['Branding', '/branding-services/']],
+    'services' => [['Website Development', '/custom-design-and-development/'], ['SEO Services', '/seo-services/'], ['AI SEO', '/ai-seo/'], ['Branding', '/branding-services/'], ['Blog Writing', '/blog-writing-services/']],
     'location' => 'Chennai, India', 'duration' => '2026, ongoing',
     'challenge' => [
         'A respected manufacturer with a real reputation was being let down by its website. On a phone, mobile performance scored 55 in Lighthouse, tracking tags blocked the page for about three seconds, and the site carried conflicting phone numbers that made it read as two separate businesses to search and AI engines.',
@@ -67,7 +67,7 @@ return [
     'client' => 'FirstChoice Used Auto Parts', 'industry' => 'Automotive · Used Parts', 'cs_type' => 'seo',
     'site' => 'https://www.firstchoiceautopart.com/', 'site_label' => 'firstchoiceautopart.com',
     'logo' => 'firstchoice-autoparts.webp',
-    'services' => [['Lead Generation SEO', '/lead-generation-seo/'], ['AI SEO', '/ai-seo/'], ['WordPress', '/wordpress-web-design/'], ['Lead Gen Web Design', '/lead-gen-web-design/']],
+    'services' => [['Lead Generation SEO', '/lead-generation-seo/'], ['AI SEO', '/ai-seo/'], ['WordPress', '/wordpress-web-design/'], ['Lead Gen Web Design', '/lead-gen-web-design/'], ['Website Content Writing', '/website-content-writing-services/']],
     'location' => 'United States', 'duration' => '2026, ongoing',
     'challenge' => [
         'The business depends on one action: a buyer requesting a quote for a specific part on a specific vehicle. Pages were thin and inconsistent, warranty and hours were stated differently across the site, and one form promised a part was "available" before anyone had checked stock.',
@@ -110,7 +110,7 @@ return [
     'client' => 'FlowEazy Software Solutions', 'industry' => 'SaaS & Tech · ERP Services', 'cs_type' => 'saas',
     'site' => 'https://floweazy.com/', 'site_label' => 'floweazy.com',
     'logo' => null,
-    'services' => [['SEO Services', '/seo-services/'], ['AI SEO', '/ai-seo/'], ['Web Design', '/web-design/'], ['SEO Content Writing', '/seo-content-writing/']],
+    'services' => [['SEO Services', '/seo-services/'], ['AI SEO', '/ai-seo/'], ['Web Design', '/web-design/'], ['SEO Content Writing', '/seo-content-writing/'], ['Blog Writing', '/blog-writing-services/']],
     'location' => 'Serving the US, Canada and global buyers', 'duration' => '2026, ongoing',
     'challenge' => [
         'The homepage scored 26 for mobile performance and a service page scored 62. The enquiry form was silently dropping the Service and Requirements fields, so sales received leads with half the information missing.',
@@ -153,7 +153,7 @@ return [
     'client' => 'Cafy', 'industry' => 'SaaS & Tech · Careers', 'cs_type' => 'saas',
     'site' => 'https://www.cafy.careers/', 'site_label' => 'cafy.careers',
     'logo' => null,
-    'services' => [['SEO Services', '/seo-services/'], ['AI SEO', '/ai-seo/'], ['SEO Content Writing', '/seo-content-writing/']],
+    'services' => [['SEO Services', '/seo-services/'], ['AI SEO', '/ai-seo/'], ['SEO Content Writing', '/seo-content-writing/'], ['Content Marketing', '/content-marketing-services/']],
     'location' => 'United Kingdom and Ireland', 'duration' => '2026, ongoing',
     'challenge' => [
         'Cafy earned plenty of clicks, but almost all of them came from people already searching for the brand. Only 12 pages were indexed, against 15 that were not, and blog articles shipped invisible until JavaScript ran, which measured an 8.3 second LCP in the lab.',

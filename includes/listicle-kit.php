@@ -47,15 +47,19 @@ function lx_glance(array $items, string $heading = 'At a glance'): void
  *   label?: string,       what the count measures, as in "3 of 10 {label}"
  *   filters?: array<string, string>, filter key => chip label; 'all' and 'todo' are built in
  *   msgs?: array<int, array{0: int, 1: string}>, [up to this count, message]
- *   tools?: string        extra controls, as HTML (the brief builder's buttons)
+ *   tools?: string,       extra controls, as HTML (the brief builder's buttons)
+ *   title?: string,       first line of the brief the reader copies or downloads (answer mode; default "Website brief")
+ *   file?: string         file name stem for the download when no project name is typed (default "website")
  * } $opt
  */
 function lx_board(string $key, array $opt = []): void
 {
     $mode = $opt['mode'] ?? 'mark';
     $filters = $opt['filters'] ?? [];
+    $brief = (!empty($opt['title']) ? ' data-lx-title="' . e($opt['title']) . '"' : '')
+        . (!empty($opt['file']) ? ' data-lx-file="' . e($opt['file']) . '"' : '');
     ?>
-<div class="lx-board lx-js" data-lx-board="<?= e($key) ?>" data-lx-mode="<?= e($mode) ?>" role="region" aria-label="Your progress">
+<div class="lx-board lx-js" data-lx-board="<?= e($key) ?>" data-lx-mode="<?= e($mode) ?>"<?= $brief ?> role="region" aria-label="Your progress">
     <div class="lx-board-top">
         <p class="lx-count" aria-live="polite"><strong data-lx-done>0</strong> of <span data-lx-total>0</span> <?= e($opt['label'] ?? 'done') ?></p>
         <button class="lx-reset" type="button" data-lx-reset>Start over</button>

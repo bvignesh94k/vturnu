@@ -166,7 +166,7 @@ function jsonld_page(array $page, string $slug, string $canonical, string $templ
     $siteId = SITE_URL . '/#website';
 
     // Templates that already emit their own page-level node elsewhere.
-    if (in_array($template, ['service', 'blog-post', 'resource', 'home'], true)) {
+    if (in_array($template, ['service', 'blog-post', 'resource', 'home', 'content-landing'], true)) {
         return null;
     }
 
@@ -828,4 +828,40 @@ function related_pages(array $pages, string $slug): array
         }
     }
     return related_ring($siblings, $slug, 4);
+}
+
+/**
+ * Hand-picked links from a service page to the content writing pages that cover
+ * what its buyer needs next: a new website needs its pages written, a store
+ * needs product descriptions. Kept apart from related_pages(), which rings over
+ * true siblings only. Slugs that do not exist are dropped.
+ *
+ * @return list<string>
+ */
+function related_extra(array $pages, string $slug): array
+{
+    $map = [
+        'seo-content-writing' => ['blog-writing-services', 'content-writing-services'],
+        'copywriting-services' => ['website-content-writing-services', 'content-writing-services'],
+        'translation-services' => ['website-content-writing-services'],
+        'branding-services' => ['content-marketing-services'],
+        'email-marketing' => ['content-marketing-services'],
+        'outbound-marketing' => ['case-study-writing-services'],
+        'social-media-marketing' => ['content-marketing-services'],
+        'seo-services' => ['blog-writing-services'],
+        'lead-generation-seo' => ['blog-writing-services', 'case-study-writing-services'],
+        'ecommerce-seo' => ['product-description-writing-services'],
+        'ai-seo' => ['content-writing-services'],
+        'web-design' => ['website-content-writing-services'],
+        'lead-gen-web-design' => ['website-content-writing-services', 'case-study-writing-services'],
+        'custom-design-and-development' => ['website-content-writing-services'],
+        'headless-web-design' => ['website-content-writing-services'],
+        'wordpress-web-design' => ['website-content-writing-services'],
+        'ecommerce-web-design' => ['product-description-writing-services'],
+        'shopify-web-design' => ['product-description-writing-services'],
+        'woocommerce-web-design' => ['product-description-writing-services'],
+        'bigcommerce-web-design' => ['product-description-writing-services'],
+        'magento-web-design' => ['product-description-writing-services'],
+    ];
+    return array_values(array_filter($map[$slug] ?? [], static fn (string $s): bool => isset($pages[$s])));
 }

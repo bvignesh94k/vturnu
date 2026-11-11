@@ -197,11 +197,11 @@ height="0" width="0" style="display:none;visibility:hidden" title="Tag Manager">
                         <a class="nav-link" href="<?= e($item['url']) ?>"><?= e($item['label']) ?><?php if ($hasMenu): ?><span class="caret" aria-hidden="true"></span><?php endif; ?></a>
                         <?php if ($hasMenu): ?>
                         <button class="submenu-toggle" type="button" aria-expanded="false" aria-label="Open <?= e($item['label']) ?> menu"><span aria-hidden="true">▾</span></button>
-                        <div class="mega">
+                        <div class="mega<?= count($item['columns']) >= 4 ? ' mega--wide' : '' ?>">
                             <?php if (!empty($item['desc'])): ?>
                             <p class="mega-tagline"><?= e($item['desc']) ?></p>
                             <?php endif; ?>
-                            <div class="mega-grid cols-<?= count($item['columns']) + ($hasPromo ? 1 : 0) ?><?= $hasPromo ? ' has-promo' : '' ?>">
+                            <div class="mega-grid cols-<?= count($item['columns']) + ($hasPromo ? 1 : 0) ?><?= $hasPromo ? ' has-promo' : '' ?><?= count($item['columns']) >= 4 ? ' mega-grid--four' : '' ?>">
                                 <?php foreach ($item['columns'] as $col): ?>
                                 <div class="mega-col">
                                     <?php if (!empty($col['url'])): ?>

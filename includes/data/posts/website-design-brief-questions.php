@@ -115,7 +115,8 @@ return [
     'Who writes, reviews and approves each page',
     'Photos, video, diagrams and translations you need',
 ]), 'If nobody has time', $prompts([
-    'Budget for a writer now rather than after the design is done. Our <a href="/seo-content-writing/">SEO content writing</a> team works from interviews with your experts, so the copy still sounds like you.',
+    'Budget for a writer now rather than after the design is done. Our <a href="/website-content-writing-services/">website content writing</a> team works from interviews with your experts, so the copy still sounds like you.',
+    'Not sure what each page should say? See <a href="/blog/what-to-write-on-every-page-of-a-b2b-website/">what to write on every page of a B2B website</a>.',
 ])); ?>
 <?php }); ?>
 
@@ -129,6 +130,7 @@ return [
 ]), 'Keep it honest', $prompts([
     'Use only real names, real logos and real numbers, with the client\'s permission.',
     'A dated result with its context beats a big claim with none.',
+    'Our guide on <a href="/blog/how-to-write-a-b2b-case-study/">how to write a B2B case study</a> covers permissions and how to source a number.',
 ])); ?>
 <?php }); ?>
 

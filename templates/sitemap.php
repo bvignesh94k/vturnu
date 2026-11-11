@@ -28,7 +28,7 @@ $tree = [
         'groups' => [
             'SEO' => $links(['seo', 'seo-services', 'local-seo', 'ecommerce-seo', 'lead-generation-seo', 'enterprise-seo', 'franchise-seo']),
             'Paid Advertising' => $links(['paid-advertising', 'google-ads', 'facebook-ads', 'instagram-ads', 'enterprise-ppc']),
-            'Brand & Content' => $links(['content-marketing', 'branding-services', 'social-media-marketing', 'seo-content-writing', 'copywriting-services', 'translation-services', 'email-marketing', 'reputation-management', 'outbound-marketing', 'online-marketing', 'digital-marketing-consulting']),
+            'Brand & Content' => $links(['content-marketing', 'content-marketing-services', 'content-writing-services', 'blog-writing-services', 'website-content-writing-services', 'white-paper-writing-services', 'case-study-writing-services', 'product-description-writing-services', 'technical-content-writing-services', 'branding-services', 'social-media-marketing', 'seo-content-writing', 'copywriting-services', 'translation-services', 'email-marketing', 'reputation-management', 'outbound-marketing', 'online-marketing', 'digital-marketing-consulting']),
             'Ecommerce SEO by Industry' => $by(static fn($s) => str_starts_with($s, 'ecommerce-seo-for-')),
             'Lead Gen SEO by Industry' => $by(static fn($s) => str_starts_with($s, 'lead-gen-seo-for-')),
         ],

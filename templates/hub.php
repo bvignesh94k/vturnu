@@ -35,7 +35,7 @@ render_money_pain($m['pain']);
         </div>
         <ul class="mp-routes">
             <?php foreach ($children as $child): $c = $PAGES[$child]; $cm = money_data($child); ?>
-            <li data-reveal="card"><a href="<?= e(page_url($child)) ?>"><b><?= e($c['h1']) ?></b><span><?= e($cm['h'] ?? $c['lede']) ?></span></a></li>
+            <li data-reveal="card"><a href="<?= e(page_url($child)) ?>"><b><?= e($c['h1']) ?></b><span><?= e($cm['h'] ?? ($c['card'] ?? $c['lede'])) ?></span></a></li>
             <?php endforeach; ?>
         </ul>
         <?php if (!empty($m['note'])): [$note_pre, $note_label, $note_url, $note_post] = $m['note']; ?>
