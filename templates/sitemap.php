@@ -72,6 +72,12 @@ $tree = [
         'url' => 'blog',
         'groups' => [],
     ],
+    'Search Updates' => [
+        'url' => 'updates',
+        'groups' => [
+            'Google Updates' => $by(static fn($s, $p) => ($p['template'] ?? '') === 'update-post'),
+        ],
+    ],
     'Company' => [
         'url' => null,
         'groups' => [

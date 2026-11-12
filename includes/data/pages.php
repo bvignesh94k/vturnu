@@ -314,6 +314,23 @@ $PAGES = [
         'h1'    => 'Growth Playbooks & Insights',
         'lede'  => 'The same thinking our clients pay for, published free. SEO, AI search, paid media, content and conversion, without the fluff.',
     ],
+    /* Google search updates, explained. The list fills from $UPDATES below and
+       from the admin panel (Search Updates). */
+    'updates' => [
+        'template' => 'update-list',
+        'title' => 'Google Search Updates Explained: Core, Spam & AI Changes',
+        'meta'  => 'Google search updates explained in plain words: what Google announced, when each update started and finished, and what to check on your site next.',
+        'h1'    => 'Google search updates, explained in plain words',
+        'crumb' => 'Search Updates',
+        'lede'  => 'When Google changes how search works, we explain it here: what was announced, when it started and finished, what it can mean for your traffic and what to check next. Every fact comes with its source.',
+        'date'  => '2026-11-12',
+        'faqs'  => [
+            ['What is a Google core update?', 'A core update is a broad change to the systems Google uses to rank search results. Google releases several a year. Core updates do not target specific sites, and they are not penalties.'],
+            ['How often does Google release core updates?', 'Google\'s Search Status Dashboard lists three core updates in 2025 (March, June and December) and three in 2026 so far (March, May and November). Google also makes smaller core updates that it does not announce.'],
+            ['Where does the information on these pages come from?', 'Dates, durations and statements come from Google\'s Search Status Dashboard and Google Search Central documentation, linked in each update. Where we cite news coverage, we name the publication.'],
+            ['Will you cover future updates?', 'Yes. We add each confirmed Google update that can affect traffic, and we update a page when Google confirms its rollout is complete.'],
+        ],
+    ],
     'ebooks' => [
         'template' => 'resource-list',
         'title' => 'Free Digital Marketing E-books | Read Online, No Sign-Up',
@@ -835,12 +852,17 @@ require __DIR__ . '/cases.php';
 require __DIR__ . '/resources.php';
 require __DIR__ . '/landings.php';
 require __DIR__ . '/content-landings.php';
+/* The update helpers are needed here (menu labels) and in the admin panel,
+   which do not all load the page kits first. */
+require_once dirname(__DIR__) . '/update-kit.php';
+$UPDATES = require __DIR__ . '/updates.php';
 
 /* Slugs that ship with the site. Admin uses these to tell an edited built-in
    (which can be reverted) apart from a post created from scratch. */
 $BLOG_BUILTIN      = array_keys($BLOG);
 $CASES_BUILTIN     = array_keys($CASES);
 $RESOURCES_BUILTIN = array_keys($RESOURCES);
+$UPDATES_BUILTIN   = array_keys($UPDATES);
 
 /**
  * Every admin edit, without touching the database on a public page view.
@@ -937,6 +959,11 @@ foreach ($RESOURCES as $k => $v) {
         [$RESOURCES[$k]['title'], $RESOURCES[$k]['meta']] = $SEO_META[$key];
     }
 }
+foreach ($UPDATES as $k => $v) {
+    if (isset($SEO_META['updates/' . $k])) {
+        [$UPDATES[$k]['title'], $UPDATES[$k]['meta']] = $SEO_META['updates/' . $k];
+    }
+}
 foreach ($PAGES as $k => $p) {
     if (isset($SEO_META[$k])) {
         [$PAGES[$k]['title'], $PAGES[$k]['meta']] = $SEO_META[$k];
@@ -963,6 +990,17 @@ $RESOURCES = apply_content_overrides($RESOURCES, 'resource', [
     'topics' => [], 'url' => '', 'image' => '', 'cta' => ['', '', ''],
 ]);
 
+/* Search updates: admin edits laid over the shipped ones, drafts held back
+   (the admin list reads $UPDATES_ALL so a draft stays editable), newest first. */
+$UPDATES = apply_content_overrides($UPDATES, 'update', [
+    'type' => 'Other', 'status' => 'info', 'started' => '', 'finished' => '', 'rollout' => '', 'scope' => '',
+    'source' => '', 'read' => '', 'sections' => [], 'takeaways' => [], 'faqs' => [], 'cta' => ['', '', ''],
+]);
+$UPDATES = array_filter($UPDATES, static fn ($u): bool => is_array($u) && !empty($u['h1']) && !empty($u['date']));
+uasort($UPDATES, static fn (array $a, array $b): int => strcmp((string) (($b['started'] ?? '') ?: $b['date']), (string) (($a['started'] ?? '') ?: $a['date'])));
+$UPDATES_ALL = $UPDATES;
+$UPDATES = array_filter($UPDATES, static fn (array $u): bool => empty($u['draft']));
+
 foreach ($BLOG as $bslug => $b) {
     $PAGES['blog/' . $bslug] = [
         'template' => 'blog-post',
@@ -988,4 +1026,36 @@ foreach ($RESOURCES as $rslug => $r) {
         'title' => $r['title'], 'meta' => $r['meta'], 'h1' => $r['h1'], 'lede' => $r['lede'],
         'parent' => $hub, 'resource' => $rslug,
     ];
+}
+
+foreach ($UPDATES as $uslug => $u) {
+    $PAGES['updates/' . $uslug] = [
+        'template' => 'update-post',
+        'title' => $u['title'] ?? $u['h1'], 'meta' => $u['meta'] ?? '', 'h1' => $u['h1'], 'lede' => $u['lede'] ?? '',
+        'crumb' => update_short($u),
+        'parent' => 'updates', 'update' => $uslug,
+        /* header.php emits these as FAQPage; the template renders the same list. */
+        'faqs' => $u['faqs'] ?? [],
+        // Read only by the XML sitemap, for an accurate lastmod.
+        'date' => $u['modified'] ?? $u['date'],
+    ];
+}
+if ($UPDATES) {
+    $PAGES['updates']['date'] = max((string) ($PAGES['updates']['date'] ?? ''), (string) max(array_map(static fn ($u) => (string) ($u['modified'] ?? $u['date']), $UPDATES)));
+}
+
+/* The Updates menu lists the newest updates, so a new one added in the admin
+   panel appears in the header without a code change. */
+if (isset($NAV) && is_array($NAV)) {
+    foreach ($NAV as &$nav_item) {
+        if (($nav_item['url'] ?? '') === '/updates/' && !empty($nav_item['columns'])) {
+            /* The column heading already links to /updates/, so the list holds updates only. */
+            $nav_item['columns'][0]['items'] = array_map(
+                static fn (string $s, array $u): array => [update_short($u), '/updates/' . $s . '/', update_line($u)],
+                array_keys(array_slice($UPDATES, 0, 4, true)),
+                array_values(array_slice($UPDATES, 0, 4, true))
+            );
+        }
+    }
+    unset($nav_item);
 }

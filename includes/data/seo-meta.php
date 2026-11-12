@@ -149,6 +149,10 @@ return [
 'ebooks' => ['Free B2B Marketing E-books: Read Online With No Email Required', 'Free B2B marketing e-books on AI search, lead generation websites, paid media budgets and analytics. Read every chapter online with no form and no email needed.'],
 'guides' => ['Free B2B Marketing Guides: SEO, AI SEO, Google Ads & Lead Gen', 'In-depth free guides to SEO, AI search, content strategy, Google Ads and B2B lead generation, written by practitioners. Read online with no sign-up required.'],
 
+/* ---------- Search updates ---------- */
+'updates' => ['Google Search Updates Explained: Core, Spam & AI Changes', 'Google search updates explained in plain words: what Google announced, when each update started and finished, and what to check on your site next.'],
+'updates/november-core-update-2026' => ['Google November 2026 Core Update: Dates, Impact, Next Steps', 'Google\'s November 2026 core update began on 10 November and may take two weeks. What it is, how to check your traffic and what to do if rankings drop.'],
+
 /* ---------- Blog ---------- */
 'blog/international-seo-checklist' => ['International SEO Checklist: 10 Steps to Rank in New Markets', 'Expanding abroad? Follow this 10-step international SEO checklist, with a free hreflang tag builder, URL structure advice and the mistakes to avoid.'],
 'blog/schema-markup-for-b2b-websites' => ['Schema Markup for B2B Websites: 9 Types Worth Adding', 'Which schema markup does a B2B website need? Nine structured data types with copy-ready JSON-LD, a page finder, and the types Google no longer shows.'],

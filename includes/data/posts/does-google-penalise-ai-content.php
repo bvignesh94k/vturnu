@@ -68,7 +68,7 @@ return [
     <li><strong>The generative AI guidance.</strong> Google's <?= ext_link($g['genai'], 'guidance on using generative AI content') ?> says AI can be useful for researching a topic and for adding structure to original content. It also warns that generating many pages without adding value for users may break the scaled content abuse policy.</li>
     <li><strong>The helpful content guidance.</strong> Google's advice on <?= ext_link($g['helpful'], 'creating helpful, reliable, people-first content') ?> asks three questions about any page: who created it, how, and why. The "why" it wants to see is content made mainly to help people. It says content made mainly to attract search visits is not what its systems seek to reward.</li>
 </ol>
-<p>Read together, the four say the same thing. The tool is not the issue. The purpose and the value are.</p>
+<p>Read together, the four say the same thing. The tool is not the issue. The purpose and the value are. The same logic sits behind core updates such as the <a href="/updates/november-core-update-2026/">November 2026 core update</a>: Google compares how helpful pages are, not how they were made.</p>
 
 <h2 id="the-real-risk">Where the Real Risk Is</h2>
 <p>The risk is scale without value. Google's <?= ext_link($g['spam'], 'spam policies') ?> describe scaled content abuse as creating large amounts of unoriginal content that gives readers little or nothing, however it was made. The examples it lists include:</p>

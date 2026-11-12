@@ -47,7 +47,7 @@ function page_section(array $page, string $slug): string
     if ($tpl === 'resource' || $tpl === 'resource-list') {
         return 'resources';
     }
-    if ($tpl === 'blog-list' || $tpl === 'blog-post') {
+    if (in_array($tpl, ['blog-list', 'blog-post', 'update-list', 'update-post'], true)) {
         return 'blog';
     }
     if ($tpl === 'case-detail' || $tpl === 'case-list' || $slug === 'case-studies') {

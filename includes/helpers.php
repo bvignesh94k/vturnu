@@ -28,7 +28,8 @@ function breadcrumbs(array $pages, string $slug): array
     $trail = [];
     $cur = $slug;
     while ($cur !== null && $cur !== '' && isset($pages[$cur])) {
-        $trail[] = [$pages[$cur]['h1'], page_url($cur)];
+        /* A page whose H1 is a long headline can name itself shorter here. */
+        $trail[] = [$pages[$cur]['crumb'] ?? $pages[$cur]['h1'], page_url($cur)];
         $cur = $pages[$cur]['parent'] ?? null;
     }
     $trail[] = ['Home', '/'];
@@ -166,7 +167,7 @@ function jsonld_page(array $page, string $slug, string $canonical, string $templ
     $siteId = SITE_URL . '/#website';
 
     // Templates that already emit their own page-level node elsewhere.
-    if (in_array($template, ['service', 'blog-post', 'resource', 'home', 'content-landing'], true)) {
+    if (in_array($template, ['service', 'blog-post', 'resource', 'home', 'content-landing', 'update-post'], true)) {
         return null;
     }
 
@@ -174,7 +175,7 @@ function jsonld_page(array $page, string $slug, string $canonical, string $templ
         'contact'    => 'ContactPage',
         'about'      => 'AboutPage',
         'case-detail' => 'Article',
-        'blog-list', 'case-list', 'resource-list', 'hub' => 'CollectionPage',
+        'blog-list', 'case-list', 'resource-list', 'hub', 'update-list' => 'CollectionPage',
         default      => 'WebPage',
     };
 

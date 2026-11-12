@@ -33,6 +33,8 @@ foreach ($PAGES as $s => $p) {
             'case-detail' => 'Case study',
             'landing' => 'Enterprise & IT',
             'content-landing' => 'Content services',
+            'update-post' => 'Google ' . strtolower((string) ($UPDATES[$p['update']]['type'] ?? 'search update')),
+            'update-list' => 'Search updates',
             default => '',
         };
         /* These pages keep a short name for breadcrumbs and cards; the banner

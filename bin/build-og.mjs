@@ -359,6 +359,20 @@ const ART = {
         s += `<g filter="url(#sh)"><circle cx="240" cy="248" r="36" fill="url(#gU)"/><path d="M225 248h28m-11-12 12 12-12 12" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
         return s + sparkle(424, 84, 24, 'url(#gV)') + sparkle(60, 420, 16);
     },
+    pulse() {
+        /* A search update: rankings moving inside a shaded rollout window, with
+           the "before" and "after" weeks marked on the timeline below. */
+        let s = panel(28, 58, 424, 300, 26);
+        s += bar(58, 92, 150, '#1d1936', 15) + `<rect x="300" y="84" width="122" height="30" rx="15" fill="url(#gU)"/>` + bar(318, 95, 86, 'rgba(255,255,255,.9)', 9);
+        s += `<rect x="190" y="132" width="150" height="190" rx="12" fill="#ffe7f0"/>`;
+        [170, 214, 258, 302].forEach((y) => { s += `<rect x="58" y="${y}" width="364" height="1.5" fill="#eceaf9"/>`; });
+        s += `<path d="M62 238 L100 230 L138 236 L176 226 L206 262 L236 214 L266 282 L296 236 L326 250 L356 222 L392 214 L418 208" fill="none" stroke="url(#gB)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+        s += `<circle cx="418" cy="208" r="9" fill="#4338ca" stroke="#fff" stroke-width="3"/>`;
+        s += `<rect x="40" y="392" width="112" height="22" rx="11" fill="#5b56c9"/><rect x="158" y="392" width="180" height="22" rx="11" fill="#e5267a"/><rect x="344" y="392" width="96" height="22" rx="11" fill="#0a8fc4"/>`;
+        s += bar(48, 428, 70) + bar(196, 428, 100) + bar(352, 428, 60);
+        s += `<g filter="url(#sh)"><circle cx="420" cy="62" r="40" fill="#1d1936"/><path d="M402 62h11l6-15 9 30 6-15h8" fill="none" stroke="#ffc94d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+        return s + sparkle(56, 466, 18, 'url(#gV)');
+    },
     review() {
         /* A page drafted with AI, then read and approved by a person. */
         let s = panel(70, 54, 304, 400, 26);
@@ -391,6 +405,7 @@ const BLOG_ART = {
     'social-media-content-strategy-for-business': 'social', 'landing-page-optimization-guide': 'browser', 'ecommerce-conversion-rate-optimization': 'cart', 'branding-vs-performance-marketing': 'brand',
 };
 const SLUG_ART = [
+    [/^updates(\/|$)/, 'pulse'],
     [/sap-cpq/, 'quote'], [/salesforce/, 'orbit'], [/odoo|erpnext/, 'modules'], [/staffing/, 'people'], [/enterprise-it/, 'orbit'], [/branding|brand-identity/, 'brand'],
     [/pricing/, 'price'], [/local|franchise|multi-location|restaurant/, 'map'], [/ecommerce|shopify|woocommerce|magento|bigcommerce|jewelry|fashion|beauty|firstchoice/, 'cart'],
     [/google-ads|ppc|paid|facebook|instagram/, 'funnel'], [/social|reputation/, 'social'], [/email|whatsapp|outbound/, 'mail'], [/ai-|chatgpt|perplexity|^ai$/, 'answer'],

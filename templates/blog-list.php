@@ -28,6 +28,13 @@ render_hero([
 
 <section class="section">
     <div class="container">
+        <?php if (!empty($GLOBALS['UPDATES'])): $lu_slug = (string) array_key_first($GLOBALS['UPDATES']); $lu = $GLOBALS['UPDATES'][$lu_slug]; ?>
+        <a class="ux-ribbon ux-st--<?= e((string) ($lu['status'] ?? 'info')) ?>" href="/updates/<?= e($lu_slug) ?>/">
+            <span class="ux-live"><i></i><?= e(update_status_label($lu)) ?></span>
+            <span><b>Latest Google update:</b> <?= e(update_short($lu)) ?>, explained</span>
+            <em aria-hidden="true">Read it →</em>
+        </a>
+        <?php endif; ?>
         <nav class="blog-filters" aria-label="Filter articles by topic">
             <a class="chip<?= $cat_filter === '' ? ' active' : '' ?>" href="<?= e($base_url) ?>">All topics</a>
             <?php foreach ($cats as $c): ?>

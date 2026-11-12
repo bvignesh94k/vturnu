@@ -3056,3 +3056,187 @@ html:not(.lx-on) .lx-js { display: none !important; }
 /* The content services a service page points to, under its sibling links. */
 .mp-rel-x { margin: -10px 0 0; padding: 0 0 22px; font-weight: 600; color: #4B4668; line-height: 1.7; }
 .mp-rel-x a { color: #2A25A0; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============================================ SEARCH UPDATES (update-kit.php)
+   /updates/ and each update page. Chart colours were checked with the dataviz
+   palette validator on a white surface (all pass, CVD worst adjacent 13.7):
+   before week #5B56C9, rollout #E5267A, after week #0A8FC4. Text never takes a
+   series colour; values sit beside marks in ink. */
+
+:root {
+    --ux-base: #5B56C9;
+    --ux-roll: #E5267A;
+    --ux-after: #0A8FC4;
+    --ux-ink: #1D1936;
+    --ux-soft: #4B4668;
+    --ux-hair: #E4E0EF;
+    --ux-grid: #EEEBF6;
+}
+
+/* Status pills, shared by the hero card, the list and the menu ribbon. */
+.ux-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; background: #EFEBFA; color: #2A25A0; font: 700 .7rem/1.2 var(--font); letter-spacing: .06em; text-transform: uppercase; }
+.ux-live { display: inline-flex; align-items: center; gap: 7px; font: 700 .76rem/1.2 var(--font); color: var(--ux-ink); }
+.ux-live i { position: relative; width: 9px; height: 9px; border-radius: 50%; background: var(--ux-roll); }
+.ux-st--rolling .ux-live i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--ux-roll); opacity: .6; animation: uxPulse 1.8s ease-out infinite; }
+.ux-st--complete .ux-live i { background: #0E8A5F; }
+.ux-st--announced .ux-live i, .ux-st--info .ux-live i { background: var(--ux-base); }
+@keyframes uxPulse { from { transform: scale(.6); opacity: .7; } to { transform: scale(1.5); opacity: 0; } }
+
+/* Hero card: the update's facts at a glance (decorative twin of .ux-facts). */
+.hx--update h1 { font-size: clamp(1.9rem, 3.3vw, 2.9rem); }
+.ux-cv { width: 100%; max-width: 420px; padding: 22px 22px 20px; border-radius: 22px; background: #fff; color: var(--ux-ink); box-shadow: 0 34px 60px -30px rgba(29, 25, 54, .45); transform: translateZ(30px); }
+.ux-cv-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ux-cv-name { display: block; margin: 16px 0 12px; font: 400 clamp(1.3rem, 2vw, 1.6rem)/1.12 var(--font-brand); }
+.ux-cv-dl { display: grid; gap: 0; margin: 0; }
+.ux-cv-dl div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-top: 1px solid var(--ux-grid); }
+.ux-cv-dl dt { font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6F6992; }
+.ux-cv-dl dd { margin: 0; font-size: .9rem; font-weight: 600; line-height: 1.4; }
+.ux-cv-win { margin-top: 12px; }
+.ux-cv-track { display: block; height: 8px; border-radius: 999px; background: repeating-linear-gradient(90deg, rgba(229, 38, 122, .18) 0 8px, rgba(229, 38, 122, .06) 8px 14px); overflow: hidden; }
+/* The window from start to Google's estimated end, striped while it is only an
+   estimate. It is not a progress bar: Google does not publish progress. */
+.ux-cv-track i { display: none; }
+.ux-cv-win.is-done .ux-cv-track i { display: block; width: 100%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--ux-base), var(--ux-after)); }
+.ux-cv-dates { display: flex; justify-content: space-between; margin-top: 6px; font-size: .74rem; font-weight: 700; color: #6F6992; }
+
+/* The facts box at the top of an article. */
+.ux-facts { margin: 26px 0 0; padding: 18px 20px 6px; border: 1.5px solid var(--ux-hair); border-radius: 16px; background: #fff; }
+.post-rich .ux-facts-h { margin: 0 0 8px; font-size: .78rem; font-weight: 700; letter-spacing: .13em; line-height: 1.3; text-transform: uppercase; color: #3B35B8; }
+.ux-facts dl { margin: 0; }
+.ux-facts dl div { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 4px 16px; padding: 10px 0; border-top: 1px solid var(--ux-grid); }
+.ux-facts dl div:first-child { border-top: 0; }
+.ux-facts dt { font-weight: 700; color: var(--ux-ink); }
+.ux-facts dd { margin: 0; line-height: 1.55; color: #2A2C33; }
+.post-rich .ux-note-s { margin: -14px 0 24px; font-size: .86rem; color: var(--ux-soft); }
+
+/* Charts: a card, a title that says what is plotted, the plot, the table twin, the source. */
+.ux-chart, .ux-win { margin: 30px 0; padding: clamp(18px, 2.6vw, 26px); border: 1.5px solid var(--ux-hair); border-radius: 18px; background: #fff; }
+.post-rich .ux-chart-t { margin: 0; font-size: 1.08rem; font-weight: 700; line-height: 1.35; color: var(--ux-ink); }
+.post-rich .ux-chart-s { margin: 4px 0 0; font-size: .9rem; line-height: 1.5; color: var(--ux-soft); }
+.ux-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; padding: 0; list-style: none; font-size: .84rem; color: var(--ux-soft); }
+.ux-legend li { display: inline-flex; align-items: center; gap: 8px; margin: 0; }
+.ux-sw { display: inline-block; flex: none; width: 18px; height: 12px; border-radius: 3px; }
+.ux-sw--done, .ux-sw--base { background: var(--ux-base); }
+.ux-sw--est { background: rgba(229, 38, 122, .12); border: 2px dashed var(--ux-roll); }
+.ux-sw--roll { background: var(--ux-roll); }
+.ux-sw--after { background: var(--ux-after); }
+.ux-sw--go { background: var(--ux-ink); }
+.ux-sw--pin { width: 12px; height: 12px; border-radius: 50%; background: #FF9100; box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(29, 25, 54, .35); }
+
+.ux-plot { --ux-lab: 136px; position: relative; margin: 18px 0 0; padding: 0 0 28px; }
+.ux-grid { position: absolute; top: 0; bottom: 0; left: var(--ux-lab); right: 0; pointer-events: none; }
+.ux-grid span { position: absolute; top: 0; bottom: 22px; left: var(--x); width: 1px; background: var(--ux-grid); }
+.ux-grid span:first-child { background: #C9C4DE; }
+.ux-grid b { position: absolute; bottom: -22px; left: 0; transform: translateX(-50%); font-size: .72rem; font-weight: 600; color: #6F6992; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ux-grid span:first-child b { transform: none; }
+.ux-grid span:last-child b { transform: translateX(-100%); }
+.post-rich ol.ux-rows { position: relative; margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.post-rich .ux-row { display: grid; grid-template-columns: var(--ux-lab) minmax(0, 1fr); align-items: center; margin: 0; min-height: 34px; border-radius: 8px; outline: none; }
+.ux-row-l { padding-right: 12px; font-size: .86rem; font-weight: 600; color: var(--ux-ink); white-space: nowrap; }
+.ux-track { position: relative; height: 34px; }
+.ux-bar { position: absolute; left: 0; top: 8px; width: var(--w); height: 18px; border-radius: 0 4px 4px 0; background: var(--ux-base); transition: filter .15s ease; }
+.ux-row.is-est .ux-bar { top: 6px; height: 22px; background: rgba(229, 38, 122, .12); border: 2px dashed var(--ux-roll); border-left-style: solid; }
+.ux-val { position: absolute; top: 8px; left: calc(var(--w) + 8px); font-size: .8rem; font-weight: 700; line-height: 18px; color: var(--ux-ink); white-space: nowrap; }
+.ux-tip { position: absolute; bottom: calc(100% - 2px); left: var(--w); z-index: 2; transform: translate(-50%, 4px); display: grid; gap: 1px; padding: 7px 10px; border-radius: 9px; background: var(--ux-ink); color: #D9D5EE; font-size: .74rem; line-height: 1.3; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease; }
+.ux-tip b { color: #fff; font-size: .84rem; }
+.ux-row:hover .ux-tip, .ux-row:focus-visible .ux-tip { opacity: 1; transform: translate(-50%, 0); }
+.ux-row:hover .ux-bar, .ux-row:focus-visible .ux-bar { filter: brightness(1.12); }
+.ux-row:focus-visible { box-shadow: 0 0 0 2px #FFC94D; }
+.ux-chart-table { margin: 22px 0 0; }
+.ux-chart-table .bx-table caption { font-size: .86rem; }
+.post-rich .ux-src { margin: 14px 0 0; font-size: .82rem; line-height: 1.5; color: #6F6992; text-align: left; }
+
+/* The measurement calendar: one column per day. */
+.ux-cal { display: grid; grid-template-columns: repeat(var(--ux-days), minmax(0, 1fr)); grid-template-rows: 30px 22px 28px; margin: 18px 0 4px; }
+.ux-seg, .ux-go { grid-row: 2; position: relative; margin: 0 1px; border-radius: 4px; }
+.ux-seg--base { background: var(--ux-base); }
+.ux-seg--roll { background: var(--ux-roll); }
+.ux-seg--after { background: var(--ux-after); }
+.ux-go { background: var(--ux-ink); }
+.ux-seg b, .ux-go b { position: absolute; top: calc(100% + 6px); left: 0; font-size: .74rem; font-weight: 700; color: var(--ux-soft); white-space: nowrap; }
+.ux-go b { left: auto; right: 0; color: var(--ux-ink); }
+.ux-pin { grid-row: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; }
+.ux-pin i { width: 10px; height: 10px; border-radius: 50%; background: #FF9100; box-shadow: 0 0 0 2px #fff; }
+.ux-pin b { font-size: .7rem; font-weight: 700; color: var(--ux-ink); line-height: 1; }
+.post-rich ol.ux-key { margin: 16px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 22px; }
+.post-rich .ux-key li { display: flex; align-items: flex-start; gap: 10px; margin: 0; font-size: .88rem; line-height: 1.45; color: #2A2C33; }
+.ux-key .ux-sw { margin-top: 4px; }
+.ux-key b { color: var(--ux-ink); }
+
+/* /updates/ list. */
+.ux-list-head { max-width: 760px; margin-bottom: clamp(20px, 3vw, 34px); }
+.ux-list-head p:last-child { margin-top: 10px; color: var(--ink-soft); line-height: 1.6; }
+.ux-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.ux-item { display: flex; flex-direction: column; height: 100%; padding: 22px 22px 18px; border: 1.5px solid var(--ux-hair); border-radius: 18px; background: #fff; color: var(--ux-ink); transition: transform .2s ease, box-shadow .2s ease; }
+.ux-item:hover, .ux-item:focus-visible { transform: translateY(-3px); box-shadow: 0 26px 40px -30px rgba(29, 25, 54, .6); }
+.ux-item-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ux-item h3 { margin: 14px 0 8px; font: 400 clamp(1.25rem, 2vw, 1.45rem)/1.18 var(--font-brand); }
+.ux-item p { color: var(--ink-soft); line-height: 1.6; font-size: .95rem; }
+.ux-item-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; padding-top: 16px; font-size: .84rem; color: #6F6992; }
+.ux-item-foot em { font-style: normal; font-weight: 700; color: #2A25A0; white-space: nowrap; }
+/* The newest update leads, full width. */
+.ux-list > li:first-child { grid-column: 1 / -1; }
+.ux-item.is-first { padding: clamp(22px, 3vw, 32px); background: linear-gradient(120deg, #fff 55%, #FDF1F6); }
+.ux-item.is-first h3 { font-size: clamp(1.5rem, 2.6vw, 2.05rem); max-width: 860px; }
+.ux-item.is-first p { max-width: 860px; font-size: 1.02rem; }
+.ux-method-sec { background: var(--bg-tint); }
+.ux-method { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; counter-reset: uxm; }
+.ux-method li { position: relative; display: grid; gap: 8px; padding: 22px 20px 20px; border-radius: 16px; background: #fff; counter-increment: uxm; }
+.ux-method li::before { content: counter(uxm); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #0A7388, #4338CA); color: #fff; font-weight: 800; }
+.ux-method b { font-size: 1.04rem; color: var(--ux-ink); }
+.ux-method span { color: var(--ink-soft); line-height: 1.6; font-size: .95rem; }
+.ux-all { margin-top: 22px; text-align: center; }
+
+/* The latest update, flagged at the top of the blog. */
+.ux-ribbon { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 22px; padding: 12px 16px; border: 1.5px solid var(--ux-hair); border-radius: 14px; background: #fff; color: var(--ux-ink); font-size: .92rem; line-height: 1.4; transition: border-color .2s ease; }
+.ux-ribbon:hover, .ux-ribbon:focus-visible { border-color: #B9B3DD; }
+.ux-ribbon em { margin-left: auto; font-style: normal; font-weight: 700; color: #2A25A0; }
+
+@media (max-width: 920px) {
+    .ux-method { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+    .ux-facts dl div { grid-template-columns: minmax(0, 1fr); }
+    .ux-plot { --ux-lab: 0px; }
+    .post-rich .ux-row { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 4px 0; }
+    .ux-row-l { padding: 0 0 2px; font-size: .82rem; }
+    .ux-track { height: auto; min-height: 26px; }
+    .ux-bar { position: relative; top: 0; display: block; }
+    .ux-row.is-est .ux-bar { top: 0; height: 22px; }
+    .ux-val { position: static; display: block; margin-top: 3px; line-height: 1.3; }
+    .ux-tip { display: none; }
+    .post-rich ol.ux-key { grid-template-columns: minmax(0, 1fr); }
+    .ux-pin b { display: none; }
+    .ux-cv { padding: 18px; }
+    .ux-cv-dl div { grid-template-columns: 84px minmax(0, 1fr); }
+    .ux-ribbon em { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ux-st--rolling .ux-live i::after { animation: none; }
+    .ux-item, .ux-tip, .ux-bar { transition: none; }
+    .ux-item:hover { transform: none; }
+}
+
+/* Eight top-level menu items since Updates joined (November 2026). The compact
+   rules higher up are overridden by the single .nav-link rule near the end, so
+   these tighten the row in steps, desktop only (the phone drawer keeps its own).
+   Boundaries overlap by a fraction of a pixel so a zoomed screen whose width
+   falls between two whole pixels still gets a rule. */
+@media (min-width: 920.01px) {
+    .nav-link { padding: 9px 7px; }
+    .nav-link::after { left: 7px; right: 7px; }
+}
+@media (min-width: 1280.01px) and (max-width: 1800px) {
+    .nav-link { padding: 9px 6px; font-size: .8rem; }
+    .nav-link::after { left: 6px; right: 6px; }
+}
+@media (min-width: 920.01px) and (max-width: 1280.99px) {
+    .nav-link { padding: 8px 5px; font-size: .76rem; }
+    .nav-link::after { left: 5px; right: 5px; }
+    .nav-cta { padding: 9px 13px; font-size: .76rem; }
+}
+@media (min-width: 920.01px) and (max-width: 1100.99px) {
+    .nav-link { padding: 8px 4px; font-size: .72rem; gap: 2px; }
+    .nav-link::after { left: 4px; right: 4px; }
+    .header-inner { gap: 10px; }
+}

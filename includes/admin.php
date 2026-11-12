@@ -240,6 +240,20 @@ function admin_slugify(string $title): string {
     return trim(preg_replace('/-+/', '-', $s), '-') ?: 'post';
 }
 
+/** Search update URLs keep their numbers (november-core-update-2026) and start with a letter. */
+function admin_update_slug(string $text): string {
+    $s = trim((string) preg_replace('/-+/', '-', (string) preg_replace('/[^a-z0-9]+/', '-', strtolower($text))), '-');
+    if ($s !== '' && !ctype_alpha($s[0])) { $s = 'update-' . $s; }
+    return substr($s, 0, 80) ?: 'search-update';
+}
+
+/** A Y-m-d date from a form field, or '' when it is blank or not a real date. */
+function admin_ymd(string $v): string {
+    $v = trim($v);
+    $d = DateTime::createFromFormat('!Y-m-d', $v);
+    return ($d && $d->format('Y-m-d') === $v) ? $v : '';
+}
+
 function admin_parse_sections(string $raw): array {
     $sections = []; $current = null;
     foreach (preg_split('/\r\n|\r|\n/', $raw) as $line) {
@@ -523,6 +537,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 admin_delete_override('blog', $_POST['slug'] ?? '');
                 header('Location: /admin/?view=blogs'); exit;
 
+            case 'update_save':
+                $custom = admin_get_overrides('update');
+                $orig = (string) ($_POST['orig_slug'] ?? '');
+                $known = $orig !== '' && (isset($custom[$orig]) || in_array($orig, $GLOBALS['UPDATES_BUILTIN'] ?? [], true));
+                if ($known) {
+                    $uslug = $orig;
+                } else {
+                    $want = trim((string) ($_POST['slug'] ?? ''));
+                    $uslug = admin_update_slug($want !== '' ? $want : (string) ($_POST['title_h1'] ?? ''));
+                    $base = $uslug;
+                    for ($n = 2; isset($GLOBALS['UPDATES_ALL'][$uslug]) || isset($custom[$uslug]); $n++) { $uslug = $base . '-' . $n; }
+                }
+                $lines = static fn (string $f): array => array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($_POST[$f] ?? '')))));
+                $src = trim((string) ($_POST['source'] ?? ''));
+                $data = [
+                    'title' => trim($_POST['seo_title'] ?? '') ?: trim($_POST['title_h1'] ?? ''),
+                    'meta' => trim($_POST['meta_desc'] ?? ''),
+                    'h1' => trim($_POST['title_h1'] ?? ''),
+                    'short' => trim($_POST['short'] ?? ''),
+                    'lede' => trim($_POST['lede'] ?? ''),
+                    'type' => in_array($_POST['type'] ?? '', UPDATE_TYPES, true) ? $_POST['type'] : 'Other',
+                    'status' => isset(UPDATE_STATUSES[$_POST['status'] ?? '']) ? $_POST['status'] : 'info',
+                    'started' => admin_ymd((string) ($_POST['started'] ?? '')),
+                    'started_time' => trim($_POST['started_time'] ?? ''),
+                    'finished' => admin_ymd((string) ($_POST['finished'] ?? '')),
+                    'checked' => admin_ymd((string) ($_POST['checked'] ?? '')),
+                    'scope' => trim($_POST['scope'] ?? ''),
+                    'rollout' => trim($_POST['rollout'] ?? ''),
+                    /* Blank means "not set" (null is dropped when the record is merged), never 0 days. */
+                    'days' => ((int) ($_POST['days'] ?? 0)) > 0 ? min(60, (int) $_POST['days']) : null,
+                    'source' => preg_match('~^https?://[^\s<>"]+$~', $src) ? $src : '',
+                    'date' => admin_ymd((string) ($_POST['pub_date'] ?? '')) ?: date('Y-m-d'),
+                    'modified' => admin_ymd((string) ($_POST['mod_date'] ?? '')) ?: date('Y-m-d'),
+                    'read' => trim($_POST['read_time'] ?? ''),
+                    'takeaways' => $lines('takeaways'),
+                    'faqs' => array_values(array_filter(array_map(
+                        fn($l) => count($p = array_map('trim', explode('|', $l, 2))) === 2 && $p[0] !== '' && $p[1] !== '' ? $p : null,
+                        $lines('faqs')
+                    ))),
+                    'cta' => [trim($_POST['cta_head'] ?? ''), trim($_POST['cta_sub'] ?? ''), trim($_POST['cta_btn'] ?? '')],
+                ];
+                /* An update with its own article file keeps that body; the editor
+                   only writes sections for updates written here. */
+                if (empty($GLOBALS['UPDATES_ALL'][$uslug]['rich'])) {
+                    $data['sections'] = admin_parse_sections((string) ($_POST['body'] ?? ''));
+                }
+                if (!empty($_POST['draft'])) { $data['draft'] = true; }
+                admin_save_override('update', $uslug, $data);
+                header('Location: /admin/?view=updates&saved=' . urlencode($uslug)); exit;
+
+            case 'update_delete':
+                admin_delete_override('update', (string) ($_POST['slug'] ?? ''));
+                header('Location: /admin/?view=updates'); exit;
+
             case 'case_save':
                 $custom = admin_get_overrides('case');
                 $orig = $_POST['orig_slug'] ?? '';
@@ -642,6 +710,7 @@ $proposal_index = $logged_in ? crm_proposal_index() : [];
 $custom_posts = admin_get_overrides('blog');
 $custom_cases = admin_get_overrides('case');
 $custom_resources = admin_get_overrides('resource');
+$custom_updates = admin_get_overrides('update');
 
 function e_a($v): string { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 
@@ -924,6 +993,7 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         <a class="nav<?= $view === 'pipeline' ? ' on' : '' ?>" href="/admin/?view=pipeline">Pipeline</a>
         <a class="nav<?= $view === 'reports' ? ' on' : '' ?>" href="/admin/?view=reports">Reports</a>
         <a class="nav<?= in_array($view, ['blogs', 'blog-edit'], true) ? ' on' : '' ?>" href="/admin/?view=blogs">Blog Posts</a>
+        <a class="nav<?= in_array($view, ['updates', 'update-edit'], true) ? ' on' : '' ?>" href="/admin/?view=updates">Search Updates</a>
         <a class="nav<?= in_array($view, ['cases', 'case-edit'], true) ? ' on' : '' ?>" href="/admin/?view=cases">Case Studies</a>
         <a class="nav<?= in_array($view, ['resources', 'resource-edit'], true) ? ' on' : '' ?>" href="/admin/?view=resources">E-books & Guides</a>
         <a class="nav<?= $view === 'settings' ? ' on' : '' ?>" href="/admin/?view=settings">Settings</a>
@@ -2136,6 +2206,202 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             </div>
 
             <br><button class="btn grad" type="submit"><?= $editing ? 'Save Changes' : 'Publish Post' ?></button>
+        </form>
+
+    <?php elseif ($view === 'updates'):
+        $all_updates = $GLOBALS['UPDATES_ALL'] ?? [];
+    ?>
+        <h1>Search Updates</h1>
+        <p class="sub"><?= count($all_updates) ?> update<?= count($all_updates) === 1 ? '' : 's' ?> at <a href="/updates/" target="_blank">/updates/</a> · <a class="btn grad sm" href="/admin/?view=update-edit">+ New update</a></p>
+        <?php if (!empty($_GET['saved'])): ?>
+        <div class="hint">Saved <span class="mono">/updates/<?= e_a($_GET['saved']) ?>/</span>. The public site picks up admin changes within about an hour.</div>
+        <?php endif; ?>
+        <div class="panel">
+            <table>
+                <thead><tr><th>Update</th><th>Type</th><th>Status</th><th>Started</th><th>Published</th><th></th></tr></thead>
+                <tbody>
+                <?php foreach ($all_updates as $uslug => $u):
+                    $is_builtin = in_array($uslug, $GLOBALS['UPDATES_BUILTIN'] ?? [], true);
+                    $is_edited  = isset($custom_updates[$uslug]);
+                ?>
+                    <tr>
+                        <td>
+                            <strong><?= e_a($u['h1'] ?? $uslug) ?></strong>
+                            <?php if (!empty($u['draft'])): ?><span class="tag-ed">draft</span><?php elseif ($is_builtin && $is_edited): ?><span class="tag-ed">edited</span><?php endif; ?>
+                            <br><small class="mono" style="color:var(--muted)">/updates/<?= e_a($uslug) ?>/</small>
+                        </td>
+                        <td><?= e_a($u['type'] ?? '') ?></td>
+                        <td><?= e_a(update_status_label($u)) ?><?= ($u['status'] ?? '') === 'complete' && !empty($u['finished']) ? '<br><small style="color:var(--muted)">' . e_a(update_day($u['finished'])) . '</small>' : '' ?></td>
+                        <td style="white-space:nowrap"><?= e_a(update_day($u['started'] ?? '')) ?></td>
+                        <td style="white-space:nowrap"><?= e_a(update_day($u['date'] ?? '')) ?></td>
+                        <td class="actions-row">
+                            <?php if (empty($u['draft'])): ?><a class="btn ghost sm" href="/updates/<?= e_a($uslug) ?>/" target="_blank">View</a><?php endif; ?>
+                            <a class="btn sm" href="/admin/?view=update-edit&slug=<?= e_a($uslug) ?>">Edit</a>
+                            <?php if ($is_builtin && $is_edited): ?>
+                            <form method="post" onsubmit="return confirm('Undo the admin edits and go back to the original update?')" style="display:inline">
+                                <input type="hidden" name="action" value="update_delete">
+                                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                                <input type="hidden" name="slug" value="<?= e_a($uslug) ?>">
+                                <button class="btn danger sm" type="submit">Revert</button>
+                            </form>
+                            <?php elseif (!$is_builtin): ?>
+                            <form method="post" onsubmit="return confirm('Delete this update permanently?')" style="display:inline">
+                                <input type="hidden" name="action" value="update_delete">
+                                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                                <input type="hidden" name="slug" value="<?= e_a($uslug) ?>">
+                                <button class="btn danger sm" type="submit">Delete</button>
+                            </form>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; if (!$all_updates): ?>
+                    <tr><td colspan="6">No updates yet. Add the next confirmed Google update with "+ New update".</td></tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="hint">When Google announces an update, add it here with the date and time from Google's Search Status Dashboard. When Google confirms the rollout is complete, edit the update: set Status to "Rollout complete", add the finish date and change "Last updated". The page, its menu entry, the sitemap and the feed follow.</div>
+
+    <?php elseif ($view === 'update-edit'):
+        $edit_slug = (string) ($_GET['slug'] ?? '');
+        $editing = $GLOBALS['UPDATES_ALL'][$edit_slug] ?? null;
+        $is_rich = !empty($editing['rich']);
+    ?>
+        <h1><?= $editing ? 'Edit search update' : 'New search update' ?></h1>
+        <p class="sub"><a href="/admin/?view=updates">← Back to updates</a><?php if ($editing && empty($editing['draft'])): ?> · <a href="/updates/<?= e_a($edit_slug) ?>/" target="_blank">View on the site</a><?php endif; ?></p>
+        <form method="post" class="panel">
+            <input type="hidden" name="action" value="update_save">
+            <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+            <input type="hidden" name="orig_slug" value="<?= e_a($editing ? $edit_slug : '') ?>">
+
+            <div class="seo-group">
+                <h3>SEO Settings</h3>
+                <label>Page Title (SEO)</label>
+                <input name="seo_title" maxlength="80" value="<?= e_a($editing['title'] ?? '') ?>" placeholder="e.g. Google March 2027 Core Update: Dates, Impact, Next Steps">
+                <p class="seo-note">Up to 63 characters. Start with the update's name. No brand name.</p>
+                <label>Meta Description</label>
+                <input name="meta_desc" maxlength="200" value="<?= e_a($editing['meta'] ?? '') ?>" placeholder="140 to 160 characters">
+                <p class="seo-note">140 to 160 characters: what happened, when, and what the reader will learn.</p>
+            </div>
+
+            <label>Headline (H1) *</label>
+            <input name="title_h1" required value="<?= e_a($editing['h1'] ?? '') ?>" placeholder="e.g. Google March 2027 Core Update: What It Is and What to Do">
+
+            <div class="grid2">
+                <div>
+                    <label>Page address</label>
+                    <?php if ($editing): ?>
+                    <input value="/updates/<?= e_a($edit_slug) ?>/" disabled>
+                    <?php else: ?>
+                    <input name="slug" pattern="[a-z][a-z0-9-]*" placeholder="e.g. march-core-update-2027">
+                    <p class="seo-note">Leave blank to build it from the headline. Lowercase letters, numbers and hyphens; it cannot change later.</p>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <label>Short name (menus and cards)</label>
+                    <input name="short" value="<?= e_a($editing['short'] ?? '') ?>" placeholder="e.g. March 2027 core update">
+                </div>
+            </div>
+
+            <label>Short answer (shown first; search and AI engines quote it) *</label>
+            <textarea name="lede" required rows="4" placeholder="What happened, when it started, how long Google says it takes, and what the reader should do. Three or four sentences."><?= e_a($editing['lede'] ?? '') ?></textarea>
+
+            <div class="grid3">
+                <div>
+                    <label>Type</label>
+                    <select name="type"><?php foreach (UPDATE_TYPES as $t): ?><option<?= ($editing['type'] ?? 'Core update') === $t ? ' selected' : '' ?>><?= e_a($t) ?></option><?php endforeach; ?></select>
+                </div>
+                <div>
+                    <label>Status</label>
+                    <select name="status"><?php foreach (UPDATE_STATUSES as $k => $label): ?><option value="<?= e_a($k) ?>"<?= ($editing['status'] ?? 'rolling') === $k ? ' selected' : '' ?>><?= e_a($label) ?></option><?php endforeach; ?></select>
+                </div>
+                <div>
+                    <label>Status last checked</label>
+                    <input type="date" name="checked" value="<?= e_a($editing['checked'] ?? date('Y-m-d')) ?>">
+                </div>
+            </div>
+
+            <div class="grid3">
+                <div>
+                    <label>Started on</label>
+                    <input type="date" name="started" value="<?= e_a($editing['started'] ?? '') ?>">
+                </div>
+                <div>
+                    <label>Start time (as Google gives it)</label>
+                    <input name="started_time" value="<?= e_a($editing['started_time'] ?? '') ?>" placeholder="e.g. 10:06 a.m. Pacific time (11:36 p.m. IST)">
+                </div>
+                <div>
+                    <label>Finished on (once Google confirms)</label>
+                    <input type="date" name="finished" value="<?= e_a($editing['finished'] ?? '') ?>">
+                </div>
+            </div>
+
+            <div class="grid3">
+                <div>
+                    <label>Google's estimate (words)</label>
+                    <input name="rollout" value="<?= e_a($editing['rollout'] ?? '') ?>" placeholder="e.g. Up to 2 weeks">
+                </div>
+                <div>
+                    <label>Google's estimate (days)</label>
+                    <input type="number" name="days" min="0" max="60" value="<?= e_a($editing['days'] ?? '') ?>" placeholder="e.g. 14">
+                </div>
+                <div>
+                    <label>Where it applies</label>
+                    <input name="scope" value="<?= e_a($editing['scope'] ?? '') ?>" placeholder="e.g. All countries and all languages">
+                </div>
+            </div>
+
+            <label>Google's announcement (link)</label>
+            <input name="source" type="url" value="<?= e_a($editing['source'] ?? '') ?>" placeholder="https://status.search.google.com/incidents/...">
+
+            <div class="grid3">
+                <div>
+                    <label>Published on</label>
+                    <input type="date" name="pub_date" value="<?= e_a($editing['date'] ?? date('Y-m-d')) ?>">
+                </div>
+                <div>
+                    <label>Last updated</label>
+                    <input type="date" name="mod_date" value="<?= e_a($editing ? date('Y-m-d') : date('Y-m-d')) ?>">
+                    <p class="seo-note">Set to today when you save. Change it only for real content changes.</p>
+                </div>
+                <div>
+                    <label>Read time</label>
+                    <input name="read_time" value="<?= e_a($editing['read'] ?? '6 min') ?>">
+                </div>
+            </div>
+
+            <?php if ($is_rich): ?>
+            <div class="hint">This update has its own article layout, with charts and tables, so its body is edited in the code (includes/data/updates/<?= e_a(basename((string) $editing['rich'])) ?>.php). Everything else on this form, including the status, the finish date and the FAQs, updates the page.</div>
+            <?php else: ?>
+            <label>Article *</label>
+            <textarea name="body" rows="16" required placeholder="## What Google announced&#10;Google started the ... update on ... Source: [Google's announcement](https://status.search.google.com/...).&#10;&#10;## What to check on your site&#10;- Wait until the rollout is complete&#10;- Compare a full week after with a week before"><?php if ($editing && !empty($editing['sections'])): foreach ($editing['sections'] as $s) { echo "## " . e_a($s[0]) . "\n"; foreach ($s[1] as $p) { echo e_a($p) . "\n"; } foreach ($s[2] as $l) { echo "- " . e_a($l) . "\n"; } echo "\n"; } endif; ?></textarea>
+            <p class="seo-note">## starts a section heading. A line starting with "- " is a bullet. Links: [label](https://...) opens in a new tab with nofollow; [label](/seo-services/) links to a page on this site. **bold** for emphasis. No em dashes.</p>
+            <?php endif; ?>
+
+            <div class="grid2">
+                <div>
+                    <label>Key takeaways (one per line)</label>
+                    <textarea name="takeaways" rows="4"><?= e_a(implode("\n", $editing['takeaways'] ?? [])) ?></textarea>
+                </div>
+                <div>
+                    <label>FAQs (one per line: Question | Answer)</label>
+                    <textarea name="faqs" rows="4" placeholder="When will the update finish? | Google said ..."><?= e_a(implode("\n", array_map(fn($f) => "{$f[0]} | {$f[1]}", $editing['faqs'] ?? []))) ?></textarea>
+                </div>
+            </div>
+
+            <div class="seo-group">
+                <h3>Call to action</h3>
+                <label>Heading</label>
+                <input name="cta_head" value="<?= e_a($editing['cta'][0] ?? 'Traffic Changed After an Update?') ?>">
+                <label>Supporting text</label>
+                <input name="cta_sub" value="<?= e_a($editing['cta'][1] ?? 'Send us your site and the dates. A senior strategist replies within one working day.') ?>">
+                <label>Button label</label>
+                <input name="cta_btn" value="<?= e_a($editing['cta'][2] ?? 'Ask a Strategist') ?>">
+            </div>
+
+            <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:.86rem"><input type="checkbox" name="draft" value="1"<?= !empty($editing['draft']) ? ' checked' : '' ?> style="width:auto"> Save as a draft (hidden from the site until you untick this)</label>
+
+            <br><button class="btn grad" type="submit"><?= $editing ? 'Save Changes' : 'Publish Update' ?></button>
         </form>
 
     <?php elseif ($view === 'cases'): ?>

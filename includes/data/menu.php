@@ -3,7 +3,7 @@
  * Navigation and footer structure.
  *
  * Order: Digital Marketing | AI Search | Web Development | Enterprise & IT |
- * Case Studies | Resources | Pricing | Company.
+ * Case Studies | Resources | Updates | Company.
  *
  * Digital marketing and branding are the core business, so they lead. Enterprise
  * & IT is a separate practice for a different buyer, and stays in its own menu.
@@ -217,6 +217,31 @@ $NAV = [
         ],
     ],
 
+    /* Google search updates. The first column lists the newest updates and is
+       filled from $UPDATES in includes/data/pages.php, so an update added in the
+       admin panel appears here on its own. */
+    [
+        'label' => 'Updates',
+        'url'   => '/updates/',
+        'desc'  => 'Google search updates explained in plain words: what changed, what Google said and what to check on your site.',
+        'columns' => [
+            [
+                'heading' => 'Latest Updates',
+                'url'     => '/updates/',
+                'items'   => [],
+            ],
+            [
+                'heading' => 'After an Update',
+                'items'   => [
+                    ['Content refresh checklist', '/blog/content-refresh-checklist/', 'Refresh, rewrite, merge or retire'],
+                    ['Does Google penalise AI content?', '/blog/does-google-penalise-ai-content/', 'What the rules really say'],
+                    ['Measure AI search visibility', '/blog/how-to-measure-ai-search-visibility/', 'Track citations month to month'],
+                ],
+            ],
+        ],
+        'promo' => ['Hit by an update?', 'Get a second opinion', 'Send us your site and the dates your traffic changed. A senior strategist replies within one working day.', 'Ask a Strategist', '/contact-us/'],
+    ],
+
     [
         'label' => 'Company',
         'url'   => '/about-us/',
@@ -296,6 +321,7 @@ $FOOTER = [
         ['Our Clients', '/our-clients/'],
         ['Case Studies', '/case-studies/'],
         ['Blog', '/blog/'],
+        ['Search Updates', '/updates/'],
         ['Guides', '/guides/'],
         ['E-books', '/ebooks/'],
     ],

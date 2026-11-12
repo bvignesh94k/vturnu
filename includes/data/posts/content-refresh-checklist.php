@@ -79,7 +79,7 @@ return [
 <?php lx_item(2, 'rankings-slipping', 'Rankings have slipped for the main query', ['type' => 'search', 'tags' => ['Search signal'], 'mark' => 'I see this'], static function (): void { ?>
 <p>A page that drifts from the first page of results to the second loses much of its traffic, because far fewer people look beyond the first page. A slow slide usually means newer or more complete pages have overtaken yours.</p>
 <?php lx_split('How to check',
-    '<ul><li>In Search Console, filter to the page and its main query, and watch the average position over six to twelve months.</li><li>Open the pages that now rank above you. What do they cover that you do not?</li></ul>',
+    '<ul><li>In Search Console, filter to the page and its main query, and watch the average position over six to twelve months.</li><li>Open the pages that now rank above you. What do they cover that you do not?</li><li>If the slide began during a Google core update, wait until the rollout ends before you judge it. Our notes on the <a href="/updates/november-core-update-2026/">November 2026 core update</a> show which weeks to compare.</li></ul>',
     'What to do',
     '<ul><li>Add what is missing, in your own words and from your own experience.</li><li>Update examples and figures.</li><li>Link to the page from newer, related posts.</li></ul>'); ?>
 <?php }); ?>

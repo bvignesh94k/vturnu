@@ -33,6 +33,7 @@ require dirname(__DIR__) . '/includes/money-kit.php';
 require dirname(__DIR__) . '/includes/trust-kit.php';
 require dirname(__DIR__) . '/includes/listicle-kit.php';
 require dirname(__DIR__) . '/includes/content-kit.php';
+require_once dirname(__DIR__) . '/includes/update-kit.php';
 
 /* parse_url() returns false, not null, on a malformed URI, so ?? never caught
    it and trim(false) was a fatal under strict_types: a request to "//" or any
@@ -103,8 +104,9 @@ if ($slug === 'sitemap.xml') {
         }
         $loc = e(abs_url(page_url($s)));
         $tpl = $p['template'] ?? 'service';
-        $priority = $s === '' ? '1.0' : ($tpl === 'hub' ? '0.8' : ($tpl === 'blog-post' ? '0.7' : '0.6'));
-        $freq = $s === '' ? 'daily' : ($tpl === 'blog-post' ? 'monthly' : 'weekly');
+        $article = in_array($tpl, ['blog-post', 'update-post'], true);
+        $priority = $s === '' ? '1.0' : ($tpl === 'hub' ? '0.8' : ($article ? '0.7' : '0.6'));
+        $freq = $s === '' ? 'daily' : ($article ? 'monthly' : 'weekly');
         // Only a real date goes out. Stamping undated pages with today's date
         // made every URL look changed on every crawl, and Google stops
         // trusting a sitemap's lastmod once it proves inaccurate.
@@ -120,16 +122,26 @@ if ($slug === 'sitemap.xml') {
    stream of new articles rather than making them diff the blog index. */
 if ($slug === 'feed.xml') {
     header('Content-Type: application/rss+xml; charset=UTF-8');
-    $posts = array_slice($GLOBALS['BLOG'] ?? [], 0, 30, true);
+    /* Articles and search updates in one stream, newest first. */
+    $items = [];
+    foreach ($GLOBALS['BLOG'] ?? [] as $ps => $post) {
+        $items['/blog/' . $ps . '/'] = $post;
+    }
+    foreach ($GLOBALS['UPDATES'] ?? [] as $us => $up) {
+        $items['/updates/' . $us . '/'] = $up;
+    }
+    uasort($items, static fn (array $a, array $b): int => strcmp((string) ($b['date'] ?? ''), (string) ($a['date'] ?? '')));
+    $posts = array_slice($items, 0, 30, true);
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     echo '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>' . "\n";
-    echo '  <title>' . e(SITE_NAME) . ' Blog</title>' . "\n";
+    echo '  <title>' . e(SITE_NAME) . ' Blog and Search Updates</title>' . "\n";
     echo '  <link>' . e(abs_url('/blog/')) . '</link>' . "\n";
-    echo '  <description>' . e(SITE_TAGLINE) . '. Search, AI search, paid media and web growth insight.</description>' . "\n";
+    echo '  <description>' . e(SITE_TAGLINE) . '. Search, AI search, paid media and web growth insight, plus Google search updates explained.</description>' . "\n";
     echo '  <language>en</language>' . "\n";
     echo '  <atom:link href="' . e(abs_url('/feed.xml')) . '" rel="self" type="application/rss+xml"/>' . "\n";
-    foreach ($posts as $ps => $post) {
-        $url = e(abs_url('/blog/' . $ps . '/'));
+    foreach ($posts as $path => $post) {
+        $ps = $path;
+        $url = e(abs_url($path));
         $pub = !empty($post['date']) ? date(DATE_RSS, strtotime((string) $post['date'])) : date(DATE_RSS);
         echo "  <item>\n";
         echo '    <title>' . e($post['h1'] ?? $ps) . "</title>\n";
@@ -180,7 +192,7 @@ if ($slug === 'llms.txt') {
 
     $groups = [
         'Digital Marketing and AI Search' => [], 'Free tools' => [], 'Enterprise & IT' => [], 'Guides and E-books' => [],
-        'Articles' => [], 'Case Studies' => [], 'Company' => [],
+        'Search Updates' => [], 'Articles' => [], 'Case Studies' => [], 'Company' => [],
     ];
     foreach ($PAGES as $s => $p) {
         $tpl = $p['template'] ?? 'service';
@@ -192,6 +204,8 @@ if ($slug === 'llms.txt') {
             $groups['Free tools'][] = $line;
         } elseif ($tpl === 'landing' || $s === 'enterprise-it-services') {
             $groups['Enterprise & IT'][] = $line;
+        } elseif ($s === 'updates' || str_starts_with($s, 'updates/')) {
+            $groups['Search Updates'][] = $line;
         } elseif (str_starts_with($s, 'blog/')) {
             $groups['Articles'][] = $line;
         } elseif (str_starts_with($s, 'ebooks/') || str_starts_with($s, 'guides/')) {

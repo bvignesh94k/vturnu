@@ -55,7 +55,7 @@ window.Tawk_API = window.Tawk_API || {};
          never submitted anything. */
 $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <meta name="robots" content="<?= $noindex ? 'noindex, follow' : 'index, follow' ?>">
-<?php [$og_img, $og_w, $og_h] = page_share_image($page, $slug); $is_article = in_array($page['template'] ?? '', ['blog-post', 'resource', 'case-detail'], true); ?>
+<?php [$og_img, $og_w, $og_h] = page_share_image($page, $slug); $is_article = in_array($page['template'] ?? '', ['blog-post', 'resource', 'case-detail', 'update-post'], true); ?>
 <meta property="og:type" content="<?= $is_article ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
 <meta property="og:title" content="<?= e($page['og_title'] ?? $page['title']) ?>">
@@ -71,6 +71,11 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
 <meta property="article:published_time" content="<?= e(date('c', strtotime($bp['date']))) ?>">
 <meta property="article:modified_time" content="<?= e(date('c', strtotime($bp['modified'] ?? $bp['date']))) ?>">
 <meta property="article:section" content="<?= e($bp['category'] ?? 'Strategy') ?>">
+<?php endif; ?>
+<?php if (($page['template'] ?? '') === 'update-post' && !empty($UPDATES[$page['update']]['date'])): $up = $UPDATES[$page['update']]; ?>
+<meta property="article:published_time" content="<?= e(date('c', strtotime($up['date']))) ?>">
+<meta property="article:modified_time" content="<?= e(date('c', strtotime($up['modified'] ?? $up['date']))) ?>">
+<meta property="article:section" content="Search updates">
 <?php endif; ?>
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="en_IN">
