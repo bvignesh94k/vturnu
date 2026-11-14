@@ -6,6 +6,7 @@ Mailbox: connect@vturnu.com. Branch: claude/relaxed-ptolemy-sdsepj. All times UT
 
 | Site | URL | vturnu.com link | rel | Counts toward the five? |
 |---|---|---|---|---|
+| SIIT (published 14 Nov, 15:59 UTC) | https://siit.co/guestposts/ai-seo-checklist-how-to-get-cited-by-chatgpt-copilot-and-google-ai-overviews/ | /blog/how-to-rank-in-google-ai-overviews/ ("how to rank in Google AI Overviews") and /ai-seo/ ("AI SEO service page"), both in the body | noopener (followed) | Yes, 2 of 5 |
 | Compare the Cloud | https://www.comparethecloud.net/opinions/hosting-choices-that-quietly-decide-search-visibility-caching-rendering-and-bot | https://vturnu.com, website icon in the author box (aria-label "Vignesh B website") | noopener noreferrer (followed) | Yes, 1 of 5 |
 | Nasscom Community (earlier win) | https://community.nasscom.in/communities/digital-transformation/ai-agents-read-your-website-your-buyers-do-five-layer-readiness | https://vturnu.com/ai-crawler-checker/ ("AI Crawler Checker") | noopener nofollow noreferrer | No, already counted |
 
@@ -67,6 +68,17 @@ Not followed up, on purpose: Infosecurity Magazine (no reply means declined), Te
 
 Next candidates worth a look: Silicon Canals (600-800 words, Word file; down at three checks), Postalytics (full articles to marketing@postalytics.com, exclusive, one body link, two-week review; active but nearly all recent posts are in-house ISP and product content, so a long shot), Foleon (DR 83; pitch through a HubSpot form, final article as a Google Doc, so it needs your Google account), Techpoint Africa (needs a normal browser to read its rules), UKTN opinion.
 
+## 5b. Owner-requested posts on platforms you are logged into (ready to paste)
+
+- beehiiv: "Google's November Core Update Is Rolling Out. Here Is a Calm Plan for Your Website" with one link to /updates/november-core-update-2026/, a 1200x630 thumbnail and SEO fields. Steps: beehiiv/publish-steps.md.
+- Indie Hackers: "Is your site blocking AI assistants without you knowing? A 10-minute check" with one link to /ai-crawler-checker/ and a disclosure line. Post: indiehackers/post.md.
+- Social posts for the SIIT article (LinkedIn company page, X single post and thread, Facebook, Threads): siit/social-posts.md.
+- Claude in Chrome is not connected to this cloud session, so these need you to paste and publish.
+
+## 5c. Research shortlist for the next round (from a background search, guidelines not yet read in full)
+
+UX Magazine (bio carries a website link; address on uxmag.com/contribute), Contact Center Pipeline (hello@contactcenterpipeline.com; CX leaders), Frontier Enterprise (non-commercial expert opinion to rahul@jicaramedia.com), Africa.com (editorial@africa.com, 800-1,500 words, Africa angle), TNGlobal (Google Form; accepts AI-assisted work), MARKETECH APAC (contributor form), Martechvibe (editorial@martechvibe.com; already received a 9 Nov news release). CMO Alliance came up too but is on this round's exclusion list.
+
 ## 6. Items for the owner
 
 1. **Gmail connector rewrites every link.** Any URL or button link sent through the Claude Gmail connector reaches the editor as a google.com/url redirect (with a "Redirect Notice"), in both the HTML and plain-text parts, and in drafts too. Only the Gmail signature keeps direct links. Since your note, emails carry no buttons or URLs; writing samples and links travel inside the attached Word files, where they stay direct. Already affected: the ContactCenterWorld email to Raj (Nasscom button) and the Compare the Cloud correction (fixed with a follow-up note). If you want the button back, send that kind of email from Gmail yourself or tell me to accept the redirect.
@@ -81,6 +93,6 @@ Next candidates worth a look: Silicon Canals (600-800 words, Word file; down at 
 
 ## 7. What I could not do, and why
 
-- Only 1 of the 5 new live articles so far (Compare the Cloud). Editors set the pace; the pipeline now holds about 20 pending pieces plus the 6 sent today.
+- 2 of the 5 new live articles so far (Compare the Cloud and SIIT). Editors set the pace; the pipeline now holds about 20 pending pieces plus the 6 sent today.
 - Could not log in anywhere (no passwords or codes used), so ContactCenterWorld went to the president by email instead of the form.
 - Starting a separate session on the open-network "VTurnU" environment was blocked by the auto-mode safety check; network access came from the approved host list instead.
