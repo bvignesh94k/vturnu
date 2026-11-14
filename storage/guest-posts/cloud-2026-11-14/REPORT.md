@@ -19,16 +19,20 @@ Not live yet: e27 (both), The Techism post 381626 and SIIT post 437003 (both sti
 |---|---|---|---|---|
 | ContactCenterWorld (owner's request) | Full article: "What AI Assistants Tell Your Customers Before They Call You" + 1200x675 cover in CCW navy and blue | Email to Raj Wadhwani, President (rajw@), free option | None possible: their free route removes all websites | Follow up 21 Nov |
 | CEOWORLD Magazine (DR 80) | Full article: "Before Buyers Call, an AI Has Already Briefed Them: Five Questions for CEOs" + 1456x816 cover in CEOWORLD blue and gold + headshot | info@ceoworld.biz | Body link to /blog/how-to-measure-ai-search-visibility/ | Decision by 24 Nov (no reply means no) |
+| CX Today | Full article: "Bots Are Filling In Your Forms: Five Ways to Keep Junk Out of Your CX Data" + 1200x675 cover in CX Today grey and purple + headshot + logo (they ask for it) | newsdesk@cxtoday.com | Company homepage link in the author bio (their guidelines allow no links in the text) | Follow up 21 Nov |
 | Growth Folks (DR 60) | Pitch, three ideas with outlines | info@growthfolks.io | /blog/content-refresh-checklist/ or /blog/how-to-stop-junk-leads-on-your-website/ | Follow up 21 Nov |
 | SmallBusiness.co.uk (DR 75) | Pitch, three ideas | anna.jordan@stubbenedge.com | /blog/website-accessibility-checklist/ or /blog/website-design-brief-questions/ | Follow up 21 Nov |
 | 150sec | Pitch, two ideas | info@150sec.com | /blog/website-accessibility-checklist/ or /ai-crawler-checker/ | Follow up 21 Nov |
-| UXmatters | One-time resend of the 7 Nov proposal (first send bounced: mailbox full) | info@uxmatters.com | n/a | Follow up 21 Nov |
+| UXmatters | One-time resend of the 7 Nov proposal (first send bounced: mailbox full) | info@uxmatters.com | n/a | Bounced again at 15:16 (same full mailbox). No more email sends |
 
 Files for each are in this folder: article.md and .docx, cover image, email text. The author sheet (bio and direct links to published work) is in _author-kit/.
 
 ## 3. Replies received and answers
 
 - Analytics Insight: paid only ($400 per guest post). Answered on 14 Nov in the owner's words: not buying links, happy to share free editorial content.
+- SIIT (owner's goal: one free article there): answered the status follow-up within ten minutes with a price list ($60 per guest post, $40 per link insertion, author account $300 a year). I replied in the owner's words that we do not buy links. SIIT then asked "Where are you sharing the posts? ... We need some good benefit in return?" At 15:52 I replied: no payment and no link exchange, but once post 437003 is live we will share it on VTurnU's LinkedIn company page, Facebook, Instagram and X tagging SIIT, keep it updated and answer reader questions, and asked them to go ahead. Waiting for their answer. Note: SIIT openly sells dofollow links, so search engines may discount links from it.
+- Growjo (a listing, not a guest post): asked $200 for a listing with a followed link. Declined politely.
+- UXmatters: the one-time resend bounced again (pabini@ mailbox still full).
 - Sugermint and Business Outreach: paid only, already declined on 9 and 10 Nov.
 - MarketingProfs: canned reply again (no waiting time stated).
 - Workhorse Studio (AW360): "7-10 business days" from 7 Nov, so not due before about 20 Nov.
@@ -56,9 +60,11 @@ Not followed up, on purpose: Infosecurity Magazine (no reply means declined), Te
 | MarTech Series | No free contributor route found ("Talk to sales") |
 | Digital Agency Network, Website Magazine, Startups Magazine, Growth Business, Inside Small Business, Chief Marketer, StartupNation, B2BNN, Business West, CXM | No reachable contributor page, login wall or 404 |
 | MarketingMind, EU-Startups | Cloudflare bot check blocks automated reading |
-| Silicon Canals | Server down (Cloudflare 522) at check time; retry next round |
+| Silicon Canals | Server down (Cloudflare 522) at both checks; retry next round |
+| Techpoint Africa | Bot protection blocks reading the guidelines in full (search summary: full drafts to editor@techpoint.africa, subject "Guest Contributor") |
+| The CX Lead | Takes Google Docs only ("please do not send Word documents"); the Drive connector here is a client account, so not used |
 
-Next candidates worth a look: Techpoint Africa (full drafts by email to editor@techpoint.africa, subject "Guest Contributor"), Silicon Canals (600-800 words, Word file), UKTN opinion.
+Next candidates worth a look: Silicon Canals (600-800 words, Word file; site was down), Postalytics (exclusive, one body link to your site, two-week review; submission address not published, use their contact page), Foleon (DR 83, pitch first, website link in bio), Techpoint Africa (needs a normal browser to read its rules), UKTN opinion.
 
 ## 6. Items for the owner
 
@@ -67,7 +73,10 @@ Next candidates worth a look: Techpoint Africa (full drafts by email to editor@t
 3. **HackerNoon profile** still says "Digital Marketing Manager at Procyon Technostructure". Update it to Founder & CEO, VTurnU when you can.
 4. **InPeaks**: I could not find its domain or an editor address (no email trail in connect@). Please share the site address if you want a follow-up.
 5. **Dynamic Business** (AU, DR 72) takes pitches only through a site account. Worth creating an account yourself.
-6. **Network access.** This session was moved to the "vturnu-promotion" environment and 40 publisher hosts were added with your approval. They stay on that environment for future sessions.
+6. **Network access.** This session was moved to the "vturnu-promotion" environment and 48 publisher hosts were added with your approval. They stay on that environment for future sessions.
+7. **UXmatters** cannot be reached by email (the editor's mailbox is full). Try their contact form or LinkedIn if you want to keep it.
+8. **The CX Lead** (CX publication) takes submissions as Google Docs only. If you share a Google Doc from VTurnU's own account, I can prepare the article for it.
+9. **SIIT promise.** If SIIT publishes post 437003 free, please share it on the VTurnU LinkedIn company page, Facebook, Instagram and your X profile, tagging SIIT, as promised in the 15:52 reply.
 
 ## 7. What I could not do, and why
 
