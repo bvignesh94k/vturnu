@@ -32,6 +32,7 @@ require dirname(__DIR__) . '/includes/hero-kit.php';
 require dirname(__DIR__) . '/includes/money-kit.php';
 require dirname(__DIR__) . '/includes/trust-kit.php';
 require dirname(__DIR__) . '/includes/listicle-kit.php';
+require dirname(__DIR__) . '/includes/post-kit.php';
 require dirname(__DIR__) . '/includes/content-kit.php';
 require_once dirname(__DIR__) . '/includes/update-kit.php';
 

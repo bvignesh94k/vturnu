@@ -380,58 +380,8 @@ return [
     'cta' => ['Is your brand named when buyers ask AI?', 'We check how the main AI engines present your brand and show you what to fix first.', 'Review My AI Visibility'],
 ],
 
-'how-to-measure-ai-search-visibility' => [
-    'title' => 'How to Measure AI Search Visibility: A Practical Method',
-    'meta'  => 'A practical way to measure AI search visibility: build a prompt set, track share of answer, read Bing citation data, and report it to leadership each month.',
-    'h1'    => 'How to Measure AI Search Visibility',
-    'lede'  => 'Measure AI search visibility by tracking a fixed set of buyer prompts across AI engines each month and recording how often your brand is named. Add first-party data from Bing Webmaster Tools and AI-referred traffic in your analytics, and report share of answer alongside leads, not in place of them.',
-    'category' => 'AI Search', 'intent' => 'How-to / Tutorial', 'date' => '2026-10-23', 'read' => '6 min',
-    'sections' => [
-        ['Step 1: build your prompt set', [
-            'Start with twenty to thirty real questions. Get them from sales calls, support tickets and search data, not from a keyword tool alone. Mix them across the journey.',
-        ], [
-            'Category questions: "best [category] companies in [market]"',
-            'Comparison questions: "[you] vs [competitor]"',
-            'Problem questions: "how do I fix [problem]"',
-            'Brand questions: "what is [your company] known for"',
-        ]],
-        ['Step 2: run them consistently', [
-            'Run the same prompts on the same engines every month: ChatGPT, Gemini, Perplexity, Copilot and Google AI Overviews. AI answers vary, so run each prompt more than once and record a rate rather than a yes or no.',
-        ]],
-        ['Step 3: record what matters', [
-            'For each prompt, capture four things. Were you named? Were you cited with a link? Who else was named? Was what it said about you accurate? Inaccurate statements are a finding in themselves, because they point to weak or conflicting information about your brand.',
-        ]],
-        ['Step 4: add first-party data', [
-            'Prompt sampling is an estimate, so back it with data you own.',
-        ], [], [
-            'caption' => 'Where to find AI visibility data',
-            'head' => ['Source', 'What it tells you'],
-            'rows' => [
-                ['Bing Webmaster Tools', 'Citations in Copilot and Bing AI answers'],
-                ['Google Search Console', 'Clicks and impressions, which include AI features in search'],
-                ['GA4 referral traffic', 'Visits from chatgpt.com, perplexity.ai and similar'],
-                ['Server logs', 'Which AI crawlers are visiting, and how often'],
-                ['Sales conversations', '"How did you hear about us?" now often includes AI tools'],
-            ],
-        ]],
-        ['Step 5: report it properly', [
-            'Show leadership share of answer against your top competitors, the trend over time, and a short list of fixes. Keep it next to pipeline, rather than replacing it. AI visibility is a leading signal, and leads are still the outcome.',
-        ]],
-    ],
-    'takeaways' => [
-        'Use real buyer questions, not only keywords',
-        'Run prompts repeatedly and record a rate',
-        'Accuracy of what AI says is a metric too',
-        'Report share of answer beside pipeline',
-    ],
-    'faqs' => [
-        ['What is share of answer?', 'The percentage of relevant AI answers that name your brand. It works like share of voice for AI search.'],
-        ['How often should I measure?', 'Monthly is enough for most businesses, because engines change gradually.'],
-        ['Can Google Search Console show AI Overview traffic separately?', 'Search Console includes AI features within its overall search data, so check its reports for what is currently broken out.'],
-        ['Why do results change between runs?', 'AI answers are generated each time, so some variation is normal. That is why you sample and record a rate.'],
-    ],
-    'cta' => ['Want this measured for your brand?', 'We track buyer prompts across AI engines and turn the results into a monthly plan.', 'Get My AI Visibility Plan'],
-],
+/* 'how-to-measure-ai-search-visibility' was rebuilt on 14 November 2026 and now
+   lives in includes/data/blog-authority.php, at the same address. */
 
 'what-is-sap-cpq-and-when-do-you-need-it' => [
     'title' => 'What Is SAP CPQ and When Does Your Business Need It?',

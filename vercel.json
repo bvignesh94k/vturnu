@@ -92,7 +92,7 @@
       "continue": true
     },
     {
-      "src": "^/(storage|includes|templates|bin|db|new)(/.*)?$",
+      "src": "^/(storage|includes|templates|bin|db|new|docs)(/.*)?$",
       "status": 404,
       "dest": "/api/index.php"
     },

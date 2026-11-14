@@ -617,6 +617,78 @@
         update(null);
     };
 
+    /* Calculators: number boxes in, rates out. data-calc names the set of sums,
+       and each sum is also written out in the article beside the tool. The
+       numbers are worked out in the page and are not stored or sent. */
+    TOOLS.calc = (el) => {
+        const num = (name) => {
+            const i = $('[data-calc-in="' + name + '"]', el);
+            if (!i || String(i.value).trim() === '') return NaN;
+            const v = parseFloat(String(i.value).replace(/,/g, ''));
+            return Number.isFinite(v) && v >= 0 ? v : NaN;
+        };
+        const fmt = (v, d) => v.toLocaleString('en', { maximumFractionDigits: d, minimumFractionDigits: 0 });
+        const put = (name, v, suffix = '', d = 1) => {
+            const o = $('[data-calc-out="' + name + '"]', el);
+            if (!o) return;
+            const ok = Number.isFinite(v);
+            o.textContent = ok ? fmt(v, d) + suffix : 'Add the numbers above';
+            o.classList.toggle('is-empty', !ok);
+        };
+        const ratio = (a, b, k = 100) => (Number.isFinite(a) && Number.isFinite(b) && b > 0 ? a / b * k : NaN);
+        const verdict = $('[data-calc-verdict]', el);
+
+        const SUMS = {
+            /* Organic lead ledger: six rates from eight counts. */
+            leads() {
+                const visits = num('visits'), forms = num('forms'), valid = num('valid'), qual = num('qual');
+                const all = num('all'), opps = num('opps'), pipe = num('pipe'), cost = num('cost');
+                put('valid', ratio(valid, forms), '%');
+                put('qualrate', ratio(qual, valid), '%');
+                put('share', ratio(qual, all), '%');
+                put('cpl', ratio(cost, qual, 1), '', 0);
+                put('opprate', ratio(opps, qual), '%');
+                put('pipe', ratio(pipe, visits, 1000), '', 0);
+            },
+            /* Two brands counted over the same number of answers: is the gap
+               bigger than the 95 percent margin of error for a difference? */
+            sample() {
+                const n = num('n'), a = num('a'), b = num('b');
+                const ok = Number.isFinite(n) && n >= 1 && Number.isFinite(a) && Number.isFinite(b) && a <= n && b <= n;
+                const pa = ok ? a / n : NaN, pb = ok ? b / n : NaN;
+                const gap = ok ? Math.abs(pa - pb) * 100 : NaN;
+                const moe = ok ? 1.96 * Math.sqrt(pa * (1 - pa) / n + pb * (1 - pb) / n) * 100 : NaN;
+                put('ra', pa * 100, '%');
+                put('rb', pb * 100, '%');
+                put('gap', gap, ' points');
+                put('moe', moe, ' points');
+                if (!verdict) return;
+                if (!ok) {
+                    verdict.textContent = Number.isFinite(n) && (a > n || b > n)
+                        ? 'A brand cannot be named in more answers than you counted. Check the three numbers.'
+                        : 'Type the three numbers to see whether the gap is larger than the margin of error.';
+                } else if (gap > moe) {
+                    verdict.textContent = 'The gap is larger than the margin of error, so it is unlikely to be noise alone. Check that it holds next month before you act on it.';
+                } else {
+                    verdict.textContent = 'The gap is inside the margin of error. Treat the two brands as level until you have counted more answers.';
+                }
+            },
+        };
+        const run = SUMS[el.dataset.calc];
+        if (!run) return;
+        el.addEventListener('input', run);
+        const clear = $('[data-calc-reset]', el);
+        if (clear) {
+            clear.addEventListener('click', () => {
+                $$('[data-calc-in]', el).forEach((i) => { i.value = ''; });
+                run();
+                const first = $('[data-calc-in]', el);
+                if (first) first.focus();
+            });
+        }
+        run();
+    };
+
     /* TOOLS:END */
 
     $$('[data-lx-tool]').forEach((el) => {

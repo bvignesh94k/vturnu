@@ -80,7 +80,9 @@ $post_img = is_file(BASE_PATH . '/assets/img/blog/' . $page['post'] . '.webp')
     : '';
 render_hero([
     'k' => $post['category'] . ' · ' . $post['intent'], 'h1' => $post['h1'], 'tone' => 'paper', 'layout' => hero_layout($page['post']) === 'flip' ? 'flip' : 'split',
-    'extra' => '<p class="post-byline">By the VTurnU strategy team · ' . e(date('j F Y', strtotime($post['date']))) . ' · ' . e($post['read']) . ' read</p>',
+    'extra' => '<p class="post-byline">By the VTurnU strategy team · ' . e(date('j F Y', strtotime($post['date'])))
+        . (!empty($post['modified']) && $post['modified'] !== $post['date'] ? ' · Updated ' . e(date('j F Y', strtotime($post['modified']))) : '')
+        . ' · ' . e($post['read']) . ' read</p>',
     'visual' => $post_img, 'class' => 'hx--post',
 ]);
 ?>

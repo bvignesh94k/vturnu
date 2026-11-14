@@ -23,3 +23,6 @@ tests/
 
 # Promo video renders and their sources: large local media, never part of a deploy.
 promo-video/
+
+# Working notes for content projects. Not part of the website.
+docs/

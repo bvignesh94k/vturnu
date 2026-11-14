@@ -3217,6 +3217,73 @@ html:not(.lx-on) .lx-js { display: none !important; }
     .ux-item:hover { transform: none; }
 }
 
+/* ============================================================
+   POST KIT (includes/post-kit.php): numbered diagrams, range charts, example
+   boxes and calculators for the long-form articles. Diagrams are markup, so
+   their words can be read and searched. A tag's marker is solid, half or
+   hollow, so the three trust levels never rest on colour alone.
+   ============================================================ */
+.pf { margin: 30px 0; padding: clamp(18px, 2.6vw, 26px); border: 1.5px solid #E4E0EF; border-radius: 18px; background: #fff; }
+.post-rich .pf-t { margin: 0; font-size: 1.08rem; font-weight: 700; line-height: 1.35; color: #1D1936; }
+.post-rich .pf-s { margin: 4px 0 0; font-size: .9rem; line-height: 1.5; color: #4B4668; }
+.post-rich ul.pf-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; padding: 0; list-style: none; font-size: .84rem; color: #4B4668; }
+.post-rich ul.pf-key li { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 0; }
+.post-rich ul.pf-key li::before { content: none; }
+.pf-dot { display: inline-block; flex: none; width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid #5B56C9; background: #5B56C9; }
+.pf-dot--b { border-color: #0A8FC4; background: linear-gradient(90deg, #0A8FC4 50%, #fff 50%); }
+.pf-dot--c { border-color: #E5267A; background: #fff; }
+.post-rich ol.pf-steps { position: relative; margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.post-rich ol.pf-steps > li.pf-step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; margin: 0; padding: 13px 15px; border: 1.5px solid #E4E0EF; border-radius: 13px; background: #FBFAFF; }
+.post-rich ol.pf-steps > li.pf-step::before { content: none; }
+.pf--stack ol.pf-steps > li.pf-step:not(:last-child)::after { content: ""; position: absolute; left: 31px; bottom: -12px; width: 2px; height: 12px; background: #C9C4DE; }
+.pf-n { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #1D1936; color: #fff; font-size: .9rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.post-rich .pf-h { margin: 0; font-size: 1rem; font-weight: 700; line-height: 1.35; color: #1D1936; }
+.post-rich .pf-d { margin: 3px 0 0; font-size: .92rem; line-height: 1.55; color: #3B3560; }
+.pf-tag { display: inline-flex; align-items: center; gap: 7px; align-self: center; padding: 5px 11px; border: 1.5px solid #E4E0EF; border-radius: 999px; background: #fff; font-size: .78rem; font-weight: 700; line-height: 1.3; color: #1D1936; white-space: nowrap; }
+.pf--row ol.pf-steps { grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); }
+.pf--row ol.pf-steps > li.pf-step { grid-template-columns: minmax(0, 1fr); align-content: start; }
+.pf--row .pf-tag { justify-self: start; margin-top: 6px; white-space: normal; }
+.post-rich .pf-cap { margin: 14px 0 0; font-size: .82rem; line-height: 1.5; color: #6F6992; text-align: left; }
+
+.px-eg { margin: 24px 0; padding: 16px 18px 6px; border: 1.5px dashed #B9B2DE; border-radius: 14px; background: #FBFAFF; }
+.post-rich .px-eg-k { display: inline-block; margin: 0 0 10px; padding: 4px 11px; border-radius: 999px; background: #EFEBFA; color: #2A25A0; font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.px-eg .bx-table-wrap { margin-top: 12px; }
+
+/* Range rows on a chart: an open marker where the figure started, a filled one where it ended. */
+.ux-seg { position: absolute; top: 15px; left: var(--a); width: calc(var(--b) - var(--a)); height: 4px; border-radius: 2px; background: var(--ux-base); }
+.ux-dot { position: absolute; top: 9px; left: var(--x); width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; border: 3px solid var(--ux-base); background: #fff; box-shadow: 0 0 0 2px #fff; }
+.ux-dot--to { background: var(--ux-base); }
+.ux-row.is-range .ux-val { left: calc(var(--w) + 14px); }
+.ux-sw--from, .ux-sw--to { width: 13px; height: 13px; border-radius: 50%; border: 3px solid var(--ux-base); background: #fff; }
+.ux-sw--to { background: var(--ux-base); }
+.ux-sw--soft { background: #C9C4DE; }
+.ux-plot--wide { --ux-lab: 178px; }
+
+/* Calculators inside an article (data-lx-tool="calc" in assets/js/listicle.js). */
+.lx-calc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; margin-top: 14px; }
+.lx-calc label { display: block; }
+.lx-tool input[type="number"] { width: 100%; min-height: 44px; padding: 9px 12px; border: 1.5px solid #CFC9EA; border-radius: 10px; background: #fff; color: #1D1936; font: inherit; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.post-rich ul.lx-calc-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+.post-rich ul.lx-calc-out li { margin: 0; padding: 12px 14px; border-radius: 12px; background: #1D1936; color: #D9D5EE; font-size: .8rem; line-height: 1.4; }
+.post-rich ul.lx-calc-out li::before { content: none; }
+.lx-calc-out b { display: block; margin-bottom: 3px; color: #fff; font-size: 1.28rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.lx-calc-out b.is-empty { color: #A9A3CC; font-size: .92rem; font-weight: 600; }
+.post-rich .lx-calc-verdict { margin: 14px 0 0; padding: 12px 15px; border-left: 4px solid #FFC94D; border-radius: 0 10px 10px 0; background: #fff; font-weight: 600; line-height: 1.55; color: #1D1936; }
+.lx-dl { display: inline-flex; align-items: center; gap: 8px; }
+
+@media (max-width: 640px) {
+    .post-rich ol.pf-steps > li.pf-step { grid-template-columns: 34px minmax(0, 1fr); }
+    .pf-tag { grid-column: 2; justify-self: start; margin-top: 6px; white-space: normal; }
+    .pf--row ol.pf-steps { grid-template-columns: minmax(0, 1fr); }
+    .pf--row ol.pf-steps > li.pf-step { grid-template-columns: 34px minmax(0, 1fr); }
+    .ux-plot--wide { --ux-lab: 0px; }
+    .ux-row.is-range .ux-track { padding-top: 32px; }
+    .ux-row.is-range .ux-seg { top: 13px; }
+    .ux-row.is-range .ux-dot { top: 7px; }
+    .ux-row.is-range .ux-val { left: 0; }
+    .lx-calc, .post-rich ul.lx-calc-out { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* Eight top-level menu items since Updates joined (November 2026). The compact
    rules higher up are overridden by the single .nav-link rule near the end, so
    these tighten the row in steps, desktop only (the phone drawer keeps its own).

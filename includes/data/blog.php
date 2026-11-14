@@ -1077,4 +1077,4 @@ $BLOG = [
 ];
 
 /* Newest first, so the feed and the blog index lead with current work. */
-$BLOG = (require __DIR__ . '/blog-new.php') + $BLOG;
+$BLOG = (require __DIR__ . '/blog-authority.php') + (require __DIR__ . '/blog-new.php') + $BLOG;
