@@ -31,7 +31,7 @@ Files for each are in this folder: article.md and .docx, cover image, email text
 
 - Analytics Insight: paid only ($400 per guest post). Answered on 14 Nov in the owner's words: not buying links, happy to share free editorial content.
 - SIIT (owner's goal: one free article there): answered the status follow-up within ten minutes with a price list ($60 per guest post, $40 per link insertion, author account $300 a year). I replied in the owner's words that we do not buy links. SIIT then asked "Where are you sharing the posts? ... We need some good benefit in return?" At 15:52 I replied: no payment and no link exchange, but once post 437003 is live we will share it on VTurnU's LinkedIn company page, Facebook, Instagram and X tagging SIIT, keep it updated and answer reader questions, and asked them to go ahead. Waiting for their answer. Note: SIIT openly sells dofollow links, so search engines may discount links from it.
-- CEOWORLD: replied within ten minutes with paid plans only ($700 for one post with one backlink, $3,000 for five, $5,000 for ten, full prepayment, posts deleted after 5 years). Replied in the owner's words: not buying links; asked them to review the article on merit through the editorial route their Contribute page describes, or confirm paid-only so we withdraw. If paid-only, the article (written for executives) can be rewritten for another site.
+- CEOWORLD: replied within ten minutes with paid plans only ($700 for one post with one backlink, $3,000 for five, $5,000 for ten, full prepayment, posts deleted after 5 years). Replied in the owner's words: not buying links; asked them to review the article on merit through the editorial route their Contribute page describes, or confirm paid-only so we withdraw. If paid-only, the article (written for executives) can be rewritten for another site. At the owner's request a second note followed at 15:55: our focus is not backlinks, the one link goes to a free guide their editors may remove, and we will share the published piece on our social channels tagging CEOWORLD.
 - Growjo (a listing, not a guest post): asked $200 for a listing with a followed link. Declined politely.
 - UXmatters: the one-time resend bounced again (pabini@ mailbox still full).
 - Sugermint and Business Outreach: paid only, already declined on 9 and 10 Nov.
@@ -65,7 +65,7 @@ Not followed up, on purpose: Infosecurity Magazine (no reply means declined), Te
 | Techpoint Africa | Bot protection blocks reading the guidelines in full (search summary: full drafts to editor@techpoint.africa, subject "Guest Contributor") |
 | The CX Lead | Takes Google Docs only ("please do not send Word documents"); the Drive connector here is a client account, so not used |
 
-Next candidates worth a look: Silicon Canals (600-800 words, Word file; site was down), Postalytics (exclusive, one body link to your site, two-week review; submission address not published, use their contact page), Foleon (DR 83, pitch first, website link in bio), Techpoint Africa (needs a normal browser to read its rules), UKTN opinion.
+Next candidates worth a look: Silicon Canals (600-800 words, Word file; down at three checks), Postalytics (full articles to marketing@postalytics.com, exclusive, one body link, two-week review; active but nearly all recent posts are in-house ISP and product content, so a long shot), Foleon (DR 83; pitch through a HubSpot form, final article as a Google Doc, so it needs your Google account), Techpoint Africa (needs a normal browser to read its rules), UKTN opinion.
 
 ## 6. Items for the owner
 
