@@ -383,6 +383,147 @@ const ART = {
         s += `<g filter="url(#sh)"><circle cx="372" cy="384" r="64" fill="url(#gU)"/>${tick(372, 388, 2.3)}</g>`;
         return s + sparkle(432, 96, 24) + sparkle(40, 424, 16, 'url(#gV)');
     },
+    /* ---- November 2026 authority series ---- */
+    layers() {
+        /* Six layers between a crawler and the content. The request gets through three and stops at the fourth. */
+        let s = '';
+        const fills = ['url(#gV)', 'url(#gV)', 'url(#gV)', 'url(#gU)', '#e4e1f7', '#e4e1f7'];
+        fills.forEach((f, i) => {
+            const y = 52 + i * 68, x = 60 + (i % 2) * 14;
+            s += `<g filter="url(#sh)"><rect x="${x}" y="${y}" width="330" height="50" rx="16" fill="${i < 4 ? 'url(#gL)' : '#f3f1fc'}" stroke="#e1dff6" stroke-width="1.5"/></g>`;
+            s += `<rect x="${x + 16}" y="${y + 13}" width="24" height="24" rx="8" fill="${f}"/>` + bar(x + 54, y + 20, 150 - i * 12, i < 4 ? '#1d1936' : '#c9c5ea', 11);
+            if (i < 3) s += `<circle cx="${x + 296}" cy="${y + 25}" r="15" fill="#1d1936"/>` + tick(x + 296, y + 26, 0.62, '#ffc94d');
+        });
+        s += `<g filter="url(#sh)"><circle cx="376" cy="281" r="34" fill="url(#gU)"/>${cross(376, 281, 1.15)}</g>`;
+        s += `<path d="M438 60v176" stroke="url(#gV)" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 15"/><path d="M426 232l12 14 12-14" fill="none" stroke="#4338ca" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+        return s + sparkle(36, 40, 18) + sparkle(444, 440, 20, 'url(#gV)');
+    },
+    gauge() {
+        /* A speed gauge reading high, beside an enquiry form that is failing. */
+        let s = panel(40, 50, 400, 250, 28);
+        s += `<path d="M110 250a130 130 0 0 1 260 0" fill="none" stroke="#e4e1f7" stroke-width="26" stroke-linecap="round"/>`;
+        s += `<path d="M110 250a130 130 0 0 1 238-72" fill="none" stroke="url(#gB)" stroke-width="26" stroke-linecap="round"/>`;
+        s += `<path d="M240 250L322 168" stroke="#1d1936" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="250" r="17" fill="#1d1936"/><circle cx="240" cy="250" r="6" fill="#ffc94d"/>`;
+        s += `<g filter="url(#sh)"><rect x="96" y="330" width="288" height="124" rx="22" fill="#1d1936"/></g>`;
+        s += bar(122, 354, 120, '#ffffff', 13) + `<rect x="122" y="382" width="170" height="22" rx="8" fill="rgba(255,255,255,.16)"/><rect x="122" y="414" width="118" height="22" rx="8" fill="rgba(255,255,255,.16)"/>`;
+        s += `<g filter="url(#sh)"><circle cx="372" cy="342" r="38" fill="url(#gU)"/>${cross(372, 342, 1.3)}</g>`;
+        return s + sparkle(430, 40, 20, 'url(#gV)') + sparkle(50, 420, 16);
+    },
+    ledger() {
+        /* A ledger of leads: each stage narrower than the one before, ending in a checked total. */
+        let s = panel(44, 44, 392, 412, 26);
+        s += bar(72, 74, 150, '#1d1936', 16) + `<rect x="72" y="106" width="336" height="2" fill="#e1dff6"/>`;
+        [[300, 'url(#gV)'], [236, 'url(#gV)'], [176, 'url(#gB)'], [122, 'url(#gU)'], [78, 'url(#gU)']].forEach(([w, f], i) => {
+            const y = 128 + i * 50;
+            s += `<rect x="72" y="${y}" width="${w}" height="30" rx="10" fill="${f}"/>` + bar(388 - 42, y + 10, 42, '#c9c5ea', 10);
+        });
+        s += `<rect x="60" y="382" width="360" height="56" rx="16" fill="#1d1936"/>` + bar(82, 403, 130, '#ffffff', 14) + bar(318, 403, 80, '#ffc94d', 14);
+        s += `<g filter="url(#sh)"><circle cx="424" cy="64" r="40" fill="url(#gU)"/>${tick(424, 66, 1.5)}</g>`;
+        return s + sparkle(34, 470, 18, 'url(#gV)');
+    },
+    ladder() {
+        /* Six rungs from mention to revenue: the lower ones counted (solid), the upper ones inferred (dotted). */
+        let s = `<path d="M96 462L176 36M304 462L384 36" stroke="#1d1936" stroke-width="12" stroke-linecap="round"/>`;
+        for (let i = 0; i < 6; i++) {
+            const y = 420 - i * 66, dx = (462 - y) * (80 / 426);
+            const x1 = 96 + dx, x2 = 304 + dx;
+            s += i < 3
+                ? `<path d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}" stroke="${i === 2 ? 'url(#gB)' : 'url(#gV)'}" stroke-width="20" stroke-linecap="round"/>`
+                : `<path d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}" stroke="#ff3d8a" stroke-width="12" stroke-linecap="round" stroke-dasharray="3 22"/>`;
+        }
+        s += `<g filter="url(#sh)"><circle cx="412" cy="96" r="42" fill="#1d1936"/><text x="412" y="112" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="46" fill="#ffc94d">?</text></g>`;
+        s += `<g filter="url(#sh)"><circle cx="70" cy="390" r="36" fill="url(#gU)"/>${tick(70, 392, 1.35)}</g>`;
+        return s + sparkle(440, 300, 20, 'url(#gV)') + sparkle(60, 80, 16);
+    },
+    split() {
+        /* One bar in two colours: the larger part is people who already knew the brand. */
+        let s = panel(30, 70, 420, 360, 26);
+        s += bar(60, 104, 170, '#1d1936', 16) + bar(60, 134, 110);
+        s += `<rect x="60" y="188" width="360" height="74" rx="20" fill="url(#gU)"/><rect x="60" y="188" width="262" height="74" rx="20" fill="url(#gV)"/><rect x="302" y="188" width="20" height="74" fill="url(#gV)"/><rect x="320" y="182" width="5" height="86" rx="2.5" fill="#fff"/>`;
+        s += `<path d="M64 286v14h254v-14" fill="none" stroke="#4338ca" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M330 286v14h86v-14" fill="none" stroke="#e5267a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+        s += `<rect x="96" y="318" width="190" height="34" rx="17" fill="#1d1936"/>` + bar(114, 330, 154, '#ffffff', 10) + `<rect x="330" y="318" width="86" height="34" rx="17" fill="#ffe7f0"/>` + bar(344, 330, 58, '#e5267a', 10);
+        s += bar(60, 384, 300) + bar(60, 404, 220);
+        s += `<g filter="url(#sh)"><circle cx="418" cy="80" r="40" fill="#1d1936"/><path d="M400 92l12-14 10 8 14-18" fill="none" stroke="#ffc94d" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+        return s + sparkle(40, 464, 18, 'url(#gV)') + sparkle(440, 452, 16);
+    },
+    agent() {
+        /* A browser window an agent is working in: it has found the button and is about to press it. */
+        let s = panel(30, 56, 420, 330, 24);
+        s += `<rect x="30" y="56" width="420" height="52" rx="24" fill="#1d1936"/><rect x="30" y="86" width="420" height="22" fill="#1d1936"/>`;
+        s += `<circle cx="60" cy="82" r="7" fill="#ff3d8a"/><circle cx="82" cy="82" r="7" fill="#ffc94d"/><circle cx="104" cy="82" r="7" fill="#00b8d9"/><rect x="130" y="70" width="230" height="24" rx="12" fill="rgba(255,255,255,.16)"/>`;
+        s += bar(60, 138, 200, '#1d1936', 16) + bar(60, 170, 250) + bar(60, 192, 210);
+        s += `<rect x="60" y="226" width="250" height="34" rx="10" fill="#f3f1fc" stroke="#d9d6f4" stroke-width="2"/><rect x="60" y="272" width="250" height="34" rx="10" fill="#f3f1fc" stroke="#d9d6f4" stroke-width="2"/>`;
+        s += `<rect x="54" y="322" width="150" height="48" rx="24" fill="none" stroke="#ff9100" stroke-width="4" stroke-dasharray="9 8"/><rect x="60" y="328" width="138" height="36" rx="18" fill="url(#gV)"/>` + bar(86, 341, 86, '#ffffff', 10);
+        s += `<path d="M196 346l6 62 16-20 26 4z" fill="#1d1936" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>`;
+        s += `<g filter="url(#sh)"><rect x="318" y="300" width="132" height="132" rx="34" fill="url(#gU)"/></g><rect x="346" y="336" width="76" height="56" rx="16" fill="#fff"/><circle cx="369" cy="362" r="8" fill="#1d1936"/><circle cx="399" cy="362" r="8" fill="#1d1936"/><path d="M384 336v-16" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="384" cy="314" r="8" fill="#fff"/><path d="M370 408h28" stroke="#fff" stroke-width="6" stroke-linecap="round"/>`;
+        return s + sparkle(440, 44, 20, 'url(#gV)') + sparkle(44, 440, 16);
+    },
+    launch() {
+        /* A launch checklist, with the switch moving from staging to live. */
+        let s = panel(46, 40, 300, 420, 26);
+        s += bar(76, 72, 150, '#1d1936', 16);
+        for (let i = 0; i < 6; i++) {
+            const y = 112 + i * 54, ok = i < 4;
+            s += `<rect x="76" y="${y}" width="32" height="32" rx="10" fill="${ok ? 'url(#gV)' : '#fff'}" stroke="${ok ? 'none' : '#c9c5ea'}" stroke-width="3"/>` + (ok ? tick(92, y + 17, 0.72) : '');
+            s += bar(124, y + 5, 170 - (i % 3) * 26, ok ? '#1d1936' : '#c9c5ea', 10) + bar(124, y + 21, 110 - (i % 2) * 20);
+        }
+        s += `<g filter="url(#sh)"><rect x="286" y="188" width="170" height="86" rx="43" fill="url(#gU)"/><circle cx="413" cy="231" r="32" fill="#fff"/></g>` + tick(413, 233, 1.05, '#e5267a');
+        s += `<path d="M308 231h54" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 14"/>`;
+        s += `<g filter="url(#sh)"><rect x="318" y="306" width="120" height="40" rx="20" fill="#1d1936"/></g>` + bar(340, 321, 76, '#ffc94d', 10);
+        return s + sparkle(410, 96, 26, 'url(#gV)') + sparkle(400, 430, 18);
+    },
+    scorecard() {
+        /* Four brands scored on four things, one column picked out. */
+        let s = panel(28, 56, 424, 388, 26);
+        s += bar(54, 86, 150, '#1d1936', 16);
+        s += `<g filter="url(#sh)"><rect x="232" y="118" width="68" height="302" rx="18" fill="#1d1936"/></g>`;
+        const cols = [164, 266, 334, 402];
+        ['url(#gV)', '#ffc94d', 'url(#gU)', 'url(#gV)'].forEach((f, i) => { s += `<circle cx="${cols[i]}" cy="148" r="15" fill="${f}"/>`; });
+        const marks = [[1, 1, 0, 1], [1, 1, 1, 0], [0, 1, 0, 1], [1, 1, 0, 0]];
+        marks.forEach((row, r) => {
+            const y = 204 + r * 58;
+            s += bar(54, y - 5, 74, '#c9c5ea', 10) + (r < 3 ? `<rect x="54" y="${y + 28}" width="372" height="1.5" fill="#eceaf9"/>` : '');
+            row.forEach((m, c) => {
+                const onDark = c === 1;
+                s += m ? `<circle cx="${cols[c]}" cy="${y}" r="17" fill="${onDark ? '#ffc94d' : '#e9f8fc'}"/>` + tick(cols[c], y + 1, 0.7, onDark ? '#1d1936' : '#0a8fc4')
+                    : `<circle cx="${cols[c]}" cy="${y}" r="17" fill="#ffe7f0"/>` + cross(cols[c], y, 0.62, '#e5267a');
+            });
+        });
+        return s + sparkle(436, 44, 22) + sparkle(40, 468, 18, 'url(#gV)');
+    },
+    signal() {
+        /* Many reactions, fading out, and the one account card worth a call. */
+        let s = '';
+        const dots = [[58, 96, 30, 1], [132, 70, 26, .85], [200, 104, 22, .7], [262, 76, 18, .55], [318, 108, 15, .4], [366, 84, 12, .28], [408, 110, 9, .18],
+            [92, 172, 22, .7], [160, 158, 18, .55], [224, 178, 14, .4], [280, 160, 11, .28], [330, 180, 8, .18]];
+        dots.forEach(([x, y, r, o], i) => {
+            s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${i % 3 === 0 ? 'url(#gU)' : i % 3 === 1 ? 'url(#gV)' : '#ffc94d'}" opacity="${o}"/>`;
+            if (r > 20) s += `<path d="M${x - r * 0.42} ${y + r * 0.08}l${r * 0.3} ${r * 0.32} ${r * 0.56}-${r * 0.62}" fill="none" stroke="#fff" stroke-width="${r * 0.2}" stroke-linecap="round" stroke-linejoin="round" opacity="${o}"/>`;
+        });
+        s += `<path d="M240 214v40" stroke="#4338ca" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 13"/><path d="M228 250l12 14 12-14" fill="none" stroke="#4338ca" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
+        s += panel(54, 276, 372, 176, 26);
+        s += `<rect x="80" y="302" width="76" height="76" rx="20" fill="#1d1936"/><rect x="100" y="322" width="14" height="36" rx="4" fill="#ffc94d"/><rect x="122" y="334" width="14" height="24" rx="4" fill="#7be8f7"/>`;
+        s += bar(176, 308, 170, '#1d1936', 16) + bar(176, 338, 120) + bar(176, 360, 150);
+        [0, 1, 2].forEach((i) => { s += `<circle cx="${96 + i * 30}" cy="414" r="15" fill="${['url(#gV)', 'url(#gU)', '#ffc94d'][i]}" stroke="#fff" stroke-width="3"/>`; });
+        s += `<rect x="286" y="396" width="116" height="36" rx="18" fill="url(#gV)"/>` + bar(306, 409, 76, '#ffffff', 10);
+        s += `<g filter="url(#sh)"><circle cx="418" cy="284" r="36" fill="url(#gU)"/>${tick(418, 286, 1.3)}</g>`;
+        return s + sparkle(446, 196, 18, 'url(#gV)') + sparkle(36, 250, 14);
+    },
+    matrix() {
+        /* Search phrases on the left, each joined to the page that answers it on the right. */
+        let s = '';
+        const rows = [78, 150, 222, 294, 366, 438];
+        const to = [1, 0, 2, 4, 3, 5];
+        rows.forEach((y, i) => {
+            const y2 = rows[to[i]];
+            s += `<path d="M196 ${y}C246 ${y} 250 ${y2} 300 ${y2}" fill="none" stroke="${i % 2 ? '#ff3d8a' : '#4338ca'}" stroke-width="4" stroke-linecap="round" opacity=".75"/>`;
+        });
+        rows.forEach((y, i) => {
+            s += `<g filter="url(#sh)"><rect x="20" y="${y - 22}" width="176" height="44" rx="22" fill="#1d1936"/></g><circle cx="46" cy="${y}" r="9" fill="none" stroke="#ffc94d" stroke-width="3.5"/><path d="M53 ${y + 7}l6 6" stroke="#ffc94d" stroke-width="3.5" stroke-linecap="round"/>` + bar(70, y - 5, 104 - (i % 3) * 16, '#ffffff', 10);
+            s += `<g filter="url(#sh)"><rect x="300" y="${y - 26}" width="160" height="52" rx="14" fill="url(#gL)" stroke="#e1dff6" stroke-width="1.5"/></g><rect x="314" y="${y - 13}" width="26" height="26" rx="8" fill="${i % 2 ? 'url(#gU)' : 'url(#gV)'}"/>` + bar(352, y - 10, 86 - (i % 2) * 14, '#1d1936', 9) + bar(352, y + 5, 60, '#d9d6f4', 8);
+        });
+        return s + sparkle(248, 36, 18) + sparkle(250, 476, 14, 'url(#gV)');
+    },
 };
 
 /* Concept per blog post, chosen for what the article is about. */
@@ -402,6 +543,10 @@ const BLOG_ART = {
     'google-ads-mistakes-draining-your-budget': 'funnel', 'seo-best-practices-for-ecommerce-stores': 'cart', 'how-we-doubled-organic-leads-for-a-clinic': 'rank',
     'chatgpt-seo-how-brands-get-recommended': 'answer', 'website-redesign-without-losing-seo': 'browser', 'email-marketing-vs-social-media-marketing': 'mail',
     'digital-marketing-faqs-answered-by-experts': 'answer', 'marketing-automation-trends-and-innovations': 'orbit', 'core-web-vitals-guide-for-business-owners': 'browser',
+    'ai-crawler-access-problems': 'layers', 'pagespeed-score-vs-qualified-leads': 'gauge', 'measure-qualified-leads-from-organic-search': 'ledger',
+    'ai-citations-vs-website-traffic': 'ladder', 'search-visibility-vs-revenue-demand': 'split', 'how-ai-agents-evaluate-b2b-websites': 'agent',
+    'wordpress-seo-launch-checklist': 'launch', 'ai-search-competitor-benchmark': 'scorecard', 'linkedin-engagement-vs-buyer-intent': 'signal',
+    'industrial-buyer-search-intent': 'matrix',
     'social-media-content-strategy-for-business': 'social', 'landing-page-optimization-guide': 'browser', 'ecommerce-conversion-rate-optimization': 'cart', 'branding-vs-performance-marketing': 'brand',
 };
 const SLUG_ART = [
