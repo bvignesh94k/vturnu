@@ -21,6 +21,7 @@ Not live yet: e27 (both), The Techism post 381626 and SIIT post 437003 (both sti
 | ContactCenterWorld (owner's request) | Full article: "What AI Assistants Tell Your Customers Before They Call You" + 1200x675 cover in CCW navy and blue | Email to Raj Wadhwani, President (rajw@), free option | None possible: their free route removes all websites | Follow up 21 Nov |
 | CEOWORLD Magazine (DR 80) | Full article: "Before Buyers Call, an AI Has Already Briefed Them: Five Questions for CEOs" + 1456x816 cover in CEOWORLD blue and gold + headshot | info@ceoworld.biz | Body link to /blog/how-to-measure-ai-search-visibility/ | Replied with a paid menu at 15:50; asked for free editorial review (see section 3) |
 | CX Today | Full article: "Bots Are Filling In Your Forms: Five Ways to Keep Junk Out of Your CX Data" + 1200x675 cover in CX Today grey and purple + headshot + logo (they ask for it) | newsdesk@cxtoday.com | Company homepage link in the author bio (their guidelines allow no links in the text) | Follow up 21 Nov |
+| UX Magazine | Full article: "One Page, Five Readers: Designing B2B Service Pages for Buying Committees" + 1200x675 cover in UX Magazine black and red + headshot | contribute@uxmag.com | Body link to /blog/what-to-write-on-every-page-of-a-b2b-website/ and vturnu.com in the bio (their author-site links are followed) | Follow up 21 Nov |
 | Growth Folks (DR 60) | Pitch, three ideas with outlines | info@growthfolks.io | /blog/content-refresh-checklist/ or /blog/how-to-stop-junk-leads-on-your-website/ | Follow up 21 Nov |
 | SmallBusiness.co.uk (DR 75) | Pitch, three ideas | anna.jordan@stubbenedge.com | /blog/website-accessibility-checklist/ or /blog/website-design-brief-questions/ | Follow up 21 Nov |
 | 150sec | Pitch, two ideas | info@150sec.com | /blog/website-accessibility-checklist/ or /ai-crawler-checker/ | Follow up 21 Nov |
@@ -72,7 +73,7 @@ Next candidates worth a look: Silicon Canals (600-800 words, Word file; down at 
 
 - beehiiv: "Google's November Core Update Is Rolling Out. Here Is a Calm Plan for Your Website" with one link to /updates/november-core-update-2026/, a 1200x630 thumbnail and SEO fields. Steps: beehiiv/publish-steps.md.
 - Indie Hackers: "Is your site blocking AI assistants without you knowing? A 10-minute check" with one link to /ai-crawler-checker/ and a disclosure line. Post: indiehackers/post.md.
-- Social posts for the SIIT article (LinkedIn company page, X single post and thread, Facebook, Threads): siit/social-posts.md.
+- Social posts for the SIIT article (LinkedIn company page, X single post and thread, Facebook, Threads): siit/social-posts.md. Posted by the owner on 14 Nov; the four links went to SIIT in a Word note (siit/vturnu-shares-siit-article.docx). Engagement numbers due to SIIT around 21 Nov.
 - Claude in Chrome is not connected to this cloud session, so these need you to paste and publish.
 
 ## 5c. Research shortlist for the next round (from a background search, guidelines not yet read in full)
