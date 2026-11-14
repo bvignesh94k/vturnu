@@ -9,12 +9,22 @@ $posts = $BLOG;
 if ($cat_filter !== '' && in_array($cat_filter, $cats, true)) {
     $posts = array_filter($BLOG, fn($b) => $b['category'] === $cat_filter);
 }
-$q = strtolower(trim((string) ($_GET['q'] ?? '')));
+$q_raw = is_string($_GET['q'] ?? null) ? trim($_GET['q']) : '';
+$q = strtolower($q_raw);
 if ($q !== '') {
-    $posts = array_filter($posts, fn($b) => str_contains(strtolower($b['h1'] . ' ' . $b['category'] . ' ' . $b['intent']), $q));
+    /* Every word must appear, the same rule the script uses in the page. */
+    $words = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
+    $posts = array_filter($posts, static function ($b) use ($words) {
+        $text = strtolower($b['h1'] . ' ' . $b['category'] . ' ' . $b['intent'] . ' ' . ($b['kicker'] ?? ''));
+        foreach ($words as $w) { if (!str_contains($text, $w)) { return false; } }
+        return true;
+    });
 }
 uasort($posts, fn($a, $b) => strcmp($b['date'], $a['date']));
 $base_url = '/' . ($slug === 'ai-blog-posts' ? 'ai-blog-posts' : 'blog') . '/';
+$n = count($posts);
+$cat_on = is_string($cat_filter) && $cat_filter !== '' && in_array($cat_filter, $cats, true);
+$count_text = $n === 0 ? 'No articles match' : $n . ($n === 1 ? ' article' : ' articles') . ($cat_on ? ' on ' . $cat_filter : '') . ($q !== '' ? ' mentioning "' . $q_raw . '"' : '') . ($cat_on || $q !== '' ? '' : ', newest first');
 ?>
 <?php
 $hero_imgs = [];
@@ -42,7 +52,7 @@ render_hero([
         <?php /* One sentence in place of a row of topic buttons: pick a topic, or
                  type a few letters. It works without the script too, through the
                  Show button. */ ?>
-        <form class="bf" method="get" action="<?= e($base_url) ?>" role="search" aria-label="Find an article" data-bf>
+        <form class="bf" method="get" action="<?= e($base_url) ?>" role="search" aria-label="Find an article" data-bf<?= $n < count($BLOG) ? ' data-bf-narrowed' : '' ?>>
             <p class="bf-line">
                 <label for="bf-cat">Show me</label>
                 <span class="bf-pick"><select id="bf-cat" name="cat" data-bf-cat>
@@ -50,10 +60,10 @@ render_hero([
                     <?php foreach ($cats as $c): ?><option value="<?= e($c) ?>"<?= $cat_filter === $c ? ' selected' : '' ?>><?= e($c) ?></option><?php endforeach; ?>
                 </select></span>
                 <label for="bf-q">that mentions</label>
-                <span class="bf-q"><input id="bf-q" type="search" name="q" autocomplete="off" enterkeyhint="search" placeholder="any word, e.g. leads" data-bf-q></span>
+                <span class="bf-q"><input id="bf-q" type="search" name="q" autocomplete="off" enterkeyhint="search" placeholder="any word, e.g. leads" value="<?= e($q_raw) ?>" data-bf-q></span>
                 <button class="bf-go" type="submit">Show</button>
             </p>
-            <p class="bf-count" aria-live="polite" data-bf-count><?= count($posts) ?> articles, newest first</p>
+            <p class="bf-count" aria-live="polite" data-bf-count><?= e($count_text) ?></p>
         </form>
 
         <div class="card-grid cols-3 blog-grid">
@@ -79,7 +89,7 @@ render_hero([
             </div>
             <?php endif; endforeach; ?>
         </div>
-        <p class="bf-none" data-bf-none hidden>Nothing matches that yet. Try a shorter word, or <a href="/contact-us/">ask us the question directly</a>.</p>
+        <p class="bf-none" data-bf-none<?= $n === 0 ? '' : ' hidden' ?>>Nothing matches that yet. Try a shorter word, or <a href="/contact-us/">ask us the question directly</a>.</p>
         <script src="/assets/js/blog-list.js?v=<?= e(asset_v('/assets/js/blog-list.js')) ?>" defer></script>
     </div>
 </section>

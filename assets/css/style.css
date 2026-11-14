@@ -88,6 +88,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 /* clip (not hidden) keeps position:sticky working while killing sideways scroll from off-screen menus */
 html, body { overflow-x: clip; }
 
@@ -1352,8 +1353,8 @@ a.card:hover, .card:hover {
 .bf select { -webkit-appearance: none; appearance: none; min-height: 48px; max-width: 100%; padding: 8px 44px 8px 18px; border: 0; border-radius: 14px; background: var(--ink); color: #fff; font: inherit; cursor: pointer; }
 .bf select option { color: var(--ink); background: #fff; font-weight: 500; }
 .bf-q { flex: 1 1 220px; min-width: 0; display: inline-flex; }
-.bf input { width: 100%; min-height: 48px; padding: 8px 16px; border: 0; border-bottom: 3px solid #CFC9EA; border-radius: 14px 14px 4px 4px; background: #fff; color: var(--ink); font: inherit; font-weight: 600; }
-.bf input::placeholder { color: #8C88A8; font-weight: 500; opacity: 1; }
+.bf input { width: 100%; min-height: 48px; padding: 8px 16px; border: 0; border-bottom: 3px solid #8480AE; border-radius: 14px 14px 4px 4px; background: #fff; color: var(--ink); font: inherit; font-weight: 600; }
+.bf input::placeholder { color: #6B6789; font-weight: 500; opacity: 1; }
 .bf select:focus-visible, .bf input:focus-visible, .bf-go:focus-visible { outline: 3px solid #4338CA; outline-offset: 2px; }
 .bf input:focus { border-bottom-color: #C72163; }
 .bf-go { min-height: 48px; padding: 0 20px; border: 0; border-radius: 14px; background: #3B35B8; color: #fff; font: inherit; font-size: .95rem; cursor: pointer; }
@@ -3335,6 +3336,11 @@ html:not(.lx-on) .lx-js { display: none !important; }
 .pv { --pv-gap: 22px; position: relative; display: grid; grid-template-columns: minmax(0, 1fr); max-width: 1420px; margin: 0 auto; padding: 0 var(--pv-gap); }
 .pv-main { min-width: 0; width: 100%; max-width: 790px; margin: 0 auto; }
 .pv-main .container { max-width: none; padding-left: 0; padding-right: 0; }
+/* The column can be narrow while the window is wide, so wide tables scroll inside themselves and long commands wrap. */
+.pv-main .bx-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.post-rich code { overflow-wrap: break-word; }
+.pv-main .cta-mid { border-radius: 18px; }
+.pv-main .cta-mid .cta-mid-inner { padding-left: 26px; padding-right: 26px; }
 .pv-main > .section { padding: 30px 0; background: none; }
 .pv-main > .section:first-child { padding-top: 34px; }
 .pv-main .faq-cols { grid-template-columns: 1fr; }
@@ -3352,13 +3358,13 @@ html:not(.lx-on) .lx-js { display: none !important; }
 .pv-rail-btn:focus-visible { outline: 3px solid #4338CA; outline-offset: -3px; }
 .pv-prog { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: transparent; }
 .pv-prog i { display: block; height: 100%; width: var(--p, 0%); background: var(--grad-brand); border-radius: 0 3px 3px 0; }
-.pv-list { display: none; position: absolute; left: 0; right: 0; top: 100%; max-height: min(64vh, 520px); margin: 0; padding: 8px var(--pv-gap) 14px; overflow-y: auto; overscroll-behavior: contain; list-style: none; background: #fff; border-bottom: 1px solid var(--line); box-shadow: 0 22px 40px rgba(29, 25, 54, .16); }
+.pv-list { display: none; position: absolute; left: 0; right: 0; top: 100%; max-height: min(64vh, 520px, calc(100vh - var(--pv-top, 60px) - 128px)); margin: 0; padding: 8px var(--pv-gap) 14px; overflow-y: auto; overscroll-behavior: contain; list-style: none; background: #fff; border-bottom: 1px solid var(--line); box-shadow: 0 22px 40px rgba(29, 25, 54, .16); }
 .pv-rail.is-open .pv-list { display: block; }
-.pv-list a { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px; align-items: baseline; padding: 10px 8px; border-radius: 10px; color: #4B4668; font-size: .93rem; line-height: 1.4; text-decoration: none; }
+.pv-list a { display: grid; grid-template-columns: 1.9rem minmax(0, 1fr); gap: 6px; align-items: baseline; padding: 10px 8px; border-radius: 10px; color: #4B4668; font-size: .93rem; line-height: 1.4; text-decoration: none; }
 .pv-list a:hover { background: var(--bg-tint); color: var(--ink); }
 .pv-list a:focus-visible { outline: 3px solid #4338CA; outline-offset: 1px; }
-.pv-n { font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #8C88A8; }
-.pv-list a.is-done { color: #7C7898; }
+.pv-n { font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #6B6789; }
+.pv-list a.is-done { color: #6B6789; }
 .pv-list a.is-active { background: var(--bg-tint); color: var(--ink); font-weight: 700; }
 .pv-list a.is-active .pv-n { color: #C72163; }
 .pv-left { display: none; }
@@ -3377,12 +3383,12 @@ html:not(.lx-on) .lx-js { display: none !important; }
 .pv-next { padding-top: 20px; }
 
 @media (min-width: 1000px) {
-    .pv { --pv-gap: 28px; grid-template-columns: minmax(0, 1fr) 324px; column-gap: 40px; align-items: start; padding-right: max(28px, calc(96px - (100vw - 1420px) / 2)); }
+    .pv { --pv-gap: 28px; grid-template-columns: minmax(0, 1fr) 324px; column-gap: 40px; align-items: start; padding-right: max(28px, calc(96px - max(0px, (100vw - 1420px) / 2))); }
     /* The form is on screen, so the floating quote button would only repeat it. */
     body:has(.pv) .float-cta { display: none; }
-    .pv-rail { grid-column: 1 / -1; margin-right: calc(max(28px, calc(96px - (100vw - 1420px) / 2)) * -1); }
+    .pv-rail { grid-column: 1 / -1; margin-right: calc(max(28px, calc(96px - max(0px, (100vw - 1420px) / 2))) * -1); }
     .pv-main { grid-column: 1; }
-    .pv-side { grid-column: 2; position: sticky; top: calc(var(--pv-top, 64px) + 70px); margin: 40px 0 60px; scroll-margin-top: 0; }
+    .pv-side { grid-column: 2; position: sticky; top: calc(var(--pv-top, 64px) + 70px); margin: 40px 0 60px; }
     .pv-card { padding: 22px 20px 18px; }
     .pv-card-h { font-size: 1.12rem; }
     .pv-card-p { margin-bottom: 14px; font-size: .86rem; }
@@ -3397,21 +3403,32 @@ html:not(.lx-on) .lx-js { display: none !important; }
     .pv-card .lf-submit { min-height: 48px; }
     .pv-card .lf-legal { font-size: .68rem; }
 }
-/* A short window: the card scrolls inside itself, so the button is never out of reach. */
-@media (min-width: 1000px) and (max-height: 900px) {
-    .pv-card { max-height: calc(100vh - var(--pv-top, 64px) - 92px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+/* The card never grows past the window: it scrolls inside itself, so the button is never out of reach. */
+@media (min-width: 1000px) {
+    .pv-card { max-height: calc(100vh - var(--pv-top, 64px) - 92px); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+    /* The calling code list is anchored to the phone row, so it fits inside the card. */
+    .pv-card .lf-phone { position: relative; }
+    .pv-card .lf-cc { position: static; }
+    .pv-card .lf-cc-list { right: 0; width: auto; }
+}
+/* A short window: drop the intro lines and tighten the fields. */
+@media (min-width: 1000px) and (max-height: 1060px) {
     .pv-card-p, .pv-card-k { display: none; }
     .pv-card .lf textarea { min-height: 58px; }
     .pv-card .lf input:not([type="hidden"]), .pv-card .lf select, .pv-card .lf-cc-btn { min-height: 40px; }
 }
+/* Touch screens: 16px controls, so the browser does not zoom the page on focus. */
+@media (min-width: 1000px) and (pointer: coarse) {
+    .pv-card .lf input:not([type="hidden"]), .pv-card .lf select, .pv-card .lf textarea { font-size: 16px; }
+}
 
 /* The rail as a list beside the article */
-@media (min-width: 1320px) {
+@media (min-width: 1400px) {
     .pv { grid-template-columns: 214px minmax(0, 1fr) 324px; column-gap: 40px; }
     .pv-main h2[id], .pv-main .lx-item, .pv-main #faq-title { scroll-margin-top: calc(var(--pv-top, 64px) + 26px); }
     .pv-rail { grid-column: 1; grid-row: 1; position: sticky; top: calc(var(--pv-top, 64px) + 26px); z-index: 1; margin: 44px 0 60px; padding-left: 16px; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; border: 0; }
     .pv-main { grid-column: 2; grid-row: 1; }
-    .pv-side { grid-column: 3; grid-row: 1; top: calc(var(--pv-top, 64px) + 26px); }
+    .pv-side { grid-column: 3; grid-row: 1; top: calc(var(--pv-top, 64px) + 26px); scroll-margin-top: calc(var(--pv-top, 64px) + 32px); }
     .pv-rail-btn { display: block; min-height: 0; padding: 0 0 12px; cursor: default; pointer-events: none; }
     .pv-rail-btn::after, .pv-rail-now, .pv-rail-count { display: none; }
     .pv-rail-k { position: static; width: auto; height: auto; clip: auto; font-size: .74rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: #3B35B8; }
@@ -3419,7 +3436,7 @@ html:not(.lx-on) .lx-js { display: none !important; }
     .pv-prog i { width: 100%; height: var(--p, 0%); border-radius: 3px; background: linear-gradient(180deg, #00B8D9, #4338CA 45%, #FF3D8A 80%, #FF9100); }
     .pv-list, .pv-rail.is-open .pv-list { display: block; position: static; max-height: calc(100vh - var(--pv-top, 64px) - 150px); padding: 0; border: 0; background: none; box-shadow: none; scrollbar-width: none; }
     .pv-list::-webkit-scrollbar { display: none; }
-    .pv-list a { grid-template-columns: 26px minmax(0, 1fr); padding: 7px 8px; font-size: .86rem; line-height: 1.35; transition: color .15s ease, background .15s ease, transform .2s ease; }
+    .pv-list a { grid-template-columns: 1.65rem minmax(0, 1fr); padding: 7px 8px; font-size: .86rem; line-height: 1.35; transition: color .15s ease, background .15s ease, transform .2s ease; }
     .pv-list a.is-active { background: none; transform: translateX(4px); }
     .pv-left { display: block; margin: 14px 0 0 8px; font-size: .78rem; font-weight: 600; color: #6B6789; }
     .pv:not(.pv--js) .pv-rail { margin: 44px 0 60px; border: 0; }
@@ -3430,5 +3447,10 @@ html:not(.lx-on) .lx-js { display: none !important; }
 }
 @media print {
     .pv-rail, .pv-side { display: none; }
+    .pv { display: block; max-width: none; padding: 0 22px; }
+    .pv-main { max-width: none; }
+}
+@media (forced-colors: active) {
+    .pv-prog i { background: Highlight; forced-color-adjust: none; }
 }
 @media (min-width: 1000px) { .pv-li-form { display: none; } }

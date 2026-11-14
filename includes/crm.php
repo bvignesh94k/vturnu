@@ -110,7 +110,7 @@ const CRM_SOURCE_NAMES = [
 /** Where each form sits, in words. */
 const CRM_PLACEMENTS = [
     'home-quote' => 'home page form', 'contact-page' => 'contact page form', 'popup' => 'quote pop-up', 'service-page' => 'service page form',
-    'landing-page' => 'landing page form', 'audit-consultation' => 'audit page form', 'resource' => 'e-book download',
+    'landing-page' => 'landing page form', 'audit-consultation' => 'audit page form', 'blog-post' => 'blog article form', 'resource' => 'e-book download',
     'newsletter' => 'newsletter signup', 'seo-audit' => 'free SEO audit', 'booking' => 'booking page',
 ];
 
@@ -1791,7 +1791,7 @@ function crm_auto_ack(array $lead): void
 {
     try {
         $settings = crm_settings();
-        if (empty($settings['auto_ack']) || !in_array((string) ($lead['source'] ?? ''), ['home-quote', 'contact-page', 'popup', 'service-page', 'landing-page', 'audit-consultation'], true)) {
+        if (empty($settings['auto_ack']) || !in_array((string) ($lead['source'] ?? ''), ['home-quote', 'contact-page', 'popup', 'service-page', 'landing-page', 'audit-consultation', 'blog-post'], true)) {
             return;
         }
         $draft = crm_ack_draft($lead, $settings);

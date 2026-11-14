@@ -72,7 +72,7 @@ if ($rich) {
     }
     if (!empty($post['takeaways'])) { $toc['key-points'] = 'What to remember'; }
 }
-if (!empty($post['faqs'])) { $toc['faq-title'] = 'Questions people ask'; }
+if (!empty($post['faqs'])) { $toc['faq-title'] = $rich ? 'Questions People Ask' : 'Questions people ask'; }
 if ($rich && preg_match('~<h2[^>]*\sid="([^"]+)"[^>]*>(.*?)</h2>~s', $rich_closing, $h)) {
     $toc[$h[1]] = trim(html_entity_decode(strip_tags($h[2]), ENT_QUOTES, 'UTF-8'));
 }
@@ -214,7 +214,7 @@ render_hero([
         </div>
 
         <?php if (!empty($post['takeaways'])): ?>
-        <div class="takeaways" data-reveal="card">
+        <div class="takeaways">
             <h2 id="key-points">What to remember</h2>
             <ul class="check-list">
                 <?php foreach ($post['takeaways'] as $t): ?><li><?= e($t) ?></li><?php endforeach; ?>
@@ -244,11 +244,11 @@ render_hero([
 <?php endif; ?>
     </div>
     <aside class="pv-side" id="post-enquiry" aria-labelledby="pv-card-h">
-        <div class="pv-card">
+        <div class="pv-card" data-nosnippet>
             <p class="pv-card-k">A reply from a strategist, not a sales script</p>
-            <h2 class="pv-card-h" id="pv-card-h"><?= e($cta[0]) ?></h2>
-            <p class="pv-card-p"><?= e($cta[1]) ?></p>
-            <?php render_lead_form_card(['uid' => 'lf-post', 'source' => 'blog-post', 'service' => lead_service_option((string) ($svc[1] ?? $post['category'] ?? '')), 'button' => $cta[2], 'lazy' => true]); ?>
+            <h2 class="pv-card-h" id="pv-card-h"><?= e($rich ? $cta[0] : 'Tell Us What You Need') ?></h2>
+            <p class="pv-card-p"><?= e($rich ? $cta[1] : 'A few details are enough. A senior strategist replies within one working day.') ?></p>
+            <?php render_lead_form_card(['uid' => 'lf-post', 'source' => 'blog-post', 'service' => lead_service_option((string) ($svc[1] ?? '')) ?: lead_service_option(str_replace('-', ' ', (string) $page['post']) . ' ' . (string) ($post['category'] ?? '')), 'button' => $cta[2], 'lazy' => true]); ?>
         </div>
     </aside>
 </div>

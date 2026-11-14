@@ -20,7 +20,7 @@ const LEAD_SERVICES = [
 ];
 const LEAD_SIZES = ['1 to 10 people', '11 to 50 people', '51 to 200 people', '201 to 1,000 people', '1,000+ people'];
 const LEAD_TIMELINES = ['As soon as possible', 'Within 1 to 3 months', 'In 3 to 6 months', 'Just researching'];
-const LEAD_SOURCES = ['home-quote', 'contact-page', 'popup', 'service-page', 'landing-page', 'audit-consultation'];
+const LEAD_SOURCES = ['home-quote', 'contact-page', 'popup', 'service-page', 'landing-page', 'audit-consultation', 'blog-post'];
 
 /** Example numbers, so the placeholder shows what a correct entry looks like. */
 const LEAD_PHONE_EXAMPLES = [

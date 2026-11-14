@@ -11,8 +11,10 @@
     const extras = [...document.querySelectorAll('[data-bf-extra]')];
     /* The server may already have narrowed the list (a topic address). Then
        changing the topic needs the full list, so load it. */
-    const narrowed = new URLSearchParams(location.search).has('cat') || new URLSearchParams(location.search).has('q');
+    const narrowed = form.hasAttribute('data-bf-narrowed');
+    if (narrowed) return;
     form.classList.add('bf--js');
+    let said = 0;
 
     const apply = () => {
         const c = cat.value;
@@ -21,21 +23,23 @@
         cards.forEach((card) => {
             const ok = (!c || card.dataset.cat === c) && words.every((w) => card.dataset.text.includes(w));
             card.hidden = !ok;
-            if (ok) { shown++; card.classList.add('is-visible'); }
+            if (ok) shown++;
         });
         const filtered = Boolean(c || words.length);
         extras.forEach((e) => { e.hidden = filtered; });
         none.hidden = shown > 0;
-        count.textContent = shown === 0 ? 'No articles match'
+        const text = shown === 0 ? 'No articles match'
             : shown + (shown === 1 ? ' article' : ' articles') + (c ? ' on ' + c : '') + (words.length ? ' mentioning "' + q.value.trim() + '"' : '') + (filtered ? '' : ', newest first');
+        clearTimeout(said);
+        said = setTimeout(() => { count.textContent = text; }, 450);
         const url = new URL(location.href);
         if (c) url.searchParams.set('cat', c); else url.searchParams.delete('cat');
         url.searchParams.delete('q');
         history.replaceState(null, '', url);
     };
 
-    cat.addEventListener('change', () => { if (narrowed) form.submit(); else apply(); });
+    cat.addEventListener('change', apply);
     q.addEventListener('input', apply);
-    form.addEventListener('submit', (e) => { if (!narrowed) { e.preventDefault(); apply(); q.blur(); } });
-    if (!narrowed) apply();
+    form.addEventListener('submit', (e) => { e.preventDefault(); apply(); q.blur(); });
+    apply();
 })();
