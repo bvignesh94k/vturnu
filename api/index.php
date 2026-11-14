@@ -112,6 +112,13 @@ if ($slug === 'sitemap.xml') {
         // made every URL look changed on every crawl, and Google stops
         // trusting a sitemap's lastmod once it proves inaccurate.
         $changed = max(SITE_UPDATED, !empty($p['date']) ? date('Y-m-d', strtotime((string) $p['date'])) : '');
+        /* A blog index changes whenever its newest post does. */
+        if ($tpl === 'blog-list') {
+            $bl = $GLOBALS['BLOG'] ?? [];
+            if (!empty($p['blog_cat'])) { $bl = array_filter($bl, static fn($b) => ($b['category'] ?? '') === $p['blog_cat']); }
+            $bd = array_column($bl, 'date');
+            if ($bd) { $changed = max($changed, date('Y-m-d', strtotime((string) max($bd)))); }
+        }
         $lastmod = '<lastmod>' . $changed . '</lastmod>';
         echo "  <url><loc>{$loc}</loc>{$lastmod}<changefreq>{$freq}</changefreq><priority>{$priority}</priority></url>\n";
     }

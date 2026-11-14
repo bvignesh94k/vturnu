@@ -141,7 +141,7 @@ define('TRUST_BADGES', [
    that search and AI engines read. They are deliberately not listed on any page. */
 /* Last site-wide content change. Update when many pages change at once:
    the sitemap and schema report it, and search engines recrawl on it. */
-define('SITE_UPDATED', '2026-11-07');
+define('SITE_UPDATED', '2026-11-14');
 
 define('TARGET_MARKETS', [
     'India', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Singapore', 'Malaysia', 'Indonesia',

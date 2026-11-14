@@ -636,6 +636,8 @@
             o.classList.toggle('is-empty', !ok);
         };
         const ratio = (a, b, k = 100) => (Number.isFinite(a) && Number.isFinite(b) && b > 0 ? a / b * k : NaN);
+        /* A part cannot be larger than its whole: show no rate rather than one above 100%. */
+        const part = (a, b) => (a <= b ? ratio(a, b) : NaN);
         const verdict = $('[data-calc-verdict]', el);
 
         const SUMS = {
@@ -643,11 +645,11 @@
             leads() {
                 const visits = num('visits'), forms = num('forms'), valid = num('valid'), qual = num('qual');
                 const all = num('all'), opps = num('opps'), pipe = num('pipe'), cost = num('cost');
-                put('valid', ratio(valid, forms), '%');
-                put('qualrate', ratio(qual, valid), '%');
-                put('share', ratio(qual, all), '%');
+                put('valid', part(valid, forms), '%');
+                put('qualrate', part(qual, valid), '%');
+                put('share', part(qual, all), '%');
                 put('cpl', ratio(cost, qual, 1), '', 0);
-                put('opprate', ratio(opps, qual), '%');
+                put('opprate', part(opps, qual), '%');
                 put('pipe', ratio(pipe, visits, 1000), '', 0);
             },
             /* Two brands counted over the same number of answers: is the gap
@@ -667,6 +669,8 @@
                     verdict.textContent = Number.isFinite(n) && (a > n || b > n)
                         ? 'A brand cannot be named in more answers than you counted. Check the three numbers.'
                         : 'Type the three numbers to see whether the gap is larger than the margin of error.';
+                } else if (n < 30) {
+                    verdict.textContent = 'Fewer than 30 answers is too small a sample for this test. Count more answers before comparing the two brands.';
                 } else if (gap > moe) {
                     verdict.textContent = 'The gap is larger than the margin of error, so it is unlikely to be noise alone. Check that it holds next month before you act on it.';
                 } else {

@@ -318,6 +318,13 @@ function render_lead_form_card(array $o = []): void
     $service = lf_old('service', $o['service'] ?? '');
     $button = $o['button'] ?? 'Send my enquiry';
     $path = (string) (parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
+    /* After a failed submission the contact page keeps where the enquiry began. */
+    if ($source === 'contact-page') {
+        $ps = lf_old('lead_source');
+        if (in_array($ps, LEAD_SOURCES, true)) { $source = $ps; }
+        $pf = lf_old('from_page');
+        if (preg_match('#^/[A-Za-z0-9/_-]{0,200}$#', $pf)) { $path = $pf; }
+    }
     $v = static fn(string $n): string => e(lf_old($n));
     $in = static fn(string $uid, string $name, string $type, string $attrs): string
         => '<input id="' . e($uid) . '-' . e($name) . '" name="' . e($name) . '" type="' . $type . '" value="' . e(lf_old($name)) . '" aria-describedby="' . e($uid) . '-' . e($name) . '-err" ' . $attrs . '>';
