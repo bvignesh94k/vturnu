@@ -41,6 +41,44 @@ if ($rich) {
     $rich_body = preg_replace_callback('~(<h2[^>]*>)(.*?)(</h2>)~s', static fn ($m) => $m[1] . $nb($m[2]) . $m[3], $rich_body);
 }
 
+/* The contents rail: every second-level heading in the article, in order.
+   Rich posts carry ids on their headings (or on the listicle item around
+   them); older posts get an id from the heading text. */
+$toc = [];
+$sec_ids = [];
+if ($rich) {
+    /* Headings written without an id get one from their text. */
+    $with_id = static fn (string $html): string => (string) preg_replace_callback(
+        '~<h2>(?!<span class="sr-only">)(.*?)</h2>~s',
+        static fn ($h) => '<h2 id="' . trim((string) preg_replace('~[^a-z0-9]+~', '-', strtolower(html_entity_decode(strip_tags($h[1]), ENT_QUOTES, 'UTF-8'))), '-') . '">' . $h[1] . '</h2>',
+        $html
+    );
+    $rich_body = $with_id($rich_body);
+    $rich_closing = $with_id($rich_closing);
+    if (preg_match_all('~<section class="lx-item" id="([^"]+)"[^>]*>.*?<h2[^>]*>(.*?)</h2>|<h2[^>]*\sid="([^"]+)"[^>]*>(.*?)</h2>~s', $rich_body, $m, PREG_SET_ORDER)) {
+        foreach ($m as $h) {
+            $id = $h[1] !== '' ? $h[1] : $h[3];
+            $label = $h[1] !== '' ? $h[2] : $h[4];
+            $label = preg_replace('~<span class="sr-only">.*?</span>~s', '', $label);
+            $toc[$id] = trim(html_entity_decode(strip_tags((string) $label), ENT_QUOTES, 'UTF-8'));
+        }
+    }
+} else {
+    foreach (($post['sections'] ?? []) as $i => $sec) {
+        $id = trim((string) preg_replace('~[^a-z0-9]+~', '-', strtolower((string) $sec[0])), '-') ?: 'part-' . ($i + 1);
+        $id = isset($toc[$id]) ? $id . '-' . ($i + 1) : $id;
+        $sec_ids[$i] = $id;
+        $toc[$id] = (string) $sec[0];
+    }
+    if (!empty($post['takeaways'])) { $toc['key-points'] = 'What to remember'; }
+}
+if (!empty($post['faqs'])) { $toc['faq-title'] = 'Questions people ask'; }
+if ($rich && preg_match('~<h2[^>]*\sid="([^"]+)"[^>]*>(.*?)</h2>~s', $rich_closing, $h)) {
+    $toc[$h[1]] = trim(html_entity_decode(strip_tags($h[2]), ENT_QUOTES, 'UTF-8'));
+}
+$toc['post-enquiry'] = 'Talk to us';
+$svc = $post['service'] ?? blog_service_link((string) ($post['category'] ?? ''));
+
 echo jsonld_script([
     '@context' => 'https://schema.org',
     '@type' => 'BlogPosting',
@@ -87,13 +125,29 @@ render_hero([
 ]);
 ?>
 
+<div class="pv" data-pv data-read="<?= (int) $post['read'] ?>">
+    <nav class="pv-rail" data-pv-rail aria-label="On this page">
+        <button class="pv-rail-btn" type="button" aria-expanded="false" aria-controls="pv-list" data-pv-toggle>
+            <span class="pv-rail-k">On this page</span>
+            <span class="pv-rail-now" data-pv-now><?= e((string) reset($toc)) ?></span>
+            <span class="pv-rail-count" data-pv-count>1 of <?= count($toc) ?></span>
+        </button>
+        <div class="pv-prog" aria-hidden="true"><i data-pv-prog></i></div>
+        <ol class="pv-list" id="pv-list">
+            <?php $ti = 0; foreach ($toc as $tid => $tlabel): $ti++; ?>
+            <li<?= $tid === 'post-enquiry' ? ' class="pv-li-form"' : '' ?>><a href="#<?= e($tid) ?>" data-pv-link><span class="pv-n" aria-hidden="true"><?= sprintf('%02d', $ti) ?></span><span><?= e($tlabel) ?></span></a></li>
+            <?php endforeach; ?>
+        </ol>
+        <p class="pv-left" data-pv-left aria-hidden="true"><?= e($post['read']) ?> read</p>
+    </nav>
+    <div class="pv-main">
 <?php if ($rich): ?>
 <section class="section post-body-wrap">
     <div class="container narrow">
         <div class="post-body post-rich"><?= $rich_body ?></div>
     </div>
 </section>
-<?php render_faqs($post['faqs'] ?? [], 'Frequently Asked Questions'); ?>
+<?php render_faqs($post['faqs'] ?? [], 'Questions People Ask', 'Asked by readers'); ?>
 <section class="section post-body-wrap post-closing">
     <div class="container narrow">
         <div class="post-body post-rich"><?= $rich_closing ?></div>
@@ -112,7 +166,7 @@ render_hero([
             <?php $si = 0; foreach ($post['sections'] as $section): $si++;
                 $h2 = $section[0]; $paras = $section[1] ?? []; $list = $section[2] ?? null;
                 $table = $section[3] ?? null; ?>
-            <h2><?= e($h2) ?></h2>
+            <h2 id="<?= e($sec_ids[$si - 1] ?? '') ?>"><?= e($h2) ?></h2>
             <?php foreach ($paras as $p): ?><p><?= e($p) ?></p><?php endforeach; ?>
             <?php if ($list): ?>
             <ul class="post-list">
@@ -161,7 +215,7 @@ render_hero([
 
         <?php if (!empty($post['takeaways'])): ?>
         <div class="takeaways" data-reveal="card">
-            <h2>Key takeaways</h2>
+            <h2 id="key-points">What to remember</h2>
             <ul class="check-list">
                 <?php foreach ($post['takeaways'] as $t): ?><li><?= e($t) ?></li><?php endforeach; ?>
             </ul>
@@ -172,7 +226,7 @@ render_hero([
     </div>
 </section>
 
-<?php render_faqs($post['faqs'] ?? [], 'Frequently asked questions'); ?>
+<?php render_faqs($post['faqs'] ?? [], 'Questions people ask', 'Asked by readers'); ?>
 
 <!-- Post-specific conversion band -->
 <section class="cta-mid">
@@ -182,14 +236,24 @@ render_hero([
             <p><?= e($cta[1]) ?></p>
         </div>
         <div class="cta-mid-actions">
-            <a class="btn btn-dark" href="/contact-us/"><?= e($cta[2]) ?></a>
+            <a class="btn btn-dark" href="#post-enquiry"><?= e($cta[2]) ?></a>
             <a class="cta-phone" href="<?= e(CONTACT_PHONE_HREF) ?>">or call <?= e(CONTACT_PHONE) ?></a>
         </div>
     </div>
 </section>
 <?php endif; ?>
+    </div>
+    <aside class="pv-side" id="post-enquiry" aria-labelledby="pv-card-h">
+        <div class="pv-card">
+            <p class="pv-card-k">A reply from a strategist, not a sales script</p>
+            <h2 class="pv-card-h" id="pv-card-h"><?= e($cta[0]) ?></h2>
+            <p class="pv-card-p"><?= e($cta[1]) ?></p>
+            <?php render_lead_form_card(['uid' => 'lf-post', 'source' => 'blog-post', 'service' => lead_service_option((string) ($svc[1] ?? $post['category'] ?? '')), 'button' => $cta[2], 'lazy' => true]); ?>
+        </div>
+    </aside>
+</div>
 
-<section class="section">
+<section class="section pv-next">
     <div class="container">
         <h2 class="section-title center">Keep reading</h2>
         <div class="card-grid cols-3">
@@ -206,4 +270,5 @@ render_hero([
 <?php if (!empty($post['listicle'])): /* progress, filters, copy buttons and tools (includes/listicle-kit.php) */ ?>
 <script src="/assets/js/listicle.js?v=<?= e(asset_v('/assets/js/listicle.js')) ?>" defer></script>
 <?php endif; ?>
+<script src="/assets/js/post.js?v=<?= e(asset_v('/assets/js/post.js')) ?>" defer></script>
 </article>

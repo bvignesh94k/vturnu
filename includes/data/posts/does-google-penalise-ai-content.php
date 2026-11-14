@@ -43,22 +43,9 @@ return [
 <p>Google has been unusually clear about where the line sits. This article goes through what its own documents say, where the real risk is, and seven checks to run before you publish anything AI has touched.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['does-google-penalise-ai-content']['lede'] ?? '') ?></p>
 </div>
 
-<nav class="bx-toc" aria-label="In this article">
-    <p class="bx-toc-h">In this article</p>
-    <ol>
-        <li><a href="#what-google-says">What Google has said</a></li>
-        <li><a href="#the-real-risk">Where the real risk is</a></li>
-        <li><a href="#assisted-vs-generated">Assisted and generated are different</a></li>
-        <li><a href="#seven-checks">Seven checks before you publish</a></li>
-        <li><a href="#disclosure">Whether to disclose AI use</a></li>
-        <li><a href="#how-we-use-ai">How we use AI in client content</a></li>
-        <li><a href="#faq-title">FAQs</a></li>
-    </ol>
-</nav>
 
 <h2 id="what-google-says">What Google Has Said About AI Content</h2>
 <p>Google's position has been consistent since early 2023: it judges what a page gives the reader, not how the page was produced. Four of its documents carry the detail.</p>

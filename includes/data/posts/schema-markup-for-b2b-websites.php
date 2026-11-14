@@ -38,7 +38,6 @@ return [
 <p>Use the finder below to see which types your page needs, copy the code for each, and tick the ones you already have.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['schema-markup-for-b2b-websites']['lede'] ?? '') ?></p>
 </div>
 

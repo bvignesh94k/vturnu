@@ -52,26 +52,9 @@ return [
 <p>That gap is why the AI-first versus data-first debate matters to anyone managing budgets, customer acquisition and revenue targets. It decides where the next budget goes, which roles you hire and what your sales team receives on Monday morning. Get the order wrong and you either automate bad decisions faster, or you spend a year cleaning data nobody acts on.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['ai-first-vs-data-first-marketing']['lede'] ?? '') ?></p>
 </div>
 
-<nav class="bx-toc" aria-label="In this article">
-    <p class="bx-toc-h">In this article</p>
-    <ol>
-        <li><a href="#what-is-ai-first">What AI-first means</a></li>
-        <li><a href="#what-is-data-first">What data-first means</a></li>
-        <li><a href="#key-differences">Key differences</a></li>
-        <li><a href="#expensive-mistakes">Expensive mistakes</a></li>
-        <li><a href="#working-together">How they work together</a></li>
-        <li><a href="#ground-framework">The GROUND framework</a></li>
-        <li><a href="#implementation-example">Implementation example</a></li>
-        <li><a href="#90-day-plan">90-day plan</a></li>
-        <li><a href="#measure-impact">Measuring impact</a></li>
-        <li><a href="#what-to-prioritize">What to prioritize</a></li>
-        <li><a href="#faq-title">FAQs</a></li>
-    </ol>
-</nav>
 
 <h2 id="what-is-ai-first">What Is AI-First Marketing?</h2>
 <p>AI-first marketing is an operating model in which AI is the starting point for marketing work. Instead of doing a task manually and adding a tool later, the team decides what AI should do, what people should do and how the work passes between them.</p>

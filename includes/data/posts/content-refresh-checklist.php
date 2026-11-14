@@ -41,7 +41,6 @@ return [
 <p>Open the page you are reviewing, work down the list and tick each sign you see. The count tells you how serious it is, and the decision helper after the list tells you what to do.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['content-refresh-checklist']['lede'] ?? '') ?></p>
 </div>
 

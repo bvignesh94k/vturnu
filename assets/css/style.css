@@ -1343,14 +1343,32 @@ a.card:hover, .card:hover {
    ============================================================ */
 
 /* Blog filters + cards */
-.blog-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 34px; }
-.chip {
-    display: inline-block; padding: 8px 18px; border-radius: 999px;
-    border: 1px solid var(--line); background: #fff; font-weight: 700; font-size: .84rem;
-    color: var(--ink-soft); transition: border-color .15s ease, background .15s ease, color .15s ease;
+/* The finder: one sentence with a topic and a word in it. */
+.bf { margin: 0 0 34px; padding: 20px 22px 16px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(120deg, #fff 0%, var(--bg-tint) 100%); }
+.bf-line { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: 0; font-family: var(--font-head, Poppins), sans-serif; font-weight: 700; font-size: clamp(1.05rem, 2.4vw, 1.4rem); line-height: 1.3; color: var(--ink); }
+.bf-line label { cursor: pointer; }
+.bf-pick { position: relative; display: inline-flex; }
+.bf-pick::after { content: ""; position: absolute; right: 16px; top: 50%; width: 9px; height: 9px; margin-top: -7px; border-right: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(45deg); pointer-events: none; }
+.bf select { -webkit-appearance: none; appearance: none; min-height: 48px; max-width: 100%; padding: 8px 44px 8px 18px; border: 0; border-radius: 14px; background: var(--ink); color: #fff; font: inherit; cursor: pointer; }
+.bf select option { color: var(--ink); background: #fff; font-weight: 500; }
+.bf-q { flex: 1 1 220px; min-width: 0; display: inline-flex; }
+.bf input { width: 100%; min-height: 48px; padding: 8px 16px; border: 0; border-bottom: 3px solid #CFC9EA; border-radius: 14px 14px 4px 4px; background: #fff; color: var(--ink); font: inherit; font-weight: 600; }
+.bf input::placeholder { color: #8C88A8; font-weight: 500; opacity: 1; }
+.bf select:focus-visible, .bf input:focus-visible, .bf-go:focus-visible { outline: 3px solid #4338CA; outline-offset: 2px; }
+.bf input:focus { border-bottom-color: #C72163; }
+.bf-go { min-height: 48px; padding: 0 20px; border: 0; border-radius: 14px; background: #3B35B8; color: #fff; font: inherit; font-size: .95rem; cursor: pointer; }
+.bf--js .bf-go { display: none; }
+.bf-count { margin: 12px 0 0; font-size: .86rem; font-weight: 600; color: #5F5B7A; }
+.bf-none { margin: 0 0 30px; padding: 22px; border: 1.5px dashed #CFC9EA; border-radius: 16px; text-align: center; color: #4B4668; }
+.bf-none a { color: #3B35B8; font-weight: 700; text-decoration: underline; }
+.blog-grid [hidden] { display: none !important; }
+@media (max-width: 600px) {
+    .bf { padding: 16px 14px 14px; border-radius: 16px; }
+    .bf-line { gap: 8px 10px; }
+    .bf-pick { flex: 1 1 auto; }
+    .bf select { width: 100%; }
+    .bf-q { flex-basis: 100%; }
 }
-.chip:hover { border-color: var(--g-pink); color: var(--g-pink); }
-.chip.active { background: var(--ink); border-color: var(--ink); color: #fff; }
 
 .post-card { position: relative; }
 .post-card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -3307,3 +3325,110 @@ html:not(.lx-on) .lx-js { display: none !important; }
     .nav-link::after { left: 4px; right: 4px; }
     .header-inner { gap: 10px; }
 }
+
+/* ============================================================
+   POST VIEW (templates/blog-post.php, assets/js/post.js): the article sits
+   between a contents rail that follows the reader and the enquiry form.
+   Phones and tablets: the rail folds into a bar under the site header that
+   names the current heading; the form follows the article.
+   ============================================================ */
+.pv { --pv-gap: 22px; position: relative; display: grid; grid-template-columns: minmax(0, 1fr); max-width: 1420px; margin: 0 auto; padding: 0 var(--pv-gap); }
+.pv-main { min-width: 0; width: 100%; max-width: 790px; margin: 0 auto; }
+.pv-main .container { max-width: none; padding-left: 0; padding-right: 0; }
+.pv-main > .section { padding: 30px 0; background: none; }
+.pv-main > .section:first-child { padding-top: 34px; }
+.pv-main .faq-cols { grid-template-columns: 1fr; }
+.pv-main .faq-head { text-align: left; margin-left: 0; }
+.pv-main h2[id], .pv-main .lx-item, .pv-main #faq-title, .pv-side { scroll-margin-top: calc(var(--pv-top, 64px) + 76px); }
+
+/* The rail as a bar (default, up to 1239px) */
+.pv-rail { position: sticky; top: var(--pv-top, 0px); z-index: 60; margin: 0 calc(var(--pv-gap) * -1); background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.pv-rail-btn { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px var(--pv-gap); border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.pv-rail-k { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pv-rail-count { order: -1; padding: 5px 11px; border-radius: 999px; background: var(--ink); color: #fff; font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pv-rail-now { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: .93rem; }
+.pv-rail-btn::after { content: ""; width: 9px; height: 9px; margin: -4px 4px 0 0; border-right: 2.5px solid #3B35B8; border-bottom: 2.5px solid #3B35B8; transform: rotate(45deg); transition: transform .2s ease; }
+.pv-rail.is-open .pv-rail-btn::after { transform: rotate(-135deg); margin-top: 4px; }
+.pv-rail-btn:focus-visible { outline: 3px solid #4338CA; outline-offset: -3px; }
+.pv-prog { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: transparent; }
+.pv-prog i { display: block; height: 100%; width: var(--p, 0%); background: var(--grad-brand); border-radius: 0 3px 3px 0; }
+.pv-list { display: none; position: absolute; left: 0; right: 0; top: 100%; max-height: min(64vh, 520px); margin: 0; padding: 8px var(--pv-gap) 14px; overflow-y: auto; overscroll-behavior: contain; list-style: none; background: #fff; border-bottom: 1px solid var(--line); box-shadow: 0 22px 40px rgba(29, 25, 54, .16); }
+.pv-rail.is-open .pv-list { display: block; }
+.pv-list a { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px; align-items: baseline; padding: 10px 8px; border-radius: 10px; color: #4B4668; font-size: .93rem; line-height: 1.4; text-decoration: none; }
+.pv-list a:hover { background: var(--bg-tint); color: var(--ink); }
+.pv-list a:focus-visible { outline: 3px solid #4338CA; outline-offset: 1px; }
+.pv-n { font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #8C88A8; }
+.pv-list a.is-done { color: #7C7898; }
+.pv-list a.is-active { background: var(--bg-tint); color: var(--ink); font-weight: 700; }
+.pv-list a.is-active .pv-n { color: #C72163; }
+.pv-left { display: none; }
+/* Without the script the list is simply shown, in the flow of the page. */
+.pv:not(.pv--js) .pv-rail { position: static; margin: 18px 0 0; border: 1.5px solid var(--line); border-radius: 14px; }
+.pv:not(.pv--js) .pv-rail-btn, .pv:not(.pv--js) .pv-prog { display: none; }
+.pv:not(.pv--js) .pv-list { display: block; position: static; max-height: none; box-shadow: none; border: 0; border-radius: 14px; }
+
+/* The enquiry card */
+.pv-side { min-width: 0; width: 100%; max-width: 790px; margin: 6px auto 54px; }
+.pv-card { position: relative; padding: 26px 24px 22px; border: 1px solid #DAD5F2; border-radius: 22px; background: #fff; box-shadow: 0 18px 44px rgba(43, 38, 112, .1); }
+.pv-card::before { content: ""; position: absolute; left: 22px; right: 22px; top: -1px; height: 4px; border-radius: 0 0 6px 6px; background: var(--grad-brand); }
+.pv-card-k { margin: 0 0 8px; font-size: .74rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #3B35B8; }
+.pv-card-h { margin: 0 0 8px; font-size: 1.3rem; line-height: 1.22; letter-spacing: -.01em; }
+.pv-card-p { margin: 0 0 18px; font-size: .93rem; line-height: 1.55; color: #4B4668; }
+.pv-next { padding-top: 20px; }
+
+@media (min-width: 1000px) {
+    .pv { --pv-gap: 28px; grid-template-columns: minmax(0, 1fr) 324px; column-gap: 40px; align-items: start; padding-right: max(28px, calc(96px - (100vw - 1420px) / 2)); }
+    /* The form is on screen, so the floating quote button would only repeat it. */
+    body:has(.pv) .float-cta { display: none; }
+    .pv-rail { grid-column: 1 / -1; margin-right: calc(max(28px, calc(96px - (100vw - 1420px) / 2)) * -1); }
+    .pv-main { grid-column: 1; }
+    .pv-side { grid-column: 2; position: sticky; top: calc(var(--pv-top, 64px) + 70px); margin: 40px 0 60px; scroll-margin-top: 0; }
+    .pv-card { padding: 22px 20px 18px; }
+    .pv-card-h { font-size: 1.12rem; }
+    .pv-card-p { margin-bottom: 14px; font-size: .86rem; }
+    /* The same form, set in one narrow column. */
+    .pv-card .lf { gap: 10px; font-size: .88rem; }
+    .pv-card .lf-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .pv-card .lf-f { gap: 4px; }
+    .pv-card .lf label { font-size: .78rem; }
+    .pv-card .lf input:not([type="hidden"]), .pv-card .lf select, .pv-card .lf-cc-btn { min-height: 42px; padding-top: 7px; padding-bottom: 7px; font-size: .9rem; }
+    .pv-card .lf textarea { min-height: 72px; font-size: .9rem; }
+    .pv-card .lf-more, .pv-card .lf-assure { display: none; }
+    .pv-card .lf-submit { min-height: 48px; }
+    .pv-card .lf-legal { font-size: .68rem; }
+}
+/* A short window: the card scrolls inside itself, so the button is never out of reach. */
+@media (min-width: 1000px) and (max-height: 900px) {
+    .pv-card { max-height: calc(100vh - var(--pv-top, 64px) - 92px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+    .pv-card-p, .pv-card-k { display: none; }
+    .pv-card .lf textarea { min-height: 58px; }
+    .pv-card .lf input:not([type="hidden"]), .pv-card .lf select, .pv-card .lf-cc-btn { min-height: 40px; }
+}
+
+/* The rail as a list beside the article */
+@media (min-width: 1320px) {
+    .pv { grid-template-columns: 214px minmax(0, 1fr) 324px; column-gap: 40px; }
+    .pv-main h2[id], .pv-main .lx-item, .pv-main #faq-title { scroll-margin-top: calc(var(--pv-top, 64px) + 26px); }
+    .pv-rail { grid-column: 1; grid-row: 1; position: sticky; top: calc(var(--pv-top, 64px) + 26px); z-index: 1; margin: 44px 0 60px; padding-left: 16px; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; border: 0; }
+    .pv-main { grid-column: 2; grid-row: 1; }
+    .pv-side { grid-column: 3; grid-row: 1; top: calc(var(--pv-top, 64px) + 26px); }
+    .pv-rail-btn { display: block; min-height: 0; padding: 0 0 12px; cursor: default; pointer-events: none; }
+    .pv-rail-btn::after, .pv-rail-now, .pv-rail-count { display: none; }
+    .pv-rail-k { position: static; width: auto; height: auto; clip: auto; font-size: .74rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: #3B35B8; }
+    .pv-prog { left: 0; right: auto; top: 30px; bottom: 34px; width: 3px; height: auto; border-radius: 3px; background: #E7E4F6; }
+    .pv-prog i { width: 100%; height: var(--p, 0%); border-radius: 3px; background: linear-gradient(180deg, #00B8D9, #4338CA 45%, #FF3D8A 80%, #FF9100); }
+    .pv-list, .pv-rail.is-open .pv-list { display: block; position: static; max-height: calc(100vh - var(--pv-top, 64px) - 150px); padding: 0; border: 0; background: none; box-shadow: none; scrollbar-width: none; }
+    .pv-list::-webkit-scrollbar { display: none; }
+    .pv-list a { grid-template-columns: 26px minmax(0, 1fr); padding: 7px 8px; font-size: .86rem; line-height: 1.35; transition: color .15s ease, background .15s ease, transform .2s ease; }
+    .pv-list a.is-active { background: none; transform: translateX(4px); }
+    .pv-left { display: block; margin: 14px 0 0 8px; font-size: .78rem; font-weight: 600; color: #6B6789; }
+    .pv:not(.pv--js) .pv-rail { margin: 44px 0 60px; border: 0; }
+    .pv:not(.pv--js) .pv-rail-btn { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pv-list a, .pv-rail-btn::after { transition: none; }
+}
+@media print {
+    .pv-rail, .pv-side { display: none; }
+}
+@media (min-width: 1000px) { .pv-li-form { display: none; } }

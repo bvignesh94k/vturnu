@@ -13,32 +13,27 @@
  * written for includes/update-kit.php.
  */
 
-/** The short answer box, filled from the lede on the post's record. */
-function px_answer(string $slug, string $label = 'The short answer'): void
+/**
+ * The answer box, filled from the lede on the post's record. It carries no
+ * heading: the box itself is the signal.
+ */
+function px_answer(string $slug, string $label = ''): void
 {
     ?>
 <div class="answer-box post-answer">
-    <p class="bx-answer-k"><?= e($label) ?></p>
     <p class="answer-text"><?= e($GLOBALS['BLOG'][$slug]['lede'] ?? '') ?></p>
 </div>
     <?php
 }
 
 /**
- * The contents list.
+ * Kept so article files need no change: the contents list is now the rail
+ * beside the article, built in templates/blog-post.php from the headings.
  *
  * @param array<string, string> $items heading id => label
  */
 function px_toc(array $items, string $heading = 'In this article'): void
 {
-    ?>
-<nav class="bx-toc" aria-label="<?= e($heading) ?>">
-    <p class="bx-toc-h"><?= e($heading) ?></p>
-    <ol>
-        <?php foreach ($items as $id => $label): ?><li><a href="#<?= e($id) ?>"><?= e($label) ?></a></li><?php endforeach; ?>
-    </ol>
-</nav>
-    <?php
 }
 
 /**

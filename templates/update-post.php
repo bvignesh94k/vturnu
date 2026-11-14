@@ -69,7 +69,6 @@ foreach (['content-refresh-checklist', 'does-google-penalise-ai-content', 'how-t
                 <?= $body_html ?>
             <?php else: ?>
                 <div class="answer-box post-answer">
-                    <p class="bx-answer-k">The short answer</p>
                     <p class="answer-text"><?= e($u['lede']) ?></p>
                 </div>
                 <?php ux_facts($u, !empty($u['source']) ? [['Official source', ext_link((string) $u['source'], 'Google\'s announcement')]] : []); ?>

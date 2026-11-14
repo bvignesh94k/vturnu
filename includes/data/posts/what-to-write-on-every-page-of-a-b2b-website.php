@@ -43,7 +43,6 @@ return [
 <p>So give each page one job. The nine pages below cover most B2B websites. For each one you get the job, what to write, what to leave out and an example opening. Tick each page as you finish it.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['what-to-write-on-every-page-of-a-b2b-website']['lede'] ?? '') ?></p>
 </div>
 

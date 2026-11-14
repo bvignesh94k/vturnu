@@ -43,7 +43,6 @@ return [
 <p>The ten steps below follow the order we work in: choose the market, set the structure, connect the versions, then localize and measure. Tick each step as you finish it. Your progress is saved in this browser, so you can come back to it.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['international-seo-checklist']['lede'] ?? '') ?></p>
 </div>
 

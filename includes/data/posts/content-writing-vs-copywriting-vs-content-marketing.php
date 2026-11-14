@@ -36,24 +36,9 @@ return [
 <p>This article explains what each one is, where they overlap, and how to tell which one your business needs first.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['content-writing-vs-copywriting-vs-content-marketing']['lede'] ?? '') ?></p>
 </div>
 
-<nav class="bx-toc" aria-label="In this article">
-    <p class="bx-toc-h">In this article</p>
-    <ol>
-        <li><a href="#at-a-glance">The three at a glance</a></li>
-        <li><a href="#content-writing">What content writing is</a></li>
-        <li><a href="#copywriting">What copywriting is</a></li>
-        <li><a href="#content-marketing">What content marketing is</a></li>
-        <li><a href="#three-ways">One topic, written three ways</a></li>
-        <li><a href="#overlap">Where the lines blur</a></li>
-        <li><a href="#which-one">Which one you need, by symptom</a></li>
-        <li><a href="#mistakes">Three hiring mistakes</a></li>
-        <li><a href="#faq-title">FAQs</a></li>
-    </ol>
-</nav>
 
 <h2 id="at-a-glance">Content Writing, Copywriting and Content Marketing at a Glance</h2>
 <p>Content writing informs, copywriting persuades, and content marketing decides what gets written and where it goes. The table sets them side by side.</p>

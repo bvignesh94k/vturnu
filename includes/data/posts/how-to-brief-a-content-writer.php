@@ -26,7 +26,6 @@ return [
 <p>The ten questions below make that difference. Answer each one in the box under it as you read. Your answers are saved in this browser, and at the end you can copy or download them as a finished brief.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['how-to-brief-a-content-writer']['lede'] ?? '') ?></p>
 </div>
 

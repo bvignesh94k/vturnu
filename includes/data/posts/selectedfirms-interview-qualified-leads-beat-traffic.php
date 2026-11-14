@@ -30,23 +30,9 @@ return [
 <p>That question sat at the center of a conversation our CEO, B. Vignesh, recently had with SelectedFirms for its interviews with agency leaders. He answered eight questions, from the numbers that show real growth to AI search and how to choose a marketing partner. You can <?= ext_link($interview, 'read the full interview on SelectedFirms', true) ?>. This is the short version, with the thinking behind each answer.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['selectedfirms-interview-qualified-leads-beat-traffic']['lede'] ?? '') ?></p>
 </div>
 
-<nav class="bx-toc" aria-label="In this article">
-    <p class="bx-toc-h">In this article</p>
-    <ol>
-        <li><a href="#traffic-is-a-signal">Traffic is a signal</a></li>
-        <li><a href="#numbers-that-matter">The numbers that matter</a></li>
-        <li><a href="#useful-everywhere">Useful wherever buyers search</a></li>
-        <li><a href="#one-goal">One goal, every channel</a></li>
-        <li><a href="#choose-an-agency">Choosing an agency</a></li>
-        <li><a href="#ai-and-people">AI and people</a></li>
-        <li><a href="#about-selectedfirms">How buyers use SelectedFirms</a></li>
-        <li><a href="#faq-title">FAQs</a></li>
-    </ol>
-</nav>
 
 <h2 id="traffic-is-a-signal">1. Traffic is a signal, not the result</h2>
 <p>Rankings, impressions and sessions tell you that people are finding you. They do not tell you whether they are the right people, or whether any of them become customers.</p>

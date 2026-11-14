@@ -56,7 +56,6 @@ return [
 <p>Core updates make people nervous because Google says very little about them. This one is no different: one line on Google's status dashboard, one short social post and no new guidance. So this page sticks to what is confirmed, explains it in plain words and gives you a simple plan for checking your own site without guessing.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($u['lede'] ?? '') ?></p>
 </div>
 

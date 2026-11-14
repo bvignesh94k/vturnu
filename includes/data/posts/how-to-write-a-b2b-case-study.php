@@ -56,7 +56,6 @@ return [
 <p>The eight steps below are the ones we follow for our own case studies, with examples taken from them. Tick each step as you finish it.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['how-to-write-a-b2b-case-study']['lede'] ?? '') ?></p>
 </div>
 

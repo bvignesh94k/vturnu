@@ -25,7 +25,6 @@ return [
 <p class="bx-note"><strong>A note on the law.</strong> Rules differ by country and by what you sell. In the EU, for example, the European Accessibility Act has <?= ext_link($w3['eaa'], 'applied since 28 June 2025') ?> to certain products and services, including e-commerce services for consumers, with an exemption for microenterprises that provide services. Check what applies to you with a specialist; this checklist is not legal advice.</p>
 
 <div class="answer-box post-answer">
-    <p class="bx-answer-k">The short answer</p>
     <p class="answer-text"><?= e($GLOBALS['BLOG']['website-accessibility-checklist']['lede'] ?? '') ?></p>
 </div>
 
