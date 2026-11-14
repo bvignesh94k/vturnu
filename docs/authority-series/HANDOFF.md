@@ -2,7 +2,18 @@
 
 Working notes for the November 2026 article series. This folder is not part of the website (it is listed in `.vercelignore`) and can be deleted once the series is live.
 
-## 1. Where the work stands (14 November 2026)
+## 0. Status on 15 November 2026 (read this first)
+
+All eleven pieces are written, read in full and registered. Banners for the ten new articles are built. Article pages have a new layout (contents rail that follows the reader, enquiry form beside the article), the blog index has a finder in place of the topic buttons, and the "The short answer" label is gone from every post.
+
+Checked from the cloud session: PHP syntax, `tests/crm/run.mjs` (all passed), `bin/audit-site.mjs` on the local preview (184 pages, nothing reported except the footer badge links, which are followed on purpose), all 56 posts at 1440, 1100 and 390 pixels wide (no overflow, one H1, every rail link resolves), the enquiry form's validation on desktop and phone.
+
+Not done, because the cloud session cannot reach outside websites or Vercel:
+
+1. Open every outside link in the six new articles and confirm it answers 200 and still says what the article reports.
+2. Release: `vercel --prod` from the owner's computer, then check the live pages and send one test enquiry from an article page.
+
+## 1. Where the work stood on 14 November 2026
 
 **Built and working locally**
 

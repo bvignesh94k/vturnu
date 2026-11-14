@@ -231,9 +231,9 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">The Cheapest Point to Change Your Mind</h2>
 <p>A brief is not paperwork. It is the cheapest point in a website project to change your mind. Every question answered now is a decision nobody has to make in a rush halfway through the build.</p>
-<p>Send the same brief to every agency you are considering, and ask each one to show its working: what it would build, in what order, and what it left out. The differences between the answers will tell you more than the differences between the prices.</p>
+<p>Send the same brief to every agency you are considering, and ask each one to show its working: what it would build, in what order, and what it left out. The differences between the answers will tell you more than the differences between the prices. If the site will run on WordPress, add our <a href="/blog/wordpress-seo-launch-checklist/">fourteen technical checks before launch</a> to the sign-off.</p>
 
 <aside class="bx-cta bx-cta--main" aria-label="Start a conversation with VTurnU">
     <p class="bx-cta-h">Ready to Brief Your Website Project?</p>

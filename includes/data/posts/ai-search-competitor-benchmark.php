@@ -196,7 +196,7 @@ TXT, 'Arithmetic'); ?>
 <h2 id="engines">Report Each Engine Separately Before Any Total</h2>
 <p>Assistants draw on different indexes and different sources, so they disagree about the same category. A brand can be named often on one and rarely on another. An average across engines hides exactly that.</p>
 <p>Keep one scorecard for each engine. Give a combined figure only after the separate ones, and only if every engine was run with the same prompts and the same number of answers.</p>
-<p>The disagreement is information. If a competitor leads on one engine alone, look at the sources that engine cites for them. The cause is often one directory, one review site or one set of pages that the other engines use less. If you trail on every engine, the cause is more likely to be on your own site, starting with whether the crawlers can read it. Our guide to <a href="/blog/ai-crawler-access-problems/">AI crawler access problems</a> covers that check.</p>
+<p>The disagreement is information. If a competitor leads on one engine alone, look at the sources that engine cites for them. It may be one directory, one review site or one set of pages that the other engines use less. If you trail on every engine, the cause is more likely to be on your own site, starting with whether the crawlers can read it. Our guide to <a href="/blog/ai-crawler-access-problems/">AI crawler access problems</a> covers that check.</p>
 
 <h2 id="one-page">A Report That Fits on One Page</h2>
 <p>Leadership asked one question, so the report should answer it on one page. Run the benchmark quarterly. Monthly comparisons on a small sample mostly report noise, and your own monthly tracking continues in between.</p>
@@ -222,7 +222,7 @@ TXT, 'Arithmetic'); ?>
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Read It Like the Small Survey It Is</h2>
 <p>A competitor benchmark in AI search is a small survey, and it should be read like one. The sample size comes first, the gap second and the conclusion last.</p>
 <p>Most of the value is in the second sheet. Knowing that a rival is named more often changes nothing by itself. Knowing which directories, reviews and articles sit beside their name gives you a list of work to do.</p>
 

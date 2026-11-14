@@ -222,7 +222,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">If You Only Answer Three Questions</h2>
 <p>The brief is where your knowledge gets into the piece. Questions four, five and six do most of that work: the angle, the expert and the proof. If you only have time for three answers, give the writer those.</p>
 <p>Keep the briefs you write. After a few months they become a record of what your buyers ask and what your company knows about it, which is most of a content strategy.</p>
 

@@ -153,7 +153,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">A High Score Is the Start of the Review</h2>
 <p>A speed score answers one question well: did this page load quickly in a test? It is worth getting right. It is also the easiest of the five checks to put on a slide, which is why it gets more attention than it has earned.</p>
 <p>The enquiry is decided later, by what the page says, whether the form delivers and who was sent to the page in the first place. Check them in order, and treat a high score as the start of the review.</p>
 

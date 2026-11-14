@@ -43,7 +43,7 @@ return [
 ]); ?>
 
 <h2 id="research-before-contact">Buyers Research Before They Call</h2>
-<p>The surveys below are all vendor, agency or trade research. The companies behind them sell marketing or advertising to industrial firms. None states its field dates. Read the figures as direction, not as measurement, and note the sample beside each one.</p>
+<p>The surveys below are all vendor, agency or trade research. The companies behind them sell marketing or advertising to industrial firms. Only one states its field dates. Read the figures as direction, not as measurement, and note the sample beside each one.</p>
 <p>The <?= ext_link($s['smte26'], '2026 State of Marketing to Engineers') ?> report, by TREW Marketing and GlobalSpec, surveyed over one thousand engineers and technical professionals worldwide. On average, respondents said 62 percent of the buying process happens online before they speak to a supplier (709 answers). When they do make contact, the most common reasons were a pricing or stock question at 26 percent, wanting to check what they had found online at 23 percent, and technical complexity at 21 percent (708 answers).</p>
 <p>So the first call is often a check on research that is already done. The same report asked which sources engineers use routinely.</p>
 
@@ -94,7 +94,7 @@ return [
     <li><strong>Supplier, compliance and commercial searches signal a buyer near a request for quotation.</strong> The need is already defined. The searcher is now choosing who to ask.</li>
 </ul>
 
-<p class="bx-note"><strong>One published example.</strong> Sai Impression manufactures labels in Chennai. Its rebuilt site has 105 pages in the sitemap, with product, industry and blog sections and fifteen long-form articles. In the three months to 29 October 2026, Search Console showed 92.9K impressions and 1.32K clicks. Two of the searches named in the <a href="/case-studies/sai-impression-label-manufacturer/">Sai Impression case study</a> are "label manufacturers in india" and "label stock manufacturers in india". Both belong to the supplier family. We have not published a breakdown by family or by page type, so this is one example of the third row and nothing more.</p>
+<p class="bx-note"><strong>One published example.</strong> Sai Impression manufactures labels in Chennai. Its rebuilt site has 105 pages in the sitemap, with product, industry and blog sections. In the three months to 29 October 2026, Search Console showed 92.9K impressions and 1.32K clicks. Two of the searches named in the <a href="/case-studies/sai-impression-label-manufacturer/">Sai Impression case study</a> are "label manufacturers in india" and "label stock manufacturers in india". Both belong to the supplier family. We have not published a breakdown by family or by page type, so this is one example of the third row and nothing more.</p>
 
 <h2 id="page-for-each-search">The Page That Answers Each Search</h2>
 <p>Each family needs its own kind of page. A search engine, or an AI assistant, is looking for a page whose subject matches the search. A general "products" page matches none of them well.</p>
@@ -179,7 +179,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Where the Line Is Blank, a Search Has Nowhere to Land</h2>
 <p>Industrial buyers do a large part of their choosing on websites, before a supplier knows they exist. What they type is rarely a company name. It is a value, a use, a standard, a fault or a term of supply.</p>
 <p>The map in this guide turns that into a plain test. Write down the six families. Beside each, write the page on your site that answers it. Where the line is blank, a search has nowhere to land. Filling the gap does not guarantee that anyone finds the page, but an empty line guarantees that nobody can.</p>
 

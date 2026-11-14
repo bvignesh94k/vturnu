@@ -190,7 +190,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">A Few Pages Do the Heavy Lifting</h2>
 <p>In many content libraries, a few pages do the heavy lifting and the rest do little. A short review each quarter, one page at a time, keeps the pages that matter strong and stops the rest from getting in their way.</p>
 <p>Start with the pages that bring you enquiries today, then the ones that used to. Those are where an hour of work pays back fastest.</p>
 

@@ -248,7 +248,7 @@ return [
     ['Every week', 'The enquiry inbox and the spam quarantine', 'Real leads are arriving, and none are being held by mistake'],
 ]); ?>
 
-<p>The <?= ext_link($s['gscperf'], 'Performance report') ?> shows clicks, impressions, click-through rate and average position, and its default view covers three months. Compare like with like: the same pages, over the same number of days, before and after. A fall in the first weeks after a move with new addresses is not unusual. A page that has dropped to nothing is a reason to recheck its redirect and its <code>noindex</code>.</p>
+<p>The <?= ext_link($s['gscperf'], 'Performance report') ?> shows clicks, impressions, click-through rate and average position, and its default view covers three months. Compare like with like: the same pages, over the same number of days, before and after. A page that has dropped to nothing is a reason to recheck its redirect and its <code>noindex</code>.</p>
 
 <h2 id="real-rebuild">One Rebuild, Checked Page by Page</h2>
 <p>FirstChoice Used Auto Parts sells used parts in the United States, and it is one of our WordPress projects. We rebuilt 99 of its pages: 31 part pages, a brands hub and 67 make pages.</p>
@@ -269,7 +269,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">One Checkbox Can Hide a Finished Website</h2>
 <p>A WordPress site can be well designed, well written and invisible, because of one checkbox. The fourteen checks exist to catch that kind of fault while it is still cheap to fix.</p>
 <p>Run them on the built site, repeat three of them on launch day, and keep the marked-up board as the record of what was agreed. Passing the gate does not promise rankings or enquiries. It means that nothing technical is standing between your pages and the people looking for them.</p>
 

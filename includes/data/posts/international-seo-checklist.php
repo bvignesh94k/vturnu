@@ -209,7 +209,7 @@ HTML, 'HTML example'); ?>
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Structure First, Translation Second</h2>
 <p>International SEO rewards order. Choose markets from evidence, settle the structure once, connect every version with hreflang, and only then pour effort into translation and local proof. Teams that start with translation tend to repeat the work later, when the structure has to change.</p>
 <p>Before your next market launch, run the hreflang builder above on one real page and its versions. If the tags come out clean, the rest of the checklist is about earning trust in that market, which is the part that brings enquiries.</p>
 <p>Two related guides help with the next steps: <a href="/blog/schema-markup-for-b2b-websites/">schema markup for B2B websites</a>, which should match on every language version, and our <a href="/blog/website-accessibility-checklist/">website accessibility checklist</a>, which covers the page language setting that screen readers depend on.</p>

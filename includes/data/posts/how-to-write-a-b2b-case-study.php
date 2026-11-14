@@ -190,7 +190,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">The One Piece of Marketing a Buyer Can Check</h2>
 <p>A case study is the one piece of marketing a buyer can check. That is its whole value, and it is why the method matters more than the prose. Choose the right customer, ask before you write, find one number with a source and admit what you could not measure.</p>
 <p>Do that and the writing takes an afternoon. Skip it and no amount of polish will make the page believable.</p>
 

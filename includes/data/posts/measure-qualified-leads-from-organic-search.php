@@ -215,7 +215,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Start With the Fields</h2>
 <p>Organic search rarely fails on the evidence. It fails on the record keeping. The visits are counted, the customers are counted, and the line between them was never written down.</p>
 <p>Six stages, nine fields and six formulas are enough to write it down. Start with the fields, because they cannot be added to leads you have already received. Every enquiry that arrives without its first source is one you will never be able to trace.</p>
 

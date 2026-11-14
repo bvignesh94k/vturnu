@@ -185,7 +185,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Start With the Pages Where a Barrier Costs an Enquiry</h2>
 <p>None of these tests needs special skill, and together they cover problems that stop real people from using a website. Run them on your home page, your main service page and your contact form first: those are the pages where a barrier costs you an enquiry.</p>
 <p>Fix what fails, retest, and build the checks into your release routine, so new pages do not bring the same problems back. If you are planning a new site, put WCAG 2.2 level AA in the brief from day one; our <a href="/blog/website-design-brief-questions/">website design brief builder</a> has a place for it. And if forms are where your site struggles, our guide to <a href="/blog/how-to-stop-junk-leads-on-your-website/">stopping junk leads</a> shows how to filter spam without locking real buyers out.</p>
 

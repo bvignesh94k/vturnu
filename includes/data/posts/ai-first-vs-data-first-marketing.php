@@ -269,7 +269,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Start With One Revenue Decision</h2>
 <p>Data tells you what is true. AI lets you act on it faster. People decide whether the action is right, and revenue tells you whether it worked. Remove any one and the system fails in a predictable way: without data you move quickly in the wrong direction, without AI you understand a market you cannot keep up with, without people nobody is accountable, and without revenue measurement nobody can tell.</p>
 <p>So the useful question for your next planning meeting is narrower than AI-first or data-first. Which single revenue decision would improve most if it were based on better evidence and made faster? Start there.</p>
 

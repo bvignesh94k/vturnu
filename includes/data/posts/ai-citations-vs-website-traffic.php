@@ -179,7 +179,7 @@ TXT, 'Source matches regex'); ?>
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Report Each Number Under Its Own Name</h2>
 <p>Citations and visits answer different questions. Citations say that AI systems read your pages and use them. Visits say that some people clicked and could be counted. Enquiries with an AI first source say that a few of those people were buyers.</p>
 <p>Report each one under its own name, with its source and its limit. A small number that is described accurately will survive a finance review. A large number that is described as something else will not. If AI answers matter to your buyers, our <a href="/google-ai-overviews-seo/">Google AI Overviews SEO</a> page explains the work that goes into being cited in the first place.</p>
 

@@ -119,7 +119,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">The Question Is What the Page Gives the Reader</h2>
 <p>Google does not penalise a page for how it was written. It ranks pages on what they give the reader, and it acts against sites that publish in bulk to manipulate rankings. AI makes that second thing very easy to do, which is why the two get confused.</p>
 <p>So the useful question is not whether AI was involved. It is whether the page tells a buyer something true that they could not have found on ten other sites. Get that right and the tools you used along the way do not matter.</p>
 

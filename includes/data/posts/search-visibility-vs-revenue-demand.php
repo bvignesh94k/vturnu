@@ -138,7 +138,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">The Chart Answers a Smaller Question Than You Asked</h2>
 <p>A visibility chart is not wrong. It answers a smaller question than the one a founder is asking. It says how often you appeared and how often you were clicked. It does not say whether those people were new to you, wanted to buy, could buy from you, or spoke to sales.</p>
 <p>Run the four tests in order on one quarter of data and find your row in the table. The result is usually one specific thing to change, which is more useful than a general instruction to do more SEO or to stop doing it.</p>
 

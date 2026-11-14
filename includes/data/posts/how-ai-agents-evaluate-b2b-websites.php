@@ -182,7 +182,7 @@ TXT, 'Instruction to paste'); ?>
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">A Visitor With No Patience and No Intuition</h2>
 <p>An agent is a visitor with no patience and no intuition. It cannot guess that the grey icon is the menu, or that the minimum order is on page four of the brochure. Everything it needs has to be stated, named and reachable.</p>
 <p>That is a description of a well-built website. The companies that do the plain work now, accessible names, facts in text, forms that explain themselves, will be easy for agents to use whatever the products are called next year.</p>
 

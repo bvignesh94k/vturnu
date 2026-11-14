@@ -395,7 +395,7 @@ const ART = {
             if (i < 3) s += `<circle cx="${x + 296}" cy="${y + 25}" r="15" fill="#1d1936"/>` + tick(x + 296, y + 26, 0.62, '#ffc94d');
         });
         s += `<g filter="url(#sh)"><circle cx="376" cy="281" r="34" fill="url(#gU)"/>${cross(376, 281, 1.15)}</g>`;
-        s += `<path d="M438 60v176" stroke="url(#gV)" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 15"/><path d="M426 232l12 14 12-14" fill="none" stroke="#4338ca" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+        s += `<path d="M438 60v176" stroke="#4338ca" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 15"/><path d="M426 232l12 14 12-14" fill="none" stroke="#4338ca" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
         return s + sparkle(36, 40, 18) + sparkle(444, 440, 20, 'url(#gV)');
     },
     gauge() {
@@ -428,7 +428,7 @@ const ART = {
             const y = 420 - i * 66, dx = (462 - y) * (80 / 426);
             const x1 = 96 + dx, x2 = 304 + dx;
             s += i < 3
-                ? `<path d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}" stroke="${i === 2 ? 'url(#gB)' : 'url(#gV)'}" stroke-width="20" stroke-linecap="round"/>`
+                ? `<path d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}" stroke="${['#00b8d9', '#2f6fd0', '#4338ca'][i]}" stroke-width="20" stroke-linecap="round"/>`
                 : `<path d="M${x1.toFixed(1)} ${y}H${x2.toFixed(1)}" stroke="#ff3d8a" stroke-width="12" stroke-linecap="round" stroke-dasharray="3 22"/>`;
         }
         s += `<g filter="url(#sh)"><circle cx="412" cy="96" r="42" fill="#1d1936"/><text x="412" y="112" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="46" fill="#ffc94d">?</text></g>`;

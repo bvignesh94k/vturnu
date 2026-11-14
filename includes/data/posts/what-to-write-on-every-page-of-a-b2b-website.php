@@ -196,9 +196,9 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Give Every Page One Job</h2>
 <p>A B2B website is a sales conversation held without a salesperson. Each page takes one turn in it: who you are, what you offer, why to believe you, what it costs and how to start. When every page knows its turn, visitors move forward. When every page tries to say everything, they leave.</p>
-<p>Write down the job of each page in one line before anyone writes a paragraph. It is the cheapest hour in the whole project.</p>
+<p>Write down the job of each page in one line before anyone writes a paragraph. It is the cheapest hour in the whole project. Manufacturers and industrial suppliers can start from <a href="/blog/industrial-buyer-search-intent/">how industrial buyers search</a>, which matches six kinds of search to the page each one needs.</p>
 
 <aside class="bx-cta bx-cta--main" aria-label="Start a conversation with VTurnU">
     <p class="bx-cta-h">Want Every Page Written for You?</p>

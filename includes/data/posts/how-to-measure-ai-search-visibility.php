@@ -139,7 +139,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Treat It as a Sample, and Say How Big</h2>
 <p>AI visibility can be measured well enough to manage, as long as you treat it as a sample and say how big the sample is. Fixed prompts, repeated runs, six columns and a rate with its margin are the whole method.</p>
 <p>The first month gives you a baseline and a list of things AI gets wrong about you. Fix those first. They are usually the cheapest improvements you will find, and they are the ones that cost you buyers who never visit your site.</p>
 

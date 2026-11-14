@@ -146,7 +146,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">You Do Not Need All Three at Once</h2>
 <p>Content writing earns attention, copywriting turns it into action, and content marketing makes sure both happen on purpose. A business with only the first has readers and no enquiries. With only the second, it has sharp pages nobody finds. With neither plan nor measurement, it has activity.</p>
 <p>You do not have to buy all three at once. Find your row in the table above, fix that first, and add the next piece when the first one is working.</p>
 

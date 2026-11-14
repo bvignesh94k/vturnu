@@ -195,7 +195,7 @@ TXT, 'Example output'); ?>
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Access Comes First, and It Is Usually a Dull Fix</h2>
 <p>When an AI assistant gets your company wrong, the cause is often dull: a setting, a status code, a page that arrives empty. Those are good problems to have, because they can be found in an afternoon and fixed without rewriting anything.</p>
 <p>Work down the six layers in order and stop at the first failure. Fixing access does not guarantee that anyone will cite you. It only makes it possible, and nothing else you do for AI search works until it is.</p>
 

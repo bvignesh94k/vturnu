@@ -22,7 +22,6 @@ $s = [
     'postanalytics' => 'https://www.linkedin.com/help/linkedin/answer/a516971',
     'dawes' => 'https://business.linkedin.com/content/dam/me/business/en-us/marketing-solutions/resources/pdfs/advertising-effectiveness-and-the-95-5-rule.pdf',
     'edelman' => 'https://www.edelman.com/insights/hidden-buyer-b2b',
-    'dreamdata' => 'https://dreamdata.io/blog/announcing-linkedin-ads-benchmarks-report-2026',
     'intent' => 'https://www.linkedin.com/help/sales-navigator/answer/a798004',
     'intentfaq' => 'https://www.linkedin.com/help/sales-navigator/answer/a507435',
     'intentacts' => 'https://www.linkedin.com/help/sales-navigator/answer/a1325209',
@@ -86,7 +85,6 @@ return [
 <p>There is a second reason engagement and intent drift apart, and it applies even when the right people are reacting. In a 2021 paper for the B2B Institute, which is part of LinkedIn, Professor John Dawes of the Ehrenberg-Bass Institute argued that <?= ext_link($s['dawes'], '"up to 95% of business clients are not in the market"') ?> for many goods and services at a given time (Dawes, 2021).</p>
 <p>The reasoning is simple arithmetic. If companies change a supplier such as their main bank or law firm about every five years, about 20 percent are buying in a given year and about 5 percent in a given quarter. The paper calls the figure a rule of thumb, not a precise number, and says the share depends on how often the category is bought. It is an argument, not a survey.</p>
 <p>Read with that in mind, engagement has a different job. A buyer at a target account who reads and reacts today is probably not buying this quarter. The post may still help that person remember the company when a need does arise. The intent, when it comes, tends to show up later and somewhere else: in a search, a visit to a pricing page or a message.</p>
-<p>Timing data points the same way, with a caution about its source. <?= ext_link($s['dreamdata'], 'Dreamdata\'s LinkedIn Ads Benchmarks Report 2026') ?> is vendor research, drawn from its own customers' data: more than 66 million sessions and 3.5 million buyer journeys. Its summary reports that revenue arrived 281 days after the first ad impression. The full report is behind a form and the summary does not state the period covered, and the figure is about ads, not organic posts. It is still a useful warning against judging a post by the enquiries it produced that week.</p>
 <p>The person who matters may also never react. Vendor research by <?= ext_link($s['edelman'], 'Edelman and LinkedIn') ?>, based on nearly 2,000 professionals, describes "hidden buyers": people in finance, legal, procurement and operations who shape a deal without meeting the sales team. They can read everything and click nothing.</p>
 
 <h2 id="three-bands">Signals in Three Bands, From Weak to Strong</h2>
@@ -202,7 +200,7 @@ return [
 <?php },
 
 'closing' => static function (): void { ?>
-<h2 id="final-thoughts">Final Thoughts</h2>
+<h2 id="final-thoughts">Change the Unit From Posts to Accounts</h2>
 <p>Engagement and intent answer different questions. Engagement says a post found an audience. Intent says a company is moving toward a purchase. The first can exist for years without the second, and the second can appear with no public engagement at all.</p>
 <p>The fix is not a better engagement rate. It is a change of unit, from posts to accounts, and a habit of sorting signals by how close they sit to a request. None of this guarantees that an account will buy. It gives sales a short, honest list of where to look first.</p>
 

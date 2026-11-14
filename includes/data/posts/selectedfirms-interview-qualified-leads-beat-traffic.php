@@ -42,12 +42,12 @@ return [
 <h2 id="numbers-that-matter">2. Measure the numbers that pay the bills</h2>
 <p>When SelectedFirms asked which metrics show whether marketing is driving growth, the answer came down to four: qualified leads, conversion rates, customer acquisition cost and revenue.</p>
 <?php $quote('Comparing qualified leads with traffic is especially important.'); ?>
-<p>That comparison is simple to run. Each month, put sessions next to qualified leads for your main channels and pages. If traffic rises while qualified leads stay flat, visibility is not the problem. The problem is who you attract, or what happens after they arrive.</p>
+<p>That comparison is simple to run. Each month, put sessions next to qualified leads for your main channels and pages. If traffic rises while qualified leads stay flat, visibility is not the problem. The problem is who you attract, or what happens after they arrive. Our <a href="/blog/search-visibility-vs-revenue-demand/">four tests for search visibility against revenue</a> show how to tell which.</p>
 
 <h2 id="useful-everywhere">3. Be useful wherever buyers search, including AI answers</h2>
 <p>Buyers now put the same questions to Google, AI Overviews and ChatGPT. Vignesh's advice for staying visible was not a trick. It was to be genuinely useful: strong content, clear answers and real brand credibility, consistently, in every place people search.</p>
 <?php $quote('Meaningful AI search optimization starts with understanding customer questions and providing accurate, useful answers.'); ?>
-<p>His test for telling real AI search work from trend-chasing is worth borrowing. Measure whether the effort improves visibility and brings in qualified enquiries. If it does neither, it is noise.</p>
+<p>His test for telling real AI search work from trend-chasing is worth borrowing. Measure whether the effort improves visibility and brings in qualified enquiries. If it does neither, it is noise. For what each AI search number can and cannot prove, see <a href="/blog/ai-citations-vs-website-traffic/">AI citations vs website traffic</a>.</p>
 
 <h2 id="one-goal">4. One goal, every channel</h2>
 <p>SEO, paid media, content and AI search often run as separate projects with separate reports. The interview argues for the opposite: one business goal that every channel serves.</p>
