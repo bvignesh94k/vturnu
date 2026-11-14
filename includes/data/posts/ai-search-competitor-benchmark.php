@@ -56,7 +56,7 @@ return [
     <li><strong>One larger name for reference.</strong> Include one well-known brand in the category and label it as the reference. It shows what a high rate looks like on your prompts. It is not a target for next quarter.</li>
     <li><strong>A written rule for brands you did not list.</strong> Assistants will name companies that are not on your list. Decide in advance when one joins the scorecard. A workable rule: any brand named in at least a tenth of the answers in two months running is added from the following month.</li>
 </ol>
-<p>Fix the set for at least a quarter. If the list changes every month, no trend can be read from it.</p>
+<p>Apart from brands added under that rule, fix the set for at least a quarter. If the list changes every month, no trend can be read from it.</p>
 
 <h2 id="neutral-prompts">Write Prompts That Favour Nobody</h2>
 <p>The prompt set decides the result more than anything else. Questions written by your own marketing team carry your own vocabulary: your product names, your category label and the features you lead with. An assistant answers the question it was asked, so a tilted question produces a tilted answer.</p>
@@ -199,7 +199,7 @@ TXT, 'Arithmetic'); ?>
 <p>The disagreement is information. If a competitor leads on one engine alone, look at the sources that engine cites for them. It may be one directory, one review site or one set of pages that the other engines use less. If you trail on every engine, the cause is more likely to be on your own site, starting with whether the crawlers can read it. Our guide to <a href="/blog/ai-crawler-access-problems/">AI crawler access problems</a> covers that check.</p>
 
 <h2 id="one-page">A Report That Fits on One Page</h2>
-<p>Leadership asked one question, so the report should answer it on one page. Run the benchmark quarterly. Monthly comparisons on a small sample mostly report noise, and your own monthly tracking continues in between.</p>
+<p>Leadership asked one question, so the report should answer it on one page. Collect the answers every month, alongside your own tracking, and report the comparison once a quarter on the combined answers. One month on a small sample mostly reports noise.</p>
 <ol class="bx-steps">
     <li><strong>The scorecard,</strong> for each engine, with the number of answers printed beside every rate.</li>
     <li><strong>The gaps that are larger than the margin,</strong> and a plain statement that the others are level.</li>

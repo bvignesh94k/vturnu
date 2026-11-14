@@ -164,7 +164,7 @@ return [
     <li><strong>The plans.</strong> LinkedIn's <?= ext_link($s['plans'], 'plan comparison') ?>, updated in September 2026, lists Buyer Intent for Advanced and Advanced Plus, and not for Core.</li>
 </ul>
 <p>LinkedIn's list of <?= ext_link($s['intentacts'], 'activities that indicate buyer intent') ?> includes company follows, Page and profile visits, new connections, lead form completions, ad views and clicks, accepted InMails and tagged website visits. Each activity is marked as showing either the person's identity or only the type of profile.</p>
-<p>Comments and reactions on posts are among the signals. So engagement does feed the score, as one input among many. LinkedIn does not publish how the signals are weighted, and this article does not guess.</p>
+<p>Comments and reactions on posts are among the signals. So engagement does feed the score, as one input among many. The LinkedIn pages read for this article do not say how the signals are weighted, and this article does not guess.</p>
 <p>That is why the intent level belongs in the strong band with a condition attached. It is a prompt to look at an account and start a conversation. It is not proof that the account is buying, or that the interest is in your product. Check it against a signal you can see yourself, such as a reply or a visit to a pricing page.</p>
 
 <h2 id="pipeline">Connecting LinkedIn to Pipeline</h2>

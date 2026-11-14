@@ -43,7 +43,7 @@ return [
 ]); ?>
 
 <h2 id="research-before-contact">Buyers Research Before They Call</h2>
-<p>The surveys below are all vendor, agency or trade research. The companies behind them sell marketing or advertising to industrial firms. Only one states its field dates. Read the figures as direction, not as measurement, and note the sample beside each one.</p>
+<p>The surveys below are all vendor, agency or trade research. The companies behind them sell marketing or advertising to industrial firms. Most do not state their field dates. Read the figures as direction, not as measurement, and note the sample beside each one.</p>
 <p>The <?= ext_link($s['smte26'], '2026 State of Marketing to Engineers') ?> report, by TREW Marketing and GlobalSpec, surveyed over one thousand engineers and technical professionals worldwide. On average, respondents said 62 percent of the buying process happens online before they speak to a supplier (709 answers). When they do make contact, the most common reasons were a pricing or stock question at 26 percent, wanting to check what they had found online at 23 percent, and technical complexity at 21 percent (708 answers).</p>
 <p>So the first call is often a check on research that is already done. The same report asked which sources engineers use routinely.</p>
 

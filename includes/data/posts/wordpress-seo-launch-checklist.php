@@ -49,17 +49,17 @@ return [
 
 <h2 id="who-checks-what">Eight Checks Need No Developer</h2>
 <p>You do not need to read code to run most of this. Eight checks need only a browser and a login to the WordPress dashboard. Six need a developer, or someone with access to the server. The board below lets you filter by either group.</p>
-<p>Run the checks on the staging site once the build is complete, and repeat checks 1, 6 and 7 on the live address on launch day. Those three change when the site moves.</p>
+<p>Run the checks on the staging site once the build is complete, and repeat checks 1, 6, 7 and 13 on the live address on launch day. Those four change when the site moves.</p>
 
 <?php px_flow('launch-timeline', 'Where each check sits, from staging to four weeks after launch', [
     ['While the site is on staging', 'Keep staging closed to crawlers and to the public.', 'Check 2'],
-    ['When the build is complete', 'Check what every page template outputs: canonical, title, text in the HTML, headings and structured data.', 'Checks 4, 5, 8, 9, 10, 11'],
+    ['When the build is complete', 'Check what every page template outputs: canonical, title, text in the HTML, headings and structured data. Decide what happens to the pages WordPress creates on its own.', 'Checks 4, 5, 8, 9, 10, 11'],
     ['The week before launch', 'Finish the redirect list, test speed with everything switched on, send test enquiries and set up backups.', 'Checks 3, 12, 13, 14'],
-    ['Launch day, on the live address', 'Confirm the site is open to search engines, the sitemap is the right one and robots.txt is the intended one.', 'Checks 1, 6, 7'],
+    ['Launch day, on the live address', 'Confirm the site is open to search engines, the sitemap is the right one, robots.txt is the intended one and a test enquiry still arrives.', 'Checks 1, 6, 7, 13'],
     ['Weeks one to four', 'Watch the sitemap, the Performance report and the enquiry inbox.', 'After launch'],
 ], [
-    'sub' => 'Three checks are repeated on launch day because they change when the site moves.',
-    'cap' => 'Most of the gate is passed before launch day. Launch day itself has three checks.',
+    'sub' => 'Four checks are repeated on launch day because they change when the site moves.',
+    'cap' => 'Most of the gate is passed before launch day. Launch day itself has four checks.',
 ]); ?>
 
 <?php lx_glance([
@@ -140,8 +140,8 @@ return [
 
 <?php lx_item(6, 'one-sitemap', 'There is one XML sitemap, and it lists only pages meant to be indexed', ['type' => 'quick', 'tags' => ['You can check', 'Takes 10 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>A sitemap is the list of addresses you are asking search engines to consider. It should match the site you mean to publish: no test pages, no thank-you pages, nothing set to <code>noindex</code>.</p>
-<p>WordPress has had <?= ext_link($s['sitemaps'], 'XML sitemaps in core since version 5.5') ?>, at <code>/wp-sitemap.xml</code>, with up to 2,000 URLs per file. Core switches the sitemap off when the setting in check 1 is on. A plugin may produce a second sitemap at another address. Either can do the job. Two at once cannot, because nobody knows which one is maintained.</p>
-<p>Google's limit is far higher, at <?= ext_link($s['gsitemap'], '50,000 URLs or 50 MB per sitemap file') ?>, so size is rarely the issue on a B2B site. Google also describes sitemap inclusion as a weak signal for choosing a canonical. A sitemap helps pages get found. It does not settle which version is indexed.</p>
+<p>WordPress has had <?= ext_link($s['sitemaps'], 'XML sitemaps in core since version 5.5') ?>, at <code>/wp-sitemap.xml</code>, with up to 2,000 URLs per file. Core <?= ext_link($s['sitemaps'], 'switches the sitemap off') ?> when the setting in check 1 is on. A plugin may produce a second sitemap at another address. Either can do the job. Two at once cannot, because nobody knows which one is maintained.</p>
+<p>Google's limit is far higher, at <?= ext_link($s['gsitemap'], '50,000 URLs or 50 MB per sitemap file') ?>, so size is rarely the issue on a B2B site. Google also <?= ext_link($s['gcanonical'], 'describes sitemap inclusion as a weak signal') ?> for choosing a canonical. A sitemap helps pages get found. It does not settle which version is indexed.</p>
 <?php lx_split('How to check',
     '<p>Open <code>yoursite.com/wp-sitemap.xml</code> in a browser, and any other sitemap address your developer names. Decide which one is the sitemap and switch the other off.</p><p>Open the lists inside it and scan the addresses.</p>',
     'What to do',
@@ -152,7 +152,7 @@ return [
 <p>The robots.txt file tells crawlers where they may go. On WordPress it can come from three places: WordPress itself, a plugin, or a real file uploaded to the server. The one that is live is the one that counts.</p>
 <p>When there is no file on the server, WordPress <?= ext_link($s['robots'], 'generates a virtual robots.txt') ?>. It has a general rule that disallows <code>/wp-admin/</code>, allows <code>/wp-admin/admin-ajax.php</code>, and on a public site adds a <code>Sitemap:</code> line.</p>
 <?php lx_split('How to check',
-    '<p>Fetch the live file and read every line:</p><p><code>curl -s https://www.example.com/robots.txt</code></p><p>Compare it with what your developer says it should contain.</p>',
+    '<p>Open <code>yoursite.com/robots.txt</code> in a browser and read every line. Or fetch it from a terminal:</p><p><code>curl -s https://www.example.com/robots.txt</code></p><p>Compare it with what your developer says it should contain.</p>',
     'What a failure looks like',
     '<ul><li>A <code>Disallow: /</code> under <code>User-agent: *</code>, left from staging.</li><li>Rules that block the folders holding the theme\'s styles and scripts. Search engines need those to see the page as a visitor does.</li><li>A <code>Sitemap:</code> line that names the staging address, or a sitemap you switched off in check 6.</li></ul>'); ?>
 <p>If AI search matters to you, the same file decides which AI crawlers may read the site. Our guide to <a href="/blog/ai-crawler-access-problems/">AI crawler access problems</a> covers that, and the layers beyond robots.txt.</p>
@@ -162,7 +162,7 @@ return [
     'label' => 'Free SEO audit tool',
     'art' => 'scan',
     'h' => 'Test One Page\'s Basics in Seconds',
-    'p' => 'Enter a page address and get twenty checks on it: indexing, title and canonical tags, speed signals, structured data and whether AI crawlers can read it. No sign-up.',
+    'p' => 'Enter a page address and get twenty checks on it: indexing, title and canonical tags, speed signals, structured data and whether AI crawlers can read it. No account needed. It asks for an email address to send the report.',
     'href' => '/free-seo-audit/',
     'btn' => 'Run the Free Audit',
     'cta' => 'blog-wp-launch-audit',
@@ -171,7 +171,7 @@ return [
 
 <?php lx_item(8, 'thin-pages', 'Pages WordPress creates on its own are handled on purpose', ['type' => 'project', 'tags' => ['Needs a developer', 'Takes 30 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>You wrote thirty pages. The site may have several hundred addresses. A WordPress site can produce pages nobody wrote: one for each uploaded image, one for each author, tag and date, and one for every internal search. Most hold a title and a list of links, and little else.</p>
-<p>These need a decision each, not a default. Remember from check 4 that core prints its canonical on single posts and pages. As we read that function, archive pages get none from core, so what they output depends on your theme and plugins.</p>
+<p>These need a decision each, not a default. Remember from check 4 that core <?= ext_link($s['canonical'], 'prints its canonical on single posts and pages') ?>. As we read that function, archive pages get none from core, so what they output depends on your theme and plugins.</p>
 <?php lx_split('How to check',
     '<p>Ask your developer for a list of every kind of page the site can produce. For each kind, visit one example and view its source.</p><p>Look in the sitemap from check 6 for kinds you did not expect.</p>',
     'Decide, for each kind',
@@ -195,7 +195,7 @@ return [
     '<p>On each page template, search the source for <code>&lt;h1</code>. There should be one, and it should name the page.</p><p>Read the headings in order, top to bottom. They should make sense as a contents list, with no level skipped for styling.</p><p>In the Media Library, open ten images used on key pages and read their alt text.</p>',
     'What a failure looks like',
     '<ul><li>Two H1s, or an H1 that is the site name on every page.</li><li>Headings used for size, such as an H4 above an H2.</li><li>Alt text that is empty on an image carrying information, or that is the file name.</li></ul>'); ?>
-<p>The <a href="/blog/website-accessibility-checklist/">website accessibility checklist</a> has eleven further tests, with a contrast checker.</p>
+<p>The <a href="/blog/website-accessibility-checklist/">website accessibility checklist</a> has eleven tests, these two among them, with a contrast checker.</p>
 <?php }); ?>
 
 <?php lx_item(11, 'structured-data', 'Structured data comes from one place and matches what the page shows', ['type' => 'project', 'tags' => ['Needs a developer', 'Takes 20 minutes'], 'tri' => true], static function () use ($s): void { ?>
@@ -210,9 +210,9 @@ return [
 
 <?php lx_item(12, 'speed-real-setup', 'Speed is checked with real plugins, tracking and consent tools switched on', ['type' => 'project', 'tags' => ['Needs a developer', 'Takes 30 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>A speed test on a bare staging site measures a site nobody will visit. The live site will carry analytics, a consent banner, chat, forms and whatever marketing adds in the first month. Test the page as it will run.</p>
-<p>WordPress already does some of this work itself. Core has lazy loaded images since 5.5 and iframes since 5.7. Since 6.3 it <?= ext_link($s['images'], 'adds a high fetch priority') ?>, the attribute <code>fetchpriority="high"</code>, to the image it judges to be the main one. Since 6.8, <?= ext_link($s['speculative'], 'speculative loading') ?> is on by default for logged-out visitors on sites with pretty permalinks. A plugin that repeats one of these adds weight and gains nothing.</p>
+<p>WordPress already does some of this work itself. Core has lazy loaded images since 5.5 and iframes since 5.7, and since 6.3 it <?= ext_link($s['images'], 'adds a high fetch priority') ?>, the attribute <code>fetchpriority="high"</code>, to the image it judges to be the main one. Since 6.8, <?= ext_link($s['speculative'], 'speculative loading') ?> is on by default for logged-out visitors on sites with pretty permalinks. A plugin that repeats one of these adds weight and gains nothing.</p>
 <?php lx_split('How to check',
-    '<p>Switch on everything that will run on the live site. Run PageSpeed Insights on the home page, a service page and an article, on mobile, several times each, and use the middle result.</p><p>Check whether the main image of each page is being lazy loaded. It should not be.</p>',
+    '<p>Switch on everything that will run on the live site. A public testing tool cannot get past the password on staging. Before launch, ask your developer to run a lab speed test from a browser that is signed in to staging. Test the home page, a service page and an article, on mobile, several times each, and use the middle result. Run PageSpeed Insights on the live address after launch.</p><p>Check whether the main image of each page is being lazy loaded. It should not be.</p>',
     'What to do',
     '<ul><li>Remove scripts that load on every page and are used on one.</li><li>Fix the largest image on each template first.</li><li>After launch, read the field data once it appears. It describes real visits, and the lab test does not.</li></ul>'); ?>
 <p>Our <a href="/blog/core-web-vitals-guide-for-business-owners/">Core Web Vitals guide for business owners</a> explains the measures, and <a href="/blog/pagespeed-score-vs-qualified-leads/">what a PageSpeed score misses</a> explains why a good score is not the finish line.</p>
@@ -221,7 +221,7 @@ return [
 <?php lx_item(13, 'forms-tracking', 'Forms deliver, spam is filtered without losing real leads, and submissions are tracked', ['type' => 'quick', 'tags' => ['You can check', 'Takes 20 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>For a B2B website, the form is the point of the whole build. It is also the part most likely to work on staging and fail in production, because email delivery depends on the live domain and the live server.</p>
 <?php lx_split('How to check',
-    '<p>Send a real test enquiry through every form, from a personal email address, on the live site.</p><p>Confirm three things for each: the message reached the right inbox, every field arrived, and the submission was recorded in analytics and in the CRM if you use one.</p>',
+    '<p>Send a real test enquiry through every form, from a personal email address. Do it on staging in the week before launch, and again on the live site on launch day.</p><p>Confirm three things for each: the message reached the right inbox, every field arrived, and the submission was recorded in analytics and in the CRM if you use one.</p>',
     'What a failure looks like',
     '<ul><li>The form shows a thank-you message and nothing arrives.</li><li>The message lands in a spam folder, or goes to the developer\'s address.</li><li>A field the visitor filled in is missing from the email.</li><li>The spam filter deletes suspect messages. It should hold them for review, so a real lead is never lost.</li></ul>'); ?>
 <p>See <a href="/blog/how-to-stop-junk-leads-on-your-website/">how to stop junk leads on your website</a> for a filter that quarantines and does not delete, and <a href="/blog/measure-qualified-leads-from-organic-search/">how to measure qualified leads from organic search</a> for what to store on every enquiry.</p>
@@ -230,7 +230,7 @@ return [
 <?php lx_item(14, 'updates-backups', 'Updates, backups and access are set up, and unused plugins and themes are removed', ['type' => 'project', 'tags' => ['Needs a developer', 'Takes 30 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>This check is not about search on day one. It is about whether the site is still healthy in month six. A hacked or broken site loses its search visibility quickly, and the cause is usually something left behind at launch.</p>
 <?php lx_split('How to check',
-    '<p>Open the Plugins and Themes screens and ask what each item is for. Open the Users screen and ask who each account belongs to.</p><p>Ask your developer three questions. Who applies updates, and how often? Where are backups kept, and when was one last restored as a test? Who is told if the site goes down?</p><p>The Site Health screen from check 1 also reports the HTTPS status.</p>',
+    '<p>Open the Plugins and Themes screens and ask what each item is for. Open the Users screen and ask who each account belongs to.</p><p>Ask your developer three questions. Who applies updates, and how often? Where are backups kept, and when was one last restored as a test? Who is told if the site goes down?</p><p>The Site Health screen from check 1 also ' . ext_link($s['sitehealth'], 'reports the HTTPS status') . '.</p>',
     'What a pass looks like',
     '<ul><li>No inactive plugins or spare themes left installed.</li><li>No shared logins, and no administrator accounts for people who have left the project.</li><li>Backups stored somewhere other than the web server, with one test restore done.</li><li>A named person responsible for updates.</li></ul>'); ?>
 <?php }); ?>
@@ -240,7 +240,7 @@ return [
 
 <?php px_table('What to look at after launch, and when', ['When', 'Look at', 'What you are checking'], [
     ['Launch day', 'Checks 1, 6 and 7 on the live address', 'The site is open, the sitemap is the right one and robots.txt is the intended one'],
-    ['Launch day', 'A test enquiry through every form', 'Email still delivers from the live domain'],
+    ['Launch day', 'Check 13 again: a test enquiry through every form', 'Email still delivers from the live domain'],
     ['Week 1', 'The sitemap in Search Console', 'It was read without errors, and it lists the live addresses'],
     ['Weeks 1 and 2', 'A sample of old addresses', 'Each still redirects in one step to the right new page'],
     ['Weeks 2 to 4', 'The Performance report in Search Console', 'Impressions and clicks for the pages that had them before'],
@@ -252,17 +252,17 @@ return [
 
 <h2 id="real-rebuild">One Rebuild, Checked Page by Page</h2>
 <p>FirstChoice Used Auto Parts sells used parts in the United States, and it is one of our WordPress projects. We rebuilt 99 of its pages: 31 part pages, a brands hub and 67 make pages.</p>
-<p>The gate was applied to every page, not to a sample. Each of the 99 was fetched after publishing and verified for a correct title, a canonical, one H1, a working form and valid FAQ markup. Those are checks 4, 5, 10, 11 and 13 on this list. The site's URLs did not change, so there was no redirect map to get wrong.</p>
+<p>Five of these checks were applied to every page, not to a sample. Each of the 99 was fetched after publishing and verified for a correct title, a canonical, one H1, a working form and valid FAQ markup. They are checks 4, 5, 10, 11 and 13 on this list. The site's URLs did not change, so there was no redirect map to get wrong.</p>
 <p>The forms had their own delivery test. Every quote form routes to one CRM mailbox, and that was confirmed with a real delivery check. The <a href="/case-studies/firstchoice-used-auto-parts/">FirstChoice case study</a> has the full account and the published figures.</p>
 <p>Checking page by page is slow. It is also the only way to know, and it is why this checklist asks you to look at several page types and not only the home page.</p>
 
 <h2 id="what-to-skip">Four Things You Can Skip</h2>
 <p>Launch lists grow because nobody removes anything. These four items appear on many of them and are rarely needed on a current WordPress release.</p>
 <ul class="post-list">
-    <li><strong>A second sitemap for its own sake.</strong> Core has produced one since 5.5. Add another tool only if you need something the core sitemap does not do, and then switch the core one off.</li>
-    <li><strong>A separate tool for lazy loading images.</strong> Core has done this since 5.5 for images and 5.7 for iframes.</li>
-    <li><strong>A separate tool to preload the next page.</strong> Speculative loading has been in core since 6.8.</li>
-    <li><strong>Extra structured data added in the hope of a rich result.</strong> Google says correct markup does not guarantee one. Mark up what the page shows and stop there.</li>
+    <li><strong>A second sitemap for its own sake.</strong> Core has <?= ext_link($s['sitemaps'], 'produced one since 5.5') ?>. Add another tool only if you need something the core sitemap does not do, and then switch the core one off.</li>
+    <li><strong>A separate tool for lazy loading images.</strong> Core <?= ext_link($s['images'], 'has done this') ?> since 5.5 for images and 5.7 for iframes.</li>
+    <li><strong>A separate tool to preload the next page.</strong> <?= ext_link($s['speculative'], 'Speculative loading') ?> has been in core since 6.8.</li>
+    <li><strong>Extra structured data added in the hope of a rich result.</strong> Google <?= ext_link($s['gsd'], 'says correct markup does not guarantee one') ?>. Mark up what the page shows and stop there.</li>
 </ul>
 <p>The rule behind all four: before adding a plugin, check whether WordPress already does the job. Fewer moving parts means fewer duplicated tags, which is where checks 4, 5, 6 and 11 usually fail.</p>
 <p>If the site is still at the planning stage, the <a href="/blog/website-design-brief-questions/">website design brief questions</a> will get these requirements written down before the build starts.</p>
@@ -271,7 +271,7 @@ return [
 'closing' => static function (): void { ?>
 <h2 id="final-thoughts">One Checkbox Can Hide a Finished Website</h2>
 <p>A WordPress site can be well designed, well written and invisible, because of one checkbox. The fourteen checks exist to catch that kind of fault while it is still cheap to fix.</p>
-<p>Run them on the built site, repeat three of them on launch day, and keep the marked-up board as the record of what was agreed. Passing the gate does not promise rankings or enquiries. It means that nothing technical is standing between your pages and the people looking for them.</p>
+<p>Run them on the built site, repeat four of them on launch day, and keep the marked-up board as the record of what was agreed. Passing the gate does not promise rankings or enquiries. It means that nothing technical is standing between your pages and the people looking for them.</p>
 
 <?php px_cta_main([
     'h' => 'Want a Second Pair of Eyes Before You Launch?',

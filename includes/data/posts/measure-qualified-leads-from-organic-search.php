@@ -211,7 +211,7 @@ return [
     <li><strong>Last-click revenue on its own.</strong> It under-counts every channel that starts journeys and over-counts every channel that ends them.</li>
     <li><strong>Any number with no owner.</strong> If nobody would do anything differently when it moves, it does not belong on the page.</li>
 </ul>
-<p>What is left fits on one screen: qualified leads from organic search, their cost, the pipeline they produced, the lag, and the three landing pages doing most of the work. Our <a href="/guides/complete-guide-to-business-lead-gen-seo/">guide to lead generation SEO</a> covers how to grow those pages, and the <a href="/ebooks/marketing-analytics-starter/">marketing analytics starter</a> covers the analytics setup behind them.</p>
+<p>What is left fits on one screen: qualified leads from organic search, their cost, the pipeline they produced, the lag, and the three landing pages doing most of the work. Our <a href="/guides/complete-guide-to-business-lead-gen-seo/">guide to lead generation SEO</a> covers how to grow those pages, and the <a href="/ebooks/marketing-analytics-starter/">marketing analytics starter</a> covers the analytics setup behind them. If LinkedIn is another channel in the same report, <a href="/blog/linkedin-engagement-vs-buyer-intent/">score LinkedIn signals by account, not by post</a>.</p>
 <?php },
 
 'closing' => static function (): void { ?>

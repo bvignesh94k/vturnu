@@ -24,6 +24,7 @@ $s = [
     'bing' => 'https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview',
     'openai' => 'https://web.archive.org/web/20261004224023/https://help.openai.com/en/articles/12627856-publishers-and-developers-faq',
     'lapse' => 'https://www.seroundtable.com/utm-parameters-missing-chatgpt-42299.html',
+    'lapseweek' => 'https://www.evertune.ai/resources/insights-on-ai/the-week-without-chatgpt-attribution',
     'ahrefs' => 'https://ahrefs.com/benchmarks/ai-vs-search',
     'kaiser' => 'https://doi.org/10.1287/mksc.2025.0489',
     'clarity' => 'https://clarity.microsoft.com/blog/ai-traffic-converts-at-3x-the-rate-of-other-channels-study/',
@@ -63,7 +64,7 @@ return [
 ], [
     'sub' => 'The tag shows how the link to AI search is established at each step.',
     'key' => [['a', 'Counted by a system'], ['b', 'Sampled by you'], ['c', 'Inferred']],
-    'cap' => 'Each step up is a smaller number and a weaker link to the AI answer. Report each rung by its own name.',
+    'cap' => 'From a citation upwards, each step is usually a smaller number and a weaker link to the AI answer. Report each rung by its own name.',
 ]); ?>
 
 <?php px_table('The six measurements, their sources and the mistake each one invites', ['Measurement', 'Where the number comes from', 'How far to trust it', 'The mistake it invites'], [
@@ -121,7 +122,7 @@ return [
 <h2 id="ga4-setup">Setting Up AI Referrals in GA4</h2>
 <p>Until 2026 this needed a custom rule. It now starts with a built-in channel. The steps below follow Google's documentation as read on 13 November 2026.</p>
 <ol class="bx-steps">
-    <li><strong>Find the AI Assistant channel.</strong> Google Analytics added it to the default channel group on 13 May 2026, according to its <?= ext_link($s['ga4notes'], 'release notes') ?>. The <?= ext_link($s['ga4channels'], 'channel definitions') ?> describe it as users arriving from sources such as ChatGPT, Gemini, Deepseek, Copilot or Grok. The rule is that the medium exactly matches <code>ai-assistant</code>, which Analytics sets when the referrer matches its list of assistants. Open the Traffic acquisition report and look for the channel by name.</li>
+    <li><strong>Find the AI Assistant channel.</strong> Google Analytics added it to the default channel group on 13 May 2026, according to its <?= ext_link($s['ga4notes'], 'release notes') ?>. The <?= ext_link($s['ga4channels'], 'channel definitions') ?> describe it as users arriving from sources such as ChatGPT, Gemini, DeepSeek, Copilot or Grok. The rule is that the medium exactly matches <code>ai-assistant</code>, which Analytics sets when the referrer matches its list of assistants. Open the Traffic acquisition report and look for the channel by name.</li>
     <li><strong>Know what it leaves out.</strong> The same page says the channel excludes Google's AI Overviews and AI Mode. Those clicks are counted in Organic Search, and the definitions give them no channel of their own.</li>
     <li><strong>Use Source Group to see which assistant.</strong> The release notes for 11 June 2026 describe a Source Group field that groups sources such as ChatGPT and Perplexity, and say it is filled in for past data.</li>
     <li><strong>Add a custom channel group only if you need one.</strong> You may want your own list of assistants, or reports for dates before the built-in channel. Google's page on <?= ext_link($s['ga4custom'], 'custom channel groups') ?> says they can be applied to reports retroactively. It also says order matters: traffic goes to the first channel it matches, so an AI channel belongs above Referral. Standard properties allow two custom groups.</li>
@@ -135,7 +136,7 @@ TXT, 'Source matches regex'); ?>
 <p><strong>What will still be missing.</strong> Three gaps remain after any setup.</p>
 <ul class="post-list">
     <li><strong>Visits with no referrer.</strong> Clicks from mobile apps often arrive as direct traffic.</li>
-    <li><strong>Tags that come and go.</strong> An <?= ext_link($s['openai'], 'archived OpenAI help page') ?> from October 2026 says ChatGPT adds <code>utm_source=chatgpt.com</code> to links from its search results. That page is no longer live. Search Engine Roundtable <?= ext_link($s['lapse'], 'reported that the tag went missing') ?> for about a week in October 2026, and OpenAI made no public statement. Treat the tag as helpful, not dependable.</li>
+    <li><strong>Tags that come and go.</strong> An <?= ext_link($s['openai'], 'archived OpenAI help page') ?> from October 2026 says ChatGPT adds <code>utm_source=chatgpt.com</code> to links from its search results. That page is no longer live. Search Engine Roundtable <?= ext_link($s['lapse'], 'reported on 14 October 2026 that the tag had gone missing') ?>. Two days later Evertune, a vendor, <?= ext_link($s['lapseweek'], 'put the gap at about a week') ?>. We found no public statement from OpenAI. Treat the tag as helpful, not dependable.</li>
     <li><strong>Google's own AI features.</strong> They sit inside Organic Search and stay there.</li>
 </ul>
 

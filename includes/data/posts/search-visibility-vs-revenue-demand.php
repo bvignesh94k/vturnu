@@ -31,7 +31,7 @@ return [
 
 <?php px_toc([
     'appearances-and-buyers' => 'Visibility counts appearances, demand counts buyers',
-    'test-1' => 'Test 1: branded or non-branded',
+    'test-1' => 'Test 1: branded vs non-branded search',
     'test-2' => 'Test 2: what the non-branded searches want',
     'test-3' => 'Test 3: whether the searchers fit',
     'test-4' => 'Test 4: whether enquiries become conversations',
@@ -43,21 +43,21 @@ return [
 
 <h2 id="appearances-and-buyers">Visibility Counts Appearances, Demand Counts Buyers</h2>
 <p>The <?= ext_link($s['perf'], 'Performance report in Search Console') ?> has four metrics: clicks, impressions, click-through rate and average position. Its default view covers three months. Every one of those metrics describes a search result. None of them describes a person, a company or an intention to buy.</p>
-<p>So a rising chart leaves four questions open. Did these people already know you? What were they looking for? Are they the kind of company that buys from you? Did any of them start a conversation with sales? Each test below answers one of those questions.</p>
+<p>So a rising chart leaves four questions open. Did these people already know you? What were they looking for? Are they the kind of company that buys from you? Did any of them start a conversation with sales? Each test below answers one of those questions. The same gap between attention and buying appears on social channels, where <a href="/blog/linkedin-engagement-vs-buyer-intent/">LinkedIn engagement is not the same as buyer intent</a>.</p>
 
 <?php px_flow('four-tests', 'Four tests, in order, for a visibility chart that is not matched by revenue', [
-    ['Branded or non-branded', 'How much of the traffic came from people who searched for you by name.', 'Search Console'],
+    ['Branded vs non-branded search', 'How much of the traffic came from people who searched for you by name.', 'Search Console'],
     ['What the non-branded searches want', 'Whether those searches are to learn, compare, find a supplier or enquire.', 'Search Console queries'],
     ['Whether the searchers fit', 'Whether the countries and landing pages match the buyers you can serve.', 'Search Console and analytics'],
     ['Whether enquiries become conversations', 'The share of enquiries from search that sales accepts, by landing page.', 'CRM or sales inbox'],
 ], [
     'sub' => 'Each test narrows the one before it. Set your own pass mark for each before you look at the numbers.',
-    'cap' => 'The first three tests use Search Console and analytics. Only the fourth needs your sales records.',
+    'cap' => 'The first three tests run on Search Console and analytics, and the third also needs a short list of past enquiries. The fourth needs your sales records.',
 ]); ?>
 
 <p><strong>Set the pass marks first.</strong> There is no universal threshold for any of these tests. A company with a well-known name will always have a large branded share. A company that sells in one country needs a different country mix from an exporter. Write down what a pass looks like for your business before you open the reports, so the numbers cannot talk you into a comfortable answer.</p>
 
-<h2 id="test-1">Test 1: Branded or Non-Branded</h2>
+<h2 id="test-1">Test 1: Branded vs Non-Branded Search</h2>
 <p>A branded search is someone typing your company name. That person already knew you. They heard about you from a colleague, an event, an advert or a sales call, and search was the door they used. The click is real. The demand was created somewhere else.</p>
 <p>A non-branded search describes a need without naming you. When your page appears for it, search has put you in front of someone who may not have known you existed. That is the part of the chart that can be new demand.</p>
 <p><strong>How to run it.</strong> Search Console has a branded queries filter in the Performance report. <?= ext_link($s['branded'], 'Google announced it') ?> on 20 November 2025 and made it available to all eligible sites from 11 March 2026. Apply the filter, note clicks and impressions for branded queries, then do the same for non-branded queries over the same three months.</p>
@@ -85,7 +85,7 @@ return [
 
 <p>Then read the mix, by impressions and by clicks. A site whose non-branded visibility is almost all "learn" has built an audience, not a market. A site with visibility in "find a supplier" and "buy or enquire" is in front of people who are choosing.</p>
 <p>Check position as well as group. A supplier search where your page sits on the third page is counted as an impression and seen by almost nobody.</p>
-<p><strong>An example from published work.</strong> Sai Impression manufactures labels in Chennai. In the same three months, its site recorded 92.9K impressions and 1.32K clicks. The <a href="/case-studies/sai-impression-label-manufacturer/">Sai Impression case study</a> notes that commercial searches such as "label manufacturers in india" and "label stock manufacturers in india" now bring buyers who do not yet know the brand. Those are "find a supplier" searches. The case study does not publish the full mix by group, so that is as far as the example goes.</p>
+<p><strong>An example from published work.</strong> Sai Impression manufactures labels in Chennai. In the same three months, its site recorded 92.9K impressions and 1.32K clicks. The <a href="/case-studies/sai-impression-label-manufacturer/">Sai Impression case study</a> notes that commercial searches such as "label manufacturers in india" and "label stock manufacturers in india" now bring buyers who do not yet know the brand. Those are "find a supplier" searches. The case study does not publish the full mix by group, so that is as far as the example goes. For the full set of searches a manufacturer's buyers make, see <a href="/blog/industrial-buyer-search-intent/">how industrial buyers search</a>.</p>
 <p><strong>Do not discard the "learn" group.</strong> Articles that answer early questions are how a buyer first meets you, and they give your commercial pages something to be linked from. The test fails only when "learn" is all there is, and nothing on the site catches the reader who is ready to compare or enquire.</p>
 <p>Want the four tests run on your Search Console data? <a href="/seo-services/#enquire" data-cta="blog-visibility-audit">Ask for a free SEO audit</a> and say which test you are least sure about.</p>
 
