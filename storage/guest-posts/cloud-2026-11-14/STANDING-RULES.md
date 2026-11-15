@@ -27,3 +27,8 @@ These come from B. Vignesh's messages during the cloud run. They sit on top of t
 - Only high-quality sites that have never been contacted. Check tracker-rows.csv and the exclusion list in the original brief before any new pitch.
 - Prefer sites that take a complete article by email and publish contributed pieces most days. Send the full package in one email: article, cover image, photo, bio.
 - Never promise him a publication date. Editors decide. Say plainly what is in his own control.
+
+## AI wording (added 15 Nov, evening)
+- No article, bio or email says it was written with AI help. That stays the rule unless a site's own rules require a disclosure; in that case the site is skipped or the disclosure is made.
+- Sites that ban AI-written articles (HubPages, Techpoint Africa, APMdigest, IndustryWeek and similar) are never sent a drafted article, and text is never reworked to slip past their checks. For HubPages the owner writes the article himself from an outline (hubpages/writing-kit.md).
+- Natural writing in his own voice is the standard everywhere.

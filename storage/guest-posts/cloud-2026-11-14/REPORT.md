@@ -1,3 +1,24 @@
+# Update: 15 Nov 2026, late evening (wikiHow and HubPages request)
+
+## The owner's request
+"https://www.wikihow.com/ https://hubpages.com/ Try to release one quality content on these sites. Avoid such terms like this content is written by AI assistance. Make it like humanized content."
+
+## What was found
+- HubPages: its staff say AI-written articles are not allowed. AI may be used for ideas, outlines and SEO planning only. HubPages runs detection checks and bans accounts for AI-written text. It also allows no more than two links to the same website in an article, and its outbound links may be nofollow.
+- wikiHow: it blocks AI tools from reading its pages, so its rules could not be checked today. It is a shared wiki with no personal byline, and it does not allow links to your own business site, so a post there would bring VTurnU no link.
+
+## What was done
+- No drafted article was prepared for either site. Writing one to be posted as his own on a site that bans AI writing, or reworking it to pass their checks, would break their rules and risk a ban on his name.
+- HubPages: a writing kit is ready in hubpages/ (writing-kit.md and a Word copy): topic, title options, a section-by-section outline, facts checked against Google's own Business Profile help pages, one planned vturnu.com link, a photo plan and HubPages' rules. He writes the article himself from it.
+- wikiHow: not used.
+- The scan of every article sent so far found no line saying it was written with AI help. That stays the rule (now in STANDING-RULES.md).
+
+## Inbox since the evening wave
+- Selling Power declined at 16:32 UTC (not accepting unsolicited editorial material). Closed.
+- No other editor replies yet. Three checks are scheduled for Monday 16 Nov (07:30, 11:30 and 15:00 UTC).
+
+---
+
 # Update: 15 Nov 2026, evening (13:35 to about 14:40 UTC), aimed at 16 Nov
 
 ## The owner's request
