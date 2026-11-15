@@ -65,8 +65,6 @@
         service: function (v) { return v ? '' : 'Please choose what you need help with.'; },
         budget: function (v) { return v ? '' : 'Please choose a budget range.'; },
         message: function (v) {
-            var words = v.replace(/[^A-Za-zÀ-ɏऀ-෿؀-ۿ一-鿿\s]/g, ' ').trim().split(/\s+/).filter(Boolean).length;
-            if (v.length < 15 || words < 3) { return 'Please tell us a little about your goal. One or two sentences is enough.'; }
             if (v.length > 2000) { return 'That message is a little long. Please keep it under 2,000 characters.'; }
             return '';
         },

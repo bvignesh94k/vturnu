@@ -170,11 +170,9 @@ function lead_validate(array $p): array
         $err['budget'] = 'Please choose a budget range.';
     }
 
+    /* The goal is optional: a visitor who leaves it empty still reaches us. */
     $msg = $p['message'];
-    $words = str_word_count(preg_replace('/[^\p{L}\s]/u', ' ', $msg));
-    if (mb_strlen($msg) < 15 || $words < 3) {
-        $err['message'] = 'Please tell us a little about your goal. One or two sentences is enough.';
-    } elseif (mb_strlen($msg) > 2000) {
+    if (mb_strlen($msg) > 2000) {
         $err['message'] = 'That message is a little long. Please keep it under 2,000 characters.';
     }
 
@@ -355,7 +353,7 @@ function render_lead_form_card(array $o = []): void
         <?= lf_field($uid, 'service', 'I need help with', $serviceSel) ?>
         <?= lf_field($uid, 'budget', 'Monthly budget', $budgetSel) ?>
     </div>
-    <?= lf_field($uid, 'message', 'What would you like to achieve?', '<textarea id="' . e($uid) . '-message" name="message" rows="4" required minlength="15" maxlength="2000" aria-describedby="' . e($uid) . '-message-err" placeholder="For example: we want more qualified enquiries from Google and AI search in the next six months.">' . $v('message') . '</textarea>', true, '', 'lf-f--wide') ?>
+    <?= lf_field($uid, 'message', 'What would you like to achieve?', '<textarea id="' . e($uid) . '-message" name="message" rows="4" maxlength="2000" aria-describedby="' . e($uid) . '-message-err" placeholder="For example: we want more qualified enquiries from Google and AI search in the next six months.">' . $v('message') . '</textarea>', false, '', 'lf-f--wide') ?>
 
     <details class="lf-more"<?= (lf_old('company_website') . lf_old('company_size') . lf_old('timeline')) !== '' ? ' open' : '' ?>>
         <summary>Add detail for a sharper reply <span class="lf-opt">optional</span></summary>

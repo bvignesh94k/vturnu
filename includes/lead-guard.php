@@ -292,7 +292,6 @@ function lead_missing(array $post, string $source): string
     if (in_array($source, LEAD_NO_MESSAGE_SOURCES, true)) {
         return '';
     }
-    $msg = trim((string) ($post['raw_message'] ?? ($post['message'] ?? '')));
     $phone = preg_replace('/\D/', '', (string) ($post['mobile'] ?? ($post['phone'] ?? '')));
     if ($source === 'home-quote') {
         return '';   // The homepage qualifier has its own required steps.
@@ -302,9 +301,6 @@ function lead_missing(array $post, string $source): string
     }
     if (strlen($phone) < 7) {
         return 'Please add a phone or WhatsApp number we can reach you on.';
-    }
-    if (mb_strlen($msg) < 15) {
-        return 'Please tell us a little about what you need, one or two lines is enough.';
     }
     return '';
 }
