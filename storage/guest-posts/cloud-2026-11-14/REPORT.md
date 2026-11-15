@@ -1,3 +1,47 @@
+# Update: 15 Nov 2026, evening (13:35 to about 14:40 UTC), aimed at 16 Nov
+
+## The owner's request
+"From yesterday, no guest blogs were published. Can you please reach more and make at least 2 blogs within tomorrow? Make it high quality unique sites. Avoid if already reached or pitched."
+
+## Where things stood at 13:40 UTC
+- No editor has replied since 14 Nov (it is Sunday). No pending piece has gone live: HackerNoon, e27, The Techism, CX Today, UX Magazine, Growth Folks and 150sec were all checked from the cloud.
+- Live count is still 2 of 5: Compare the Cloud and SIIT, both still up with their vturnu.com links.
+
+## What went out this evening: seven complete articles
+Each one is a finished article with a cover image, photo and bio, so an editor can publish it on Monday morning without another email. Six sites are new and were never contacted before.
+
+| Site | DR | Country | Article | vturnu.com link |
+|---|---|---|---|---|
+| CommPRO | 61 | US | Did That Coverage Work? Three Website Checks Any Communicator Can Run | /blog/search-visibility-vs-revenue-demand/ |
+| IT News Africa | 71 | Africa | Who holds the keys to your company's website? Keep a register before you need one | /blog/website-redesign-without-losing-seo/ |
+| The Media Online | 62 | South Africa | Block, allow or charge? How publishers can decide what AI crawlers may read | /ai-crawler-checker/ |
+| Passionate in Marketing | 69 | India | The 95-5 Rule: Most of Your Buyers Are Not Buying Today | /blog/branding-vs-performance-marketing/ |
+| New Digital Age | 72 | UK | B2B advertisers are optimising for the wrong moment | /blog/linkedin-ads-vs-google-ads-for-lead-generation/ |
+| ManufacturingTomorrow | 71 | US | Your RFQ Form Is the Front Door of the Factory: Seven Fixes That Bring Better Inquiries | /blog/industrial-buyer-search-intent/ |
+| Medianews4u (pitched this morning) | 72 | India | Consent Is Now a Design Problem: What India's Data Protection Rules Mean for Every Lead Form | none (their columns carry no links) |
+
+With the two full articles sent in the morning (Bizcommunity, DR 79, and The CEO Magazine, DR 40), nine finished articles are now waiting in editors' inboxes for Monday.
+
+One address bounced (IT News Africa's old contributors address) and the article was re-sent to the editor's address on their contact page. Bizcommunity's own Submit News page confirmed that marketingnews@ is the right address for contributor opinion, so the morning submission did reach the right desk.
+
+## Honest odds for 16 Nov
+Whether a piece goes live on a given day is the editor's decision, and none of these sites promises a turnaround. The ones that publish contributed pieces most days, and so have the best chance of running something on Monday or Tuesday, are Medianews4u (Authors Corner ran eight columns between 2 and 13 November), The Media Online, CommPRO, Passionate in Marketing, IT News Africa and Bizcommunity. Three inbox checks are scheduled for Monday so that any editor's question is answered within a few hours.
+
+## What the owner can do to make a piece live himself
+These are the only routes that do not depend on an editor:
+1. HackerNoon: sign in and open the story. Editors often leave notes that must be answered before a story is published. It has been in review since early November.
+2. e27: sign in and check the status of the two articles. If either says revision needed, tell me what it asks for.
+3. ContactCenterWorld: paste the article through the member form (three minutes, kit in contactcenterworld/email-and-kit.md). It publishes quickly, but behind their login and without links.
+4. Indie Hackers and Hashnode: the prepared posts (indiehackers/post.md and hashnode/post.md) can be published at once. These are your own profiles, so they are not counted as guest posts.
+
+## Sites checked this evening and not used
+See the end of pitches-2026-11-15.md. In short: Memeburn and Ventureburn have turned into crypto referral sites; Techpoint Africa and APMdigest do not accept AI-assisted writing; Startup Daily labels such pieces; Retail Customer Experience runs six weeks out; several others have no open route or block automated reading.
+
+## Environment
+The network allow-list was full at 124 hosts. With the owner's approval, 16 publisher sites rejected earlier were removed and 16 new ones were added.
+
+---
+
 # Update: 15 Nov 2026 (cloud session, 03:25 to about 04:30 UTC)
 
 ## Replies

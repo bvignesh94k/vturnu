@@ -21,3 +21,9 @@ These come from B. Vignesh's messages during the cloud run. They sit on top of t
 
 ## Platforms he posts on himself (local session with his logged-in Chrome)
 - beehiiv, Hashnode (vturnu.hashnode.dev) and Indie Hackers (@bvignesh). The cloud session cannot log in to these.
+
+## Speed and new sites (added 15 Nov, evening)
+- He wants published results quickly: at least two guest blogs live by 16 Nov, and five in all.
+- Only high-quality sites that have never been contacted. Check tracker-rows.csv and the exclusion list in the original brief before any new pitch.
+- Prefer sites that take a complete article by email and publish contributed pieces most days. Send the full package in one email: article, cover image, photo, bio.
+- Never promise him a publication date. Editors decide. Say plainly what is in his own control.
