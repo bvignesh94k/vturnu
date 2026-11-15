@@ -1,14 +1,67 @@
-# Update: 15 Nov 2026 (03:25 to 04:10 UTC)
+# Update: 15 Nov 2026 (cloud session, 03:25 to about 04:30 UTC)
 
-**Inbox.** No editor replies and no bounces since 14 Nov evening (weekend). SIIT has not written since the owner sent the share links at 16:40. CEOWORLD has not answered the founder-feature request. Platform notices: the owner's local session published a first Hashnode post (https://vturnu.hashnode.dev/honest-sitemap-lastmod-dates) and a first beehiiv post on 14 Nov, and @bvignesh has two comment replies waiting on Indie Hackers (drafts in indiehackers/comment-replies.md).
+## Replies
+No editor has replied since the evening of 14 Nov (it is the weekend). SIIT has not written since the share links went at 16:40 on 14 Nov. CEOWORLD has not answered the founder-feature request. New mail today:
+- Indie Hackers: @paulwei replied to @bvignesh at 02:15 UTC. A reply draft is in indiehackers/comment-replies.md, with the earlier one for @praneetbrar. Both need the owner's login.
+- Bizcommunity: a welcome email for a new MyBiz account at 03:28 UTC. This session did not open that account.
+- Two bounces from old Bizcommunity contributor addresses (see below). Nothing else bounced.
 
-**New pitches (5).** Chief Executive (CEO magazine), Founder Reports (founder interview), Martechvibe, Frontier Enterprise, Customer Experience Magazine. Details in pitches-2026-11-15.md.
+## Sent today: 14 pieces of outreach
+Full text is in Gmail Sent. Rules followed, addresses and follow-up dates for each are in pitches-2026-11-15.md.
 
-**Owner's new rules, now in STANDING-RULES.md.** No clients and no earlier guest posts in any content. Bio limited to digital marketing, founding history and career (no Odoo, Salesforce, ERP). Links the owner asks to send go in the email body itself. Word counts are never mentioned in emails (original brief; three emails on 14 Nov did mention them).
+| Type | Site | DR | What went |
+|---|---|---|---|
+| CEO magazine | Chief Executive | 77 | Treatment: Your buyers are briefed by AI before they call. Five questions for the CEO |
+| CEO magazine | The CEO Magazine | 40 | FULL ARTICLE: Stop Asking Marketing for More Traffic. Ask for These Four Numbers |
+| Founder magazine | Founder Reports | 68 | Founder interview pitch |
+| Leadership title | Management-Issues | 62 | Leader Q&A pitch: leading a small team when AI does more of the work |
+| Guest article | Bizcommunity | 79 | FULL ARTICLE: Marketing does not end at the enquiry form |
+| Guest article | CPA Practice Advisor | 79 | Two ideas for accounting firm partners |
+| Guest article | Selling Power | 72 | Query: first-call questions belong on the website |
+| Guest article | Medianews4u | 72 | Authors Corner column on consent and lead forms under India's data rules |
+| Guest article | Customer Experience Magazine | 72 | Two digital experience ideas |
+| Guest article | Sales & Marketing Management | 68 | Two ideas on lead quality and handover |
+| Guest article | Martechvibe | 63 | Two ideas on marketing data quality |
+| Guest article | Frontier Enterprise | 63 | Expert opinion on third-party website scripts |
+| Guest article | Contact Center Pipeline | 61 | Two ideas on avoidable contacts and the contact page |
+| Guest article | GLOBIS Insights | 52 | The one-page brief for outside partners |
 
-**New files.** _author-kit/bio.md (bio set), _author-kit/founder-interview-answers.md (what founder magazines will ask; 14 answers need the owner), hashnode/post.md (second Hashnode article, ready), indiehackers/comment-replies.md.
+Not confirmed: the MARKETECH APAC contributor form (DR 69). It was submitted twice from the cloud browser and showed no confirmation, and no email came. It needs one submission by hand.
 
-**Waiting for the owner.** (1) Approve the site-access request so the form-based and guideline-heavy sites can be read and used: Foundr, IdeaMensch, zPlatform, TNGlobal, MARKETECH APAC, Contact Center Pipeline, Management-Issues, Maddyness UK and others. (2) Fill the NEEDS YOUR ANSWER lines in the founder interview sheet. (3) Post the two Indie Hackers comment replies.
+Bizcommunity note: the two contributor addresses in their old guidelines bounced. The article then went to marketingnews@bizcommunity.com, the Marketing & Media address on their current Submit News page, and that one did not bounce. If nothing comes back by 24 Nov, the same piece can go in through the new MyBiz account (steps in bizcommunity/email.md).
+
+No email today mentions a client, an earlier guest post or a word count. Where a site asks for a LinkedIn or contact link, it is written out in the email body.
+
+## Live count
+Still 2 of 5: Compare the Cloud and SIIT. Checked from the cloud today: the Hashnode post published by the owner's local session is live (https://vturnu.hashnode.dev/honest-sitemap-lastmod-dates), and its vturnu.com link is rel "noopener noreferrer nofollow ugc", so it is not counted.
+
+## Owner's rules, now in STANDING-RULES.md
+No clients and no earlier guest posts in any content. Bio limited to digital marketing, the company's founding history and his career (no Odoo, Salesforce or ERP). Links the owner asks to send go in the email body itself, each with a label. Word counts are never mentioned in emails.
+
+## New files today
+- _author-kit/bio.md: the new bio set.
+- _author-kit/founder-interview-answers.md: answers from his published views, the lines only he can answer, IdeaMensch's exact 15 questions and its pitch form with suggested text.
+- bizcommunity/ and the-ceo-magazine/: article, Word file, image and notes for each.
+- hashnode/post.md: a second Hashnode article, ready, with its cover checked.
+- indiehackers/comment-replies.md: two reply drafts.
+- pitches-2026-11-15.md: every pitch, the rule it followed and the sites checked and rejected.
+
+## Waiting for the owner
+1. Founder interviews: fill the NEEDS YOUR ANSWER lines in _author-kit/founder-interview-answers.md. IdeaMensch (DR 75) is free and takes any founder who answers properly, but its pitch form has a CAPTCHA, wants a personal company email and needs a photo at least 1200 px wide by 800 px tall (the current headshot is 800 x 800).
+2. MARKETECH APAC: submit the contributor form once by hand (answers in pitches-2026-11-15.md, item 15).
+3. Indie Hackers: post the two comment replies.
+4. SIIT: send the engagement numbers for the four social posts around 21 Nov, as promised to them.
+5. DesignRush Spotlight (DR 90) runs founder interviews with agency leaders, and VTurnU is already listed there. It was not contacted because it is unclear whether it is free. Say the word and a request goes to spotlight@designrush.com.
+6. Site access: a dozen titles (Marketing-Interactive, PR Daily, Bulldog Reporter, Spin Sucks, BestMediaInfo, Leaderonomics, ChannelPro, Real Leaders, Singapore Business Review, KrASIA, ExchangeWire, Global Trade Magazine) show no contributor route in search results. Reading them needs their hosts approved for this environment.
+
+## Follow-up calendar
+- 21 Nov: first follow-up on the six 14 Nov submissions (ContactCenterWorld, CX Today, UX Magazine, Growth Folks, SmallBusiness.co.uk, 150sec).
+- 22 Nov: Chief Executive, Founder Reports, Martechvibe, Frontier Enterprise, Contact Center Pipeline, Medianews4u, Sales & Marketing Management, CPA Practice Advisor.
+- 24 Nov: Bizcommunity, GLOBIS Insights, The CEO Magazine.
+- 25 Nov: Management-Issues (their 10 days).
+- 29 Nov: Customer Experience Magazine (their two weeks).
+- 4 Dec: Selling Power closes without a reply (their rule: no follow-up).
+- 6 Dec: Bizcommunity exclusivity ends; the article is free to offer elsewhere.
 
 ---
 

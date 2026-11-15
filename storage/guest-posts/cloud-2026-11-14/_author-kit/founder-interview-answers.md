@@ -39,7 +39,48 @@ His approach to marketing is practical: understand the customer's questions, giv
 13. How big is the team today? (only if you want it published)
 14. For Starter Story only: monthly revenue range. (They require it. Skip this site if you prefer not to share.)
 
+## IdeaMensch: the exact questions (copied from ideamensch.com/interview on 15 Nov 2026)
+
+IdeaMensch asks every founder the same 15 questions and says it does not turn anyone down who puts serious work into the answers. All outgoing links on IdeaMensch are nofollow.
+
+1. What is your typical day, and how do you make it productive?
+2. How do you bring ideas to life?
+3. What's one trend that excites you?
+4. What is one habit that helps you be productive?
+5. What advice would you give your younger self?
+6. Tell us something you believe that almost nobody agrees with you on.
+7. What is the one thing you repeatedly do and recommend everyone else do?
+8. When you feel overwhelmed or unfocused, what do you do?
+9. What is one strategy that has helped you grow your business or advance in your career? Please explain how.
+10. What is one failure in your career, how did you overcome it, and what lessons did you take away from it?
+11. What is one business idea you're willing to give away to our readers?
+12. What is one piece of software that helps you be productive? How do you use it?
+13. What is the best $100 you recently spent? What and why? (personal or professional)
+14. Do you have a favorite book or podcast (or both) from which you've gotten much value, and why?
+15. What's a movie or series you recently enjoyed and why?
+
+Also required:
+- Key learnings: 3 to 5 bullet points at the end, not in the first person and not self-congratulatory.
+- A high-resolution photo, at least 1200 px wide by 800 px tall. The current headshot is 800 x 800, so a larger photo is needed.
+- A third-person bio (the one at the top of this sheet fits their length).
+- Your location: Chennai, India.
+- Their warning: unanswered questions or a small photo can delay an interview by three months or more.
+
+Questions 3 and 9 can be answered from the published views above. Questions 1, 2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14 and 15 need your own answers.
+
+### IdeaMensch pitch form (ideamensch.com/contact): two minutes, must be done by you
+The form has a CAPTCHA, so the cloud session cannot send it. It also says: use your own email at your company's domain, no Gmail and no shared inboxes such as hello@ or info@. connect@ may be read as a shared inbox, so use a personal vturnu.com address if you have one.
+
+- Who are you? I'm the founder/entrepreneur
+- Your name: Vignesh B
+- Company or project name: VTurnU
+- Website or LinkedIn URL: https://vturnu.com
+- What is your idea about in one sentence? VTurnU is a digital marketing and web development company that helps businesses get found in search and in AI answers, and turns website visits into qualified enquiries.
+- What makes your story worth sharing? (500 characters max) I began in digital marketing in 2017 and started VTurnU in Chennai in 2020, in the middle of the pandemic. I can share what it takes to start a services company in a lockdown, why I judge marketing by qualified leads and revenue and not by traffic, and how a small team uses AI for speed while people keep the judgment.
+- How did you find IdeaMensch? Search
+
 ## Where the answers will be used
-- IdeaMensch (DR 75): free standard interview through the form on ideamensch.com/interview. Needs a photo at least 1200 px wide by 800 px tall. Do not choose the paid recorded interview.
+- IdeaMensch (DR 75): free standard interview. Pitch through the form above, then answer the 15 questions. Do not choose a paid option if one is offered.
 - Founder Reports (DR 68): pitched on 15 Nov; they send questions if they accept.
-- zPlatform (DR 63) and other founder interview sites that are free.
+- Management-Issues (DR 62): a leader Q&A was pitched on 15 Nov. If they accept, the answers on leading a small team with AI must be yours.
+- Chief Executive, The CEO Magazine and CEOWORLD are article or feature routes and do not need this sheet.
