@@ -122,7 +122,7 @@ return [
 
 <?php lx_item(4, 'one-canonical', 'Each page outputs one canonical, pointing to itself', ['type' => 'quick', 'tags' => ['You can check', 'Takes 10 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>A canonical tag tells search engines which address is the main one for a page. Two tags that disagree, or one that points somewhere else, leave the choice to the search engine.</p>
-<p>Google <?= ext_link($s['gcanonical'], 'treats the canonical as a hint') ?>, not an instruction. It recommends a self-referencing canonical on each page, written as an absolute URL. WordPress core <?= ext_link($s['canonical'], 'prints a canonical link') ?> on single posts and pages. A theme or a plugin may print another.</p>
+<p>Google <?= ext_link($s['gcanonical'], 'treats the canonical as a strong signal of your preference') ?>, not an instruction. It recommends a self-referencing canonical on each page, written as an absolute URL. WordPress core <?= ext_link($s['canonical'], 'prints a canonical link') ?> on single posts and pages. A theme or a plugin may print another.</p>
 <?php lx_split('How to check',
     '<p>On five different kinds of page (home, a service page, a blog article, a category, a contact page), view the source and search for <code>rel="canonical"</code>.</p><p>Or count the tags from a terminal:</p><p><code>curl -s https://www.example.com/your-page/ | grep -c \'rel="canonical"\'</code></p>',
     'What a failure looks like',
@@ -150,7 +150,7 @@ return [
 
 <?php lx_item(7, 'robots-txt', 'The robots.txt is the intended one, and blocks nothing needed to render pages', ['type' => 'quick', 'tags' => ['You can check', 'Takes 5 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>The robots.txt file tells crawlers where they may go. On WordPress it can come from three places: WordPress itself, a plugin, or a real file uploaded to the server. The one that is live is the one that counts.</p>
-<p>When there is no file on the server, WordPress <?= ext_link($s['robots'], 'generates a virtual robots.txt') ?>. It has a general rule that disallows <code>/wp-admin/</code>, allows <code>/wp-admin/admin-ajax.php</code>, and on a public site adds a <code>Sitemap:</code> line.</p>
+<p>By default, WordPress <?= ext_link($s['robots'], 'generates a virtual robots.txt') ?>. Its rules disallow <code>/wp-admin/</code> and allow <code>/wp-admin/admin-ajax.php</code>. Since version 5.5, it also <?= ext_link($s['sitemaps'], 'lists the core sitemap') ?>.</p>
 <?php lx_split('How to check',
     '<p>Open <code>yoursite.com/robots.txt</code> in a browser and read every line. Or fetch it from a terminal:</p><p><code>curl -s https://www.example.com/robots.txt</code></p><p>Compare it with what your developer says it should contain.</p>',
     'What a failure looks like',
@@ -181,7 +181,7 @@ return [
 
 <?php lx_item(9, 'text-in-html', 'The main text and links are in the HTML source', ['type' => 'quick', 'tags' => ['You can check', 'Takes 5 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>WordPress normally sends a complete page from the server. Some page builders, sliders, tabs and "load more" buttons do not. They send a shell and add the text afterwards with JavaScript. A visitor sees no difference. A crawler that does not run scripts sees an empty space.</p>
-<p>Google can run JavaScript, and its <?= ext_link($s['gjs'], 'JavaScript guidance') ?> still carries a warning that matters at launch. If the first HTML a page sends contains <code>noindex</code>, Google may not render the page at all, so a script cannot remove the rule later.</p>
+<p>Google can run JavaScript, and its <?= ext_link($s['gjs'], 'JavaScript guidance') ?> still carries a warning that matters at launch. If the first HTML a page sends contains <code>noindex</code>, Google may skip rendering the page. A script that removes the rule later may then not work.</p>
 <?php lx_split('How to check',
     '<p>Choose a sentence from the middle of a service page. View the page source and search for it.</p><p>Or from a terminal:</p><p><code>curl -s https://www.example.com/your-page/ | grep -c "a sentence from the page"</code></p><p>Do the same for a link in the main menu and a link in the body.</p>',
     'What a failure looks like',
@@ -210,7 +210,7 @@ return [
 
 <?php lx_item(12, 'speed-real-setup', 'Speed is checked with real plugins, tracking and consent tools switched on', ['type' => 'project', 'tags' => ['Needs a developer', 'Takes 30 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>A speed test on a bare staging site measures a site nobody will visit. The live site will carry analytics, a consent banner, chat, forms and whatever marketing adds in the first month. Test the page as it will run.</p>
-<p>WordPress already does some of this work itself. Core has lazy loaded images since 5.5 and iframes since 5.7, and since 6.3 it <?= ext_link($s['images'], 'adds a high fetch priority') ?>, the attribute <code>fetchpriority="high"</code>, to the image it judges to be the main one. Since 6.8, <?= ext_link($s['speculative'], 'speculative loading') ?> is on by default for logged-out visitors on sites with pretty permalinks. A plugin that repeats one of these adds weight and gains nothing.</p>
+<p>WordPress already does some of this work itself. Core has lazy loaded images since 5.5. Since 6.3 it <?= ext_link($s['images'], 'adds a high fetch priority') ?>, the attribute <code>fetchpriority="high"</code>, to the image it judges to be the main one. Since 6.8, <?= ext_link($s['speculative'], 'speculative loading') ?> is on by default for logged-out visitors on sites with pretty permalinks. A plugin that repeats one of these adds weight and gains nothing.</p>
 <?php lx_split('How to check',
     '<p>Switch on everything that will run on the live site. A public testing tool cannot get past the password on staging. Before launch, ask your developer to run a lab speed test from a browser that is signed in to staging. Test the home page, a service page and an article, on mobile, several times each, and use the middle result. Run PageSpeed Insights on the live address after launch.</p><p>Check whether the main image of each page is being lazy loaded. It should not be.</p>',
     'What to do',
@@ -260,7 +260,7 @@ return [
 <p>Launch lists grow because nobody removes anything. These four items appear on many of them and are rarely needed on a current WordPress release.</p>
 <ul class="post-list">
     <li><strong>A second sitemap for its own sake.</strong> Core has <?= ext_link($s['sitemaps'], 'produced one since 5.5') ?>. Add another tool only if you need something the core sitemap does not do, and then switch the core one off.</li>
-    <li><strong>A separate tool for lazy loading images.</strong> Core <?= ext_link($s['images'], 'has done this') ?> since 5.5 for images and 5.7 for iframes.</li>
+    <li><strong>A separate tool for lazy loading images.</strong> Core has lazy loaded images since 5.5. Since 6.3 it also <?= ext_link($s['images'], 'leaves the main image out of lazy loading') ?>.</li>
     <li><strong>A separate tool to preload the next page.</strong> <?= ext_link($s['speculative'], 'Speculative loading') ?> has been in core since 6.8.</li>
     <li><strong>Extra structured data added in the hope of a rich result.</strong> Google <?= ext_link($s['gsd'], 'says correct markup does not guarantee one') ?>. Mark up what the page shows and stop there.</li>
 </ul>

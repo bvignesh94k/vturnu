@@ -20,8 +20,8 @@
 
 $s = [
     'sparktoro' => 'https://sparktoro.com/blog/new-research-ais-are-highly-inconsistent-when-recommending-brands-or-products-marketers-should-take-care-when-tracking-ai-visibility/',
-    'bing' => 'https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview',
-    'bingshare' => 'https://blogs.bing.com/search/June-2026/New-AI-Visibility-Insights-in-Bing-Webmaster-Tools-Intents-Topics-Citation-Share-Compare',
+    'bing' => 'https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/',
+    'bingshare' => 'https://blogs.bing.com/search/2026/6/New-AI-Visibility-Insights-in-Bing-Webmaster-Tools-Intents-Topics-Citation-Share-Compare/',
 ];
 
 $in = static fn (string $name, string $label, string $value): string =>
@@ -89,7 +89,7 @@ return [
 <p>"Recommended" needs a written rule, because it is a judgement. One that works: the answer says the brand suits the buyer's stated need, or includes it in a list the answer itself presents as its suggestions. A brand mentioned as an alternative, as background or with a warning is named and not recommended.</p>
 <p>You can only check accuracy for competitors from what they publish, so keep that score to plain facts: what they sell, where they operate and what they say they charge.</p>
 
-<p class="bx-note"><strong>Do not score "named first".</strong> It is tempting to give extra credit to the brand at the top of a list. A <?= ext_link($s['sparktoro'], 'study published by SparkToro in January 2026') ?>, carried out with a co-author from Gumshoe, an AI tracking company, had 600 volunteers run 12 prompts through ChatGPT, Claude and Google's AI features in November and December 2025, for 2,961 runs in total. The chance of getting the same list of brands twice was under 1 in 100, and about 1 in 1,000 for the same list in the same order. How often a brand appeared across many runs was much steadier. The study is not peer reviewed, and its authors disclose the link to a company that sells tracking. Its conclusion still matches the arithmetic: count how often, not where.</p>
+<p class="bx-note"><strong>Do not score "named first".</strong> It is tempting to give extra credit to the brand at the top of a list. A <?= ext_link($s['sparktoro'], 'study published by SparkToro in January 2026') ?>, carried out with a co-author from Gumshoe, an AI tracking company, had 600 volunteers run 12 prompts through ChatGPT, Claude and Google's AI features in November and December 2025, for 2,961 runs in total. For ChatGPT and Google's AI, the chance of getting the same list of brands twice in 100 runs was under 1 in 100. Claude was only slightly more likely to repeat a list. For the same list in the same order, the odds were closer to 1 in 1,000. How often a brand appeared across many runs was much steadier. The study is not peer reviewed, and its authors disclose the link to a company that sells tracking. Its conclusion still matches the arithmetic: count how often, not where.</p>
 
 <?php px_example('Example scorecard, with invented brands and numbers', static function (): void { ?>
 <p>Four made-up brands in an unnamed category. Thirty neutral prompts were run three times each on one assistant, which gives 90 answers. Brand A is the company doing the benchmark. None of these figures comes from a real test.</p>

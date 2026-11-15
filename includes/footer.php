@@ -97,7 +97,13 @@
     </div>
 </footer>
 
-<a class="float-cta" id="float-cta" href="/contact-us/">
+<?php
+/* Article pages carry their own enquiry form beside the text, so the quote
+   buttons jump to it and the pop-up copy of the form is left out of the page. */
+$on_article = (($page['template'] ?? '') === 'blog-post');
+$quote_href = $on_article ? '#post-enquiry' : '/contact-us/';
+?>
+<a class="float-cta" id="float-cta" href="<?= $quote_href ?>">
     <span class="float-dot" aria-hidden="true"></span>
     Get a Free Quote
 </a>
@@ -118,7 +124,7 @@
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5s0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>
         <span>WhatsApp</span>
     </a>
-    <a class="mb-btn mb-quote" href="/contact-us/">
+    <a class="mb-btn mb-quote" href="<?= $quote_href ?>">
         <span class="float-dot" aria-hidden="true"></span>
         Get a Quote
     </a>
@@ -128,6 +134,7 @@
     </button>
 </div>
 
+<?php if (!$on_article): ?>
 <dialog class="quote-modal" id="quote-modal" aria-labelledby="qm-title">
     <button class="qm-close" type="button" aria-label="Close dialog">×</button>
     <div class="qm-body">
@@ -139,6 +146,7 @@
         <?php render_lead_form_card(['uid' => 'qm', 'source' => 'popup', 'lazy' => true, 'service' => lead_page_service($page ?? [], $slug ?? ''), 'button' => 'Get my custom quote']); ?>
     </div>
 </dialog>
+<?php endif; ?>
 
 <script src="/assets/js/main.js?v=<?= asset_v('/assets/js/main.js') ?>" defer></script>
 <script src="/assets/js/lead-form.js?v=<?= asset_v('/assets/js/lead-form.js') ?>" defer></script>

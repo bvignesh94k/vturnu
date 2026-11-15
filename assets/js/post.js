@@ -112,12 +112,15 @@
         });
     });
     /* Beside the article the form is already on screen: go to its first field. */
-    shell.querySelectorAll('.pv-main a[href="#post-enquiry"]').forEach((a) => a.addEventListener('click', (e) => {
+    /* Every "talk to us" or quote link on the page goes straight to the form's first field. */
+    document.querySelectorAll('a[href="#post-enquiry"]').forEach((a) => a.addEventListener('click', (e) => {
         const side = document.getElementById('post-enquiry');
         const first = side && side.querySelector('input[name="name"]');
-        if (!first || getComputedStyle(side).position !== 'sticky') return;
+        if (!first) return;
         e.preventDefault();
-        first.focus();
+        close();
+        first.focus({ preventScroll: true });
+        first.scrollIntoView({ block: 'center', behavior: 'instant' });
     }));
     document.addEventListener('click', (e) => { if (!rail.contains(e.target)) close(); });
 

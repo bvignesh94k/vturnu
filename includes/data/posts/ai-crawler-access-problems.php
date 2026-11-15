@@ -96,7 +96,7 @@ return [
 curl -s -o /dev/null -w "%{http_code} %{size_download}\n" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36" https://www.example.com/your-page/
 
 # 2. With a search crawler's name in the user agent
-curl -s -o /dev/null -w "%{http_code} %{size_download}\n" -A "Mozilla/5.0 (compatible; OAI-SearchBot/1.0; +https://openai.com/searchbot)" https://www.example.com/your-page/
+curl -s -o /dev/null -w "%{http_code} %{size_download}\n" -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36; compatible; OAI-SearchBot/1.4; +https://openai.com/searchbot" https://www.example.com/your-page/
 SH, 'Terminal'); ?>
 <p>On Windows, use <code>curl.exe</code> and replace <code>/dev/null</code> with <code>NUL</code>. Repeat the second command with <code>ClaudeBot</code> and <code>PerplexityBot</code> in place of <code>OAI-SearchBot</code>.</p>
 <?php lx_split('How to read it',
@@ -117,7 +117,7 @@ SH, 'Terminal'); ?>
 <?php lx_item(4, 'raw-html', 'The page without JavaScript', ['tags' => ['Owner: developer', 'Takes 5 minutes'], 'tri' => true], static function () use ($s): void { ?>
 <p>This is the layer that catches modern websites. A page built with a JavaScript framework can send the browser an almost empty document and fill in the text afterwards. A person never notices. A crawler that does not run JavaScript receives the empty document and leaves.</p>
 <p>The largest published study of this is by <?= ext_link($s['vercel'], 'Vercel and MERJ') ?>, from December 2024. Across their network, none of the main AI crawlers they tracked ran JavaScript, including OpenAI's, Anthropic's and Perplexity's. Googlebot did. Google's own <?= ext_link($s['gjs'], 'JavaScript guidance') ?> still recommends rendering on the server, because not every bot runs scripts.</p>
-<p class="bx-note"><strong>A newer and smaller finding.</strong> In October 2026, <?= ext_link($s['genezio'], 'small log tests') ?> reported OpenAI's search crawler running JavaScript some time after fetching the HTML. OpenAI has not confirmed it, and the tests cover very few sites. It does not change the advice: text that is in the HTML works for every crawler, today.</p>
+<p class="bx-note"><strong>A newer and smaller finding.</strong> In October 2026, a <?= ext_link($s['genezio'], 'small log test by Genezio') ?> reported that OpenAI's search crawler ran JavaScript on its own website. OpenAI has not confirmed it, and the test covers very few sites. It does not change the advice: text that is in the HTML works for every crawler, today.</p>
 <?php lx_split('How to test',
     '<p>Fetch the page without a browser and count the lines that contain a sentence from the middle of your article:</p><p><code>curl -s https://www.example.com/your-article/ | grep -c "a sentence from the article"</code></p><p>No terminal? Open the page, press Ctrl and U to view the source, and search it for the sentence.</p>',
     'What a failure looks like',

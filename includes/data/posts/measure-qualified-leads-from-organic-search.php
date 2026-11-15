@@ -17,6 +17,7 @@ $s = [
     'keyevents' => 'https://support.google.com/analytics/answer/9267568',
     'leadevents' => 'https://support.google.com/analytics/answer/9267735',
     'channels' => 'https://support.google.com/analytics/answer/9756891',
+    'releasenotes' => 'https://support.google.com/analytics/answer/9164320',
     'gsc' => 'https://support.google.com/analytics/answer/10737381',
     'attribution' => 'https://support.google.com/analytics/answer/10597962',
     'hubspot' => 'https://knowledge.hubspot.com/records/use-lifecycle-stages',
@@ -63,7 +64,7 @@ return [
     'cap' => 'Names vary between companies. What matters is that each stage has a written rule and a named owner.',
 ]); ?>
 
-<p>These names are conventions, not standards. <?= ext_link($s['hubspot'], 'HubSpot\'s default lifecycle stages') ?>, for example, run from lead to marketing qualified lead, sales qualified lead, opportunity and customer, with no separate stage for sales acceptance. The sales accepted lead comes from the demand waterfall that SiriusDecisions, now part of Forrester, <?= ext_link($s['sal'], 'described in 2012') ?>: a formal step where sales confirms that a lead meets the criteria both teams agreed, before anyone contacts the buyer.</p>
+<p>These names are conventions, not standards. <?= ext_link($s['hubspot'], 'HubSpot\'s default lifecycle stages') ?>, for example, run from subscriber and lead to marketing qualified lead, sales qualified lead, opportunity, customer and evangelist, with no separate stage for sales acceptance. The sales accepted lead comes from the demand waterfall that SiriusDecisions, now part of Forrester, <?= ext_link($s['sal'], 'described in 2012') ?>: a formal step where sales confirms that a lead meets the criteria both teams agreed, before anyone contacts the buyer.</p>
 <p>Use whichever names your CRM uses. Keep the acceptance step, though, even if it is only a tick box. It is the point where marketing's definition of a good lead meets sales's, and it is where you find out that they differ.</p>
 <p>In analytics, the same idea exists as events. Google Analytics calls the actions that matter to a business <?= ext_link($s['keyevents'], 'key events') ?>, and its <?= ext_link($s['leadevents'], 'recommended events for lead generation') ?> include one for a new lead, one for a qualified lead, one for a disqualified lead and one for a lead that became a customer. If your CRM can send those back, analytics stops ending at the form.</p>
 
@@ -75,7 +76,7 @@ return [
     <li><strong>Junk is counted as leads.</strong> Spam, students, job seekers and suppliers all fill in forms. Counted together with buyers, they make every channel look productive and every lead look poor.</li>
     <li><strong>Branded searches hide the real work.</strong> Someone who searches for your company by name arrived because of something earlier: a referral, an article, an AI answer. Our guide to <a href="/blog/search-visibility-vs-revenue-demand/">search visibility and revenue</a> shows how to separate the two.</li>
 </ol>
-<p>There is a newer wrinkle. Google's <?= ext_link($s['channels'], 'definition of the Organic Search channel') ?> now includes clicks from AI Overviews and AI Mode, while visits from assistants such as ChatGPT sit in a separate AI Assistant channel that Google added in May 2026. Organic search, in your reports, already contains some AI. See <a href="/blog/ai-citations-vs-website-traffic/">AI citations vs website traffic</a> for what each of those numbers proves.</p>
+<p>There is a newer wrinkle. Google's <?= ext_link($s['channels'], 'definition of the Organic Search channel') ?> now includes clicks from AI Overviews and AI Mode, while visits from assistants such as ChatGPT sit in a separate AI Assistant channel that Google <?= ext_link($s['releasenotes'], 'added in May 2026') ?>. Organic search, in your reports, already contains some AI. See <a href="/blog/ai-citations-vs-website-traffic/">AI citations vs website traffic</a> for what each of those numbers proves.</p>
 
 <h2 id="nine-fields">Nine Fields to Store on Every Enquiry</h2>
 <p>The fix for all four leaks is the same: store the evidence on the enquiry itself, at the moment it is sent, so it travels with the lead into the CRM. Nine fields are enough.</p>
@@ -130,7 +131,7 @@ return [
 <ul class="post-list">
     <li><strong>Sound: Search Console to analytics, by landing page and date.</strong> Google's <?= ext_link($s['gsc'], 'Search Console integration for Google Analytics') ?> adds a report that lists landing pages with their search clicks and impressions beside analytics metrics, key events included. It tells you which pages turn search visits into enquiries.</li>
     <li><strong>Sound: the form to the CRM, by the enquiry record.</strong> If the nine fields are saved on the lead, every later stage can be counted by first source and by first landing page.</li>
-    <li><strong>Not sound: a search query to one named lead.</strong> Google does not pass the query to your site, and the same documentation says the queries report cannot be broken down by analytics dimensions. Nobody can truthfully write "this customer searched for industrial label printing". What you can say is that the customer's first landing page was the label printing page, and that the page appears for these searches.</li>
+    <li><strong>Not sound: a search query to one named lead.</strong> Google does not pass the search query to your site. Google's documentation for the Search Console integration also says the queries report can be broken down by Search Console dimensions but not by analytics dimensions. Nobody can truthfully write "this customer searched for industrial label printing". What you can say is that the customer's first landing page was the label printing page, and that the page appears for these searches.</li>
 </ul>
 <p>The landing page is the hinge. It is the one fact that Search Console, analytics, the form and the CRM can all hold. Report by landing page and the four systems line up.</p>
 

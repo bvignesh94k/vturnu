@@ -72,7 +72,7 @@ return [
 <?php px_table('What four browser agents are documented to do, and where they stop', ['Product', 'What it can do', 'Where it pauses or refuses'], [
     ['ChatGPT cloud browser (OpenAI)', 'Reads pages, clicks buttons and fills in forms in a browser on a remote computer, on public and signed-in sites', 'Designed to ask before actions that are hard to reverse and before financial, legal or account commitments. The user signs in through a form the model cannot see'],
     ['Gemini in Chrome, auto browse (Google)', 'Carries out multi-step tasks in Chrome after the user approves a plan', 'Hands back to the user to finish payments, accept terms and create accounts. Google describes it as experimental and warns it can make mistakes'],
-    ['Claude in Chrome (Anthropic)', 'Reads the page, clicks, types, fills in forms and navigates', 'Its permissions guide lists purchases, financial transactions and creating accounts as things it will not do in any mode'],
+    ['Claude in Chrome (Anthropic)', 'Acts on websites for the user, such as entering information into a page, under one of three permission modes', 'Its permissions guide lists purchases, financial transactions and creating accounts as things it will not do in any mode'],
     ['Comet assistant (Perplexity)', 'Browses and acts on pages for the user', 'Pauses for confirmation before sending messages, placing a final order or entering details it does not already have'],
 ]); ?>
 
@@ -93,7 +93,7 @@ return [
     ['Cumulative Layout Shift', 'Whether elements move while the page loads, which makes clicks miss', 'Yes'],
     ['llms.txt follows recommendations', 'Whether an llms.txt file, if the site has one, is well-formed', 'Only if the file exists'],
     ['WebMCP tools registered', 'Whether the page offers tools to agents', 'Information only'],
-    ['WebMCP form coverage', 'Whether forms are described for agents', 'Information only'],
+    ['WebMCP form coverage', 'Whether forms are described for agents', 'Only if the page uses WebMCP. It counts as a pass when every form is described'],
     ['WebMCP schemas are valid', 'Whether those tool descriptions are valid', 'Only if the page uses WebMCP'],
     ['ARD manifest is valid', 'Whether an ard.json manifest for agents, if the site has one, is valid', 'Only if the file exists'],
 ]); ?>

@@ -21,7 +21,7 @@ $s = [
     'gai' => 'https://developers.google.com/search/docs/appearance/ai-features',
     'gsccount' => 'https://support.google.com/webmasters/answer/7042828',
     'gscgen' => 'https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports',
-    'bing' => 'https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview',
+    'bing' => 'https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/',
     'openai' => 'https://web.archive.org/web/20261004224023/https://help.openai.com/en/articles/12627856-publishers-and-developers-faq',
     'lapse' => 'https://www.seroundtable.com/utm-parameters-missing-chatgpt-42299.html',
     'lapseweek' => 'https://www.evertune.ai/resources/insights-on-ai/the-week-without-chatgpt-attribution',
@@ -82,7 +82,7 @@ return [
 <p>A wide gap between rung two and rung three is normal. There are four reasons, and none of them is a tracking fault you can fully fix.</p>
 <ol class="bx-steps">
     <li><strong>The answer often satisfies the reader.</strong> An AI answer is written so that the person does not need to open the sources. Your page helped to produce the answer and nobody visited it.</li>
-    <li><strong>Some visits carry no referrer.</strong> No assistant vendor documents this fully. <?= ext_link($s['natzir'], 'One analyst\'s review of his own server logs') ?>, updated during 2026, found that the assistants' websites pass a referrer and that their mobile apps mostly strip it. Analytics files a visit without a referrer under direct traffic. The tags that assistants add to links are not dependable either, as the tracking section below explains.</li>
+    <li><strong>Some visits carry no referrer.</strong> No assistant vendor documents this fully. <?= ext_link($s['natzir'], 'One analyst\'s review of the server logs of the sites he measures') ?>, updated in October 2026, found that Perplexity, Copilot, Gemini and Claude pass a referrer from their websites. ChatGPT now rarely passes one, so its visits depend on its tag. The mobile apps mostly strip the referrer. Analytics files a visit without a referrer under direct traffic. The tags that assistants add to links are not dependable either, as the tracking section below explains.</li>
     <li><strong>Some answers name a brand without a link.</strong> That is a mention with nothing to click.</li>
     <li><strong>Buyers come back later by another route.</strong> A person reads an answer on Monday and searches for the company by name on Thursday. Analytics records a branded organic search visit.</li>
 </ol>
@@ -100,7 +100,7 @@ return [
 
 <h3>Search Console counts impressions in Google's AI features</h3>
 <p>Google says sites that appear in AI Overviews and AI Mode <?= ext_link($s['gai'], 'are included in overall search traffic') ?> in Search Console, under the Web search type. Its <?= ext_link($s['gsccount'], 'counting rules') ?> say a click on an external link in an AI Overview counts as a click, and that every link in an Overview shares the Overview's position.</p>
-<p>In June 2026 Google <?= ext_link($s['gscgen'], 'announced a Generative AI performance report') ?>. It shows impressions only, by page, country, device and date, with AI Overviews and AI Mode combined. It has no clicks, no queries and no position. The same impressions are already inside the main Performance report, so the two must not be added together.</p>
+<p>In June 2026 Google <?= ext_link($s['gscgen'], 'announced Generative AI performance reports') ?> for Search and Discover. The Search report shows impressions by page, country, device and date. Its help page counts AI Overviews and AI Mode together and lists no clicks, queries or position. The same impressions are already inside the main Performance report, so the two must not be added together.</p>
 
 <h3>Analytics counts visits that say where they came from</h3>
 <p>Google Analytics can count a visit from an assistant when the visit carries a referrer or a tag. The next section covers the setup. What it cannot count is a visit that arrives with neither.</p>

@@ -30,7 +30,7 @@ $s = [
     'hubmetrics' => 'https://www.linkedin.com/help/lms/answer/a7109308',
     'hubemployer' => 'https://www.linkedin.com/help/lms/answer/a10166020',
     'capi' => 'https://www.linkedin.com/help/lms/answer/a1655394',
-    'capidev' => 'https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/conversions-api',
+    'capidev' => 'https://learn.microsoft.com/en-us/linkedin/marketing/integrations/ads-reporting/conversions-api?view=li-lms-2026-10',
     'revenue' => 'https://www.linkedin.com/help/lms/answer/a715191',
     'influenced' => 'https://www.linkedin.com/help/lms/answer/a1367472',
 ];
@@ -161,7 +161,7 @@ return [
     <li><strong>What feeds it.</strong> The score combines more than 180 signals in four groups: activity on LinkedIn, interactions with ads, accepted or declined InMail messages, and visits to your website where LinkedIn's Insight Tag is installed.</li>
     <li><strong>The levels.</strong> High, Moderate, Neutral and Negative.</li>
     <li><strong>The time window.</strong> The filter for high or moderate intent covers the past 30 days.</li>
-    <li><strong>The plans.</strong> LinkedIn's <?= ext_link($s['plans'], 'plan comparison') ?>, updated in September 2026, lists Buyer Intent for Advanced and Advanced Plus, and not for Core.</li>
+    <li><strong>The plans.</strong> LinkedIn's <?= ext_link($s['plans'], 'plan comparison') ?> lists Buyer Intent for Advanced and Advanced Plus, and not for Core. The pricing FAQ on that page is marked as updated on 27 September 2026.</li>
 </ul>
 <p>LinkedIn's list of <?= ext_link($s['intentacts'], 'activities that indicate buyer intent') ?> includes company follows, Page and profile visits, new connections, lead form completions, ad views and clicks, accepted InMails and tagged website visits. Each activity is marked as showing either the person's identity or only the type of profile.</p>
 <p>Comments and reactions on posts are among the signals. So engagement does feed the score, as one input among many. The LinkedIn pages read for this article do not say how the signals are weighted, and this article does not guess.</p>

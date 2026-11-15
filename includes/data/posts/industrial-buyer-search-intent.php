@@ -54,11 +54,13 @@ return [
     ['label' => 'Sales or application engineers', 'value' => 41, 'text' => '41%'],
     ['label' => 'Industry directories', 'value' => 31, 'text' => '31%'],
     ['label' => 'YouTube', 'value' => 30, 'text' => '30%'],
+    ['label' => 'Industry or association groups', 'value' => 28, 'text' => '28%'],
     ['label' => 'Trade shows', 'value' => 27, 'text' => '27%'],
     ['label' => 'Webinars', 'value' => 27, 'text' => '27%'],
     ['label' => 'Newsletters', 'value' => 24, 'text' => '24%'],
     ['label' => 'Generative AI platforms', 'value' => 21, 'text' => '21%'],
     ['label' => 'LinkedIn', 'value' => 11, 'text' => '11%'],
+    ['label' => 'Podcasts', 'value' => 4, 'text' => '4%'],
 ], [
     'wide' => true, 'max' => 100, 'ticks' => [0, 25, 50, 75],
     'head' => ['Source', 'Share who use it routinely'],

@@ -15,9 +15,10 @@
 
 $s = [
     'sparktoro' => 'https://sparktoro.com/blog/new-research-ais-are-highly-inconsistent-when-recommending-brands-or-products-marketers-should-take-care-when-tracking-ai-visibility/',
-    'bing' => 'https://blogs.bing.com/webmaster/February-2026/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview',
+    'bing' => 'https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/',
     'gscgen' => 'https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports',
     'ga4' => 'https://support.google.com/analytics/answer/9756891',
+    'ga4rn' => 'https://support.google.com/analytics/answer/9164320',
 ];
 
 return [
@@ -93,13 +94,13 @@ return [
 <p>Prompt sampling is an estimate. Four first-party sources sit beside it, and each one counts something different.</p>
 
 <?php px_table('First-party sources for AI visibility, and what each one counts', ['Source', 'What it counts', 'What it leaves out'], [
-    ['Bing Webmaster Tools, AI Performance', 'Citations of your pages in Copilot and Bing\'s AI answers, with a sample of the queries behind them', 'Clicks, and anything outside Microsoft\'s products'],
+    ['Bing Webmaster Tools, AI Performance', 'Citations of your pages in Copilot, Bing\'s AI summaries and some partner services, with a sample of the queries behind them', 'Clicks. Microsoft does not list click data in the report'],
     ['Search Console, Generative AI report', 'Impressions of your pages in Google\'s AI Overviews and AI Mode', 'Clicks, queries and position'],
     ['Analytics, AI Assistant channel', 'Visits that arrive from assistants such as ChatGPT', 'Visits that arrive without a referrer, which show as direct'],
     ['Server logs', 'Requests from AI crawlers and fetchers', 'People. A crawler request is not a visit'],
 ]); ?>
 
-<p>All three reports are recent. Microsoft <?= ext_link($s['bing'], 'launched AI Performance') ?> as a public preview in February 2026. Google <?= ext_link($s['gscgen'], 'announced the Generative AI performance report') ?> in June 2026, and it shows impressions only. Google Analytics added an <?= ext_link($s['ga4'], 'AI Assistant channel') ?> to its default channel group in May 2026.</p>
+<p>All three reports are recent. Microsoft <?= ext_link($s['bing'], 'launched AI Performance') ?> as a public preview in February 2026. Google <?= ext_link($s['gscgen'], 'announced the Generative AI performance report') ?> in June 2026, and it shows impressions only. Google Analytics added an <?= ext_link($s['ga4'], 'AI Assistant channel') ?> to its default channel group <?= ext_link($s['ga4rn'], 'in May 2026') ?>.</p>
 <p>These numbers do not add up to one total, and they should not be forced to. A citation is not a visit, and a visit is not an enquiry. Our article on <a href="/blog/ai-citations-vs-website-traffic/">AI citations vs website traffic</a> explains what each one proves and how to set up the tracking. If the crawlers are not reaching you at all, start with the <a href="/blog/ai-crawler-access-problems/">six access checks</a> instead.</p>
 
 <h2 id="step-5">Step 5: Report a Rate, With Its Sample Size</h2>
