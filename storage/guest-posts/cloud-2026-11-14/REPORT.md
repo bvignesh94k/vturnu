@@ -55,11 +55,11 @@ No clients and no earlier guest posts in any content. Bio limited to digital mar
 6. Site access: a dozen titles (Marketing-Interactive, PR Daily, Bulldog Reporter, Spin Sucks, BestMediaInfo, Leaderonomics, ChannelPro, Real Leaders, Singapore Business Review, KrASIA, ExchangeWire, Global Trade Magazine) show no contributor route in search results. Reading them needs their hosts approved for this environment.
 
 ## Follow-up calendar
-- 21 Nov: first follow-up on the six 14 Nov submissions (ContactCenterWorld, CX Today, UX Magazine, Growth Folks, SmallBusiness.co.uk, 150sec).
-- 22 Nov: Chief Executive, Founder Reports, Martechvibe, Frontier Enterprise, Contact Center Pipeline, Medianews4u, Sales & Marketing Management, CPA Practice Advisor.
+- 16 Nov, 15:00 UTC (8:30 pm in India): a scheduled check in this cloud session reads the inbox and answers any editor replies under STANDING-RULES.md. It sends no follow-ups.
+- 23 Nov (Monday, because 21 and 22 Nov fall on the weekend): first follow-up on the six 14 Nov submissions (ContactCenterWorld, CX Today, UX Magazine, Growth Folks, SmallBusiness.co.uk, 150sec) and on Chief Executive, Founder Reports, Martechvibe, Frontier Enterprise, Contact Center Pipeline, Medianews4u, Sales & Marketing Management and CPA Practice Advisor.
 - 24 Nov: Bizcommunity, GLOBIS Insights, The CEO Magazine.
 - 25 Nov: Management-Issues (their 10 days).
-- 29 Nov: Customer Experience Magazine (their two weeks).
+- 30 Nov (Monday): Customer Experience Magazine (their two weeks end on Sunday 29 Nov).
 - 4 Dec: Selling Power closes without a reply (their rule: no follow-up).
 - 6 Dec: Bizcommunity exclusivity ends; the article is free to offer elsewhere.
 
