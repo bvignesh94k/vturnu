@@ -1,3 +1,17 @@
+# Update: 15 Nov 2026 (03:25 to 04:10 UTC)
+
+**Inbox.** No editor replies and no bounces since 14 Nov evening (weekend). SIIT has not written since the owner sent the share links at 16:40. CEOWORLD has not answered the founder-feature request. Platform notices: the owner's local session published a first Hashnode post (https://vturnu.hashnode.dev/honest-sitemap-lastmod-dates) and a first beehiiv post on 14 Nov, and @bvignesh has two comment replies waiting on Indie Hackers (drafts in indiehackers/comment-replies.md).
+
+**New pitches (5).** Chief Executive (CEO magazine), Founder Reports (founder interview), Martechvibe, Frontier Enterprise, Customer Experience Magazine. Details in pitches-2026-11-15.md.
+
+**Owner's new rules, now in STANDING-RULES.md.** No clients and no earlier guest posts in any content. Bio limited to digital marketing, founding history and career (no Odoo, Salesforce, ERP). Links the owner asks to send go in the email body itself. Word counts are never mentioned in emails (original brief; three emails on 14 Nov did mention them).
+
+**New files.** _author-kit/bio.md (bio set), _author-kit/founder-interview-answers.md (what founder magazines will ask; 14 answers need the owner), hashnode/post.md (second Hashnode article, ready), indiehackers/comment-replies.md.
+
+**Waiting for the owner.** (1) Approve the site-access request so the form-based and guideline-heavy sites can be read and used: Foundr, IdeaMensch, zPlatform, TNGlobal, MARKETECH APAC, Contact Center Pipeline, Management-Issues, Maddyness UK and others. (2) Fill the NEEDS YOUR ANSWER lines in the founder interview sheet. (3) Post the two Indie Hackers comment replies.
+
+---
+
 # Guest posting, cloud run of 14 Nov 2026
 
 Mailbox: connect@vturnu.com. Branch: claude/relaxed-ptolemy-sdsepj. All times UTC.

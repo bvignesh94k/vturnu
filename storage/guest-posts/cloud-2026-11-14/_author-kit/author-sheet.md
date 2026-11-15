@@ -1,4 +1,4 @@
-# B. Vignesh: author details and published writing
+# B. Vignesh: author details and writing samples
 
 **Name:** B. Vignesh
 **Title:** Founder & CEO, VTurnU
@@ -8,11 +8,11 @@
 
 B. Vignesh is the Founder & CEO of VTurnU, a B2B digital marketing and web development company based in Chennai, India. An omni-channel digital marketing expert whose career began in 2017, he started VTurnU in 2020 during the COVID-19 pandemic and incorporated it in 2025. He leads the company's work on search, AI search visibility, paid media, social and websites that turn visits into qualified enquiries for businesses across industries worldwide.
 
-## Published writing
+## Writing samples
 
-- Nasscom Community, 4 November 2026: [AI Agents Read Your Website Before Your Buyers Do: A Five-Layer Readiness Framework for Indian Tech Firms](https://community.nasscom.in/communities/digital-transformation/ai-agents-read-your-website-your-buyers-do-five-layer-readiness)
-- Compare the Cloud, 9 November 2026: [Hosting choices that quietly decide search visibility: caching, rendering and bot access](https://www.comparethecloud.net/opinions/hosting-choices-that-quietly-decide-search-visibility-caching-rendering-and-bot)
-- VTurnU blog: [How to Measure AI Search Visibility: A Practical B2B Method](https://vturnu.com/blog/how-to-measure-ai-search-visibility/)
+- [How to Measure AI Search Visibility: A Practical B2B Method](https://vturnu.com/blog/how-to-measure-ai-search-visibility/)
+- [How to Stop Spam and Junk Leads on Your Website](https://vturnu.com/blog/how-to-stop-junk-leads-on-your-website/)
+- [Website Accessibility Checklist: 11 Tests Anyone Can Run](https://vturnu.com/blog/website-accessibility-checklist/)
 
 ## Profiles
 

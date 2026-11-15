@@ -2,7 +2,7 @@
 
 Founders keep asking how to get their product mentioned in ChatGPT, Claude or Perplexity answers. Before you write a single new page, check something more basic: whether those assistants can read your site at all.
 
-In client audits we keep finding sites that block AI search crawlers by accident. Nobody decided to. It came from a template, a default or a security setting. Here is why it happens, which bots matter, and how to check yours in about 10 minutes.
+Plenty of sites block AI search crawlers by accident. Nobody decided to. It came from a template, a default or a security setting. Here is why it happens, which bots matter, and how to check yours in about 10 minutes.
 
 ## Why it happens
 
