@@ -32,3 +32,11 @@ These come from B. Vignesh's messages during the cloud run. They sit on top of t
 - No article, bio or email says it was written with AI help. That stays the rule unless a site's own rules require a disclosure; in that case the site is skipped or the disclosure is made.
 - Sites that ban AI-written articles (HubPages, Techpoint Africa, APMdigest, IndustryWeek and similar) are never sent a drafted article, and text is never reworked to slip past their checks. For HubPages the owner writes the article himself from an outline (hubpages/writing-kit.md).
 - Natural writing in his own voice is the standard everywhere.
+
+## Client website links (added 16 Nov, afternoon)
+The owner wrote: "if they allow - Kindly try to add my client websites - saiimpression.com, cafy.careers, firstchoiceautopart.com, groviya.com, zealitdigital.com - Not mandatory ... Never Ever mandatorily inject. vturnu.com link is only mandatory."
+- A vturnu.com link is required in every piece (in the body where the site allows it, otherwise in the bio).
+- A client link is optional. Use one only when the publisher's guidelines allow outside links and a page on the client's site genuinely helps the reader with the point being made. Never add one just to place a link.
+- If a client page is linked, say plainly that the site is a VTurnU client, so the relationship is not hidden. The 14 Nov rule still applies otherwise: no client results or case studies unless the owner supplies them.
+- Skip client links where the site allows only one author link, asks for vendor-neutral copy, or bans promotional links.
+

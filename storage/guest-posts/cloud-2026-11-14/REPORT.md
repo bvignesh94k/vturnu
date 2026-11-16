@@ -1,3 +1,12 @@
+# Update: 16 Nov 2026, about 13:20 to 13:35 UTC (owner asked for replies to the responses)
+
+- Sales & Marketing Management: editor Paul Nolan accepted both ideas and sent his guidelines. Both articles were written to them and sent in his thread as Word (.doc) files, each under 1,000 words, how-to, with the bio link to vturnu.com and the author email. SMM posts in the order received, typically 4 to 6 weeks after receipt, and emails the date and link when an article is scheduled. A polite request was made to run the lead definition piece before January if the queue allows.
+- CanadianSME: declined (Canada-based contributors only). Thank-you sent; the article can go elsewhere.
+- buildd: paid only. The owner's standard line was sent.
+- Client links: none added. SMM's bio allows one website and the pitch promised vendor-neutral text. The new rule is in STANDING-RULES.md.
+
+---
+
 # Update: 16 Nov 2026, 11:30 UTC scheduled check (5 pm India time)
 
 ## Inbox (since 07:30 UTC)
