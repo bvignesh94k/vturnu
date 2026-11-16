@@ -1,3 +1,11 @@
+# Update: 16 Nov 2026, 13:36 UTC (Sales & Marketing Management queued both articles)
+
+Paul Nolan accepted both articles for the posting queue. SMM is running about 60 days out because of a large volume of contributed articles, so the expected posting date is around mid-January 2027. He will send a link when each is scheduled. A short thank-you went back, offering edits or an earlier slot if one opens. Both pieces must stay original to SMM for 3 months after posting. Check again on 18 Jan 2027 if no scheduling email has arrived.
+
+These two do not count toward this week's five; the live count is still 2.
+
+---
+
 # Update: 16 Nov 2026, about 13:20 to 13:35 UTC (owner asked for replies to the responses)
 
 - Sales & Marketing Management: editor Paul Nolan accepted both ideas and sent his guidelines. Both articles were written to them and sent in his thread as Word (.doc) files, each under 1,000 words, how-to, with the bio link to vturnu.com and the author email. SMM posts in the order received, typically 4 to 6 weeks after receipt, and emails the date and link when an article is scheduled. A polite request was made to run the lead definition piece before January if the queue allows.
