@@ -1,3 +1,12 @@
+# Update: 16 Nov 2026, 15:00 UTC scheduled check (8:30 pm India time)
+
+- Inbox since 13:36 UTC: no new editor replies and no bounces. Only a Hubstaff promotion.
+- Live check: nothing new. Still 2 of 5 (Compare the Cloud, SIIT). RSS feeds of Logistics Insider, Medianews4u, The Media Online, Digital Terminal, Passionate in Marketing, Bizcommunity and Donorbox show none of our pieces; the browser check of the other sites found nothing either. IT News Africa and New Digital Age still block automated reading; The CEO Magazine, ManufacturingTomorrow and Africa.com are outside the cloud network.
+- No follow-ups sent. Next dates: Logistics Insider 19 Nov; e27 and HackerNoon 20 Nov; most others Monday 23 Nov; Africa.com and Donorbox 30 Nov; Sales & Marketing Management 18 Jan 2027 (queued, about 60 days out).
+- One more check scheduled for 17 Nov at 04:30 UTC (10 am India time).
+
+---
+
 # Update: 16 Nov 2026, 13:36 UTC (Sales & Marketing Management queued both articles)
 
 Paul Nolan accepted both articles for the posting queue. SMM is running about 60 days out because of a large volume of contributed articles, so the expected posting date is around mid-January 2027. He will send a link when each is scheduled. A short thank-you went back, offering edits or an earlier slot if one opens. Both pieces must stay original to SMM for 3 months after posting. Check again on 18 Jan 2027 if no scheduling email has arrived.
