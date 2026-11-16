@@ -1,3 +1,17 @@
+# Update: 16 Nov 2026, about 05:40 to 06:10 UTC (owner's answers)
+
+The owner wrote: "1. ASBN - done 2. Hackernoon - No update, it's still in pending 3. e27 - No article shown 4. Logistics insider - Yes".
+
+- Logistics Insider: full article sent to the editor, "Shippers Search by Lane, Not by Slogan: What Logistics Websites Should Publish". The site says approval usually takes under two days and publishing under three. Follow up 19 Nov.
+- e27: the dashboard is empty although e27 confirmed both articles on 6 Nov. Emailed writers@e27.co (the Editorial address on e27's contact widget) to ask whether they are still in review or should be resubmitted. Follow up 20 Nov.
+- ASBN: submitted by the owner. Follow up 23 Nov.
+- HackerNoon: still pending, nothing to answer. Check again 20 Nov.
+- Another session is also sending outreach from connect@vturnu.com today (a second Bizcommunity article, SimplyBook.me, Cliqforms, Hive House Digital, Awards International, HYVND Academy). Those are not this campaign's. They are now on the do-not-contact list so editors are not pitched twice.
+
+Pipeline: 16 complete articles with editors from this campaign (15 by email, including Logistics Insider, plus ASBN by form), and the e27 pair under query. Live this round: still 2 of 5.
+
+---
+
 # Update: 16 Nov 2026, morning (04:50 to about 05:40 UTC)
 
 ## The owner's request
