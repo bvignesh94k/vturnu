@@ -1,3 +1,19 @@
+# Update: 16 Nov 2026, 07:30 UTC scheduled check (1 pm India time)
+
+## Inbox (since 15 Nov 14:25 UTC)
+- No editor has replied to any article or pitch, and nothing new has bounced. The only bounce is CXPA from this morning, already closed.
+- Earlier replies were already answered: Clutch (asked why it declined), Founder Reports (fee declined), Selling Power (declined).
+- Not campaign mail: a Brevo newsletter, GST and bank alerts, and two Google security notices for connect@vturnu.com (a new sign-in on a Windows device at 05:58 UTC and 2-Step Verification turned on at 06:11 UTC).
+
+## Live check
+Nothing new is live. Still 2 of 5: Compare the Cloud and SIIT, both still up with followed vturnu.com links.
+- Checked in the browser with no sign of our pieces: Bizcommunity, CommPRO, The Media Online, Medianews4u (search and Authors Corner), CanadianSME, Digital Terminal, Donorbox blog, Techeconomy, Logistics Insider, CX Today, UX Magazine, Martechvibe, CXM, Frontier Enterprise, Contact Center Pipeline, SmallBusiness.co.uk and the HackerNoon profile.
+- Passionate in Marketing: page timed out; its RSS feed has no sign of the piece.
+- IT News Africa and New Digital Age block the browser with a bot check; The CEO Magazine, ManufacturingTomorrow and Africa.com are not reachable from the cloud network. A web search for each article title found nothing.
+- No follow-ups sent today, as planned.
+
+---
+
 # Update: 16 Nov 2026, about 05:40 to 06:10 UTC (owner's answers)
 
 The owner wrote: "1. ASBN - done 2. Hackernoon - No update, it's still in pending 3. e27 - No article shown 4. Logistics insider - Yes".
