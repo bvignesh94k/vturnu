@@ -1,3 +1,15 @@
+# Update: 16 Nov 2026, 07:45 UTC scheduled task (the 15th new site)
+
+The task was written before the owner approved Logistics Insider. With Logistics Insider sent at about 05:58 UTC, today's count of new sites is 15: 13 by email in the morning, ASBN by the owner's form, and Logistics Insider. So no extra site was sent.
+
+Checked for a possible 16th and not used:
+- Every publisher host already on the network allow-list was contacted or rejected earlier.
+- Young Upstarts: its guidelines mention "paid post options", and third parties resell guest posts on it.
+- Just Entrepreneurs: pitch first, then a 14-day deadline; vendor neutral with no body links. Too slow for this week.
+- IndustryWeek and The National CIO Review: not reachable from this cloud network, so their rules could not be read. Adding them needs the owner's approval of a network change.
+
+---
+
 # Update: 16 Nov 2026, 07:30 UTC scheduled check (1 pm India time)
 
 ## Inbox (since 15 Nov 14:25 UTC)

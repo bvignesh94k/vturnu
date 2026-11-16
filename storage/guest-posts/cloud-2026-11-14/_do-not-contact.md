@@ -158,6 +158,7 @@ Environment note: the allow-list was full at 124 hosts, so 16 rejected publisher
 - Contacted: Africa.com, CanadianSME, Digital Terminal, Donorbox, Techeconomy, Wamda, Disrupt Africa, Vulcan Post, Tahawul Tech, Bloomerang, Condia, Demodesk, IndustrialSage; ASBN (owner to submit by form).
 - Closed or not used: CXPA (bounced) and every site in "Rejected by the research agents" in pitches-2026-11-16.md.
 - Later on 16 Nov: Logistics Insider (owner approved; full article sent), ASBN (submitted by the owner), e27 (asked writers@e27.co about the two 6 Nov submissions).
+- Checked at 07:45 UTC on 16 Nov and not used: Young Upstarts (its guidelines offer "paid post options" and third parties resell guest posts on it), Just Entrepreneurs (pitch first, then a 14-day writing deadline; vendor neutral with no body links, so too slow for this week), IndustryWeek and The National CIO Review (their hosts are not on this environment's network list, so the rules could not be read), iTech Series (same publisher as MarTech Series, which has no free route).
 - Sent from connect@vturnu.com on 16 Nov by ANOTHER session, not this campaign (seen in Gmail Sent; do not pitch these again without checking): Bizcommunity (a second article, "Before the December shutdown", 05:32 UTC), SimplyBook.me (blog@simplybook.me), Cliqforms (editor@cliqforms.com), Hive House Digital (emily@hivehousedigital.com), Awards International (david.dungay@awardsinternational.com), HYVND Academy (sales follow-up).
 
 ## 5. Topics already written (do not repeat)
