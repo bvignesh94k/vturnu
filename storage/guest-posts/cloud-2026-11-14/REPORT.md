@@ -1,3 +1,41 @@
+# Update: 16 Nov 2026, morning (04:50 to about 05:40 UTC)
+
+## The owner's request
+"Check the inbox if there is any good news or not. Also clutch replied that the article was rejected. Ask them the reason to send an another article. Also pitch the new guest posts across a new 15 websites. ... You need to publish at least 5 content on the quality sites with quality content in a week."
+
+## Inbox
+- No editor has accepted or published anything since the 15 Nov evening wave (it was the weekend).
+- Clutch declined on 15 Nov ("not a fit for us at this time"). Replied at about 05:00 UTC asking what made it a poor fit and which topics they want, so a better article can follow.
+- Founder Reports offered an interview for a $100 admin fee. Declined politely in the owner's words; asked for a free route if they ever offer one.
+- Selling Power declined on 15 Nov (no unsolicited material).
+- Not campaign mail: a job application from an SEO candidate (left for the owner).
+
+## Live count
+Still 2 of 5 in this round: Compare the Cloud (9 Nov) and SIIT (14 Nov). A browser check of 17 site searches found nothing new live yet.
+
+## New sites today: 14 (13 sent, 1 ready for the owner)
+- Complete articles (5): Africa.com (DR 82), CanadianSME (DR 65), Digital Terminal (DR 62), Donorbox (DR 91), Techeconomy (DR 67).
+- Pitches (8): Wamda (74), Disrupt Africa (72), Vulcan Post (75), Tahawul Tech (70), Bloomerang (77), Condia (59), Demodesk (71, best effort), IndustrialSage (44).
+- Ready for the owner (1): ASBN (DR 63, publishes daily). Its form has reCAPTCHA, which the cloud session does not solve. Kit: asbn/submit-kit.md.
+- Bounced: CXPA (server rejects outside mail). Not sent: Logistics Insider (fast, but pharmacy links in its footer).
+- The 15th site is scheduled for the 07:30 UTC check-in, when the web-search allowance resets.
+Details, rules and facts checked: pitches-2026-11-16.md.
+
+## The pipeline for "five live this week"
+Fourteen complete articles now sit with editors: nine from 15 Nov (Bizcommunity, The CEO Magazine, CommPRO, IT News Africa, The Media Online, Passionate in Marketing, New Digital Age, ManufacturingTomorrow, Medianews4u) and five from today. Most likely to publish first, because they run contributed pieces most days or reply fast: Medianews4u, The Media Online, CommPRO, CanadianSME, Passionate in Marketing, Bizcommunity and IT News Africa. No editor promises a date.
+
+## What only the owner can do (each is quick)
+1. ASBN: submit the form with the prepared answers and PDF (asbn/submit-kit.md).
+2. HackerNoon: sign in and answer any editor notes on the story in review since early November.
+3. e27: check the status of the two articles in review.
+4. Logistics Insider: say yes or no. It publishes within about three days, but its footer links look like link selling.
+5. Still open from earlier: MARKETECH APAC form, Bizcommunity MyBiz submission, IdeaMensch answers, the HubPages article from the kit, two Indie Hackers replies.
+
+## Network
+Two allow-list swaps were approved: 18 new publisher hosts in place of 18 rejected ones, then 6 more (corrected addresses for Logistics Insider and Demodesk, plus IndustrialSage and Condia).
+
+---
+
 # Update: 15 Nov 2026, late evening (wikiHow and HubPages request)
 
 ## The owner's request
