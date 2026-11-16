@@ -1,3 +1,18 @@
+# Update: 16 Nov 2026, 11:30 UTC scheduled check (5 pm India time)
+
+## Inbox (since 07:30 UTC)
+- No editor has replied to this campaign's articles or pitches, and nothing has bounced.
+- buildd (community@buildd.co) replied at 07:34 UTC with a paid offer: $299 for a guest post with one do-follow link, or $249 for a link insertion. That pitch was sent at 05:52 UTC by the other session that is also using connect@vturnu.com, not by this campaign. Under the owner's rule the answer is no. Not answered here, so the editor does not get two replies; the owner can send the standard line or let it lapse. Added to the do-not-contact list.
+- Not campaign mail: a GST notice.
+
+## Live check
+Nothing new is live. Still 2 of 5: Compare the Cloud and SIIT.
+- Browser checks found no sign of our pieces at Bizcommunity, CommPRO, The Media Online, Medianews4u, CanadianSME, Digital Terminal, Donorbox, Techeconomy, Logistics Insider, CX Today, UX Magazine, CXM, Frontier Enterprise, Contact Center Pipeline, SmallBusiness.co.uk and HackerNoon. Passionate in Marketing's feed shows nothing new from us.
+- IT News Africa and New Digital Age still block automated reading. The CEO Magazine, ManufacturingTomorrow and Africa.com are not reachable from the cloud network. Web searches for Bizcommunity, IT News Africa, New Digital Age, The CEO Magazine, ManufacturingTomorrow and Africa.com found no sign of the articles.
+- No follow-ups sent.
+
+---
+
 # Update: 16 Nov 2026, 07:45 UTC scheduled task (the 15th new site)
 
 The task was written before the owner approved Logistics Insider. With Logistics Insider sent at about 05:58 UTC, today's count of new sites is 15: 13 by email in the morning, ASBN by the owner's form, and Logistics Insider. So no extra site was sent.
