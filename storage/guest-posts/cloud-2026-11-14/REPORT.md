@@ -1,3 +1,12 @@
+# Update: 17 Nov 2026, 04:30 UTC scheduled check (10 am India time)
+
+- Inbox since 16 Nov 15:00 UTC: no editor replies and no bounces. Not campaign mail: the VTurnU CRM digest, a beehiiv newsletter, an Instagram recap, The Org (declined to verify VTurnU), RocketReach (profile update accepted) and Pick an Agency (a thank-you video for their link). The last three relate to listing work, not to guest posts.
+- Live check: nothing new. Still 2 of 5 (Compare the Cloud, SIIT). The RSS feeds of Logistics Insider, Medianews4u, The Media Online, Passionate in Marketing, Bizcommunity and Donorbox show none of our pieces; the browser check of the other reachable sites found nothing; a web search for the sites the cloud cannot reach found nothing.
+- No follow-ups sent. Next: Logistics Insider 19 Nov; e27 and HackerNoon 20 Nov; most others Monday 23 Nov.
+- Next check scheduled for 17 Nov at 11:30 UTC (5 pm India time).
+
+---
+
 # Update: 16 Nov 2026, 15:00 UTC scheduled check (8:30 pm India time)
 
 - Inbox since 13:36 UTC: no new editor replies and no bounces. Only a Hubstaff promotion.
