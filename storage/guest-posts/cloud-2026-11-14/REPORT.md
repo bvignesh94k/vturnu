@@ -1,3 +1,11 @@
+# Update: 17 Nov 2026, 11:30 UTC scheduled check (5 pm India time)
+
+- Replies since 04:30 UTC: two automatic acknowledgements (Today's Hotelier: the editor is away until 18 Nov; The Recursive: newsroom auto-reply). Analytics Insight repeated that it only sells placements; it was already declined on 14 Nov, so no reply was sent. No bounces.
+- Live check: nothing new. The latest posts from Logistics Insider, Medianews4u, The Media Online, Bizcommunity, Passionate in Marketing and Donorbox do not include our pieces. Logistics Insider is publishing opinion pieces, so ours may still come; its follow-up is due 19 Nov.
+- Next check scheduled for 18 Nov at 04:30 UTC (10 am India time).
+
+---
+
 # Update: 17 Nov 2026, about 10:50 to 11:45 UTC ("pitch the maximum in high quality websites")
 
 - Four research agents checked about 140 publications across four segments. Only four passed every rule, because most quality titles are already contacted or excluded, and many others ban AI-assisted writing, sell placements or take forms only. Details: pitches-2026-11-17.md.
