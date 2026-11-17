@@ -110,3 +110,18 @@
 
 ### Honest count for the catch-up
 - Quality over count: one new pitch and two listing packs today. No weaker sites were used to make up the paused days.
+
+## Tuesday 17 November 2026 (day 4)
+
+### Re-checks (logged out)
+- Pick an Agency: live. Hubstaff Talent: still not public (re-review pending). Top Interactive Agencies: no listing yet. MarTech Series, NZ Marketing, Zyppy List: no replies.
+- CXM: the owner sent the pitch on 16 Nov (05:01 UTC). Status: pitched.
+
+### Article (1)
+- Dynamic Business (Australia): the site now takes contributions through a free account and a submit-story dashboard, with editors reviewing every submission. Full article written: "Your Google Result Is Your Shop Window: Five Fixes for Small Business Websites" (about 730 words, Australian English). It cites Google Search Central's pages on title links, snippets and Search Console (all load), and links once to VTurnU's free SEO audit, whose home-page check covers title and description length. Word file built and validated. The owner submits it from his own account.
+- A reviews-and-ACCC topic was considered first and dropped: its official sources (ACCC, Google Business Profile help) are blocked for this session, so the links could not be verified.
+
+### Listings (0 new today, stated plainly)
+- No new directory passed the checks today. Feedbax has no visible way to apply and lists hourly rates; MarketingMonk shows no submission terms; GEO directories from tool makers are limited to their users. New hosts stay blocked for this session, so leads cannot be verified on their own sites. Pick an Agency's own 2026 comparison lists only directories VTurnU is already on.
+- Yesterday's two packs (GEO Agencies, Behance) still wait for the owner's browser check.
+- The pool of free, credible B2B agency directories not yet used is now small. Reserves that the owner may choose: Startup India Hub (free, government, weak agency-buyer fit) and the Salesforce consultant listing (partner enrolment; fee not verified; it centres on the Enterprise practice, which the owner keeps out of descriptions).
