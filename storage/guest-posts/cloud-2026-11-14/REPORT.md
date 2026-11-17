@@ -1,3 +1,12 @@
+# Update: 17 Nov 2026, about 10:50 to 11:45 UTC ("pitch the maximum in high quality websites")
+
+- Four research agents checked about 140 publications across four segments. Only four passed every rule, because most quality titles are already contacted or excluded, and many others ban AI-assisted writing, sell placements or take forms only. Details: pitches-2026-11-17.md.
+- Sent: a full article to Today's Hotelier (hotel direct booking website checks, built on the FTC's fee rule) and pitches to Construction Executive (DR 74), The Recursive (DR 69) and Elite Agent (DR 70). No bounces.
+- Network: the owner approved swapping 8 rejected publisher hosts for 8 new ones.
+- Every rejected site is now in _do-not-contact.md (section 4c) so it is not checked again.
+
+---
+
 # Update: 17 Nov 2026, 04:30 UTC scheduled check (10 am India time)
 
 - Inbox since 16 Nov 15:00 UTC: no editor replies and no bounces. Not campaign mail: the VTurnU CRM digest, a beehiiv newsletter, an Instagram recap, The Org (declined to verify VTurnU), RocketReach (profile update accepted) and Pick an Agency (a thank-you video for their link). The last three relate to listing work, not to guest posts.
