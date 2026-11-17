@@ -40,3 +40,6 @@ The owner wrote: "if they allow - Kindly try to add my client websites - saiimpr
 - If a client page is linked, say plainly that the site is a VTurnU client, so the relationship is not hidden. The 14 Nov rule still applies otherwise: no client results or case studies unless the owner supplies them.
 - Skip client links where the site allows only one author link, asks for vendor-neutral copy, or bans promotional links.
 
+## Reporting (added 17 Nov)
+- The owner asked to stop mentioning Compare the Cloud and SIIT in updates ("Leave these"). Do not list them, link them or use them in a live count. Report only new placements: new approvals and new live articles, counted from 16 Nov onward.
+
