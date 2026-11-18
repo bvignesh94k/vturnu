@@ -8,9 +8,19 @@ Hubstaff rejected the edited profile on 9 Nov 2026 with this reason: the About s
 
 Edit page: https://hubstafftalent.net/agencies/vturnu/edit
 
-**About (paste as one paragraph, no bullet points or line breaks):**
+**About (Hubstaff's form recommends 400 words; paste these five paragraphs, no bullet points):**
 
-> VTurnU is a B2B digital marketing and web development agency based in Chennai, India, working with businesses across industries worldwide. Our team of 25+ specialists has delivered more than 150 projects across 10+ industries. We plan and run search engine optimization, AI search visibility for Google AI Overviews, ChatGPT and Perplexity, Google Ads and paid social campaigns, content and email marketing, and branding. We also design and build fast, search-ready websites, ecommerce stores and landing pages on WordPress, Shopify and custom code. Recent work includes a website rebuild and SEO for a label manufacturer, lead generation SEO for a used auto parts business, and SEO for a UK careers platform, each published as a case study with its source and dates on our website.
+> VTurnU is a B2B digital marketing and web development agency based in Chennai, India, working with businesses across industries worldwide. Founded in 2025, our team of 25+ specialists has delivered more than 150 projects across 10+ industries. We work with founders, owners, marketing heads and sales heads at companies that have a clear offer. Our work has one aim: to bring them qualified enquiries from people who are ready to buy, rather than traffic for its own sake.
+
+> On the marketing side, we plan and run search engine optimization, from technical audits and site structure to on-page work, content and local search. We help brands become visible in AI answers, including Google AI Overviews, ChatGPT, Perplexity, Gemini and Copilot. We also manage Google Ads and paid social campaigns, write SEO content and blog articles, run email marketing and social media, and build brand identities that give a company one clear story.
+
+> On the website side, we design and build fast, search-ready websites, ecommerce stores and landing pages on WordPress, Shopify and custom code. We pay close attention to mobile speed, page structure and lead capture, and we develop practical AI tools for everyday business tasks.
+
+> Our published case studies show this experience with sources and dates. For Sai Impression, a label manufacturer in Chennai, we rebuilt the website and worked on its speed, search data and content; Google Search Console recorded 1.32K clicks and 92.9K impressions from 30 July to 29 October 2026. For FirstChoice Used Auto Parts in the United States, we rebuilt 99 pages; Bing Webmaster Tools recorded 10.7K citations of the site in Copilot and Bing AI answers in September 2026. For FlowEazy, a SaaS and technology company, we worked on the pages, structure, speed and lead capture of a 101-page site, and its homepage mobile score rose from 26 to 96+ in Lighthouse lab tests in October 2026. For Cafy, a careers platform in the UK and Ireland, we delivered the SEO audit, speed fixes and a content plan that its own developer put live; Search Console recorded 14.8K clicks and 28.6K impressions over the same three months, mostly from branded searches, which is why the plan now targets non-branded demand.
+
+> We measure our work in Google Search Console, Bing Webmaster Tools and analytics, and we publish results with their source and period on our website, so anyone can check them before they talk to us.
+
+Every figure above was checked on the live case study pages on 18 Nov 2026, with its period and source; team, project and industry counts are from https://vturnu.com/about-us/ .
 
 **Headline (optional change):** B2B Digital Marketing, SEO and Web Development Agency. The current headline, "AI-first Digital Marketing & IT Consultant", was not the rejection reason, but "IT Consultant" describes the practice the owner keeps out of descriptions.
 
