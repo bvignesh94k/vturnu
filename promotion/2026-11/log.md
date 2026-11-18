@@ -125,3 +125,19 @@
 - No new directory passed the checks today. Feedbax has no visible way to apply and lists hourly rates; MarketingMonk shows no submission terms; GEO directories from tool makers are limited to their users. New hosts stay blocked for this session, so leads cannot be verified on their own sites. Pick an Agency's own 2026 comparison lists only directories VTurnU is already on.
 - Yesterday's two packs (GEO Agencies, Behance) still wait for the owner's browser check.
 - The pool of free, credible B2B agency directories not yet used is now small. Reserves that the owner may choose: Startup India Hub (free, government, weak agency-buyer fit) and the Salesforce consultant listing (partner enrolment; fee not verified; it centres on the Enterprise practice, which the owner keeps out of descriptions).
+
+## Wednesday 18 November 2026 (day 5)
+
+### Owner requests
+- Hubstaff Talent rejection: a new About paragraph was written to answer the reason (work experience and capabilities, in paragraph form), using only figures from the live About page and the published case studies, and following the owner's description rule. Saved in the Hubstaff pack.
+- The owner asked me to make the edit through Chrome. This cloud session has no tool that can drive a browser, and the brief rules out using the owner's signed-in accounts, so the owner pastes the paragraph.
+
+### Re-checks (logged out)
+- Pick an Agency: live. Hubstaff Talent: not public. Top Interactive Agencies: not listed. MarTech Series: not published. No replies from MarTech Series, NZ Marketing, CXM, Zyppy List or the directories.
+- NZ Marketing and Marketing Mag (Australia) are now blocked for this session as well, so replies are tracked in Gmail only.
+
+### Article (1 pitch)
+- UX Magazine: contributions start with an inquiry form on the contribute page. Pitch written: "Guide, Not Gate: Designing Chatbots for B2B Websites", with the EU AI Act's chatbot transparency rule (in force since 2 August 2026) as the timely hook. The owner submits the form.
+
+### Listings (0 new)
+- No new directory could be checked: candidate sites are blocked for this session and the pool of free, credible agency directories not yet used is small. GEO Agencies and Behance still wait for the owner's browser check.
