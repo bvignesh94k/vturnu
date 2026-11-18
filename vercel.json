@@ -101,6 +101,13 @@
       "status": 403
     },
     {
+      "src": "^/favicon\\.ico$",
+      "status": 301,
+      "headers": {
+        "Location": "/assets/img/vturnu-icon-48.png"
+      }
+    },
+    {
       "handle": "filesystem"
     },
     {

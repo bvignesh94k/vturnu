@@ -1,8 +1,8 @@
 # VTurnU, https://vturnu.com
 # Search engines and AI answer engines are both welcome.
-# Private paths are listed once under the catch-all below; every named agent
-# inherits nothing from it, so the sensitive paths are repeated per agent
-# only where a crawler is known to ignore the wildcard group.
+# A crawler that has its own group below follows only that group and
+# inherits nothing from the catch-all, so the private paths are repeated
+# in every AI crawler group and in the main search crawler groups.
 
 User-agent: *
 Allow: /
@@ -76,72 +76,132 @@ Allow: /
 # OpenAI / ChatGPT
 User-agent: GPTBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Google Gemini / AI Overviews
 User-agent: Google-Extended
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Anthropic / Claude
 User-agent: ClaudeBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Claude-SearchBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Perplexity
 User-agent: PerplexityBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Perplexity-User
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # xAI / Grok
 User-agent: xAI-Bot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Grokbot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Meta AI
 User-agent: meta-externalagent
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: FacebookBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Apple Intelligence
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Amazon
 User-agent: Amazonbot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Common Crawl, a training and retrieval source for many engines
 User-agent: CCBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # Others
 User-agent: cohere-ai
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: YouBot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 User-agent: Diffbot
 Allow: /
+Disallow: /storage/
+Disallow: /admin/
+Disallow: /enquiry/
 
 # ---------------------------------------------------------------
 # Scrapers that bring no search or AI visibility. The edge also
