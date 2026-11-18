@@ -2,6 +2,22 @@
 
 **Update, 7 Nov 2026 (owner):** the owner has created a Hubstaff account; the agency profile on Hubstaff Talent is not created yet.
 
+## Fix for the rejection (18 Nov 2026)
+
+Hubstaff rejected the edited profile on 9 Nov 2026 with this reason: the About section "should be a concise description of your work experience and capabilities", written "in paragraph form". The text below answers that: one paragraph, experience first (team size and projects, from the live About page at https://vturnu.com/about-us/), then capabilities, then real examples of work. It follows the owner's rule for descriptions (no Enterprise and IT practice, no engagement terms) and names no person.
+
+Edit page: https://hubstafftalent.net/agencies/vturnu/edit
+
+**About (paste as one paragraph, no bullet points or line breaks):**
+
+> VTurnU is a B2B digital marketing and web development agency based in Chennai, India, working with businesses across industries worldwide. Our team of 25+ specialists has delivered more than 150 projects across 10+ industries. We plan and run search engine optimization, AI search visibility for Google AI Overviews, ChatGPT and Perplexity, Google Ads and paid social campaigns, content and email marketing, and branding. We also design and build fast, search-ready websites, ecommerce stores and landing pages on WordPress, Shopify and custom code. Recent work includes a website rebuild and SEO for a label manufacturer, lead generation SEO for a used auto parts business, and SEO for a UK careers platform, each published as a case study with its source and dates on our website.
+
+**Headline (optional change):** B2B Digital Marketing, SEO and Web Development Agency. The current headline, "AI-first Digital Marketing & IT Consultant", was not the rejection reason, but "IT Consultant" describes the practice the owner keeps out of descriptions.
+
+Keep website links, email and phone in their own fields, not inside the About text. If Hubstaff rejects the profile again, the other requirement in its own guide is at least one team member's contractor profile linked to the agency, besides the owner's.
+
+Facts checked on 18 Nov 2026: 150+ projects delivered, 10+ industries served and 25+ specialists (live About page); the three examples match the published case studies on https://vturnu.com/case-studies/ .
+
 | Item | Detail |
 | --- | --- |
 | Site | Hubstaff Talent, a free marketplace where companies post jobs and search freelancers and agencies (run by Hubstaff / Netsoft Holdings) |
