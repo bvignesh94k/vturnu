@@ -91,6 +91,7 @@ No email route: ASBN (submitted by the owner through its form). Check the site o
 - Packaging Strategies: addingtonb@bnpmedia.com (pitch sent 19 Nov)
 - Fibre2Fashion: no follow-up. They reply only to accepted submissions, within one to eight weeks. Check the site for the article only.
 - Recycling Today: dtoto@gie.net (synopsis sent 19 Nov)
+- TechImply: info@techimply.com (pitch sent 19 Nov at the owner's request; AI assistance disclosed). If they say only human-written content is accepted, do not send an article; tell the owner.
 - Logistics Insider: tariq@logisticsinsider.in. Second and final follow-up only if there is still no reply and the article is not live (first follow-up sent 19 Nov 07:41 UTC).
 
 ## Fri 27 Nov

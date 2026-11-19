@@ -1,3 +1,9 @@
+# Update: 19 Nov 2026, about 09:10 UTC (owner's request: TechImply)
+
+- TechImply (DR 74): pitch sent to info@techimply.com with two ideas (CMS buyer's guide for B2B websites; marketing automation buying questions). Their rules allow one do-follow link (vturnu.com, in the body) and ask for "100% unique and human-written" content, so the pitch disclosed AI-assisted drafting and asked whether that meets their standard before any article is written. Their web form is behind a bot check from the cloud; the text is saved in techimply/email.md for the owner to paste into the form if they ask. Follow-up on 26 Nov.
+
+---
+
 # Update: 19 Nov 2026, 07:39 to 08:15 UTC (resumed after the owner's pause; scheduled 04:30 UTC check completed)
 
 - Inbox since 18 Nov 04:30 UTC: no editor replies and no bounces. Not campaign mail: CRM digest, newsletters, Hubstaff listing notices (other session) and a Dynamic Business contributor email-verification message (not from this campaign; left for the owner).
