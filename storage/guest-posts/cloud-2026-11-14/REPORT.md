@@ -1,9 +1,11 @@
-# Update: 19 Nov 2026, 03:20 to 03:50 UTC (owner: follow-ups on time; Logistics Insider client links; up to 15 new pitches)
+# Update: 19 Nov 2026, 03:20 to 04:05 UTC (owner: follow-ups on time; Logistics Insider client links; up to 15 new pitches)
 
 - Follow-ups: every date now has its own scheduled check at 04:30 UTC (19, 20, 21, 23, 24, 25, 26, 27, 28, 30 Nov; 1, 3, 8 Dec; 18 Jan 2027). The full list of who gets a follow-up on which date is in followups-plan.md.
 - Logistics Insider: no client links. The article is about what logistics providers should publish on their websites; a label manufacturer and a used auto parts seller are not natural examples there, and the site rejects promotional articles. The 19 Nov follow-up stays a plain status question.
 - New sites, first batch (4): TechJuice (DR 70, full article, bio link to vturnu.com; no follow-up because they do not answer status queries), Label & Narrow Web (DR 61, outline; asked whether one disclosed Sai Impression example is allowed), MSDynamicsWorld (DR 68, pitch), Panorama Consulting (DR 72, pitch). Follow-ups on 26 Nov. Details: pitches-2026-11-19.md.
-- More research is running (client-relevant trade titles; India, the Gulf and Asia-Pacific; US, UK and Europe).
+- Second batch (4), after the owner approved a network swap so each candidate's own rules page could be read: Fibre2Fashion (DR 78, full article; no follow-up because they reply only if accepted), Call Centre Helper (DR 75, full article), Supply Chain Management Review (DR 75, pitch; conflicts and AI use disclosed as their rules require) and Packaging Strategies (DR 72, pitch). Follow-ups on 26 Nov.
+- New sites this round so far: 8 (TechJuice, Label & Narrow Web, MSDynamicsWorld, Panorama, Fibre2Fashion, Call Centre Helper, SCMR, Packaging Strategies). Rejected after reading their pages: HR Zone, Inbound Logistics, PR News, Retail IT Insights, Enterprise IT World, Personnel Today, SupplyChainBrain (reasons in _do-not-contact.md, section 4d).
+- A third, narrower search is running for the publications the first agents did not reach.
 
 ---
 

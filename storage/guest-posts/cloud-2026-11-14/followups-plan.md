@@ -85,6 +85,10 @@ No email route: ASBN (submitted by the owner through its form). Check the site o
 - MSDynamicsWorld: jgumpert@msdynamicsworld.com (pitch sent 19 Nov)
 - Panorama Consulting: marketing@panorama-consulting.com (pitch sent 19 Nov)
 - TechJuice: no follow-up. Their page says they do not answer status queries and will contact the author. Check the site for the article only.
+- Call Centre Helper: newsdesk@callcentrehelper.com (full article sent 19 Nov to editor Megan Jones)
+- Supply Chain Management Review: bstraight@peerlessmedia.com (pitch sent 19 Nov)
+- Packaging Strategies: addingtonb@bnpmedia.com (pitch sent 19 Nov)
+- Fibre2Fashion: no follow-up. They reply only to accepted submissions, within one to eight weeks. Check the site for the article only.
 
 ## Fri 27 Nov
 - Reply check only.
@@ -105,3 +109,4 @@ No email route: ASBN (submitted by the owner through its form). Check the site o
 ## New pitches sent from 19 Nov
 Each gets one follow-up 7 days after sending (moved to Monday if that falls on a weekend). Add them to this file when sent.
 - 19 Nov: TechJuice (full article; no follow-up), Label & Narrow Web, MSDynamicsWorld, Panorama Consulting (follow-ups on Thu 26 Nov, listed above).
+- 19 Nov, second batch: Fibre2Fashion (full article; no follow-up), Call Centre Helper (full article), Supply Chain Management Review and Packaging Strategies (pitches); follow-ups on Thu 26 Nov.
