@@ -156,3 +156,4 @@
 ### Listings (0 new)
 - No directory host beyond those already used is reachable from this session, so no new pack could be verified.
 - Later on 19 Nov (owner): UX Magazine's contribute page no longer has an inquiry form; its contact page lists a contributions address, so the pitch "Guide, Not Gate: Designing Chatbots for B2B Websites" was sent there from connect@vturnu.com at the owner's request. Dynamic Business: email verified, contributor approval pending. GEO Agencies and Behance: the owner will handle them from his own computer.
+- Later on 19 Nov (owner): GEO Agencies is paid (its pricing page), so it is dropped. Behance team page created by the owner at https://www.behance.net/vturnudigital; Behance blocks automated checks, so it is recorded as owner-reported live, not verified from this session.
