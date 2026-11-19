@@ -1,3 +1,22 @@
+# Status report: 19 Nov 2026, about 03:00 UTC (8:30 am India time), requested by the owner
+
+**New articles live since 16 Nov: 0.**
+
+**Accepted to publish: 2 sites**
+- Sales & Marketing Management (DR 68): both articles accepted 16 Nov, in the posting queue, about 60 days out (mid-January 2027). The editor will send the links.
+- GrowthFolks (DR 60): topic accepted 18 Nov 18:33 UTC, free, one dofollow link. Full article sent 19 Nov 00:19 UTC with the owner's agreement to create a free agency profile when their platform launches in 2027. No publish date yet.
+
+**Declined or closed:** CanadianSME (Canada-based contributors only), Selling Power, Clutch, Founder Reports (fee), Analytics Insight (paid), buildd (paid; pitched by the other session).
+
+**Waiting for editors (full articles):** Bizcommunity, The CEO Magazine, CommPRO, IT News Africa, The Media Online, Passionate in Marketing, New Digital Age, ManufacturingTomorrow, Medianews4u, Africa.com, Digital Terminal, Donorbox, Techeconomy, Logistics Insider (its stated 3-day publishing window ends today), Today's Hotelier (editor back from a retreat after 18 Nov), ASBN (owner's form), plus CX Today and UX Magazine from 14 Nov, and e27 (2) and HackerNoon (1) under query.
+**Pitches awaiting a reply:** Construction Executive, The Recursive (auto-acknowledged), Elite Agent, and the 14 to 16 Nov pitches.
+
+**Live check (feeds, site search and web search):** none of our articles found. IT News Africa and New Digital Age block automated reading; The CEO Magazine, ManufacturingTomorrow and Africa.com are not reachable from the cloud network.
+**Inbox since 18 Nov 04:30 UTC:** one editor reply (GrowthFolks, answered). No bounces.
+**Next dates:** Logistics Insider follow-up 19 Nov (scheduled 04:30 UTC); e27 and HackerNoon 20 Nov; most others 23 Nov; The Recursive 24 Nov; GrowthFolks 26 Nov if no date; Africa.com, Donorbox, Today's Hotelier, Construction Executive and Elite Agent 30 Nov or 1 Dec.
+
+---
+
 # Update: 19 Nov 2026 (GrowthFolks accepted)
 
 - GrowthFolks (growthfolks.io, DR 60) accepted the pitched topic: free publication with one dofollow link to a page of our choice. In return they ask VTurnU to create a free agency profile on their marketplace when it launches in 2027. The owner agreed.
