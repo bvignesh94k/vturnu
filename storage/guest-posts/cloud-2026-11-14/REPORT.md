@@ -1,3 +1,15 @@
+# Update: 19 Nov 2026, 07:39 to 08:15 UTC (resumed after the owner's pause; scheduled 04:30 UTC check completed)
+
+- Inbox since 18 Nov 04:30 UTC: no editor replies and no bounces. Not campaign mail: CRM digest, newsletters, Hubstaff listing notices (other session) and a Dynamic Business contributor email-verification message (not from this campaign; left for the owner).
+- Logistics Insider: not live (RSS feed shows 16 to 19 Nov posts, including a guest piece on 18 Nov). First follow-up sent in the original thread at 07:41 UTC. No client links. A second and final follow-up is listed for 26 Nov if there is still no reply.
+- Live check of about 25 sites: no new article live. HackerNoon still shows no published story.
+- Network: the owner approved the second swap (12 finished or rejected hosts out, 11 candidate hosts in).
+- Third batch: 1 pitch sent, Recycling Today (DR 76; synopsis to the editorial director). Read directly and not used: ENR and ISM (bylines without a company link), ALA Legal Management (AI rule), HR Magazine UK and Legal IT Insider (bot checks; addresses not found), Zweig Letter (email-only credits), Screen Printing (LinkedIn-only credits), Logistics Manager (no contributor rules).
+- New sites this round: 9 (TechJuice, Label & Narrow Web, MSDynamicsWorld, Panorama, Fibre2Fashion, Call Centre Helper, SCMR, Packaging Strategies, Recycling Today). Follow-ups for the seven that reply are on 26 Nov; TechJuice and Fibre2Fashion only reply if they accept.
+- New approvals: none since GrowthFolks. New live articles: none.
+
+---
+
 # Update: 19 Nov 2026, 03:20 to 04:05 UTC (owner: follow-ups on time; Logistics Insider client links; up to 15 new pitches)
 
 - Follow-ups: every date now has its own scheduled check at 04:30 UTC (19, 20, 21, 23, 24, 25, 26, 27, 28, 30 Nov; 1, 3, 8 Dec; 18 Jan 2027). The full list of who gets a follow-up on which date is in followups-plan.md.

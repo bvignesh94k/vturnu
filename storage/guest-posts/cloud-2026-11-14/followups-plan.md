@@ -12,6 +12,7 @@ Each date has its own scheduled check at 04:30 UTC (10 am India time). On every 
 - After sending, update tracker-rows.csv (Status and Follow-up Date) and REPORT.md, commit with git add -f and push to claude/relaxed-ptolemy-sdsepj.
 
 ## Thu 19 Nov
+- DONE 07:41 UTC (delayed by the owner's pause): first follow-up sent in the original thread; not live, no reply.
 - Logistics Insider: tariq@logisticsinsider.in (full article sent 16 Nov; their page says approval under 2 days, publishing under 3). No client links: Sai Impression (labels) and FirstChoice (used auto parts) are not relevant to an article on logistics provider websites, and the site rejects promotional articles.
 
 ## Fri 20 Nov
@@ -89,6 +90,8 @@ No email route: ASBN (submitted by the owner through its form). Check the site o
 - Supply Chain Management Review: bstraight@peerlessmedia.com (pitch sent 19 Nov)
 - Packaging Strategies: addingtonb@bnpmedia.com (pitch sent 19 Nov)
 - Fibre2Fashion: no follow-up. They reply only to accepted submissions, within one to eight weeks. Check the site for the article only.
+- Recycling Today: dtoto@gie.net (synopsis sent 19 Nov)
+- Logistics Insider: tariq@logisticsinsider.in. Second and final follow-up only if there is still no reply and the article is not live (first follow-up sent 19 Nov 07:41 UTC).
 
 ## Fri 27 Nov
 - Reply check only.
@@ -110,3 +113,4 @@ No email route: ASBN (submitted by the owner through its form). Check the site o
 Each gets one follow-up 7 days after sending (moved to Monday if that falls on a weekend). Add them to this file when sent.
 - 19 Nov: TechJuice (full article; no follow-up), Label & Narrow Web, MSDynamicsWorld, Panorama Consulting (follow-ups on Thu 26 Nov, listed above).
 - 19 Nov, second batch: Fibre2Fashion (full article; no follow-up), Call Centre Helper (full article), Supply Chain Management Review and Packaging Strategies (pitches); follow-ups on Thu 26 Nov.
+- 19 Nov, third batch: Recycling Today (synopsis); follow-up on Thu 26 Nov.
