@@ -6,6 +6,7 @@
 - Network: the owner approved the second swap (12 finished or rejected hosts out, 11 candidate hosts in).
 - Third batch: 1 pitch sent, Recycling Today (DR 76; synopsis to the editorial director). Read directly and not used: ENR and ISM (bylines without a company link), ALA Legal Management (AI rule), HR Magazine UK and Legal IT Insider (bot checks; addresses not found), Zweig Letter (email-only credits), Screen Printing (LinkedIn-only credits), Logistics Manager (no contributor rules).
 - New sites this round: 9 (TechJuice, Label & Narrow Web, MSDynamicsWorld, Panorama, Fibre2Fashion, Call Centre Helper, SCMR, Packaging Strategies, Recycling Today). Follow-ups for the seven that reply are on 26 Nov; TechJuice and Fibre2Fashion only reply if they accept.
+- 07:57 UTC: Recycling Today sent an automatic reply (the editor is at a conference until 20 Nov), which confirms the address. No bounces from any of the 10 emails sent on 19 Nov.
 - New approvals: none since GrowthFolks. New live articles: none.
 
 ---
