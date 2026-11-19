@@ -141,3 +141,17 @@
 
 ### Listings (0 new)
 - No new directory could be checked: candidate sites are blocked for this session and the pool of free, credible agency directories not yet used is small. GEO Agencies and Behance still wait for the owner's browser check.
+
+## Thursday 19 November 2026 (day 6)
+
+### Re-checks (logged out)
+- Hubstaff Talent: LIVE again at https://hubstafftalent.net/agencies/vturnu. Hubstaff approved the profile on 18 Nov after the owner pasted the new 400-word About; the page shows it. vturnu.com links are nofollow; the page is noindex (platform default).
+- Pick an Agency: live. Top Interactive Agencies: not listed. MarTech Series: not published. No replies from MarTech Series, NZ Marketing, CXM, UX Magazine or Zyppy List.
+- Dynamic Business: the owner created the contributor account; a verification email is waiting.
+
+### Article (0 today, stated plainly)
+- Medianews4u was reachable but its contributed opinion section has been dormant since August 2024, so it was dropped.
+- Influencer Marketing Hub and Marketing News Canada have contributor guidelines, but their sites are blocked for this session, so the routes and rules could not be read. Recorded as leads.
+
+### Listings (0 new)
+- No directory host beyond those already used is reachable from this session, so no new pack could be verified.
