@@ -1,3 +1,12 @@
+# Update: 19 Nov 2026 (GrowthFolks accepted)
+
+- GrowthFolks (growthfolks.io, DR 60) accepted the pitched topic: free publication with one dofollow link to a page of our choice. In return they ask VTurnU to create a free agency profile on their marketplace when it launches in 2027. The owner agreed.
+- Sent in the thread: the full article "How to Improve a B2B Landing Page When Traffic Is Too Low for A/B Tests", written to their current guidelines (about 2,200 words, sources linked, four original visuals, dofollow link to /blog/landing-page-optimization-guide/ in the middle of the article), with a Word file, cover, visuals and photo. They prefer Google Docs; a Google Doc was offered if needed.
+- Tooling: the Word builder (_tools/md2docx.py) now renders italic text without literal asterisks and embeds images and tables. Earlier Word files showed the italic bio line with asterisks at each end; editors normally remove these, so the files were not resent.
+- Owner to-do in 2027: create the free agency profile on GrowthFolks when it launches.
+
+---
+
 # Update: 18 Nov 2026, 04:30 UTC scheduled check (10 am India time)
 
 - Replies since 17 Nov 11:30 UTC: none from editors. CanadianSME sent a short closing note (no reply needed). Not campaign mail: Google Business Profile ownership notices for a business called Focus English Class, and a Hubstaff follow-up sent by the other session. No bounces.
