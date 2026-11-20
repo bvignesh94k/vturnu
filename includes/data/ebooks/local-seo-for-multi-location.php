@@ -233,7 +233,7 @@ That is enough for a genuinely distinct page without inventing anything.
 6. **The team here**
 7. **Getting here,** with practical detail
 8. **Reviews from this location**
-9. **Branch FAQs** with FAQPage schema
+9. **Branch FAQs** answered in plain text on the page (FAQPage markup is optional since Google ended FAQ rich results on 7 May 2026)
 10. **Link to the parent service pages**
 
 ## URL structure

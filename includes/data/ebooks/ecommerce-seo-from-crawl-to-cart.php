@@ -149,7 +149,7 @@ The questions a salesperson would answer: how to choose a size, what the price t
 
 ### 4. FAQ block
 
-Three to six real questions with direct answers, marked up with FAQPage schema. This is the section most likely to be quoted by an answer engine.
+Three to six real questions with direct answers, in plain text on the page. This is the section most likely to be quoted by an answer engine. FAQPage markup is optional now that Google no longer shows FAQ rich results.
 
 ### 5. Internal links
 
@@ -175,9 +175,10 @@ The job is different: convince and convert, while being machine-legible.
 | --- | --- | --- |
 | Product | Product pages | Price, availability, ratings in results |
 | BreadcrumbList | Everywhere | Path display instead of raw URL |
-| FAQPage | Category and product | Expanded results, answer-engine citations |
 | Organization | Site-wide | Entity recognition |
 | ItemList | Category pages | Better category understanding |
+
+FAQPage is no longer on this list. Google stopped showing FAQ rich results on 7 May 2026, so the markup earns nothing in Google results. Keep the FAQ block itself for buyers and answer engines.
 
 Keep markup synchronised with what the page displays. Divergence between markup and visible content is both a policy violation and a trust problem.
 

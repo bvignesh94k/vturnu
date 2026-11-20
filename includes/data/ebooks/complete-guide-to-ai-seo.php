@@ -182,7 +182,7 @@ That last field is a direct statement that these scattered profiles are one enti
 | Page type | Schema | Common error |
 | --- | --- | --- |
 | Article | Article with author and dates | No author, no dateModified |
-| Question content | FAQPage | Marking up invisible content |
+| Question content | FAQPage (no Google rich result since 7 May 2026) | Marking up invisible content |
 | Service | Service linked to Organization | Orphaned from the entity |
 | Product | Product with real price | Fabricated reviews |
 
@@ -218,7 +218,7 @@ MD],
 
 State the limits before promising anything internally.
 
-- No impression counts for answer engines
+- No impression counts from most answer engines. Google and Microsoft now report on their own AI features (below)
 - Answers vary by user, session and phrasing
 - No citation API for arbitrary brands
 - Attribution from answer to conversion is indirect
@@ -238,9 +238,16 @@ Anyone promising exact AI impression share is selling a model, not a measurement
 
 ### Assistant referral traffic
 
-Identifiable referrers in analytics. Segment them. Volume looks small, quality is usually high, because the visitor arrived after reading an evaluation.
+Google Analytics groups it for you: the AI Assistant channel, added to the default channel group on 13 May 2026, covers visits from sources such as ChatGPT, Gemini, DeepSeek, Copilot and Grok. Clicks from Google's AI Overviews and AI Mode count as Organic Search instead, and visits without a referrer show as Direct, so the channel is a floor. Volume looks small, quality is usually high, because the visitor arrived after reading an evaluation.
 
 Judge on conversion rate, not volume. Comparing to organic session counts is the wrong comparison and will always look bad.
+
+### Google and Microsoft reports
+
+- **Search Console's generative AI performance report** (all websites since 31 August 2026): impressions in AI Overviews and AI Mode by page, country, device and date. No clicks.
+- **Bing Webmaster Tools AI Performance** (public preview since 10 February 2026): a sample of citations of your pages in Copilot, AI summaries in Bing and some partner services, with grounding queries.
+
+Each covers its owner's own AI features, so the prompt set stays the core method for ChatGPT, Perplexity and the rest.
 
 ### Crawler access logs
 
@@ -261,7 +268,9 @@ The lagging commercial indicator. Working AI visibility raises branded search an
 | --- | --- |
 | Citation share | Prompt set |
 | Prompts won or lost | Prompt diff |
-| Assistant referrals | Analytics segment |
+| Assistant referrals | Google Analytics, AI Assistant channel |
+| Google AI impressions | Search Console, generative AI report |
+| Copilot and Bing citations | Bing Webmaster Tools, AI Performance |
 | AI crawler hits | Server logs |
 | Branded search | Search Console |
 

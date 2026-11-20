@@ -34,7 +34,7 @@ return [
     'rollout' => 'Up to 2 weeks',
     'days' => 14,
     'finished' => '',
-    'checked' => '2026-11-12',
+    'checked' => '2026-11-20',
     'source' => 'https://status.search.google.com/incidents/WLxcJyC6jMWMfryxsKMc',
     'date' => '2026-11-12',
     'modified' => '2026-11-12',

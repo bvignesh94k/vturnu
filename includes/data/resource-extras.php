@@ -13,7 +13,7 @@ return [
     'faqs' => [
         ['What is the difference between SEO and AEO?', 'SEO earns rankings in a results page. AEO, answer engine optimization, earns a place inside the answer itself. They share foundations such as crawlability and quality content, but AEO puts more weight on direct answers, clear entities and independent corroboration.'],
         ['Which AI engines does this cover?', 'ChatGPT, Perplexity, Gemini, Copilot and Google AI Overviews. The retrieval logic is similar across them, so the same core work carries over.'],
-        ['Can AI citations be measured?', 'Yes. Build a list of the prompts your buyers use, run them on a schedule across each engine, and record whether you are named. Bing Webmaster Tools also reports citations in Copilot.'],
+        ['Can AI citations be measured?', 'Yes. Build a list of the prompts your buyers use, run them on a schedule across each engine, and record whether you are named. Bing Webmaster Tools also reports citations in Copilot, and the generative AI report in Search Console shows impressions in AI Overviews and AI Mode.'],
         ['How long until AI visibility improves?', 'Technical and entity fixes can show within weeks, as engines refresh sources. Earning independent corroboration takes longer, usually months.'],
         ['Is this beginner-friendly?', 'Yes. Concepts are explained from zero, and the systems are the same ones we run for clients.'],
     ],
@@ -37,7 +37,7 @@ return [
         ['Which pages does a service business need?', 'A home page, a page per service, proof such as case studies, an about page and a contact page with a clear offer.'],
         ['Should pricing be on the website?', 'Showing a starting price usually filters out poor-fit enquiries and builds trust, even for custom work.'],
         ['How do I stop junk leads?', 'Combine a hidden trap field, a captcha, a time check and required business details, then screen the content. Store flagged leads rather than deleting them.'],
-        ['How fast should the site be?', 'Aim to pass Core Web Vitals, including a Largest Contentful Paint under 2.5 seconds on a phone.'],
+        ['How fast should the site be?', 'Aim to pass Core Web Vitals, including a Largest Contentful Paint within 2.5 seconds on a phone.'],
     ],
 ],
 'paid-media-budgeting-for-founders' => [
@@ -78,7 +78,7 @@ return [
     'takeaways' => ['Third-party tags are usually the biggest cost', 'Reserve space to prevent layout shift', 'Lab scores vary, field data decides', 'Speed work must be measured page type by page type'],
     'faqs' => [
         ['What are Core Web Vitals?', 'Three measures of real experience: Largest Contentful Paint for loading, Interaction to Next Paint for responsiveness and Cumulative Layout Shift for visual stability.'],
-        ['What scores do I need to pass?', 'LCP under 2.5 seconds, INP under 200 milliseconds and CLS under 0.1, measured at the 75th percentile of real visits.'],
+        ['What scores do I need to pass?', 'LCP within 2.5 seconds, INP of 200 milliseconds or less and CLS of 0.1 or less, measured at the 75th percentile of real visits, separately for mobile and desktop.'],
         ['Why is my lab score high but Core Web Vitals fail?', 'Lab tests simulate one device. Core Web Vitals use 28 days of real visitors, so results also move slowly after a fix.'],
         ['Does speed affect rankings?', 'It is a small ranking factor, but it has a real effect on conversions, especially on mobile.'],
         ['Is a page builder too slow?', 'It can be. Heavy builders add scripts and markup, and a well-tuned build is often faster than a theme with many plugins.'],

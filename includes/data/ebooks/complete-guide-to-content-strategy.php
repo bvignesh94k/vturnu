@@ -201,7 +201,7 @@ The same structural work serves both, which is convenient, because the alternati
 - **Subheadings:** phrased as questions where natural
 - **URL:** short, readable, stable
 - **Images:** descriptive alt text, dimensions declared
-- **Schema:** Article with author and dates; FAQPage where questions are visible
+- **Schema:** Article with author and dates. FAQPage markup is optional, since Google stopped showing FAQ rich results on 7 May 2026
 
 ## Writing for extraction
 

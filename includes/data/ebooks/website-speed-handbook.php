@@ -15,7 +15,7 @@ Speed reporting is full of numbers that sound similar and mean different things.
 
 **What it measures:** how long until the largest visible element in the viewport finishes rendering. Usually a hero image, a heading, or a banner.
 
-**Target:** under 2.5 seconds for 75% of visits.
+**Target:** 2.5 seconds or less for at least 75% of visits.
 
 **What it really tells you:** how long the visitor stares at a mostly blank screen wondering whether the site is broken.
 
@@ -23,7 +23,7 @@ Speed reporting is full of numbers that sound similar and mean different things.
 
 **What it measures:** how long the page takes to visually respond after a user interaction, across the whole visit. It replaced First Input Delay in March 2024, and the change matters: FID measured only the delay before processing began, which flattered sites badly. INP measures the full round trip, on every interaction, and reports near the worst.
 
-**Target:** under 200 milliseconds.
+**Target:** 200 milliseconds or less.
 
 **What it really tells you:** whether the page feels responsive or laggy when someone taps something.
 
@@ -31,7 +31,7 @@ Speed reporting is full of numbers that sound similar and mean different things.
 
 **What it measures:** how much visible content moves unexpectedly during loading.
 
-**Target:** under 0.1.
+**Target:** 0.1 or less.
 
 **What it really tells you:** whether people tap the wrong thing because the button moved as their finger landed.
 
@@ -233,9 +233,9 @@ Set explicit limits and treat exceeding them as a bug rather than a discussion.
 | Total page weight | Under 1.5MB |
 | JavaScript, compressed | Under 300KB |
 | Number of third-party origins | Under 8 |
-| LCP, field, mobile | Under 2.5s |
-| INP, field | Under 200ms |
-| CLS, field | Under 0.1 |
+| LCP, field, mobile | 2.5s or less |
+| INP, field | 200ms or less |
+| CLS, field | 0.1 or less |
 
 Adjust the numbers to your context. The value is in having a threshold that triggers a conversation.
 

@@ -295,7 +295,7 @@ function service_faqs(array $page): array
         'ai' => [
             ["What is {$name}?", 'It is the work of making your brand visible and recommended inside AI-generated answers, through clear content, structured data, consistent entity facts and mentions on trusted sources.'],
             ['Can you guarantee AI engines will mention us?', 'No one can, because AI answers vary. We improve the signals engines rely on, and we track how often you are named across a set of buyer prompts.'],
-            ['How do you measure results?', 'We sample buyer prompts across engines each month and record whether you are named, along with citation data from Bing Webmaster Tools where available.'],
+            ['How do you measure results?', 'We sample buyer prompts across engines each month and record whether you are named. We add the first-party data that now exists: visits in the AI Assistant channel of Google Analytics, impressions in Search Console\'s generative AI report and citations in Bing Webmaster Tools.'],
             ['Do we still need regular SEO?', 'Yes. AI engines draw on the same web, and sites that are crawlable and well structured have a head start.'],
             ['How long does it take?', 'Technical and entity fixes can show within weeks. Earning corroboration on independent sites usually takes a few months.'],
             ['Is my industry a good fit?', 'If your buyers research before they buy, yes. B2B services, software and considered purchases benefit the most.'],

@@ -207,7 +207,7 @@ $PAGES = [
             ['What is AEO?', 'Answer engine optimization, or AEO, is the practice of making your content the source AI assistants and search features quote when they answer a question.'],
             ['What is GEO?', 'Generative engine optimization, or GEO, means earning visibility inside AI-generated answers. In practice it overlaps almost entirely with AEO.'],
             ['Can I really influence what ChatGPT says about my brand?', 'You cannot control it, but you can influence it, by making your site readable, your facts consistent and your brand mentioned on sources AI engines trust.'],
-            ['How do you measure AI visibility?', 'We track a set of buyer prompts across AI engines, and use Bing Webmaster Tools citation data where it is available.'],
+            ['How do you measure AI visibility?', 'We track a set of buyer prompts across AI engines, then add the first-party data that now exists: the AI Assistant channel in Google Analytics for visits, the generative AI report in Search Console for impressions in AI Overviews and AI Mode, and Bing Webmaster Tools for citations in Copilot.'],
             ['How is this different from SEO?', 'It builds on SEO, then puts more weight on direct answers, entity clarity and independent corroboration.'],
             ['How long does it take?', 'Technical and entity fixes can show within weeks. Building trusted third-party mentions takes months.'],
         ],

@@ -91,7 +91,7 @@ Run this diagnostic before changing anything.
 
 | Check | How to test | Common failure |
 | --- | --- | --- |
-| Crawl access | Fetch robots.txt, look for GPTBot, ClaudeBot, PerplexityBot, Google-Extended | Blocked by default in a security template |
+| Crawl access | Fetch robots.txt, look for OAI-SearchBot, GPTBot, ClaudeBot, PerplexityBot, Google-Extended | Blocked by default in a security template |
 | Render dependency | View source with JavaScript disabled | Content only in the JS bundle |
 | Answer position | Read your first 60 words | Opens with brand history, not the answer |
 | Claim specificity | Count numbers in the page | Adjectives instead of figures |
@@ -222,7 +222,7 @@ Match the type to the content and keep it truthful.
 | Page type | Schema | Common mistake |
 | --- | --- | --- |
 | Article or guide | Article, with author and dates | No author, no dateModified |
-| Question content | FAQPage | Marking up questions not visible on the page |
+| Question content | FAQPage (no Google rich result since 7 May 2026) | Marking up questions not visible on the page |
 | Service page | Service, with provider linked to the Organization | Orphaned, not linked to the entity |
 | Case study | Article plus verifiable result claims | Results with no method or timeframe |
 | Product | Product with real price and availability | Fabricated review markup |
@@ -259,7 +259,7 @@ Most teams do not measure AI visibility because they believe it is unmeasurable.
 
 Be honest about the limits before promising anything internally.
 
-- There is no impression count for answer engines
+- Most answer engines publish no impression counts for your site. Google and Microsoft now report on their own AI features, covered below
 - Answers vary by user, session, phrasing and time
 - No engine publishes a citation API for arbitrary brands
 - Attribution from an answer to a later conversion is usually indirect
@@ -283,11 +283,22 @@ Keep the prompt set frozen. Changing it every month destroys comparability, whic
 
 ### 2. Referral traffic from assistants
 
-Assistant referrals appear in analytics with identifiable referrers. Segment them. The volume will look small and the quality will usually be high, because the visitor arrived after reading an evaluation rather than clicking a link speculatively.
+Google Analytics now groups these visits for you. On 13 May 2026 it added an AI Assistant channel to the default channel group, for visits from sources such as ChatGPT, Gemini, DeepSeek, Copilot and Grok. Two limits matter. Clicks from Google's AI Overviews and AI Mode are not in this channel, because Google Analytics counts them as Organic Search. And a visit that arrives without a referrer shows as Direct, so treat the channel as a floor, not a full count.
+
+The volume will look small and the quality will usually be high, because the visitor arrived after reading an evaluation rather than clicking a link speculatively.
 
 Judge this traffic on conversion rate and lead quality, not volume. Comparing it to organic session counts will always look bad and will always be the wrong comparison.
 
-### 3. Crawler access logs
+### 3. First-party reports from Google and Microsoft
+
+Two search engines now report on their own AI features, free of charge.
+
+- **Search Console, generative AI performance report.** Launched in June 2026 and available to all websites since 31 August 2026, it shows how often your pages appeared in AI Overviews and AI Mode, by page, country, device and date. It shows impressions, not clicks.
+- **Bing Webmaster Tools, AI Performance.** In public preview since 10 February 2026, it counts citations of your pages in Microsoft Copilot, AI summaries in Bing and some partner services, with the grounding queries behind them. Microsoft describes the data as a sample.
+
+Each report covers its owner's own AI features, so the prompt set stays the core method for ChatGPT, Perplexity and the other assistants.
+
+### 4. Crawler access logs
 
 Your server logs show which AI agents fetch which pages, how often, and what they receive. This is the most underused data in the entire discipline.
 
@@ -298,19 +309,21 @@ Answers this data gives you directly:
 - Which content attracts repeat retrieval
 - Did access change after a robots.txt or firewall edit
 
-### 4. Branded demand
+### 5. Branded demand
 
 The lagging indicator that matters commercially. If AI visibility is working, branded search volume and direct traffic rise, because buyers encountered you inside answers and later looked you up.
 
 ## A monthly reporting format
 
-Keep it to one page. Five numbers, one action.
+Keep it to one page. Seven numbers, one action.
 
 | Metric | Source | Reading |
 | --- | --- | --- |
 | Citation share | Prompt set run | The headline number |
 | Prompts won or lost | Prompt set diff | Where movement happened |
-| Assistant referrals | Analytics segment | Volume and conversion rate |
+| Assistant referrals | Google Analytics, AI Assistant channel | Volume and conversion rate |
+| AI Overview and AI Mode impressions | Search Console, generative AI report | Visibility in Google's AI features |
+| Copilot and Bing citations | Bing Webmaster Tools, AI Performance | Visibility in Microsoft's AI answers |
 | AI crawler hits | Server logs | Access health |
 | Branded search | Search Console | Demand trend |
 

@@ -254,7 +254,7 @@ If you have one location, your homepage and contact page can serve. With multipl
 6. The team here
 7. Getting here, practically
 8. Reviews from this branch
-9. FAQs with FAQPage schema
+9. FAQs answered in plain text on the page (FAQPage markup is optional since Google ended FAQ rich results on 7 May 2026)
 
 ## Local content that works
 

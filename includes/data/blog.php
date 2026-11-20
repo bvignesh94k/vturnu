@@ -175,7 +175,7 @@ $BLOG = [
     'meta'  => 'Answer Engine Optimization (AEO) makes your brand the answer ChatGPT, Perplexity and Google AI Overviews give. Learn how AEO works and how to start.',
     'h1'    => 'What Is Answer Engine Optimization (AEO)?',
     'lede'  => 'Answer Engine Optimization (AEO) is the practice of structuring your content, data and authority signals so AI assistants, ChatGPT, Perplexity, Gemini and Google AI Overviews, cite your brand as the answer. Here is how it works and why it now sits beside SEO in every serious marketing plan.',
-    'category' => 'AI Search', 'intent' => 'Informational', 'date' => '2026-07-02', 'read' => '8 min',
+    'category' => 'AI Search', 'intent' => 'Informational', 'date' => '2026-07-02', 'modified' => '2026-11-20', 'read' => '8 min',
     'sections' => [
         ['Why answers are replacing links', [
             'For twenty years, winning search meant winning a ranking position. That contract is changing: a growing share of queries now end inside an AI-generated answer, with no click at all. Google AI Overviews appear on informational and commercial queries alike, and buyers increasingly start research inside ChatGPT or Perplexity rather than a search box.',
@@ -189,23 +189,23 @@ $BLOG = [
             'Demonstrated authority, original data, expert authorship and citations from other trusted sites',
         ]],
         ['AEO and SEO: allies, not rivals', [
-            'AEO is not a replacement for SEO, it is built on top of it. Engines retrieve from the same index your rankings live in, so technical health, crawlability and quality content remain the foundation. What changes is the format: content must answer first and elaborate second, schema must be complete, and your brand must be verifiable across the web.',
-            'Practically, that means every important page needs an answer box, FAQ coverage with FAQPage schema, and a maintained knowledge-graph footprint. Teams that treat these as one program, not two competing budgets, win both surfaces at once.',
+            'AEO is not a replacement for SEO, it is built on top of it. Engines retrieve from the same index your rankings live in, so technical health, crawlability and quality content remain the foundation. What changes is the format: content must answer first and elaborate second, structured data must describe the page accurately, and your brand must be verifiable across the web.',
+            'Practically, that means every important page needs an answer box, the questions buyers ask answered in plain text on the page, and a maintained knowledge-graph footprint. FAQPage markup is optional now: Google stopped showing FAQ rich results on 7 May 2026, and its documentation on AI features says there are no additional requirements or special optimizations needed to appear in AI Overviews or AI Mode. Teams that treat these as one program, not two competing budgets, win both surfaces at once.',
         ]],
         ['How to start with AEO this quarter', [
-            'You do not need to rebuild your site. Start by identifying the twenty questions your buyers actually ask, restructure your best pages to answer them directly, and add complete structured data. Then measure: ask the major engines your money questions monthly and record who gets cited.',
+            'You do not need to rebuild your site. Start by identifying the twenty questions your buyers actually ask, restructure your best pages to answer them directly, and add complete structured data. Then measure: ask the major engines your money questions monthly, record who gets cited, and read the first-party reports that now exist: the AI Assistant channel in Google Analytics, the generative AI performance report in Search Console and the AI Performance report in Bing Webmaster Tools.',
             'Most brands find gaps immediately, and because few competitors are doing this deliberately, early movers capture an outsized share of AI answers.',
         ]],
     ],
     'takeaways' => [
         'AEO makes your brand the answer AI engines give, a trust position stronger than any blue link.',
-        'Engines cite sources that answer directly, mark up data completely, and prove authority.',
+        'Engines cite sources that answer directly, describe the business consistently, and prove authority.',
         'AEO builds on SEO; run them as one program, not competing budgets.',
     ],
     'faqs' => [
-        ['Is AEO different from SEO?', 'They overlap heavily. SEO earns rankings in classic results; AEO earns citations inside AI-generated answers. The technical foundation is shared, but AEO adds answer-first formatting, deeper structured data and entity management.'],
+        ['Is AEO different from SEO?', 'They overlap heavily. SEO earns rankings in classic results; AEO earns citations inside AI-generated answers. The technical foundation is shared, but AEO adds answer-first formatting, entity management and tracking of AI citations.'],
         ['How long does AEO take to show results?', 'Structural changes (answer boxes, schema) can influence citations within weeks because engines retrieve live content. Authority building takes months, like SEO. Most clients see measurable citation share within one quarter.'],
-        ['Can I measure AEO?', 'Yes, track citation share: ask ChatGPT, Perplexity and Google your key buying questions on a schedule and record which brands appear. We build this into monthly reporting.'],
+        ['Can I measure AEO?', 'Yes. Track citation share by asking ChatGPT, Perplexity and Google your key buying questions on a schedule and recording which brands appear. Then add the first-party data that now exists: Google Analytics added an AI Assistant channel for visits from assistants such as ChatGPT and Gemini on 13 May 2026, Search Console\'s generative AI performance report shows impressions in AI Overviews and AI Mode, and Bing Webmaster Tools reports citations in Copilot. We build all of it into monthly reporting.'],
     ],
     'cta' => ['See how AI engines present your brand today', 'Get a free AI Visibility Report: we\'ll show you exactly what ChatGPT, Perplexity and Google AI Overviews say when buyers ask about your category.', 'Get My Free AI Report'],
 ],
@@ -268,8 +268,8 @@ $BLOG = [
     'title' => 'How to Rank in Google AI Overviews: A Step-by-Step Playbook',
     'meta'  => 'A practical, step-by-step playbook for earning citations in Google AI Overviews: query research, answer-first formatting, schema, entities and measurement.',
     'h1'    => 'How to Rank in Google AI Overviews',
-    'lede'  => 'To appear in Google AI Overviews, structure pages so an AI can lift your answer directly: lead with a concise response, support it with evidence and schema, and build entity trust. Here is the exact playbook we run for clients, step by step.',
-    'category' => 'AI Search', 'intent' => 'How-to / Tutorial', 'date' => '2026-06-18', 'read' => '11 min',
+    'lede'  => 'To appear in Google AI Overviews, a page must be indexed and eligible to show in Google Search with a snippet. Google says there are no additional requirements or special optimizations. Beyond that, structure pages so an AI can lift your answer directly: lead with a concise response, support it with evidence, and build entity trust. Here is the exact playbook we run for clients, step by step.',
+    'category' => 'AI Search', 'intent' => 'How-to / Tutorial', 'date' => '2026-06-18', 'modified' => '2026-11-20', 'read' => '11 min',
     'sections' => [
         ['Step one: find the queries that trigger Overviews', [
             'Not every search shows an AI Overview. Start by mapping which of your money queries trigger one today, search your top fifty target terms and record where Overviews appear and who is cited. Question-form and comparison queries trigger them most often; brand-navigational queries rarely do.',
@@ -280,26 +280,27 @@ $BLOG = [
             'Pages built as long wind-ups to a conclusion get skipped; the engine cannot find the quotable core.',
         ]],
         ['Step three: add the supporting signals', [], [
-            'FAQPage and Article schema on every content page, complete, validated, matching visible text',
+            'Accurate Article and Organization markup that matches the visible text. Google says AI Overviews need no special optimizations, and it stopped showing FAQ rich results on 7 May 2026, so FAQPage markup is now optional',
             'Original numbers: engines love citable statistics; publish your own data where possible',
             'Author credentials and about pages: expertise signals feed source selection',
             'Internal links from related content so crawlers understand topical depth',
         ]],
         ['Step four: measure citation share monthly', [
-            'Re-run your target queries every month and log three things: does an Overview appear, are you cited, and who else is. Citation share moves faster than classic rankings, structural fixes often show within weeks because Google retrieves live content when composing Overviews.',
+            'Re-run your target queries every month and log three things: does an Overview appear, are you cited, and who else is. Then open the generative AI performance report in Search Console. Google launched it in June 2026 and made it available to all websites by 31 August 2026. It shows how often your pages appeared in AI Overviews and AI Mode, by page, country, device and date. It shows impressions only: clicks from AI Overviews are counted in the main Performance report, under the Web search type, together with other search clicks. Structural fixes often show within weeks, once Google recrawls the improved page.',
             'Treat losses seriously: when a competitor replaces you, diff their cited page against yours. The gap is usually formatting or freshness, both fixable in a day.',
         ]],
     ],
     'takeaways' => [
         'Map which money queries trigger Overviews before optimizing anything.',
         'Answer-first formatting is the single highest-leverage change: question heading, immediate concise answer.',
-        'Schema, original data and author credentials decide close calls between similar sources.',
-        'Track citation share monthly; it responds faster than classic rankings.',
+        'Original data and clear author credentials help a page stand out among similar sources.',
+        'Track citation share monthly, alongside the generative AI report in Search Console.',
     ],
     'faqs' => [
         ['Do AI Overviews steal traffic?', 'They reduce clicks on purely informational queries but concentrate trust on cited brands. Cited sources capture high-intent clicks and brand recall; invisible brands lose both.'],
         ['Does ranking number one guarantee an Overview citation?', 'No. Overviews frequently cite pages ranking fifth or tenth when their formatting is more quotable. Structure matters as much as position.'],
         ['How is this different from featured snippet optimization?', 'It is the same discipline evolved: snippets took one source, Overviews synthesize several. Answer-first formatting wins both, but Overviews add heavier weight on entity trust and corroboration.'],
+        ['Can I see AI Overview data in Search Console?', 'Partly. Since 31 August 2026 every website has a generative AI performance report in Search Console, showing impressions in AI Overviews and AI Mode by page, country, device and date. It does not show clicks. Clicks are counted in the main Performance report under the Web search type, with other search clicks, and Google Analytics counts these visits as Organic Search, not in its AI Assistant channel.'],
     ],
     'cta' => ['Want us to run this playbook for you?', 'Our AI SEO team maps your Overview opportunities, restructures your pages and reports citation share monthly. Start with a free audit of your current AI visibility.', 'Get My Free AI Visibility Audit'],
 ],
@@ -470,7 +471,7 @@ $BLOG = [
     'meta'  => 'The AI search trends reshaping discovery: zero-click answers, conversational research, shopping inside assistants, and what winning brands are doing about each.',
     'h1'    => 'AI Search Trends Marketers Cannot Ignore',
     'lede'  => 'Search behavior is migrating from keywords to conversations, from links to answers, and from browsers to assistants. These are the trends with real budget implications this year, and the concrete response to each.',
-    'category' => 'AI Search', 'intent' => 'Industry Trends', 'date' => '2026-04-22', 'read' => '8 min',
+    'category' => 'AI Search', 'intent' => 'Industry Trends', 'date' => '2026-04-22', 'modified' => '2026-11-20', 'read' => '8 min',
     'sections' => [
         ['Zero-click becomes the default for information', [
             'AI Overviews and chat assistants now resolve most purely informational queries without a click. The strategic response is not mourning lost traffic, it is repositioning content: informational pieces become citation assets that buy brand presence inside answers, while click-worthy investment shifts to pages AI cannot substitute: tools, calculators, original data, and genuine bottom-funnel decision content.',
@@ -494,7 +495,7 @@ $BLOG = [
     'faqs' => [
         ['Is classic SEO dead?', 'No: AI engines retrieve from the same indexed web, so crawlability, content quality and links still gate everything. What changed is the output format and the extra signals that decide citations.'],
         ['Which platform should I optimize for first?', 'Google AI Overviews for volume, then ChatGPT and Perplexity for high-intent research. In practice one answer-first content program serves all three; measurement is where they differ.'],
-        ['How do I measure brand visibility in AI answers?', 'Systematic prompt sampling: ask each engine your category\'s buying questions monthly, record mentions and citations, and trend share against competitors. We run this as standard reporting for AI SEO clients.'],
+        ['How do I measure brand visibility in AI answers?', 'Start with systematic prompt sampling: ask each engine your category\'s buying questions monthly, record mentions and citations, and trend share against competitors. Then add the first-party reports that now exist: the AI Assistant channel in Google Analytics for visits, the generative AI performance report in Search Console for impressions in AI Overviews and AI Mode, and the AI Performance report in Bing Webmaster Tools for citations in Copilot. We run this as standard reporting for AI SEO clients.'],
     ],
     'cta' => ['Get ahead of the shift', 'Our AI Visibility Report shows where your brand stands across ChatGPT, Perplexity and AI Overviews today, and the ninety-day plan to improve it. Free for qualifying businesses.', 'Claim My Free Report'],
 ],
@@ -695,22 +696,23 @@ $BLOG = [
     'meta'  => 'How ChatGPT decides which brands to recommend, training data, browsing, citations, and the practical program that earns your brand a seat in AI answers.',
     'h1'    => 'ChatGPT SEO: How Brands Get Recommended',
     'lede'  => 'When a buyer asks ChatGPT "who should I use for X", the answer comes from what the model learned, what it retrieves live, and how confidently sources corroborate you. ChatGPT SEO is the discipline of engineering all three in your favor.',
-    'category' => 'AI Search', 'intent' => 'Informational', 'date' => '2026-01-28', 'read' => '9 min',
+    'category' => 'AI Search', 'intent' => 'Informational', 'date' => '2026-01-28', 'modified' => '2026-11-20', 'read' => '9 min',
     'sections' => [
         ['Where ChatGPT\'s recommendations come from', [
-            'Three inputs shape a recommendation: model knowledge (patterns absorbed in training: your brand\'s historical web footprint), live retrieval (when browsing is used, current pages and their clarity), and corroboration (do reviews, press and directories agree you are credible for this exact thing?). A brand weak on any leg gets skipped for one that is consistent across all three.',
+            'Three inputs shape a recommendation: model knowledge (patterns absorbed in training: your brand\'s historical web footprint), live retrieval (when ChatGPT searches the web, current pages and their clarity), and corroboration (do reviews, press and directories agree you are credible for this exact thing?). A brand weak on any leg gets skipped for one that is consistent across all three.',
         ]],
         ['Make your brand machine-legible', [], [
             'One canonical description of what you do, used consistently across your site, profiles and directories',
             'Organization and Service schema so parsers extract facts, not guesses',
             'About and author pages with verifiable credentials: models weigh expertise trails',
             'Consistent NAP and entity details everywhere; contradictions dilute confidence',
+            'OAI-SearchBot allowed in robots.txt: OpenAI uses it to show sites in ChatGPT search results, and it is separate from GPTBot, the training crawler, so you can allow one and block the other',
         ]],
         ['Earn the corroboration layer', [
             'ChatGPT is trained on, and retrieves, the open web talking about you: review platforms, industry listicles, press, forums. Being genuinely present in "best X in Y" round-ups, maintaining review depth, and earning niche-relevant mentions is the AI-era equivalent of link building. Thin brands with great websites still lose to corroborated brands with average ones.',
         ]],
         ['Publish answer-shaped expertise', [
-            'When browsing kicks in, quotable content wins: direct answers under question headings, comparison tables, transparent pricing pages, original data. This is the same asset base that wins Google AI Overviews: one program covers both engines, which is exactly how we structure AI SEO retainers.',
+            'When ChatGPT searches the web, quotable content wins: direct answers under question headings, comparison tables, transparent pricing pages, original data. This is the same asset base that wins Google AI Overviews: one program covers both engines, which is exactly how we structure AI SEO retainers.',
         ]],
     ],
     'takeaways' => [
@@ -719,8 +721,8 @@ $BLOG = [
         'Third-party corroboration (reviews, round-ups, press) is the new link building.',
     ],
     'faqs' => [
-        ['Can I pay to appear in ChatGPT answers?', 'Not organically-presented answers. Visibility is earned through the signals above, which is precisely why early movers gain a durable moat.'],
-        ['How do I check what ChatGPT says about my brand?', 'Ask it your buyers\' questions directly, category recommendations, comparisons with competitors, "is <brand> good": monthly, and log the outputs. That baseline is where our AI Visibility Report starts.'],
+        ['Can I pay to appear in ChatGPT answers?', 'Not inside the answer. ChatGPT now shows ads to some users, but OpenAI says ads appear separately below a response, are clearly labelled, and that advertisers cannot shape, rank or alter ChatGPT\'s answers. A place in the answer itself is earned through the signals above, which is precisely why early movers gain a durable moat.'],
+        ['How do I check what ChatGPT says about my brand?', 'Ask it your buyers\' questions directly, category recommendations, comparisons with competitors, "is <brand> good": monthly, and log the outputs. For visits, open the AI Assistant channel in Google Analytics, which counts sessions that arrive from ChatGPT and other assistants with a referrer. That baseline is where our AI Visibility Report starts.'],
         ['Does this help with Perplexity and Gemini too?', 'Substantially, the retrieval-and-corroboration model is shared. Perplexity leans harder on live citations, which answer-shaped content wins the same way.'],
     ],
     'cta' => ['Find out what AI says about you', 'Get a free AI Visibility Report: what ChatGPT, Perplexity and Google AI Overviews currently say about your brand, and the plan to improve it.', 'Get My Free Report'],
@@ -888,12 +890,14 @@ $BLOG = [
     'meta'  => 'What Core Web Vitals actually measure, why they affect rankings and revenue, what good scores look like, and the fixes that usually matter, jargon-free.',
     'h1'    => 'Core Web Vitals: A Business Owner\'s Guide',
     'lede'  => 'Core Web Vitals are Google\'s three measurements of user experience: how fast your main content loads, how quickly the page responds to taps, and whether things jump around while loading. They influence rankings, and they quietly tax conversions when they fail. Here is what you need to know, minus the jargon.',
-    'category' => 'Web', 'intent' => 'Informational / Guide', 'date' => '2025-11-06', 'read' => '8 min',
+    'category' => 'Web', 'intent' => 'Informational / Guide', 'date' => '2025-11-06', 'modified' => '2026-11-20', 'read' => '8 min',
     'sections' => [
-        ['The three numbers, in plain language', [], [
-            'Loading (LCP): how long until the main thing on the page is visible, good is within two and a half seconds',
-            'Responsiveness (INP): when someone taps or types, how fast the page reacts, good is under two hundred milliseconds',
-            'Stability (CLS): does content shift under the user\'s finger while loading: good is barely at all',
+        ['The three numbers, in plain language', [
+            'Google judges each number on real visits by Chrome users, at the 75th percentile, separately for mobile and desktop. In other words, at least three in four visits need a good result for the page to pass.',
+        ], [
+            'Loading (LCP): how long until the main thing on the page is visible, good is within 2.5 seconds',
+            'Responsiveness (INP): when someone taps or types, how fast the page reacts, good is 200 milliseconds or less',
+            'Stability (CLS): does content shift under the user\'s finger while loading: good is a score of 0.1 or less',
         ]],
         ['Why owners should care beyond rankings', [
             'The ranking influence is real but modest, a tiebreaker among comparable results. The revenue influence is direct: every additional second of load measurably increases abandonment, and mobile users on mid-range phones (most of India, much of everywhere) feel your bloat first. Fast sites convert better on the same traffic: that is the business case, with rankings as a bonus.',
@@ -902,7 +906,7 @@ $BLOG = [
             'The same culprits appear in nearly every audit: oversized images, too many third-party scripts (chat widgets, trackers, app embeds each taking a toll), render-blocking assets, cheap hosting, and themes built for demos rather than speed. On Shopify and WordPress specifically, accumulated plugins and apps are the usual tax collectors.',
         ]],
         ['How to check yours, and act', [
-            'Search "PageSpeed Insights", enter your URL, and read the field data section: that is real visitors, not lab simulation. Green across mobile is the goal; your homepage plus a money page is enough to start. The fixes are developer work, but the priorities are business decisions: compress and resize images, audit every script for earned keep, and demand speed budgets in any redesign contract. Our builds target ninety-five-plus scores as standard, this site included.',
+            'Search "PageSpeed Insights", enter your URL, and read the field data section: that is real Chrome visitors over the previous 28 days, not a lab simulation, so a fix takes up to four weeks to show in full. Green across mobile is the goal; your homepage plus a money page is enough to start. The fixes are developer work, but the priorities are business decisions: compress and resize images, audit every script for earned keep, and demand speed budgets in any redesign contract. Our builds target ninety-five-plus scores as standard, this site included.',
         ]],
     ],
     'takeaways' => [

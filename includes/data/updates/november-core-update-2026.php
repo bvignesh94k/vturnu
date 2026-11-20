@@ -5,8 +5,9 @@
  * includes/data/updates.php.
  *
  * Every date, duration and statement comes from Google's Search Status
- * Dashboard or Google Search Central (checked 12 November 2026), linked in the
- * sentence that uses it. News coverage is named where it is the source. The
+ * Dashboard or Google Search Central (checked 12 November 2026, every source
+ * checked again on 20 November 2026), linked in the sentence that uses it. The
+ * "checked" dates on the page read the record's 'checked' field. News coverage is named where it is the source. The
  * pump distributor in the example is made up and labelled so. Status-dependent
  * lines read the record, so marking the update complete in the admin panel
  * updates the facts, the chart and the calendar together. External links are
@@ -51,6 +52,7 @@ return [
     $done = ($u['status'] ?? '') === 'complete' && !empty($u['finished']);
     $end = update_end($u);
     $took = $done ? (int) round((strtotime($u['finished']) - strtotime($u['started'])) / 86400) : 0;
+    $checked = update_day((string) ($u['checked'] ?? ''), 'j F Y');
     ?>
 <p class="bx-open">On 10 November 2026, Google started rolling out its third core update of the year. If your search traffic moves up or down over the next few weeks, this is the most likely reason.</p>
 <p>Core updates make people nervous because Google says very little about them. This one is no different: one line on Google's status dashboard, one short social post and no new guidance. So this page sticks to what is confirmed, explains it in plain words and gives you a simple plan for checking your own site without guessing.</p>
@@ -104,7 +106,7 @@ return [
     ['September 2026 spam update', '24 Sep 2026', '13 days, 16 hours'],
     ['November 2026 core update', '10 Nov 2026', $done ? 'Finished ' . update_day($u['finished']) . ', about ' . $took . ' days' : 'Rolling out (Google\'s estimate: up to 2 weeks)'],
 ], 'ux-y-table'); ?>
-<p class="ux-note-s">Source: Google's <?= ext_link($g['history'], 'ranking update history') ?> on the Search Status Dashboard, checked 12 November 2026.</p>
+<p class="ux-note-s">Source: Google's <?= ext_link($g['history'], 'ranking update history') ?> on the Search Status Dashboard<?= $checked !== '' ? ', checked ' . e($checked) : '' ?>.</p>
 
 <?php ux_duration_chart('core-update-durations', 'How long recent core updates took to roll out', 'Every core update in 2025 and 2026, from start to finish, as recorded by Google.', [
     ['label' => 'March 2025', 'hours' => 333, 'text' => '13 days, 21 hours'],
@@ -200,7 +202,10 @@ return [
 <p>So the work that helps a page in regular results is the same work that helps it get linked in AI answers: a clear answer near the top, facts you can stand behind, and pages Google can crawl and index. If you want to track how often AI answers mention your brand, here is <a href="/blog/how-to-measure-ai-search-visibility/">how to measure AI search visibility</a>, and our <a href="/google-ai-overviews-seo/">AI Overviews optimization</a> service covers the rest.</p>
 <?php },
 
-'closing' => static function (): void { ?>
+'closing' => static function (): void {
+    $u = $GLOBALS['UPDATES']['november-core-update-2026'] ?? [];
+    $checked = update_day((string) ($u['checked'] ?? ''), 'j F Y');
+    ?>
 <h2 id="final-thoughts">Final Thoughts</h2>
 <p>A core update is Google checking again which pages answer each search best. You cannot opt out of it, and you do not need to fear it. Wait for the rollout to finish, measure the right weeks, and spend your effort on the pages that matter most to your business.</p>
 <p>We will update this page when Google confirms the rollout is complete. New updates appear on our <a href="/updates/">search updates page</a> as soon as Google announces them.</p>
@@ -221,7 +226,7 @@ return [
 
 <aside class="bx-author" aria-label="About the author">
     <p class="bx-author-h">Written by the VTurnU strategy team</p>
-    <p>VTurnU is a B2B digital marketing and branding agency based in Chennai, working across SEO, AI search, paid media, content and websites for clients worldwide. Sources for this update were checked on 12 November 2026. Read more <a href="/about-us/">about the team</a>, <a href="/how-we-work/">how we work</a> and <a href="/ai-policy/">how we use AI</a>.</p>
+    <p>VTurnU is a B2B digital marketing and branding agency based in Chennai, working across SEO, AI search, paid media, content and websites for clients worldwide.<?= $checked !== '' ? ' Sources for this update were checked on ' . e($checked) . '.' : '' ?> Read more <a href="/about-us/">about the team</a>, <a href="/how-we-work/">how we work</a> and <a href="/ai-policy/">how we use AI</a>.</p>
 </aside>
 <?php },
 
