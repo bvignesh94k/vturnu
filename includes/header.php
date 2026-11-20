@@ -229,7 +229,7 @@ height="0" width="0" style="display:none;visibility:hidden" title="Tag Manager">
                                 <?php if ($hasPromo): [$p_eyebrow, $p_title, $p_text, $p_btn, $p_url] = $item['promo']; ?>
                                 <div class="mega-promo">
                                     <p class="eyebrow"><?= e($p_eyebrow) ?></p>
-                                    <h3><?= e($p_title) ?></h3>
+                                    <p class="mega-promo-t"><?= e($p_title) ?></p>
                                     <p><?= e($p_text) ?></p>
                                     <a class="btn btn-grad" href="<?= e($p_url) ?>"><?= e($p_btn) ?></a>
                                 </div>
