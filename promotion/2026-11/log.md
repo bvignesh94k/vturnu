@@ -157,3 +157,10 @@
 - No directory host beyond those already used is reachable from this session, so no new pack could be verified.
 - Later on 19 Nov (owner): UX Magazine's contribute page no longer has an inquiry form; its contact page lists a contributions address, so the pitch "Guide, Not Gate: Designing Chatbots for B2B Websites" was sent there from connect@vturnu.com at the owner's request. Dynamic Business: email verified, contributor approval pending. GEO Agencies and Behance: the owner will handle them from his own computer.
 - Later on 19 Nov (owner): GEO Agencies is paid (its pricing page), so it is dropped. Behance team page created by the owner at https://www.behance.net/vturnudigital; Behance blocks automated checks, so it is recorded as owner-reported live, not verified from this session.
+
+## Friday 20 and Saturday 21 November 2026 (days 7 and 8)
+
+- The 20 Nov scheduled run fired while the session was idle and only arrived on 21 Nov, so the two days ran as one batch.
+- Re-checks: Hubstaff Talent and Pick an Agency still live (logged out). Behance and AdForum block automated checks. Top Interactive Agencies: not listed. No replies from MarTech Series, NZ Marketing, CXM, UX Magazine, Zyppy List or Dynamic Business. martechseries.com is now blocked for this session as well, so its archive could not be re-checked.
+- Follow-ups: one polite follow-up each drafted in the original threads for MarTech Series (sent 7 Nov) and NZ Marketing (sent 8 Nov). They wait for the owner's approval; the NZ one goes on or after 22 Nov.
+- New articles and listings: none. Every new publisher and directory host tested (16 more today) is blocked for this session, so nothing new could be verified. Not padded with unverified sites.
