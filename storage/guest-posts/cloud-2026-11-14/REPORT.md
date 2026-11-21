@@ -1,3 +1,11 @@
+# Update: 21 Nov 2026, 04:30 UTC scheduled check (Saturday, 10 am India time)
+
+- Replies since 00:20 UTC: none from editors; no bounces. Only the VTurnU leads digest came in. No follow-ups were due (weekend).
+- Live check: the checker now has time limits on every step (the old one stalled on Logistics Insider's search page) and covers 29 pages, including GrowthFolks, TechJuice, Fibre2Fashion, Call Centre Helper and Today's Hotelier. All 29 ran; the only matches were search pages echoing the name and the HackerNoon profile (still no published story). Six pages could not load from the cloud (The CEO Magazine, ManufacturingTomorrow, Africa.com, CanadianSME, Management-Issues, Passionate in Marketing), and Logistics Insider's RSS feed returned a bot-check page today. New live articles: none. New approvals: none.
+- Tooling: the fixed checker is saved as _tools/live-check.cjs and replaces live4.cjs in the scratchpad, so the scheduled checks use it.
+
+---
+
 # Update: 21 Nov 2026, 00:00 to 00:20 UTC (20 Nov scheduled check, which reached the session 19.5 hours late; owner asked to check and answer replies)
 
 - Replies since 19 Nov: TechImply, The Techism and LeadGen App (the other session's Cliqforms pitch) all replied with paid-only terms ($350, $25 and $300 per post). All three were already declined from this mailbox on 20 Nov ("I will pass for now"), not by this session. GrowthFolks (Hanna, 19 Nov 20:46 UTC): the article is with their editor; thanks and an offer of same-day edits or a Google Doc sent 21 Nov 00:15 UTC. Recycling Today: auto-reply only. No bounces.
