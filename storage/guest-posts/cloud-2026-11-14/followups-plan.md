@@ -16,6 +16,7 @@ Each date has its own scheduled check at 04:30 UTC (10 am India time). On every 
 - Logistics Insider: tariq@logisticsinsider.in (full article sent 16 Nov; their page says approval under 2 days, publishing under 3). No client links: Sai Impression (labels) and FirstChoice (used auto parts) are not relevant to an article on logistics provider websites, and the site rejects promotional articles.
 
 ## Fri 20 Nov
+- DONE 21 Nov 00:10 UTC (check reached the session 19.5 hours late): e27 not followed up again, because a second note already went from this mailbox on 18 Nov and e27 says reviews take 12 to 14 working days; moved to Thu 26 Nov. HackerNoon: owner reminded to check the dashboard.
 - e27: writers@e27.co (asked 16 Nov about the two 6 Nov submissions missing from the dashboard).
 - HackerNoon: no email route. Remind the owner to check the story in his HackerNoon dashboard.
 
@@ -42,7 +43,7 @@ Second and final follow-ups (first follow-up was 14 Nov):
 - CXL: stefan@cxl.com
 - ClickZ: editorial@clickz.com
 - Express Computer: editors@expresscomputeronline.com
-- The Techism: thetechismofficial@gmail.com
+- The Techism: REMOVED (replied 20 Nov with paid-only terms; declined).
 - MarketingProfs: WriteForUs@marketingprofs.com
 - SmartBrief: mike.driehorst@futurenet.com (cc mike.driehorst@futureb2b.com)
 - destinationCRM: lklie@infotoday.com
@@ -91,7 +92,8 @@ No email route: ASBN (submitted by the owner through its form). Check the site o
 - Packaging Strategies: addingtonb@bnpmedia.com (pitch sent 19 Nov)
 - Fibre2Fashion: no follow-up. They reply only to accepted submissions, within one to eight weeks. Check the site for the article only.
 - Recycling Today: dtoto@gie.net (synopsis sent 19 Nov)
-- TechImply: info@techimply.com (pitch sent 19 Nov at the owner's request; AI assistance disclosed). If they say only human-written content is accepted, do not send an article; tell the owner.
+- TechImply: REMOVED (replied 20 Nov with paid-only rates; declined).
+- e27: writers@e27.co. If there is still no reply and nothing on the dashboard after their 12 to 14 working-day review window, send one last short note in the same thread.
 - Logistics Insider: tariq@logisticsinsider.in. Second and final follow-up only if there is still no reply and the article is not live (first follow-up sent 19 Nov 07:41 UTC).
 
 ## Fri 27 Nov

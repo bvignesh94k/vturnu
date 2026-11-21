@@ -1,3 +1,12 @@
+# Update: 21 Nov 2026, 00:00 to 00:20 UTC (20 Nov scheduled check, which reached the session 19.5 hours late; owner asked to check and answer replies)
+
+- Replies since 19 Nov: TechImply, The Techism and LeadGen App (the other session's Cliqforms pitch) all replied with paid-only terms ($350, $25 and $300 per post). All three were already declined from this mailbox on 20 Nov ("I will pass for now"), not by this session. GrowthFolks (Hanna, 19 Nov 20:46 UTC): the article is with their editor; thanks and an offer of same-day edits or a Google Doc sent 21 Nov 00:15 UTC. Recycling Today: auto-reply only. No bounces.
+- Not answered, for the owner: M Adeel (info.adeel71@gmail.com) asks for prices for link insertions on vturnu.com and the client sites, in the owner's own thread from 13 Nov. Selling followed links breaks Google's spam policies and could hurt vturnu.com and the clients' sites, so no reply was sent.
+- e27: no third note. A second note already went from this mailbox on 18 Nov, and e27 says reviews take 12 to 14 working days (window ends about 24 to 26 Nov); next check 26 Nov. HackerNoon: owner to check the dashboard (profile still shows no published story).
+- Live check: 16 of 25 sites checked before the browser timed out on Logistics Insider's search page; Logistics Insider's RSS feed and a web search for the byline found nothing new. New live articles: none. New approvals: none (GrowthFolks and SMM remain accepted).
+
+---
+
 # Update: 19 Nov 2026, about 09:10 UTC (owner's request: TechImply)
 
 - TechImply (DR 74): pitch sent to info@techimply.com with two ideas (CMS buyer's guide for B2B websites; marketing automation buying questions). Their rules allow one do-follow link (vturnu.com, in the body) and ask for "100% unique and human-written" content, so the pitch disclosed AI-assisted drafting and asked whether that meets their standard before any article is written. Their web form is behind a bot check from the cloud; the text is saved in techimply/email.md for the owner to paste into the form if they ask. Follow-up on 26 Nov.
