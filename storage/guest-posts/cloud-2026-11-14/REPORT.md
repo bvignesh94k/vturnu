@@ -1,3 +1,16 @@
+# Note: 22 Nov 2026 (owner asked why nothing has gone live in 10+ days)
+
+Funnel from tracker-rows.csv (about 90 sites since 4 Nov; Compare the Cloud and SIIT left out as the owner asked):
+- Accepted, not yet published: 2 (GrowthFolks, with their editor since 19 Nov; Sales & Marketing Management, 2 articles queued for mid-January).
+- Asked for payment (declined): 6. Declined us: 6.
+- Full articles waiting for a decision: 23. Pitches waiting for a reply: 29.
+- Earliest batch (4 to 7 Nov) silent after one follow-up: 15 (final follow-ups on 23 Nov). In review on dashboards only the owner can see: e27 (2) and HackerNoon (1).
+- Timing: 64 of the dated contacts went out between 14 and 19 Nov, so most are still inside normal editorial review windows (e27 12 to 14 working days; Fibre2Fashion up to 8 weeks; SMM about 60 days).
+
+Changes agreed in this session: follow-ups on 23 and 24 Nov ask full-article sites for a publish date and offer same-day edits; new outreach goes only to quality sites that take full articles and publish within about two weeks (no more pitch-first emails to monthly print magazines). Owner checks requested: HackerNoon and e27 dashboards; SPF, DKIM and DMARC on a sent message ("Show original" in Gmail), which the cloud cannot check.
+
+---
+
 # Update: 21 Nov 2026, 04:30 UTC scheduled check (Saturday, 10 am India time)
 
 - Replies since 00:20 UTC: none from editors; no bounces. Only the VTurnU leads digest came in. No follow-ups were due (weekend).

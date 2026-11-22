@@ -5,7 +5,7 @@ Each date has its own scheduled check at 04:30 UTC (10 am India time). On every 
 ## Rules for every follow-up
 - Search Gmail for the address, open the thread with get_thread and reply in that thread (replyToMessageId of our latest message, same subject with "Re:"). One short, polite message. No re-attachments unless the editor asks.
 - Skip a site if it has replied, published the piece, or bounced; record why in tracker-rows.csv.
-- First follow-up: ask whether the article or idea suits them, and offer edits or a different angle.
+- First follow-up: ask whether the article or idea suits them, and offer edits or a different angle. For sites holding a full article, also say it is ready to publish, offer same-day edits, and ask whether a publishing date is possible (owner asked on 22 Nov for faster results).
 - Second and final follow-up (sites already followed up on 14 Nov): one line to close the loop; say we will take no reply as a no. Keep any exclusivity already promised.
 - Do not add client links in follow-ups. Do not mention other publications or clients.
 - HTML email, 16px/26px, includeSignature true, plain sentences, no em or en dashes.
