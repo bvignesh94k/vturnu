@@ -1,3 +1,14 @@
+# Update: 23 Nov 2026, 05:11 to 05:40 UTC (Monday scheduled check, batch A follow-ups)
+
+- Replies since 21 Nov 00:20 UTC: Dynamic Business rejected a submission ("Your Google Result Is Your Shop Window") for quality issues; that article is not from this campaign (not in tracker-rows.csv), so it belongs to the owner's own work or the other session, and no reply was sent from here. No campaign editor replies and no bounces.
+- Live check: the fixed checker ran cleanly across all 29 pages (no timeouts this time). Nothing of ours is live yet. HackerNoon still shows no published story.
+- Follow-ups sent (batch A, 24 total, each in its own thread):
+  - First follow-ups (10), each also asked for a publish date and offered same-day edits: ContactCenterWorld, CX Today, UX Magazine, SmallBusiness.co.uk, 150sec, Chief Executive, Martechvibe, Frontier Enterprise, Contact Center Pipeline, CPA Practice Advisor. Next check: 26 Nov.
+  - Second and final follow-ups (14), each given a 4 December deadline: Inc42, exchange4media, SME Today, YourStory, CXL, ClickZ, Express Computer, MarketingProfs, SmartBrief, destinationCRM, Social Samosa, Security Boulevard, DevOps.com, SC Media. A one-shot check is scheduled for 4 Dec to close out any still silent.
+- New approvals: none. New live articles: none.
+
+---
+
 # Note: 22 Nov 2026 (owner asked why nothing has gone live in 10+ days)
 
 Funnel from tracker-rows.csv (about 90 sites since 4 Nov; Compare the Cloud and SIIT left out as the owner asked):

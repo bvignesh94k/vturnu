@@ -24,6 +24,7 @@ Each date has its own scheduled check at 04:30 UTC (10 am India time). On every 
 - Reply check only.
 
 ## Mon 23 Nov (batch A: due 21 and 22 Nov, moved off the weekend)
+DONE 23 Nov 2026, about 05:15 to 05:35 UTC. All 10 first follow-ups and 14 second-and-final follow-ups sent (one thread each). First follow-ups to full-article sites also asked for a publish date and offered same-day edits (owner asked 22 Nov for faster results). Second-and-final follow-ups gave a 4 December deadline, after which each site is closed if silent. Next check for these: 26 Nov (first follow-ups) and 4 Dec (final-follow-up deadline).
 First follow-ups:
 - ContactCenterWorld: rajw@contactcenterworld.com
 - CX Today: newsdesk@cxtoday.com (full article)
