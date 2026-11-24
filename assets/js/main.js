@@ -291,22 +291,6 @@
         });
     }
 
-    /* Tawk arrives through Tag Manager and may finish loading after its own
-       onLoad hook has run, so check until the launcher is confirmed hidden.
-       Vee (assets/js/chat.js) now owns every .js-live-chat trigger; this stays
-       only until the owner pauses the Tawk tag in Tag Manager, so no stray
-       tawk.to bubble appears beside Vee's own launcher in the meantime. */
-    var tawkTries = 0;
-    var tawkHide = setInterval(function () {
-        var api = window.Tawk_API;
-        if (api && api.isChatHidden && api.hideWidget) {
-            if (!api.isChatHidden()) { api.hideWidget(); }
-            clearInterval(tawkHide);
-        } else if (++tawkTries > 40) {
-            clearInterval(tawkHide);
-        }
-    }, 500);
-
     // Footer newsletter: background submit, inline confirmation
     var newsForm = document.querySelector('.footer-news');
     if (newsForm && window.fetch) {

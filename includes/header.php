@@ -2,21 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<?php /* Tawk.to is injected by Google Tag Manager, not by this codebase, so its
-         own launcher bubble appeared alongside our Live Chat button. Tawk_API has
-         to exist before GTM loads Tawk, because Tawk reads this object on init.
-         hideWidget() suppresses only the bubble; Tawk_API.toggle() still opens
-         the chat window normally. */ ?>
-<script>
-window.Tawk_API = window.Tawk_API || {};
-(function () {
-    var prev = window.Tawk_API.onLoad;
-    window.Tawk_API.onLoad = function () {
-        if (typeof prev === 'function') { prev(); }
-        if (typeof window.Tawk_API.hideWidget === 'function') { window.Tawk_API.hideWidget(); }
-    };
-})();
-</script>
 <!-- Google Tag Manager -->
 <?php /* Tag Manager carries analytics, ads and chat, and was the heaviest thing on
          every page. It starts on the first real interaction, so it never competes

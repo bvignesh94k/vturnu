@@ -108,17 +108,19 @@ $quote_href = $on_article ? '#post-enquiry' : '/contact-us/';
     Get a Free Quote
 </a>
 
-<!-- Desktop-only quick actions: WhatsApp + live chat. The mobile bar below covers phones/tablets. -->
+<!-- Desktop-only WhatsApp button, bottom-left. Vee (assets/js/chat.js) renders its
+     own launcher bottom-right; the old black "Live chat" button that used to sit
+     here opened tawk.to and is gone now that Vee is the one live-chat trigger
+     (owner, 24 Nov 2026: one bubble per side, not three stacked on the right). -->
 <div class="desktop-quick-actions">
     <a class="dqa-btn dqa-wa" href="https://wa.me/919363731498?text=Hi%20VTurnU%2C%20I%27d%20like%20to%20grow%20my%20business.%20Can%20we%20talk%3F" target="_blank" rel="noopener nofollow" aria-label="Chat on WhatsApp">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5s0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>
     </a>
-    <button class="dqa-btn dqa-chat js-live-chat" type="button" aria-label="Open live chat">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.4 5.1 3.7 6.7L5 22l4-1.8c1 .2 2 .3 3 .3 5.5 0 10-3.9 10-8.8S17.5 3 12 3zm-4 10a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>
-    </button>
 </div>
 
-<!-- Sticky mobile action bar: WhatsApp · Get a Quote · Live chat -->
+<!-- Sticky mobile action bar: WhatsApp · Get a Quote. Vee's own launcher floats
+     above this bar on the right (assets/css/chat.css); no separate Live Chat
+     segment here any more, for the same reason as above. -->
 <div class="mobile-bar" role="navigation" aria-label="Quick actions">
     <a class="mb-btn mb-wa" href="https://wa.me/919363731498?text=Hi%20VTurnU%2C%20I%27d%20like%20to%20grow%20my%20business.%20Can%20we%20talk%3F" target="_blank" rel="noopener nofollow" aria-label="Chat on WhatsApp">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5s0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>
@@ -128,10 +130,6 @@ $quote_href = $on_article ? '#post-enquiry' : '/contact-us/';
         <span class="float-dot" aria-hidden="true"></span>
         Get a Quote
     </a>
-    <button class="mb-btn mb-chat js-live-chat" type="button">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.4 5.1 3.7 6.7L5 22l4-1.8c1 .2 2 .3 3 .3 5.5 0 10-3.9 10-8.8S17.5 3 12 3zm-4 10a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>
-        <span>Live Chat</span>
-    </button>
 </div>
 
 <?php if (!$on_article): ?>
