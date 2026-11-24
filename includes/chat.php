@@ -1286,7 +1286,10 @@ function chat_send_email(array $s, string $kind, array $msgs): bool
         'text' => implode("\n", $text),
     ];
     if ($s['email'] !== '') {
-        $payload['reply_to'] = ($s['name'] !== '' ? str_replace(['"', '<', '>'], '', $s['name']) . ' ' : '') . '<' . $s['email'] . '>';
+        /* Resend refuses "<email>" with nothing before the bracket (HTTP 422,
+           found live on the first deploy, 24 Nov 2026): a visitor who gave an
+           email but no name must get the bare address, not a blank name. */
+        $payload['reply_to'] = $s['name'] !== '' ? str_replace(['"', '<', '>'], '', $s['name']) . ' <' . $s['email'] . '>' : $s['email'];
     }
     $r = resend_send($payload);
     if (!$r['ok']) {

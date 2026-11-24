@@ -351,6 +351,18 @@ check('notify succeeds', $notifyResult['ok'] === true);
 check('exactly one email went out', count($GLOBALS['captured_mail']) === 1, (string) count($GLOBALS['captured_mail']));
 $mail = $GLOBALS['captured_mail'][0];
 check('the email goes to connect@ and replies to the visitor', in_array(ENQUIRY_TO, $mail['to'], true) && str_contains($mail['reply_to'], 'priya@gmail.com'), json_encode($mail));
+
+/* Found live on the first deploy (24 Nov 2026): a visitor who gives an email
+   but never a name got reply_to = "<email>", which Resend's API refuses
+   outright (HTTP 422, "Invalid reply_to field"), silently losing the email
+   every other check here missed because they all had a name by this point. */
+$fakeSession = ['id' => 999, 'token' => 'x', 'name' => '', 'email' => 'noname@gmail.com', 'phone' => '', 'company' => '',
+    'website' => '', 'service' => '', 'budget_label' => '', 'timeline' => '', 'intent' => '', 'summary' => '', 'handoff' => false,
+    'country' => '', 'first_page' => '', 'attribution' => '', 'enquiry_id' => 0];
+chat_send_email($fakeSession, 'lead', [['id' => 1, 'role' => 'visitor', 'body' => 'hi', 'created_at' => date('c')]]);
+check('a visitor with no name yet gets a bare reply-to address, not "<email>"', end($GLOBALS['captured_mail'])['reply_to'] === 'noname@gmail.com', json_encode(end($GLOBALS['captured_mail'])['reply_to']));
+chat_send_email(array_merge($fakeSession, ['name' => 'Priya', 'email' => 'priya2@gmail.com']), 'lead', [['id' => 1, 'role' => 'visitor', 'body' => 'hi', 'created_at' => date('c')]]);
+check('a visitor with a name still gets "Name <email>"', end($GLOBALS['captured_mail'])['reply_to'] === 'Priya <priya2@gmail.com>', json_encode(end($GLOBALS['captured_mail'])['reply_to']));
 check('the subject names the lead', str_contains($mail['subject'], 'Priya'), $mail['subject']);
 check('the transcript carries both messages', str_contains($mail['html'], 'new website') && str_contains($mail['html'], 'Happy to help'), 'len=' . strlen($mail['html']));
 
