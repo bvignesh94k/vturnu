@@ -771,43 +771,12 @@ return [
     'kicker' => 'AI assistant',
     'category' => 'Innovation', 'intent' => 'Industry Trends', 'date' => '2026-11-24', 'read' => '10 min',
     'service' => ['/ai-development/', 'AI development'],
-    'sections' => [
-        ['What Vee actually does', [
-            'Click the chat bubble on this page and you are talking to Vee. It is built to handle everything a visitor might open live chat for, not just sales:',
-        ], [
-            'Sales questions across every service VTurnU offers, from a new website to AI search visibility, answered from the site\'s own service pages so Vee never improvises a scope or a figure it is not supposed to',
-            'Prices: the site publishes one number, a minimum budget by country, and Vee holds that line too. No invented package, no hourly rate, ever',
-            'Guest posts, link requests, sponsored posts and partnership pitches: Vee collects the details and hands them to a person. It never accepts, declines or prices one of these in the chat',
-            'Existing clients who need help, and anyone who simply asks to talk to a person, which gets a direct answer and an immediate alert to the team, not a queue',
-        ]],
-        ['Why a paid platform was not the starting point', [
-            'A chat widget like this is usually sold as a monthly subscription, often for a feature set most small sites use a fraction of. We wanted to know what a genuinely useful version would cost on infrastructure that is free at the scale a normal business website actually sees, and whether "free" meant a toy or something that could carry a real sales conversation.',
-            'It carries one. Vee answers through a chain of free-tier AI models: Groq\'s free plan first, Cloudflare Workers AI\'s free daily allocation as a backup, and a plain scripted reply as the last resort if both are unavailable for that minute. A visitor is never told "something went wrong"; worst case, Vee still takes their name and contact details and a person follows up, which is the actual job a chat widget has to do.',
-            'The honest limit is volume: free plans cap how many AI replies a day are possible, somewhere in the low hundreds for the stack we used. Past that cap, Vee drops to the scripted reply until the next day\'s quota resets. For the traffic a small or mid-size business website gets, that ceiling is rarely the bottleneck; for a high-traffic site, the same chain works with a paid key slotted in behind the free one, which is a one-line change, not a rebuild.',
-        ]],
-        ['The honesty rule we built in before anyone asked for it', [
-            'Since 2 August 2026, the EU\'s AI Act has required an AI system to disclose that it is an AI when a person is interacting with it, under Article 50. Vee carries an "AI assistant" label in its own header, says so in its first message, and answers truthfully if a visitor asks whether they are talking to a person.',
-            'The other decision was not legally required, just obvious once you think about what a chat widget actually sees: a visitor\'s email address and phone number never reach the AI model at all. They are found in the visitor\'s message by the server, replaced with a plain placeholder before the model reads anything, and handled separately from that point on. The model that answers a sales question has no reason to see a stranger\'s contact details, so it never does.',
-        ]],
-        ['What happened the first day it went live', [
-            'Vee shipped, answered correctly, and saved every lead to the CRM exactly as designed. The one thing that did not happen was the email telling the team about it. Every single notification was silently rejected by the email provider, for one specific reason: a visitor who gave an email address but had not yet given their name got a malformed "reply to" field, which the provider\'s API refuses outright.',
-            'Nothing about that showed up in the chat itself; the visitor got a normal, helpful reply. It only surfaced because we went looking for the actual email in the inbox it was supposed to reach, found nothing, and pulled the live server logs instead of assuming the silence meant success. That is the part worth naming plainly: a chat widget can look completely fine to the person using it while quietly failing the one job it exists to do for the business running it. We fixed the formatting, confirmed a real email landed, and wrote an automated test for exactly that condition so it cannot happen again unnoticed.',
-        ]],
-        ['A small detail most chat widgets get wrong: the clock', [
-            'Tell a visitor in New York that your team works "9:30 AM to 6:30 PM India time" and you have told them nothing they can use. Vee instead works out what that actually means for the person reading it: an Indian visitor gets the plain hours, and everyone else gets the time difference stated directly, plus what time it genuinely is for the team right now, using the timezone their own browser already reports. It is a small thing to get right, and almost every chat widget we have used does not bother.',
-        ]],
-        ['If your own website could use one of these', [
-            'None of this needed a large budget or a platform subscription: a free AI plan, a database the site already had, and the same email service most small business sites already use for order and lead notifications. That is the version of "AI chat assistant" most businesses actually need: one that answers the real questions their visitors ask, from their own real content, and gets a human involved the moment it should.',
-            'We build this for client sites the same way we built it for our own: scoped to what the business actually sells, trained on its own service pages and FAQs, and kept on free infrastructure for as long as that infrastructure can carry the traffic. There is no price list for it, the same as everything else we build; the site publishes a minimum budget and the rest is quoted after a short call once we know what the chat needs to cover.',
-        ]],
-    ],
-    'takeaways' => [
-        'An AI chat assistant can run on free infrastructure (a free-tier model chain plus a fallback) for the traffic a normal business website sees',
-        'Disclosing that a visitor is talking to an AI is not optional in the EU since 2 August 2026, and it costs nothing to build in from day one',
-        'A visitor\'s contact details can be kept out of the AI model entirely, by redacting them before the model ever sees the message',
-        'Hours and reply times should account for a visitor\'s own timezone, not state a head office\'s clock as if it means something universally',
-        'A chat widget can fail silently at the one job that matters to the business (telling someone a lead arrived) while still looking correct to the visitor; check the actual inbox, not just the chat window',
-    ],
+    /* Rich format: real anchor-text internal links in the body need raw HTML,
+       which the standard sections/takeaways arrays (escaped via e()) cannot
+       carry. See includes/data/posts/introducing-vee-ai-chat-assistant.php. */
+    'rich' => 'introducing-vee-ai-chat-assistant',
+    'sections' => [],
+    'takeaways' => [],
     'faqs' => [
         ['What is Vee?', 'Vee is the AI chat assistant VTurnU built and runs on vturnu.com. It answers visitor questions about VTurnU\'s services from the site\'s own content, collects contact details for enquiries it cannot settle in the chat, and always tells the visitor it is an AI.'],
         ['Is an AI chat widget like this actually free to run?', 'The AI side is, up to a daily volume most business websites do not reach: it uses free plans from more than one AI provider, with a scripted fallback if both are temporarily unavailable. Sending the lead email itself uses a free-tier email service. The hosting and database were already part of running the website.'],

@@ -17,6 +17,9 @@
     var sending = false;
     var opened = false;
     var greeted = false;
+    var LAST_ID_KEY = 'vee_last_id';
+    var lastId = 0;
+    try { lastId = parseInt(localStorage.getItem(LAST_ID_KEY) || '0', 10) || 0; } catch (e) {}
 
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, function (c) {
@@ -48,7 +51,7 @@
     root.innerHTML =
         '<button class="vee-launcher" type="button" aria-expanded="false" aria-label="Chat with ' + escapeHtml(cfg.name) + ', ' + escapeHtml(cfg.label) + '">' +
             '<span class="vee-dot" aria-hidden="true"></span>' +
-            '<svg class="vee-chat-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.7 1.4 5.1 3.7 6.7L5 22l4-1.8c1 .2 2 .3 3 .3 5.5 0 10-3.9 10-8.8S17.5 3 12 3z"/></svg>' +
+            '<img class="vee-chat-ic" src="' + escapeHtml(cfg.avatar) + '" alt="">' +
             '<svg class="vee-close-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
         '</button>' +
         '<div class="vee-teaser" role="button" tabindex="0"><button class="vee-teaser-x" type="button" aria-label="Dismiss">&times;</button><span class="vee-teaser-text"></span></div>' +
@@ -63,7 +66,6 @@
             '</div>' +
             '<div class="vee-body" aria-live="polite"></div>' +
             '<div class="vee-foot">' +
-                '<div class="vee-quick"></div>' +
                 '<form class="vee-form">' +
                     '<label class="vee-honey">Leave this field empty<input type="text" name="hp" tabindex="-1" autocomplete="off"></label>' +
                     '<div class="vee-input-row">' +
@@ -81,7 +83,6 @@
     var launcher = root.querySelector('.vee-launcher');
     var panel = root.querySelector('.vee-panel');
     var body = root.querySelector('.vee-body');
-    var quick = root.querySelector('.vee-quick');
     var form = root.querySelector('.vee-form');
     var input = root.querySelector('.vee-input');
     var sendBtn = root.querySelector('.vee-send');
@@ -96,8 +97,10 @@
     function addRow(role, text, save) {
         var row = document.createElement('div');
         row.className = 'vee-row vee-' + role;
-        var avatar = role === 'vee' ? '<span class="vee-bubble-avatar"><img src="' + escapeHtml(cfg.avatar) + '" alt=""></span>' : '';
-        row.innerHTML = avatar + '<span class="vee-bubble">' + (role === 'system' ? escapeHtml(text) : linkify(text)) + '</span>';
+        var avatar = role === 'vee' ? '<span class="vee-bubble-avatar"><img src="' + escapeHtml(cfg.avatar) + '" alt=""></span>'
+            : role === 'owner' ? '<span class="vee-bubble-avatar vee-owner-avatar" aria-hidden="true">VT</span>' : '';
+        var label = role === 'owner' ? '<b class="vee-owner-name">VTurnU team</b><br>' : '';
+        row.innerHTML = avatar + '<span class="vee-bubble">' + label + (role === 'system' ? escapeHtml(text) : linkify(text)) + '</span>';
         body.appendChild(row);
         scrollDown();
         if (save !== false && role !== 'system') {
@@ -192,6 +195,10 @@
                 sid = res.sid;
                 try { localStorage.setItem(SID_KEY, sid); } catch (e) {}
             }
+            if (res && res.msg_id && res.msg_id > lastId) {
+                lastId = res.msg_id;
+                try { localStorage.setItem(LAST_ID_KEY, String(lastId)); } catch (e) {}
+            }
             var replies = (res && res.ok && res.replies && res.replies.length) ? res.replies
                 : ['Sorry, something went wrong on our side. Please try again, or write to ' + cfg.email + '.'];
             var delay = res && res.ok ? typingDelay(replies[0], elapsed) : 300;
@@ -219,6 +226,30 @@
         }
     }
 
+    /* -------------------- live takeover: the owner's own replies -------- */
+
+    /* While the panel is open, check every few seconds for a reply the owner
+       typed straight into the admin (see includes/chat.php chat_owner_reply()
+       and chat_poll()). Paused when the panel is closed or the tab is in the
+       background, so an abandoned tab does not poll forever. */
+    function poll() {
+        if (!sid || !panel.classList.contains('open') || document.visibilityState !== 'visible') { return; }
+        fetch(cfg.api, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'poll', sid: sid, after: lastId }), credentials: 'omit',
+        }).then(function (r) { return r.json().catch(function () { return null; }); })
+          .then(function (res) {
+            if (!res || !res.ok || !res.messages || !res.messages.length) { return; }
+            res.messages.forEach(function (m) {
+                addRow(m.role, m.body);
+                if (m.id > lastId) { lastId = m.id; }
+            });
+            try { localStorage.setItem(LAST_ID_KEY, String(lastId)); } catch (e) {}
+            if (document.hidden !== true) { launcher.removeAttribute('data-unread'); }
+        }).catch(function () {});
+    }
+    setInterval(poll, 5000);
+
     /* -------------------- open / close -------------------------- */
 
     function openPanel() {
@@ -230,6 +261,7 @@
         if (!history.length) { restoreHistory(); }
         if (!greeted) { greet(); }
         setTimeout(function () { input.focus(); }, 260);
+        poll();
     }
     function closePanel() {
         panel.classList.remove('open');
@@ -258,22 +290,6 @@
     var triggers = document.querySelectorAll('.js-live-chat');
     for (var t = 0; t < triggers.length; t++) {
         triggers[t].addEventListener('click', function (e) { e.preventDefault(); openPanel(); });
-    }
-
-    /* -------------------- quick replies -------------------------- */
-
-    var QUICK = (cfg.quickReplies && cfg.quickReplies.length) ? cfg.quickReplies
-        : ['What does VTurnU do?', 'How much does it cost?', 'I want to talk to someone'];
-    if (!history.length) {
-        QUICK.forEach(function (q) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.textContent = q;
-            b.addEventListener('click', function () { quick.hidden = true; send(q); });
-            quick.appendChild(b);
-        });
-    } else {
-        quick.hidden = true;
     }
 
     /* -------------------- the teaser bubble ----------------------- */

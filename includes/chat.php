@@ -903,7 +903,8 @@ function chat_route(string $slug): bool
 
 /**
  * One request from the widget: send (a message), notify (email the team now
- * that contact details arrived) or end (the visitor left the page).
+ * that contact details arrived), poll (any new reply from the owner, once a
+ * person has taken the chat over) or end (the visitor left the page).
  */
 function chat_handle(array $in): array
 {
@@ -926,11 +927,35 @@ function chat_handle(array $in): array
             }
             return $action === 'end' ? ['status' => 204] : ['ok' => true];
         }
+        if ($action === 'poll') {
+            return chat_poll($sid, (int) ($in['after'] ?? 0));
+        }
         return chat_send($in, $sid);
     } catch (Throwable $e) {
         error_log('chat_handle: ' . $e->getMessage());
         return ['ok' => false, 'error' => 'unavailable'];
     }
+}
+
+/**
+ * What the widget calls every few seconds while its panel is open, to pick
+ * up a reply the owner typed straight into the admin (see chat_owner_reply()).
+ * Only "owner" and "system" rows are new to the visitor; their own messages
+ * and Vee's replies are already on screen from chat_send()'s own response.
+ */
+function chat_poll(string $sid, int $afterId): array
+{
+    if ($sid === '' || !security_rate_ok('chat-poll', 150, 300)) {
+        return ['ok' => false];
+    }
+    $store = chat_store();
+    $s = $store->session($sid);
+    if (!$s) {
+        return ['ok' => false];
+    }
+    $messages = array_values(array_filter($store->messages($s['id'], $afterId),
+        static fn(array $m): bool => in_array($m['role'], ['owner', 'system'], true)));
+    return ['ok' => true, 'messages' => array_map(static fn(array $m): array => ['id' => $m['id'], 'role' => $m['role'], 'body' => $m['body']], $messages)];
 }
 
 /** A visitor's message in, Vee's reply out. */
@@ -1050,7 +1075,7 @@ function chat_send(array $in, string $sid): array
     if ($mode === 'ai') {
         $set['ai_replies'] = $s['ai_replies'] + 1;
     }
-    $store->addMessage($s['id'], 'vee', $reply, ['mode' => $mode, 'model' => $res['model'], 'ms' => $res['ms'],
+    $veeMsgId = $store->addMessage($s['id'], 'vee', $reply, ['mode' => $mode, 'model' => $res['model'], 'ms' => $res['ms'],
         'in' => $res['tokens_in'], 'out' => $res['tokens_out'], 'intent' => $res['intent']]);
     $store->update($s['id'], $set);
 
@@ -1069,7 +1094,42 @@ function chat_send(array $in, string $sid): array
         'notify' => ($urgent || ($hasContact && empty($s['lead_mailed_at']))) && !$spamNow,
         'urgent' => $urgent,
         'mode' => $mode,
+        /* The id of Vee's own reply, so the widget's live-takeover poll (see
+           chat_route()'s 'poll' action) starts looking for a team reply only
+           after this point, never re-delivering what the visitor just read. */
+        'msg_id' => $veeMsgId,
     ];
+}
+
+/* ------------------------------------------------------------------ */
+/* Live takeover: the owner replies inside the same chat               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A reply typed by the owner in the admin, straight into a visitor's chat.
+ * Saved as role "owner" so the widget can tell it apart from Vee's own
+ * replies and from the visitor's own words (see chat_route()'s 'poll'
+ * action and assets/js/chat.js). The first one in a conversation also gets a
+ * short system note, so the visitor knows a real person has joined, not Vee
+ * answering differently.
+ */
+function chat_owner_reply(int $sessionId, string $text): bool
+{
+    $text = trim($text);
+    if ($text === '' || mb_strlen($text) > CHAT_MAX_CHARS) {
+        return false;
+    }
+    $store = chat_store();
+    $s = $store->sessionById($sessionId);
+    if (!$s) {
+        return false;
+    }
+    $hadOwnerReply = (bool) array_filter($store->messages($sessionId), static fn(array $m): bool => $m['role'] === 'owner');
+    if (!$hadOwnerReply) {
+        $store->addMessage($sessionId, 'system', 'A member of the VTurnU team has joined this chat.');
+    }
+    $store->addMessage($sessionId, 'owner', chat_clean_reply($text));
+    return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1332,26 +1392,6 @@ function chat_daily(): array
 /* ------------------------------------------------------------------ */
 
 /** What chat.js needs to know about this page: greeting, teaser, links. */
-/**
- * The opening suggestions under the input box: tailored to the kind of page a
- * visitor is on, so the first thing Vee offers already matches what they are
- * likely looking at, rather than three generic lines on every page.
- */
-function chat_quick_replies(string $kind, string $topic): array
-{
-    return match ($kind) {
-        'service' => [
-            'What does ' . $topic . ' include?',
-            'How long does it take?',
-            'What would this cost?',
-        ],
-        'tool' => ['What should I fix first?', 'Can your team fix this for me?', 'I want to talk to someone'],
-        'case' => ['Can you do this for my business?', 'What would it cost?', 'I want to talk to someone'],
-        'home' => ['What does VTurnU do?', 'How much does it cost?', 'I want to talk to someone'],
-        default => ['What does VTurnU do?', 'How much does it cost?', 'I want to talk to someone'],
-    };
-}
-
 function chat_widget_config(string $slug, array $page): array
 {
     $p = chat_kb_policy();
@@ -1367,13 +1407,12 @@ function chat_widget_config(string $slug, array $page): array
         'greeting' => crm_no_dashes(strtr((string) $p['greeting'], ['{line}' => strtr($line, ['{topic}' => $topic])])),
         'teaser' => $settings['teaser'] && $teaser !== '' ? strtr($teaser, ['{topic}' => $topic]) : '',
         'teaserDelay' => $settings['teaser_delay'],
-        'quickReplies' => chat_quick_replies($kind, $topic),
         'privacy' => '/privacy-policy/',
         'whatsapp' => 'https://wa.me/' . CONTACT_WHATSAPP,
         'email' => CONTACT_EMAIL,
-        /* The "on-dark" mark (lighter strokes) stays readable on the small,
-           flat-dark bubble avatars and on the header's own gradient; the
-           plain mark (saturated strokes) reads muddy at that size on either. */
-        'avatar' => '/assets/img/vturnu-icon-mark-on-dark.svg',
+        /* Vee's own face: a complete circular badge (owner-supplied, 24 Nov
+           2026), used as the launcher icon and every avatar; replaces the
+           abstract VU mark used on the first deploy. */
+        'avatar' => '/assets/img/vee/vee-avatar.png',
     ];
 }

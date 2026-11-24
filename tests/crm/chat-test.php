@@ -314,9 +314,8 @@ check('the widget always carries the AI assistant label', $cfg['label'] === 'AI 
 check('the home greeting invites a question', str_contains($cfg['greeting'], "I'm Vee"));
 $svcCfg = chat_widget_config('seo-services', ['template' => 'service', 'h1' => 'Search Engine Optimization Services']);
 check('a service page greeting names the topic', str_contains($svcCfg['greeting'], 'search engine optimization') || str_contains($svcCfg['greeting'], 'SEO'), $svcCfg['greeting']);
-check('a service page gets quick replies naming the topic', str_contains($svcCfg['quickReplies'][0], 'include'), json_encode($svcCfg['quickReplies']));
-check('a tool page gets its own quick replies', chat_widget_config('free-seo-audit', ['template' => 'audit'])['quickReplies'][0] === 'What should I fix first?');
-check('the avatar is the on-dark mark, legible on a coloured backdrop', str_contains($cfg['avatar'], 'icon-mark-on-dark'));
+check('the widget carries no pre-written quick replies', !array_key_exists('quickReplies', $cfg));
+check('the avatar is Vee\'s own face', str_contains($cfg['avatar'], 'vee-avatar'));
 
 /* ---------------- team hours mean something outside India too ---------------- */
 
@@ -403,6 +402,22 @@ $noContactSession = chat_store()->session($n1['sid']);
 chat_deliver($noContactSession, 'cron');
 check('the no-contact chat is emailed once there are two messages', count($GLOBALS['captured_mail']) === 1, (string) count($GLOBALS['captured_mail']));
 check('a no-contact email says so in the subject', str_contains($GLOBALS['captured_mail'][0]['subject'], 'no contact details'));
+
+/* ---------------- live takeover: the owner replies straight into the chat ---------------- */
+
+chat_reset();
+$GLOBALS['CHAT_HTTP'] = chat_test_http([chat_test_ok('Happy to help with your website.')]);
+$lt1 = chat_send(['text' => 'Hi, I need a new website', 'page' => '/web-design/', 'title' => 'Website Design'], '');
+check('a sent message carries the id of Vee\'s own reply', $lt1['msg_id'] > 0, json_encode($lt1));
+$ltSession = chat_store()->session($lt1['sid']);
+check('chat_owner_reply() saves the owner\'s message', chat_owner_reply($ltSession['id'], 'Hi, this is the VTurnU team, happy to help directly.'));
+check('the first owner reply also drops a short system note', (bool) array_filter(chat_store()->messages($ltSession['id']), static fn(array $m): bool => $m['role'] === 'system'));
+$ltPoll = chat_poll($lt1['sid'], $lt1['msg_id']);
+check('polling after Vee\'s message id returns the owner\'s reply, not Vee\'s own one', $ltPoll['ok'] && count($ltPoll['messages']) === 2
+    && $ltPoll['messages'][0]['role'] === 'system' && $ltPoll['messages'][1]['role'] === 'owner', json_encode($ltPoll));
+check('polling again after those ids returns nothing new', chat_poll($lt1['sid'], (int) end($ltPoll['messages'])['id'])['messages'] === []);
+check('polling an unknown session is refused', chat_poll('0000000000000000000000000000000', 0)['ok'] === false);
+check('an empty owner reply is refused', !chat_owner_reply($ltSession['id'], '   '));
 
 /* ---------------- guards ---------------- */
 

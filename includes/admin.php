@@ -447,6 +447,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $flash = 'Chat assistant settings saved.';
                 break;
 
+            /* Live takeover: a reply typed here lands straight in the
+               visitor's own chat window within a few seconds (chat_poll()). */
+            case 'chat_reply':
+                $ccid = (int) ($_POST['id'] ?? 0);
+                $csent = chat_owner_reply($ccid, (string) ($_POST['text'] ?? '')) ? '1' : '0';
+                header('Location: /admin/?view=chat&id=' . $ccid . '&sent=' . $csent); exit;
+
             case 'digest_now':
                 $d = crm_daily_digest(true);
                 $flash = $d['sent'] ? 'Digest sent to ' . ENQUIRY_TO . '.' : 'The digest could not be sent. Check that email is set up.';
@@ -1691,6 +1698,9 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
     <?php else: ?>
         <p class="sub"><a href="/admin/?view=chats">← Live chats</a></p>
         <h1>Chat with <?= e_a($chat_s['name'] ?: 'a visitor') ?></h1>
+        <?php if (isset($_GET['sent'])): ?>
+        <div class="flash"><?= $_GET['sent'] === '1' ? '✓ Sent. It will appear in the visitor\'s chat within a few seconds.' : 'Could not send that reply. Try again.' ?></div>
+        <?php endif; ?>
         <div class="cards" style="grid-template-columns:1fr 1fr">
             <div class="panel" style="margin:0">
                 <h2>Visitor</h2>
@@ -1715,12 +1725,33 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         </div>
         <div class="panel">
             <h2>Conversation</h2>
-            <?php foreach ($chat_msgs as $m): $mine = $m['role'] === 'visitor'; ?>
-            <div style="max-width:560px;margin:0 0 10px<?= $mine ? '' : ' auto' ?>;background:<?= $mine ? '#F5F4FE' : '#fff' ?>;border:1px solid var(--line);border-radius:10px;padding:9px 12px">
-                <div style="font-size:.78rem;color:var(--muted);margin-bottom:3px"><strong style="color:<?= $mine ? 'var(--ink)' : 'var(--p)' ?>"><?= $mine ? e_a($chat_s['name'] ?: 'Visitor') : 'Vee (AI)' ?></strong> · <?= e_a(date('j M, g:i a', strtotime((string) $m['created_at']))) ?></div>
+            <?php foreach ($chat_msgs as $m):
+                $mine = $m['role'] === 'visitor';
+                $who = match ($m['role']) {
+                    'visitor' => $chat_s['name'] ?: 'Visitor',
+                    'owner' => 'You (team)',
+                    'system' => '',
+                    default => 'Vee (AI)',
+                }; ?>
+            <?php if ($m['role'] === 'system'): ?>
+            <p class="note" style="text-align:center;margin:10px 0"><?= e_a((string) $m['body']) ?></p>
+            <?php else: ?>
+            <div style="max-width:560px;margin:0 0 10px<?= $mine ? '' : ' auto' ?>;background:<?= $mine ? '#F5F4FE' : ($m['role'] === 'owner' ? '#EAF7F0' : '#fff') ?>;border:1px solid var(--line);border-radius:10px;padding:9px 12px">
+                <div style="font-size:.78rem;color:var(--muted);margin-bottom:3px"><strong style="color:<?= $mine ? 'var(--ink)' : 'var(--p)' ?>"><?= e_a($who) ?></strong> · <?= e_a(date('j M, g:i a', strtotime((string) $m['created_at']))) ?></div>
                 <div style="white-space:pre-wrap;word-break:break-word"><?= nl2br(e_a((string) $m['body'])) ?></div>
             </div>
+            <?php endif; ?>
             <?php endforeach; if (!$chat_msgs): ?><p class="note">No messages.</p><?php endif; ?>
+            <?php if ($chat_s['status'] !== 'spam'): ?>
+            <form method="post" style="margin-top:14px;display:flex;gap:8px;align-items:flex-end">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <input type="hidden" name="action" value="chat_reply">
+                <input type="hidden" name="id" value="<?= (int) $chat_s['id'] ?>">
+                <textarea name="text" rows="2" maxlength="1000" placeholder="Reply as yourself, right in this visitor's chat..." required style="flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;resize:vertical"></textarea>
+                <button class="btn grad" type="submit">Send to chat</button>
+            </form>
+            <p class="note" style="margin-top:6px">Your reply shows up in their chat window as "VTurnU team" within a few seconds, while they still have it open.</p>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 
