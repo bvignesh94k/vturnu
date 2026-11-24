@@ -25,7 +25,7 @@ return [
     'meta' => 'Google\'s November 2026 core update ran from 10 to 24 November. What it is, when to check your traffic and what to do if rankings dropped.',
     'h1' => 'Google November 2026 Core Update: What It Is and What to Do',
     'short' => 'November 2026 core update',
-    'lede' => 'Google started the November 2026 core update on 10 November 2026 at 10:06 a.m. Pacific time (11:36 p.m. in India) and confirmed it finished on 24 November 2026 at 6:03 a.m. Pacific time (7:33 p.m. in India), about 14 days later. It applied to every country and language. A core update is a broad change to how Google ranks pages, not a penalty, and Google published no new guidance with it. Wait one more full week, then compare a full week of Search Console data after the rollout with the week before 10 November.',
+    'lede' => 'What happened: Google rolled out its November 2026 core update from 10 November (10:06 a.m. Pacific time) to 24 November 2026 (6:03 a.m. Pacific time), about 14 days, worldwide and in every language. The core message: this was a broad re-ranking, not a penalty, and Google gave no new guidance. If your traffic moved, do not rewrite pages in a hurry. Wait until after 1 December, compare 25 November to 1 December with 3 to 9 November in Search Console, and improve only the pages that lost ground.',
     'type' => 'Core update',
     'status' => 'complete',
     'started' => '2026-11-10',
