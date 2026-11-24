@@ -80,13 +80,19 @@ const ADMIN_PRIORITIES = ['low', 'normal', 'high'];
 const ADMIN_SEG_AUDIT  = ['seo-audit', 'audit-consultation'];
 const ADMIN_SEG_EBOOK  = ['resource'];
 const ADMIN_SEG_SIGNUP = ['newsletter'];
+/* Guest posts, link requests, sponsored posts, partnerships, careers and
+   vendor pitches that arrived through the live chat: reviewed by the team,
+   never counted as a sales lead (owner, 24 Nov 2026: "collect details, team
+   decides"). */
+const ADMIN_SEG_OUTREACH = ['live-chat-outreach'];
 
-/** Which admin section a lead belongs to: audit, ebook, newsletter or lead. */
+/** Which admin section a lead belongs to: audit, ebook, newsletter, outreach or lead. */
 function lead_segment(array $l): string {
     $s = $l['source'] ?? '';
-    if (in_array($s, ADMIN_SEG_AUDIT, true))  return 'audit';
-    if (in_array($s, ADMIN_SEG_EBOOK, true))  return 'ebook';
-    if (in_array($s, ADMIN_SEG_SIGNUP, true)) return 'newsletter';
+    if (in_array($s, ADMIN_SEG_AUDIT, true))    return 'audit';
+    if (in_array($s, ADMIN_SEG_EBOOK, true))    return 'ebook';
+    if (in_array($s, ADMIN_SEG_SIGNUP, true))   return 'newsletter';
+    if (in_array($s, ADMIN_SEG_OUTREACH, true)) return 'outreach';
     return 'lead';
 }
 
@@ -436,6 +442,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $flash = 'CRM settings saved.';
                 break;
 
+            case 'chat_settings':
+                chat_save_settings($_POST);
+                $flash = 'Chat assistant settings saved.';
+                break;
+
             case 'digest_now':
                 $d = crm_daily_digest(true);
                 $flash = $d['sent'] ? 'Digest sent to ' . ENQUIRY_TO . '.' : 'The digest could not be sent. Check that email is set up.';
@@ -707,6 +718,15 @@ $leads = $logged_in ? admin_load_leads() : [];
 $junk_leads = $logged_in ? admin_load_leads(true) : [];
 /* The latest proposal for each lead, so lists and the dashboard can show where it stands. */
 $proposal_index = $logged_in ? crm_proposal_index() : [];
+/* Live chat: conversations that have said anything, newest first. */
+$chat_sessions = [];
+if ($logged_in && in_array($view, ['dashboard', 'chats', 'chat'], true)) {
+    try {
+        $chat_sessions = chat_store()->recent(300);
+    } catch (Throwable $e) {
+        error_log('admin chats: ' . $e->getMessage());
+    }
+}
 $custom_posts = admin_get_overrides('blog');
 $custom_cases = admin_get_overrides('case');
 $custom_resources = admin_get_overrides('resource');
@@ -982,6 +1002,8 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
         <div class="side-sub">CRM & Content</div>
         <a class="nav<?= $view === 'dashboard' ? ' on' : '' ?>" href="/admin/?view=dashboard">Dashboard</a>
         <a class="nav<?= in_array($view, ['leads', 'lead'], true) ? ' on' : '' ?>" href="/admin/?view=leads">Sales leads</a>
+        <a class="nav<?= in_array($view, ['chats', 'chat'], true) ? ' on' : '' ?>" href="/admin/?view=chats">Live chats (Vee)</a>
+        <a class="nav<?= $view === 'outreach' ? ' on' : '' ?>" href="/admin/?view=outreach">Outreach<?= ($n = count(leads_in($leads, 'outreach'))) ? ' (' . $n . ')' : '' ?></a>
         <a class="nav<?= in_array($view, ['meetings', 'meeting'], true) ? ' on' : '' ?>" href="/admin/?view=meetings">Meetings</a>
         <a class="nav<?= $view === 'junk' ? ' on' : '' ?>" href="/admin/?view=junk">Junk filter<?= $junk_leads ? ' (' . count($junk_leads) . ')' : '' ?></a>
         <a class="nav<?= $view === 'audits' ? ' on' : '' ?>" href="/admin/?view=audits">Audit requests</a>
@@ -1175,6 +1197,8 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             <a class="kpi kpi-link" href="/admin/?view=audits"><b><?= count(leads_in($leads, 'audit')) ?></b><span>Audit requests</span></a>
             <a class="kpi kpi-link" href="/admin/?view=downloads"><b><?= count(leads_in($leads, 'ebook')) ?></b><span>E-book downloads</span></a>
             <a class="kpi kpi-link" href="/admin/?view=subscribers"><b><?= count(leads_in($leads, 'newsletter')) ?></b><span>Subscribers</span></a>
+            <a class="kpi kpi-link" href="/admin/?view=chats"><b><?= count($chat_sessions) ?></b><span>Live chats</span></a>
+            <a class="kpi kpi-link" href="/admin/?view=outreach"><b><?= count(leads_in($leads, 'outreach')) ?></b><span>Outreach</span></a>
         </div>
 
         <div class="panel">
@@ -1587,6 +1611,118 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 </tbody>
             </table>
         </div>
+
+    <?php elseif ($view === 'outreach'):
+        $scope = leads_in($leads, 'outreach');
+        usort($scope, fn($a, $b) => strtotime((string) ($b['date'] ?? 'now')) <=> strtotime((string) ($a['date'] ?? 'now')));
+    ?>
+        <h1>Outreach</h1>
+        <p class="sub">Guest posts, link requests, sponsored posts, partnerships, careers and vendor pitches that came in through the live chat (Vee, AI assistant). Vee never accepts, refuses or quotes a price; every one of these is yours to decide.</p>
+        <div class="panel">
+            <table>
+                <thead><tr><th>When</th><th>Contact</th><th>About</th><th>Message</th><th></th></tr></thead>
+                <tbody>
+                <?php foreach ($scope as $l): ?>
+                    <tr>
+                        <td style="white-space:nowrap"><?= e_a(date('j M', strtotime($l['date'] ?? 'now'))) ?><br><small style="color:var(--muted)"><?= e_a(date('H:i', strtotime($l['date'] ?? 'now'))) ?></small></td>
+                        <td><strong><?= e_a($l['name'] ?? '') ?></strong><?= $l['company'] !== '' ? '<br><small style="color:var(--muted)">' . e_a(mb_substr($l['company'], 0, 44)) . '</small>' : '' ?><br><small style="color:var(--muted)"><?= e_a($l['email'] ?? $l['mobile'] ?? '') ?></small></td>
+                        <td><?= e_a($l['service'] ?: 'Not specified') ?></td>
+                        <td style="max-width:360px"><small><?= nl2br(e_a(mb_substr((string) preg_replace('/^Lead grade:.*?\n\n/s', '', (string) $l['message']), 0, 220))) ?></small></td>
+                        <td><a class="btn ghost sm" href="/admin/?view=lead&id=<?= e_a($l['id']) ?>">Open</a></td>
+                    </tr>
+                <?php endforeach; if (!$scope): ?><tr><td colspan="5">Nothing yet.</td></tr><?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+    <?php elseif ($view === 'chats'):
+        $f_q = trim($_GET['q'] ?? '');
+        $filtered = array_values(array_filter($chat_sessions, function (array $s) use ($f_q) {
+            if ($f_q === '') return true;
+            $hay = strtolower($s['name'] . ' ' . $s['email'] . ' ' . $s['phone'] . ' ' . $s['company'] . ' ' . $s['summary']);
+            return str_contains($hay, strtolower($f_q));
+        }));
+        $needsReply = count(array_filter($chat_sessions, fn($s) => $s['handoff'] && $s['status'] !== 'spam'));
+    ?>
+        <h1>Live chats</h1>
+        <p class="sub">Every conversation with Vee, VTurnU's AI assistant, newest first. A chat becomes a lead the moment a visitor leaves an email or phone number.</p>
+        <div class="cards">
+            <div class="kpi grad"><b><?= count($chat_sessions) ?></b><span>Conversations</span></div>
+            <div class="kpi"><b><?= count(array_filter($chat_sessions, fn($s) => (bool) $s['enquiry_id'])) ?></b><span>Became leads</span></div>
+            <div class="kpi"><b><?= $needsReply ?></b><span>Vee could not answer</span></div>
+        </div>
+        <form class="filters" method="get" action="/admin/">
+            <input type="hidden" name="view" value="chats">
+            <input type="search" name="q" placeholder="Search name, email, phone…" value="<?= e_a($f_q) ?>" style="width:280px">
+            <button class="btn ghost" type="submit">Search</button>
+            <?php if ($f_q !== ''): ?><a class="btn ghost" href="/admin/?view=chats">Clear</a><?php endif; ?>
+        </form>
+        <div class="panel">
+            <table>
+                <thead><tr><th>When</th><th>Visitor</th><th>Page</th><th>About</th><th>Messages</th><th></th></tr></thead>
+                <tbody>
+                <?php foreach ($filtered as $s): ?>
+                    <tr>
+                        <td style="white-space:nowrap"><?= e_a(date('j M, H:i', strtotime((string) $s['updated_at']))) ?></td>
+                        <td><strong><?= e_a($s['name'] ?: 'Not given') ?></strong><br><small style="color:var(--muted)"><?= e_a($s['email'] ?: $s['phone'] ?: 'No contact details') ?></small></td>
+                        <td><small><?= e_a(mb_substr($s['first_page'], 0, 40)) ?></small></td>
+                        <td><?= e_a(CHAT_INTENT_LABELS[$s['intent']] ?? 'General question') ?><?= $s['handoff'] ? ' <span style="color:#C22349;font-weight:800">needs reply</span>' : '' ?></td>
+                        <td style="text-align:right"><?= (int) $s['visitor_msgs'] ?></td>
+                        <td><a class="btn ghost sm" href="/admin/?view=chat&id=<?= (int) $s['id'] ?>">Open</a><?php if ($s['enquiry_id']): ?> <a class="btn ghost sm" href="/admin/?view=lead&id=<?= (int) $s['enquiry_id'] ?>">Lead</a><?php endif; ?></td>
+                    </tr>
+                <?php endforeach; if (!$filtered): ?><tr><td colspan="6">No chats yet.</td></tr><?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+    <?php elseif ($view === 'chat'):
+        $cid = (int) ($_GET['id'] ?? 0);
+        $chat_s = null;
+        $chat_msgs = [];
+        try {
+            $chat_s = $cid > 0 ? chat_store()->sessionById($cid) : null;
+            $chat_msgs = $chat_s ? chat_store()->messages($cid) : [];
+        } catch (Throwable $e) {
+            error_log('admin chat view: ' . $e->getMessage());
+        }
+        if (!$chat_s): ?>
+        <h1>Chat not found</h1>
+        <p class="sub"><a href="/admin/?view=chats">← Live chats</a></p>
+    <?php else: ?>
+        <p class="sub"><a href="/admin/?view=chats">← Live chats</a></p>
+        <h1>Chat with <?= e_a($chat_s['name'] ?: 'a visitor') ?></h1>
+        <div class="cards" style="grid-template-columns:1fr 1fr">
+            <div class="panel" style="margin:0">
+                <h2>Visitor</h2>
+                <table><tbody>
+                    <?php foreach (['Name' => $chat_s['name'], 'Email' => $chat_s['email'], 'Phone / WhatsApp' => $chat_s['phone'], 'Company' => $chat_s['company'],
+                                     'Website' => $chat_s['website'], 'Service' => $chat_s['service'], 'About' => CHAT_INTENT_LABELS[$chat_s['intent']] ?? '',
+                                     'Budget' => $chat_s['budget_label'], 'Timeline' => $chat_s['timeline'],
+                                     'Country' => $chat_s['country'] !== '' ? (country_names()[$chat_s['country']] ?? $chat_s['country']) : '',
+                                     'Started on' => $chat_s['first_page']] as $label => $val): if ($val === '') continue; ?>
+                    <tr><td style="color:var(--muted);white-space:nowrap;padding-right:8px"><?= e_a($label) ?></td><td><?= e_a($val) ?></td></tr>
+                    <?php endforeach; ?>
+                </tbody></table>
+                <?php if ($chat_s['summary'] !== ''): ?><p class="note" style="margin-top:10px"><strong>In short:</strong> <?= e_a($chat_s['summary']) ?></p><?php endif; ?>
+                <?php if ($chat_s['handoff']): ?><p class="note" style="margin-top:6px;color:#C22349;font-weight:700">Vee could not answer something here and promised a reply from the team.</p><?php endif; ?>
+                <?php if ($chat_s['enquiry_id']): ?><p style="margin-top:10px"><a class="btn grad sm" href="/admin/?view=lead&id=<?= (int) $chat_s['enquiry_id'] ?>">Open the lead</a></p><?php endif; ?>
+            </div>
+            <div class="panel" style="margin:0">
+                <h2>How they found this</h2>
+                <?php $chat_attr = $chat_s['attribution'] !== '' ? crm_attribution(['attribution' => $chat_s['attribution'], 'from_page' => $chat_s['first_page'], 'lead_source' => 'live-chat']) : []; ?>
+                <p class="note"><?= $chat_attr ? e_a(crm_source_line($chat_attr)) : 'Not tracked.' ?></p>
+            </div>
+        </div>
+        <div class="panel">
+            <h2>Conversation</h2>
+            <?php foreach ($chat_msgs as $m): $mine = $m['role'] === 'visitor'; ?>
+            <div style="max-width:560px;margin:0 0 10px<?= $mine ? '' : ' auto' ?>;background:<?= $mine ? '#F5F4FE' : '#fff' ?>;border:1px solid var(--line);border-radius:10px;padding:9px 12px">
+                <div style="font-size:.78rem;color:var(--muted);margin-bottom:3px"><strong style="color:<?= $mine ? 'var(--ink)' : 'var(--p)' ?>"><?= $mine ? e_a($chat_s['name'] ?: 'Visitor') : 'Vee (AI)' ?></strong> · <?= e_a(date('j M, g:i a', strtotime((string) $m['created_at']))) ?></div>
+                <div style="white-space:pre-wrap;word-break:break-word"><?= nl2br(e_a((string) $m['body'])) ?></div>
+            </div>
+            <?php endforeach; if (!$chat_msgs): ?><p class="note">No messages.</p><?php endif; ?>
+        </div>
+    <?php endif; ?>
 
     <?php elseif ($view === 'lead'):
         $lead = null;
@@ -2964,6 +3100,25 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
             </div>
             <label style="margin-top:16px">Signature on every client email</label>
             <div class="mail-preview" style="max-height:none;padding:16px 18px"><?= crm_signature_html($crm_cfg, 'IN') ?></div>
+        </div>
+        <?php $chat_cfg = chat_settings(); ?>
+        <div class="panel" style="max-width:720px" id="chat">
+            <h2>Chat assistant (Vee)</h2>
+            <p class="note" style="margin:0 0 6px">Vee answers visitors from free AI plans (Groq, then Cloudflare Workers AI) and always says it is an AI assistant. When the free daily limit is reached, or Vee is turned off below, the chat still takes a message and emails <strong><?= e_a(ENQUIRY_TO) ?></strong>, so a chat never goes unanswered.</p>
+            <p class="note" style="margin:0 0 6px">AI keys: <?= env_var('GROQ_API_KEY', '') !== '' ? '<strong style="color:#12A150">Groq connected</strong>' : '<strong style="color:#C22349">Groq not connected</strong>' ?> · <?= env_var('CF_ACCOUNT_ID', '') !== '' && env_var('CF_API_TOKEN', '') !== '' ? '<strong style="color:#12A150">Cloudflare connected</strong>' : '<strong style="color:var(--muted)">Cloudflare not connected (optional backup)</strong>' ?></p>
+            <form method="post">
+                <input type="hidden" name="action" value="chat_settings">
+                <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                <div class="opts" style="display:grid;gap:8px">
+                    <label class="chk"><input type="checkbox" name="enabled" value="1"<?= $chat_cfg['enabled'] ? ' checked' : '' ?>> Vee answers with AI (untick to only take messages for the team)</label>
+                    <label class="chk"><input type="checkbox" name="teaser" value="1"<?= $chat_cfg['teaser'] ? ' checked' : '' ?>> Show a small invitation bubble on the home page and service pages</label>
+                    <label class="chk">Delay before the bubble appears: <input type="number" name="teaser_delay" min="5" max="300" value="<?= (int) $chat_cfg['teaser_delay'] ?>" style="width:70px;padding:4px 8px"> seconds</label>
+                    <label class="chk"><input type="checkbox" name="nocontact_email" value="1"<?= $chat_cfg['nocontact_email'] ? ' checked' : '' ?>> Also email <?= e_a(ENQUIRY_TO) ?> for chats with no contact details, once the visitor sends 2 or more messages</label>
+                    <label class="chk">Most AI replies allowed per day, across every chat: <input type="number" name="daily_cap" min="0" max="5000" value="<?= (int) $chat_cfg['daily_cap'] ?>" style="width:80px;padding:4px 8px"></label>
+                </div>
+                <br><button class="btn grad" type="submit">Save</button>
+            </form>
+            <p style="margin-top:12px"><a class="btn ghost" href="/admin/?view=chats">Open live chats ↗</a> <a class="btn ghost" href="/admin/?view=outreach">Open outreach ↗</a></p>
         </div>
         <?php $bk_cfg = booking_settings(); ?>
         <div class="panel" style="max-width:720px" id="booking">

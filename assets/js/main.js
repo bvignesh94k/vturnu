@@ -292,7 +292,10 @@
     }
 
     /* Tawk arrives through Tag Manager and may finish loading after its own
-       onLoad hook has run, so check until the launcher is confirmed hidden. */
+       onLoad hook has run, so check until the launcher is confirmed hidden.
+       Vee (assets/js/chat.js) now owns every .js-live-chat trigger; this stays
+       only until the owner pauses the Tawk tag in Tag Manager, so no stray
+       tawk.to bubble appears beside Vee's own launcher in the meantime. */
     var tawkTries = 0;
     var tawkHide = setInterval(function () {
         var api = window.Tawk_API;
@@ -303,27 +306,6 @@
             clearInterval(tawkHide);
         }
     }, 500);
-
-    // Live chat: every trigger (desktop buttons + mobile bar) opens the real
-    // Tawk.to widget. If Tawk hasn't finished loading yet, queue the toggle
-    // for the moment it does rather than doing nothing on a fast click.
-    var liveChatButtons = document.querySelectorAll('.js-live-chat');
-    if (liveChatButtons.length) {
-        var openLiveChat = function () {
-            if (window.Tawk_API && typeof Tawk_API.toggle === 'function') {
-                Tawk_API.toggle();
-            } else if (window.Tawk_API) {
-                var prevOnLoad = Tawk_API.onLoad;
-                Tawk_API.onLoad = function () {
-                    if (typeof prevOnLoad === 'function') prevOnLoad();
-                    Tawk_API.toggle();
-                };
-            }
-        };
-        liveChatButtons.forEach(function (btn) {
-            btn.addEventListener('click', openLiveChat);
-        });
-    }
 
     // Footer newsletter: background submit, inline confirmation
     var newsForm = document.querySelector('.footer-news');

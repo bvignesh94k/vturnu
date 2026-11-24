@@ -132,6 +132,7 @@ $noindex = $slug === '__404__' || !empty($page['noindex']); ?>
          the whole sheet inside every page's HTML. ?v= busts the cache on edit. */
 $css_v = asset_v('/assets/css/style.css'); ?>
 <link rel="stylesheet" href="/assets/css/style.css?v=<?= $css_v ?>">
+<link rel="stylesheet" href="/assets/css/chat.css?v=<?= asset_v('/assets/css/chat.css') ?>">
 <?php /* Homepage-only sheet. Every rule inside is scoped under .hp, so it
          cannot reach any other template. */
 if ($slug === ""):

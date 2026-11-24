@@ -488,8 +488,14 @@ $db->bookingSettings = [];
 booking_settings(true);
 $schema = (string) file_get_contents('/site/db/schema.sql');
 $own = (string) file_get_contents('/site/includes/booking-schema.sql');
-$from = static fn(string $s): string => trim(substr($s, (int) strpos($s, 'create table if not exists meetings')));
-check('includes/booking-schema.sql matches db/schema.sql', $from($schema) === $from($own) && str_contains($own, 'exclude using gist'));
+/* The booking block in db/schema.sql ends where the next feature's own block
+   begins (today, Vee's chat tables); bound the slice there instead of running
+   to end of file, so appending another feature after it never breaks this. */
+$bookingStart = (int) strpos($schema, 'create table if not exists meetings');
+$nextBlock = strpos($schema, "\n-- Vee, the AI chat assistant", $bookingStart);
+$bookingSlice = $nextBlock !== false ? substr($schema, $bookingStart, $nextBlock - $bookingStart) : substr($schema, $bookingStart);
+$ownSlice = trim(substr($own, (int) strpos($own, 'create table if not exists meetings')));
+check('includes/booking-schema.sql matches db/schema.sql', trim($bookingSlice) === $ownSlice && str_contains($own, 'exclude using gist'));
 $sig = crm_signature_html(crm_settings(), 'IN') . crm_email_html('x', 'Hi there,', crm_settings(), str_repeat('a', 32), str_repeat('a', 32));
 check('CRM signature and proposal button are Gmail-safe', $gmailSafe($sig) && str_contains($sig, 'bgcolor="#4338CA"'));
 check('signature shows the WhatsApp logo (owner, 9 Nov 2026)', str_contains($sig, '/assets/img/email/sig-whatsapp-logo.png'));

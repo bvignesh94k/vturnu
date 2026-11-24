@@ -154,5 +154,15 @@ $quote_href = $on_article ? '#post-enquiry' : '/contact-us/';
 <script src="/assets/js/home.js?v=<?= $home_js_v ?>" defer></script>
 <?php endif; ?>
 
+<?php /* Vee, the AI live chat. chat_widget_config() (includes/chat.php) carries
+         the greeting, teaser and label for this page; chat.js builds the whole
+         widget from it, so a slow or blocked script just means no widget, not
+         a broken page. Skipped on noindex utility pages and the admin's own
+         views, which never include this file. */
+if (empty($page['noindex']) && function_exists('chat_widget_config')): ?>
+<script>window.VEE_CONFIG = <?= json_encode(chat_widget_config($slug ?? '', $page ?? []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>;</script>
+<script src="/assets/js/chat.js?v=<?= asset_v('/assets/js/chat.js') ?>" defer></script>
+<?php endif; ?>
+
 </body>
 </html>

@@ -443,11 +443,35 @@ function enquiry_qualify(array $post): array
 
 function save_enquiry(array $post, string $source): bool
 {
+    return save_enquiry_full($post, $source)['ok'];
+}
+
+/**
+ * The full form a caller may need: the lead id (so it can be logged or linked
+ * to), and the choice to skip the inbox email or the acknowledgement because
+ * the caller sends its own (the live chat does both, in one email, see
+ * includes/chat.php chat_save_lead()).
+ *
+ * @param array{mail?:bool,ack?:bool,allow_phone_only?:bool,signals?:array,activity?:string} $o
+ *   mail: send mail_enquiry() to the sales inbox (default true, as before).
+ *   ack: send crm_auto_ack() when the verdict is ok (default: as crm_auto_ack()
+ *     itself decides, from the source list in includes/crm.php).
+ *   allow_phone_only: accept a lead with a valid phone and no email (the lead
+ *     form itself always has an email; the live chat may not).
+ *   signals: extra lead_screen() signals, such as ['outreach' => true] to
+ *     relax the vendor-pitch and cold-outreach phrases for an enquiry the
+ *     visitor asked for themselves (a guest post or link request).
+ *   activity: one more line appended to the lead's timeline after it saves.
+ * @return array{ok:bool,id:int,verdict:string}
+ */
+function save_enquiry_full(array $post, string $source, array $o = []): array
+{
     $honeypot = trim($post['website'] ?? '');
     $name  = trim($post['name'] ?? '');
     $email = trim($post['email'] ?? '');
-    if ($honeypot !== '' || $name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return false;
+    $phoneOk = !empty($o['allow_phone_only']) && trim((string) ($post['mobile'] ?? ($post['phone'] ?? ''))) !== '';
+    if ($honeypot !== '' || $name === '' || (!filter_var($email, FILTER_VALIDATE_EMAIL) && !$phoneOk)) {
+        return ['ok' => false, 'id' => 0, 'verdict' => 'rejected'];
     }
     /* The country code arrives from its own <select>, so store the full
        E.164-style number rather than a bare local one. Skip the prefix if
@@ -473,10 +497,10 @@ function save_enquiry(array $post, string $source): bool
 
     /* Quality screen. Everything is stored; only what passes reaches the sales
        inbox. Junk keeps status 'junk' so the admin Junk view can restore it. */
-    $screen = lead_screen($entry + ['raw_message' => $post['raw_message'] ?? null], $source, true, [
+    $screen = lead_screen($entry + ['raw_message' => $post['raw_message'] ?? null], $source, true, array_merge([
         'hx' => (string) ($post['_hx'] ?? ''),
         'captcha' => $GLOBALS['recaptcha_signal'] ?? null,
-    ]);
+    ], (array) ($o['signals'] ?? [])));
     $status = $screen['verdict'] === 'junk' ? 'junk' : 'new';
     $tags = $screen['verdict'] === 'ok' ? '' : ($screen['verdict'] === 'junk' ? 'auto-junk' : 'check-first');
     $activity = json_encode([[
@@ -518,14 +542,21 @@ function save_enquiry(array $post, string $source): bool
         error_log('save_enquiry: DB insert failed: ' . $e->getMessage());
     }
 
+    $id = (int) ($entry['id'] ?? 0);
+    if ($stored && $id > 0 && !empty($o['activity']) && function_exists('crm_log')) {
+        crm_log($id, (string) $o['activity']);
+    }
+
     /* A junk verdict skips the inbox, unless the database failed too: then the
        email is the only copy, and a false positive must not vanish. */
     if ($screen['verdict'] === 'junk' && $stored) {
-        return true;
+        return ['ok' => true, 'id' => $id, 'verdict' => $screen['verdict']];
     }
     $entry['quality'] = $screen;
     $entry['not_stored'] = !$stored;
-    $emailed = mail_enquiry($entry);
+    /* A caller that sends its own notification (the live chat, one email for
+       both the lead and the conversation) passes mail => false. */
+    $emailed = (bool) ($o['mail'] ?? true) ? mail_enquiry($entry) : true;
 
     /* A lead survives if it reached the database or the sales inbox. If
        neither worked, say so, because the alternative is what happened
@@ -534,17 +565,20 @@ function save_enquiry(array $post, string $source): bool
        Returning false surfaces the error and invites them to call instead. */
     if (!$stored && !$emailed) {
         error_log('save_enquiry: LEAD LOST, neither database nor email accepted it: ' . $entry['email']);
-        return false;
+        return ['ok' => false, 'id' => 0, 'verdict' => $screen['verdict']];
     }
     if (!$stored) {
         error_log('save_enquiry: DB unavailable, lead delivered by email only: ' . $entry['email']);
     }
-    /* A real enquiry gets an instant, personal acknowledgement (Settings can turn it off). */
-    if ($stored && $screen['verdict'] === 'ok' && function_exists('crm_auto_ack')) {
+    /* A real enquiry gets an instant, personal acknowledgement (Settings can turn it off).
+       A caller may say outright whether to send one (ack), or leave it to
+       crm_auto_ack()'s own source list. */
+    $wantAck = $o['ack'] ?? null;
+    if ($stored && $screen['verdict'] === 'ok' && $wantAck !== false && function_exists('crm_auto_ack')) {
         crm_auto_ack($entry);
     }
 
-    return true;
+    return ['ok' => true, 'id' => $id, 'verdict' => $screen['verdict']];
 }
 
 /**

@@ -296,6 +296,8 @@ require '/site/includes/lead-guard.php';
 require '/site/includes/crm.php';
 require '/site/includes/booking.php';
 require '/site/includes/lead-form.php';
+require '/site/includes/chat-kb.php';
+require '/site/includes/chat.php';
 
 $GLOBALS['T_PASS'] = 0;
 $GLOBALS['T_FAIL'] = 0;

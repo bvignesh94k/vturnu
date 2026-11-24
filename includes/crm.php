@@ -112,6 +112,7 @@ const CRM_PLACEMENTS = [
     'home-quote' => 'home page form', 'contact-page' => 'contact page form', 'popup' => 'quote pop-up', 'service-page' => 'service page form',
     'landing-page' => 'landing page form', 'audit-consultation' => 'audit page form', 'blog-post' => 'blog article form', 'resource' => 'e-book download',
     'newsletter' => 'newsletter signup', 'seo-audit' => 'free SEO audit', 'booking' => 'booking page',
+    'live-chat' => 'live chat', 'live-chat-outreach' => 'live chat',
 ];
 
 /** [channel, group] for a referring host, or null when it is not one we know. */
@@ -1791,7 +1792,7 @@ function crm_auto_ack(array $lead): void
 {
     try {
         $settings = crm_settings();
-        if (empty($settings['auto_ack']) || !in_array((string) ($lead['source'] ?? ''), ['home-quote', 'contact-page', 'popup', 'service-page', 'landing-page', 'audit-consultation', 'blog-post'], true)) {
+        if (empty($settings['auto_ack']) || !in_array((string) ($lead['source'] ?? ''), ['home-quote', 'contact-page', 'popup', 'service-page', 'landing-page', 'audit-consultation', 'blog-post', 'live-chat'], true)) {
             return;
         }
         $draft = crm_ack_draft($lead, $settings);
@@ -2145,10 +2146,22 @@ function crm_daily_digest(bool $force = false): array
     /* Calls booked for today and tomorrow, checked against Google Calendar first. */
     $meetings = function_exists('booking_digest_lines') ? booking_digest_lines() : [];
     $counts['Meetings'] = count($meetings);
-    if (array_sum($counts) === 0 && !$force) {
+    /* Vee, the live chat: send anything still owed (a visitor who closed the tab
+       before the widget could say so) and drop chats that never became a lead. */
+    $chat = function_exists('chat_daily') ? chat_daily() : ['emailed' => 0, 'purged' => 0, 'yesterday' => 0, 'leads' => 0];
+    if (array_sum($counts) === 0 && $chat['yesterday'] === 0 && $chat['emailed'] === 0 && !$force) {
         return ['ok' => true, 'sent' => false, 'counts' => $counts];
     }
     $lines = ['Good morning. Here is what needs you today.', ''];
+    if ($chat['yesterday'] > 0 || $chat['emailed'] > 0) {
+        $lines[] = 'LIVE CHAT (VEE), LAST 24 HOURS';
+        $lines[] = '  ' . $chat['yesterday'] . ' ' . ($chat['yesterday'] === 1 ? 'conversation' : 'conversations') . ', ' . $chat['leads'] . ' became a lead';
+        if ($chat['emailed'] > 0) {
+            $lines[] = '  ' . $chat['emailed'] . ' chat ' . ($chat['emailed'] === 1 ? 'email' : 'emails') . ' sent just now for conversations the visitor left open';
+        }
+        $lines[] = '  ' . SITE_URL . '/admin/?view=chats';
+        $lines[] = '';
+    }
     if ($meetings) {
         $lines[] = 'MEETINGS TODAY AND TOMORROW (' . count($meetings) . ')';
         array_push($lines, ...$meetings);

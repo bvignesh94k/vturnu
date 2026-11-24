@@ -38,10 +38,21 @@ const booking = await php.run({ code: `<?php require '/t/booking-test.php';` });
 process.stdout.write(booking.text);
 if (booking.errors || !/ 0 failed/.test(booking.text)) { failed++; if (booking.errors) console.log(String(booking.errors).slice(0, 1500)); }
 
+/* Vee, the AI live chat: redaction, cleaning, model fallback chain, replies, the lead and email pipeline.
+   Unlike the suites above, this one deliberately drives failing models (a 429,
+   a bad answer, a server error) to prove the chain falls through correctly,
+   and chat.php logs each of those with error_log() by design. So a clean run
+   here still carries stderr text; only " 0 failed" in the output says whether
+   the checks themselves passed. A real crash still shows as a failed check,
+   since done() never prints " 0 failed" when a PHP fatal cut the script short. */
+const chat = await php.run({ code: `<?php require '/t/chat-test.php';` });
+process.stdout.write(chat.text);
+if (!/ 0 failed/.test(chat.text)) { failed++; if (chat.errors) console.log(String(chat.errors).slice(0, 1500)); }
+
 /* Every admin view must render without a single PHP warning. */
 const views = ['view=dashboard', 'view=leads', 'view=leads&channel=Organic+search&grade=A&proposal=none', 'view=lead&id=42', 'view=lead&id=43', 'view=proposal&id=42',
   'view=proposal&id=43&kind=followup', 'view=meeting&id=42', 'view=meeting&id=43', 'view=meetings', 'view=pipeline', 'view=reports', 'view=settings', 'view=junk', 'view=deleted', 'view=audits', 'view=downloads', 'view=subscribers',
-  'view=updates', 'view=update-edit', 'view=update-edit&slug=november-core-update-2026'];
+  'view=updates', 'view=update-edit', 'view=update-edit&slug=november-core-update-2026', 'view=chats', 'view=chat&id=1', 'view=outreach'];
 for (const v of views) {
   const get = JSON.stringify(Object.fromEntries(new URLSearchParams(v))).replace(/'/g, "\\'");
   try {
