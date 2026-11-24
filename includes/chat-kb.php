@@ -85,10 +85,43 @@ function chat_kb_cases(): array
 }
 
 /**
+ * When the team works, in words that mean something to this visitor. A flat
+ * "9:30 AM to 6:30 PM India time" tells a visitor outside India nothing they
+ * can use; translating it into their own clock hour by hour would also have
+ * to shift the day of the week half the time (India's evening is already
+ * tomorrow across the Pacific), which reads stranger than it helps. Instead,
+ * an Indian visitor gets the team's own hours; everyone else gets the UTC
+ * offset to place it by, plus what time it actually is there right now, which
+ * answers the question a visitor abroad is really asking ("are they awake").
+ */
+function chat_hours_phrase(string $tz, ?string $country = null): string
+{
+    $ist = new DateTimeZone('Asia/Kolkata');
+    if (($country ?? security_visitor_country()) === 'IN') {
+        return 'Monday to Friday, 9:30 AM to 6:30 PM India time';
+    }
+    $now = new DateTime('now', $ist);
+    $there = $now->format('g:i A');
+    try {
+        $visitor = $tz !== '' ? new DateTimeZone($tz) : null;
+    } catch (Throwable $e) {
+        $visitor = null;
+    }
+    $local = $visitor ? ', which is ' . $now->setTimezone($visitor)->format('g:i A \o\n l') . ' for you' : '';
+    return 'Monday to Friday, 9:30 AM to 6:30 PM India Standard Time, GMT+5:30. It is about ' . $there . ' there right now' . $local . '.';
+}
+
+/** "as soon as possible, usually within one working day (...)", with chat_hours_phrase() filled in for this visitor. */
+function chat_reply_time_line(string $tz, ?string $country = null): string
+{
+    return 'as soon as possible, usually within one working day (' . chat_hours_phrase($tz, $country) . ')';
+}
+
+/**
  * The facts Vee always has, in this visitor's currency. Kept short: it is sent
  * with every message, and the free AI plans count every token.
  */
-function chat_kb_core(): string
+function chat_kb_core(string $visitorTz = ''): string
 {
     $p = chat_kb_policy();
     $services = [];
@@ -101,12 +134,13 @@ function chat_kb_core(): string
     $lines = [
         'VTurnU (legal name ' . LEGAL_NAME . ') is a digital marketing, branding, web development and AI company in Chennai, India, founded in ' . FOUNDING_YEAR . '. It works with clients worldwide, in every industry, mostly remotely.',
         ...array_map('strval', (array) ($p['facts'] ?? [])),
+        'Team hours: ' . chat_hours_phrase($visitorTz) . '.',
         'SERVICES. ' . implode('. ', $services) . '.',
         'Minimum budget: ' . min_budget() . ' for any project or monthly plan. ' . $note . ' Exact quotes come after a short call. There is no price list and no hourly rate.',
         'BUDGET BANDS per month: ' . $bands . '.',
         'How work starts: a senior strategist reads the enquiry and replies within one working day, then a short call and a free audit. Search programs have a 90-day minimum, then run month to month.',
         'Offers: ' . ($p['offers'] ?? ''),
-        'Contact: email ' . CONTACT_EMAIL . ', WhatsApp or phone ' . CONTACT_PHONE . ' (https://wa.me/' . CONTACT_WHATSAPP . '). The team replies ' . ($p['reply_time'] ?? 'as soon as possible') . '.',
+        'Contact: email ' . CONTACT_EMAIL . ', WhatsApp or phone ' . CONTACT_PHONE . ' (https://wa.me/' . CONTACT_WHATSAPP . '). The team replies ' . chat_reply_time_line($visitorTz) . '.',
     ];
     if (!empty($booking['enabled'])) {
         $lines[] = 'A free 30-minute call on Google Meet with ' . ($booking['host_name'] ?? 'the team') . (($booking['host_title'] ?? '') !== '' ? ', ' . $booking['host_title'] : '')

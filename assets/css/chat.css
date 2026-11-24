@@ -83,7 +83,10 @@
 .vee-row.vee-vee, .vee-row.vee-system { align-self: flex-start; }
 .vee-bubble-avatar {
     width: 24px; height: 24px; border-radius: 50%; flex: none; overflow: hidden;
-    background: var(--grad-brand); display: flex; align-items: center; justify-content: center; margin-top: 2px;
+    /* A flat, dark backdrop, not the busy multi-hue gradient: at 24px the
+       logo's own light-on-dark strokes need one plain colour behind them to
+       stay readable, not another gradient in the same hue family. */
+    background: var(--ink); display: flex; align-items: center; justify-content: center; margin-top: 2px;
 }
 .vee-bubble-avatar img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
 .vee-bubble {

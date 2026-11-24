@@ -440,6 +440,7 @@ WHAT YOU KNOW
 
 WHAT TO DO
 - Buyers: understand the goal, point to the right service, then ask about timeline and budget naturally. Once there is a real need, ask for their name and an email or WhatsApp number so the team can follow up. When they have described a real project, you may offer the 30-minute call from FACTS.
+- A visitor who asks to talk to a person, a human or your team: do not argue or stall. If you do not have their email or WhatsApp number yet, ask for it in the same breath, plainly, so the team can reach them right away. If you already have it, say you have flagged this for the team and they will reach out directly. Set handoff to true either way.
 - Other enquiries, by intent:
 {POLICIES}
 - Spam, abuse or anything unrelated to VTurnU: one polite line that steers back to how VTurnU can help; intent "spam" only for spam or abuse.
@@ -524,7 +525,7 @@ function chat_build_messages(array $s, array $history, string $pageTitle, string
 
     $context = [
         'FACTS',
-        chat_kb_core(),
+        chat_kb_core((string) ($s['time_zone'] ?? '')),
         '',
         'PAGE: the visitor is on "' . crm_clean_line($pageTitle, 120) . '" (' . SITE_URL . ($slug !== '' ? '/' . $slug . '/' : '/') . ').',
         'KNOWN SO FAR: ' . chat_known_line($s) . '.',
@@ -790,6 +791,23 @@ function chat_split_reply(string $r): array
 /* Message-taking mode: no AI, still useful                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * True when a visitor is explicitly asking to stop talking to the bot and
+ * reach a person ("I want to talk to someone", the quick-reply chip of the
+ * same name, "can I speak to a human", "connect me to an agent"...). This is
+ * checked directly against the visitor's own words, independent of the model
+ * or the scripted fallback, so it fires the same way whichever answered.
+ */
+function chat_wants_human(string $text): bool
+{
+    return (bool) preg_match(
+        '/\b(talk|speak|chat|connect me) (to|with) (a |an |someone|a real |a human|a person|an agent|your team|your staff)|'
+        . 'real (person|human)|live (agent|person|rep)|human (agent|support|rep)|customer (service|support) (agent|rep|person)|'
+        . 'can (i|you) (talk|speak) to (someone|a human|a person|an agent)/i',
+        $text
+    );
+}
+
 /** A best guess at what a message is about, from its words. */
 function chat_guess_intent(string $text): string
 {
@@ -828,7 +846,7 @@ function chat_fallback_reply(array $s, string $text): array
     $reply = ($first !== '' ? 'Thanks, ' . $first . '. ' : '') . ($lines[$intent] ?? $lines['general']);
     $hasContact = $s['email'] !== '' || $s['phone'] !== '';
     $reply .= $hasContact
-        ? ' I have passed this to our team, and they will reply ' . (chat_kb_policy()['reply_time'] ?? 'as soon as possible') . '.'
+        ? ' I have passed this to our team, and they will reply ' . chat_reply_time_line((string) ($s['time_zone'] ?? '')) . '.'
         : ' What is the best email or WhatsApp number for our team to reach you? They will reply as soon as possible.';
     return [
         'reply' => $reply, 'intent' => $intent, 'service' => '', 'handoff' => true, 'ask_contact' => !$hasContact,
@@ -899,7 +917,12 @@ function chat_handle(array $in): array
         if ($action === 'notify' || $action === 'end') {
             $s = $sid !== '' ? chat_store()->session($sid) : null;
             if ($s && security_rate_ok('chat-mail', 30, 3600)) {
-                chat_deliver($s, $action);
+                /* 'urgent' comes from chat_send()'s own response (a visitor
+                   who already gave contact details and just asked for a
+                   person): it reaches the team now, not at the next quiet
+                   moment in the chat or the next morning's digest. */
+                $trigger = $action === 'notify' && !empty($in['urgent']) ? 'urgent' : $action;
+                chat_deliver($s, $trigger);
             }
             return $action === 'end' ? ['status' => 204] : ['ok' => true];
         }
@@ -980,6 +1003,18 @@ function chat_send(array $in, string $sid): array
     }
     $mode = $res['model'] === 'fallback' ? 'fallback' : 'ai';
 
+    /* A visitor who explicitly asks for a person gets a direct, specific
+       answer, not whatever generic line the model or fallback happened to
+       pick, and the team hears about it right away (see 'urgent' below),
+       not whenever the chat next goes quiet. Owner's request, 24 Nov 2026. */
+    $wantsHuman = $s['status'] !== 'spam' && chat_wants_human($text);
+    if ($wantsHuman) {
+        $res['handoff'] = true;
+        $reply = ($s['email'] !== '' || $s['phone'] !== '')
+            ? "I've flagged this for our team right now, and they'll reach out on it directly."
+            : "Of course. I'll get our team on this right away. What's the best email or WhatsApp number so they can reach you directly?";
+    }
+
     /* What the conversation is about, for the CRM. A real intent sticks; spam twice ends the chat. */
     if ($res['intent'] === 'spam') {
         $set['spam_hits'] = $s['spam_hits'] + 1;
@@ -1020,12 +1055,19 @@ function chat_send(array $in, string $sid): array
     $store->update($s['id'], $set);
 
     $hasContact = $s['email'] !== '' || $s['phone'] !== '';
+    $spamNow = ($set['status'] ?? $s['status']) === 'spam';
+    /* Urgent: the visitor already gave contact details and just asked for a
+       person. A fresh lead is told to the team the normal way regardless; an
+       already-known lead who asks mid-conversation would otherwise wait for
+       the chat to go quiet, which is the gap this exists to close. */
+    $urgent = $wantsHuman && $hasContact && !$spamNow;
     return [
         'ok' => true,
         'sid' => $s['token'],
         'replies' => chat_split_reply($reply),
         'handoff' => (bool) $res['handoff'],
-        'notify' => $hasContact && empty($s['lead_mailed_at']) && ($set['status'] ?? $s['status']) !== 'spam',
+        'notify' => ($urgent || ($hasContact && empty($s['lead_mailed_at']))) && !$spamNow,
+        'urgent' => $urgent,
         'mode' => $mode,
     ];
 }
@@ -1065,6 +1107,10 @@ function chat_deliver(array $s, string $trigger): string
         $store->update($s['id'], ['enquiry_id' => $s['enquiry_id'] ?: null, 'mailed_msgs' => $s['visitor_msgs'], 'mailed_msg_id' => $lastId, 'mailed_at' => 'now()']);
         return 'lead';
     }
+    /* 'urgent' is this same "a known lead re-engaged and asked for a person"
+       path, just not willing to wait: it skips the quiet-window below exactly
+       like the cron does, so the team hears about it within the same request
+       that told the visitor "I've flagged this for our team right now." */
     if ($trigger === 'notify' || $s['visitor_msgs'] <= $s['mailed_msgs']) {
         return '';
     }
@@ -1074,7 +1120,7 @@ function chat_deliver(array $s, string $trigger): string
             return '';
         }
         $kind = 'nocontact';
-    } elseif ($trigger === 'cron' || $quiet >= 600) {
+    } elseif (in_array($trigger, ['cron', 'urgent'], true) || $quiet >= 600) {
         $kind = 'update';
     } else {
         return '';
@@ -1322,6 +1368,9 @@ function chat_widget_config(string $slug, array $page): array
         'privacy' => '/privacy-policy/',
         'whatsapp' => 'https://wa.me/' . CONTACT_WHATSAPP,
         'email' => CONTACT_EMAIL,
-        'avatar' => '/assets/img/vturnu-icon-mark.png',
+        /* The "on-dark" mark (lighter strokes) stays readable on the small,
+           flat-dark bubble avatars and on the header's own gradient; the
+           plain mark (saturated strokes) reads muddy at that size on either. */
+        'avatar' => '/assets/img/vturnu-icon-mark-on-dark.svg',
     ];
 }

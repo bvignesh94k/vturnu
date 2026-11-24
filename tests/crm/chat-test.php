@@ -213,6 +213,54 @@ check('partnership wording is spotted', chat_guess_intent('We would love to expl
 check('a website question is spotted', chat_guess_intent('How much for a new website?') === 'sales_web');
 check('plain chat falls back to general', chat_guess_intent('Hello, how are you?') === 'general');
 
+/* ---------------- asking for a person, directly and by phrase ---------------- */
+
+/* chat_handle() (unlike chat_send(), called directly everywhere else in this
+   file) also checks the request's Origin, so the notify calls below need it set. */
+$_SERVER['HTTP_ORIGIN'] = 'https://vturnu.com';
+$_SERVER['HTTP_HOST'] = 'vturnu.com';
+
+check('the exact quick-reply phrase is recognised', chat_wants_human('I want to talk to someone'));
+check('"speak to a human" is recognised', chat_wants_human('Can I speak to a human please'));
+check('"connect me with an agent" is recognised', chat_wants_human('Please connect me with an agent'));
+check('a plain question is not mistaken for it', !chat_wants_human('How long does SEO take?'));
+check('mentioning a person in passing is not mistaken for it', !chat_wants_human('I spoke to your sales team last year'));
+
+/* A fresh visitor asks for a person straight away: no contact yet, so Vee
+   asks for it instead of notifying (there is no one to reach yet). */
+chat_reset();
+$GLOBALS['CHAT_HTTP'] = chat_test_http([]);
+$h1 = chat_send(['text' => 'I want to talk to someone', 'page' => '/', 'title' => 'Home'], '');
+check('asking for a person with no contact yet gets asked for it', str_contains($h1['replies'][0], 'What') || str_contains($h1['replies'][0], 'email'), json_encode($h1));
+check('handoff is set even from the scripted fallback', $h1['handoff'] === true);
+check('nothing to notify yet, there is no contact to reach', $h1['notify'] === false);
+
+/* The same visitor then gives an email in the same breath: a lead is saved
+   and the team is told, same as any other first contact. */
+$h2 = chat_send(['sid' => $h1['sid'], 'text' => 'sure, priya@gmail.com', 'page' => '/', 'title' => 'Home'], $h1['sid']);
+check('giving contact right after asking for a person still notifies', $h2['notify'] === true, json_encode($h2));
+
+/* A visitor who is ALREADY a known lead (already emailed once) asks for a
+   person mid-conversation: this must reach the team now, not at the next
+   quiet moment, which is the gap the owner asked to close (24 Nov 2026). */
+chat_reset();
+$GLOBALS['CHAT_HTTP'] = chat_test_http([chat_test_ok('Happy to help with your website.', ['intent' => 'sales_web', 'lead' => ['name' => 'Arjun', 'company' => '', 'website' => '', 'budget' => '', 'timeline' => '']])]);
+$u1 = chat_send(['text' => 'Hi, I need a website, my email is arjun@gmail.com', 'page' => '/web-design/', 'title' => 'Website Design'], '');
+chat_handle(['action' => 'notify', 'sid' => $u1['sid']]);
+check('the first lead email went out as usual', count($GLOBALS['captured_mail']) === 1, (string) count($GLOBALS['captured_mail']));
+$GLOBALS['CHAT_HTTP'] = chat_test_http([]);
+$u2 = chat_send(['sid' => $u1['sid'], 'text' => 'Actually I want to talk to someone now', 'page' => '/web-design/', 'title' => 'Website Design'], $u1['sid']);
+check('an already-known lead asking for a person is marked urgent', $u2['notify'] === true && $u2['urgent'] === true, json_encode($u2));
+check('the warm, specific line is used, not a generic one', str_contains($u2['replies'][0], 'flagged'), json_encode($u2));
+chat_handle(['action' => 'notify', 'sid' => $u1['sid'], 'urgent' => true]);
+check('a second, immediate email went out for the urgent request', count($GLOBALS['captured_mail']) === 2, (string) count($GLOBALS['captured_mail']));
+check('the urgent email subject flags that a reply is needed', str_contains($GLOBALS['captured_mail'][1]['subject'], 'needs a reply'), $GLOBALS['captured_mail'][1]['subject']);
+/* Without the urgent flag, the exact same request would have waited (the
+   quiet-window has not passed), proving the flag is what unblocks it. */
+$beforeCount = count($GLOBALS['captured_mail']);
+chat_handle(['action' => 'notify', 'sid' => $u1['sid']]);
+check('a plain notify call (no urgent flag) does not also send one', count($GLOBALS['captured_mail']) === $beforeCount);
+
 /* ---------------- the model chain ---------------- */
 
 chat_reset();
@@ -268,6 +316,20 @@ $svcCfg = chat_widget_config('seo-services', ['template' => 'service', 'h1' => '
 check('a service page greeting names the topic', str_contains($svcCfg['greeting'], 'search engine optimization') || str_contains($svcCfg['greeting'], 'SEO'), $svcCfg['greeting']);
 check('a service page gets quick replies naming the topic', str_contains($svcCfg['quickReplies'][0], 'include'), json_encode($svcCfg['quickReplies']));
 check('a tool page gets its own quick replies', chat_widget_config('free-seo-audit', ['template' => 'audit'])['quickReplies'][0] === 'What should I fix first?');
+check('the avatar is the on-dark mark, legible on a coloured backdrop', str_contains($cfg['avatar'], 'icon-mark-on-dark'));
+
+/* ---------------- team hours mean something outside India too ---------------- */
+
+/* security_visitor_country() memoises its result for the whole process (it
+   reads $_SERVER once), so these pass the country straight in rather than
+   changing $_SERVER partway through one PHP run, which it would not see. */
+check('an Indian visitor gets the plain hours', chat_hours_phrase('Asia/Kolkata', 'IN') === 'Monday to Friday, 9:30 AM to 6:30 PM India time');
+$usPhrase = chat_hours_phrase('America/Los_Angeles', 'US');
+check('a US visitor gets the GMT offset, not a bare "India time"', str_contains($usPhrase, 'GMT+5:30') && !str_contains($usPhrase, 'India time'), $usPhrase);
+check('a US visitor also sees their own local time', str_contains($usPhrase, 'for you'), $usPhrase);
+check('an unknown timezone still gives the offset, just no local conversion', !str_contains(chat_hours_phrase('', 'US'), 'for you') && str_contains(chat_hours_phrase('', 'US'), 'GMT+5:30'));
+check('a garbled timezone string does not crash the reply', is_string(chat_hours_phrase('not/a/real/zone', 'GB')));
+check('the reply-time line wraps the hours phrase', str_contains(chat_reply_time_line('America/Los_Angeles', 'US'), 'GMT+5:30'));
 
 /* ---------------- a full conversation: new session, a reply, a lead, one email ---------------- */
 

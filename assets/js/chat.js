@@ -155,9 +155,9 @@
         } catch (e) {}
     }
 
-    function notifyTeam() {
+    function notifyTeam(urgent) {
         if (!sid) { return; }
-        var body = JSON.stringify({ action: 'notify', sid: sid });
+        var body = JSON.stringify({ action: 'notify', sid: sid, urgent: !!urgent });
         try {
             if (window.fetch) {
                 fetch(cfg.api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true, credentials: 'omit' });
@@ -199,7 +199,7 @@
                 typingRow.remove();
                 showNext(replies, 0);
             }, delay);
-            if (res && res.notify) { notifyTeam(); }
+            if (res && res.notify) { notifyTeam(res.urgent === true); }
         }).catch(function () {
             typingRow.remove();
             addRow('vee', 'Sorry, I could not reach our server. Please try again, or write to ' + cfg.email + '.');

@@ -39,17 +39,19 @@ return [
         'service' => 'Questions about {topic}? I can help right here.',
     ],
 
-    /* Facts the site's pages do not state in one place. */
+    /* Facts the site's pages do not state in one place. Team hours are not
+       listed here as plain text: a visitor outside India gets no use from
+       "9:30 AM to 6:30 PM India time", so includes/chat-kb.php works out a
+       line that means something in the visitor's own timezone instead
+       (chat_hours_phrase(), chat_reply_time_line()); it is added to these
+       facts and used for the reply-time line at runtime. */
     'facts' => [
         'Leadership: B. Vignesh, Founder & CEO, and V. Kalpana, Managing Director.',
-        'Team hours: Monday to Friday, 9:30 AM to 6:30 PM India time. Languages the team speaks: English, Tamil, Telugu and Kannada.',
+        'Languages the team speaks: English, Tamil, Telugu and Kannada.',
         'Payments: retainers are invoiced monthly in advance, and project work is invoiced on the agreed milestones. Ad spend is paid by the client directly to the platforms.',
         'Ending a retainer: either side gives 30 days written notice.',
         'Ownership: clients own their ad accounts, analytics, content, code and data. Work made for a client becomes theirs on full payment.',
     ],
-
-    /* How Vee describes when the team replies. */
-    'reply_time' => 'as soon as possible, usually within one working day (Monday to Friday, 9:30 AM to 6:30 PM India time)',
 
     /* Offers and prices: the site rule is the minimum budget only (owner, 24 Nov 2026). */
     'offers' => 'There are no discounts, bundles or packages to quote in the chat. Give the minimum budget and point to the free tools; the team shares a tailored quote and any current offers after a short call.',
