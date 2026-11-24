@@ -1170,6 +1170,14 @@ function chat_send(array $in, string $sid): array
         'notify' => ($urgent || ($hasContact && empty($s['lead_mailed_at']))) && !$spamNow,
         'urgent' => $urgent,
         'mode' => $mode,
+        /* Told the widget straight, rather than left for it to guess from the
+           reply text: whether this turn is asking for contact details, and
+           whether it already has them. When both are true (and the reply
+           itself just asked in words) the widget shows the details card with
+           its own field validation instead of waiting for free text, owner,
+           24 Nov 2026. */
+        'ask_contact' => (bool) $res['ask_contact'] && !$hasContact,
+        'has_contact' => $hasContact,
         /* The id of Vee's own reply, so the widget's live-takeover poll (see
            chat_route()'s 'poll' action) starts looking for a team reply only
            after this point, never re-delivering what the visitor just read. */

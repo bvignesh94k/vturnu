@@ -244,11 +244,13 @@ $h1 = chat_send(['text' => 'I want to talk to someone', 'page' => '/', 'title' =
 check('asking for a person with no contact yet gets asked for it', str_contains($h1['replies'][0], 'What') || str_contains($h1['replies'][0], 'email'), json_encode($h1));
 check('handoff is set even from the scripted fallback', $h1['handoff'] === true);
 check('nothing to notify yet, there is no contact to reach', $h1['notify'] === false);
+check('the widget is told to show the details card, since the reply just asked in words', $h1['ask_contact'] === true && $h1['has_contact'] === false, json_encode($h1));
 
 /* The same visitor then gives an email in the same breath: a lead is saved
    and the team is told, same as any other first contact. */
 $h2 = chat_send(['sid' => $h1['sid'], 'text' => 'sure, priya@gmail.com', 'page' => '/', 'title' => 'Home'], $h1['sid']);
 check('giving contact right after asking for a person still notifies', $h2['notify'] === true, json_encode($h2));
+check('once contact is given, the widget is told not to show the card again', $h2['ask_contact'] === false && $h2['has_contact'] === true, json_encode($h2));
 
 /* A visitor who is ALREADY a known lead (already emailed once) asks for a
    person mid-conversation: this must reach the team now, not at the next

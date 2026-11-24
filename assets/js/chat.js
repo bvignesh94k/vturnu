@@ -24,6 +24,8 @@
     var detailsOffered = false;
     try { detailsOffered = localStorage.getItem(DETAILS_KEY) === '1'; } catch (e) {}
     var sentCount = 0;
+    var formVisible = false;
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, function (c) {
@@ -211,9 +213,10 @@
                 : [isDetails ? 'Thanks. Please also write to ' + cfg.email + ' in case this did not go through.'
                     : 'Sorry, something went wrong on our side. Please try again, or write to ' + cfg.email + '.'];
             var delay = res && res.ok ? typingDelay(replies[0], elapsed) : 300;
+            var askNow = !!(res && res.ok && res.ask_contact);
             setTimeout(function () {
                 typingRow.remove();
-                showNext(replies, 0);
+                showNext(replies, 0, askNow);
             }, delay);
             if (res && res.notify) { notifyTeam(res.urgent === true); }
         }).catch(function () {
@@ -224,41 +227,47 @@
         });
     }
 
-    function showNext(replies, i) {
+    function showNext(replies, i, askNow) {
         addRow('vee', replies[i]);
         if (i + 1 < replies.length) {
             var row = showTyping();
-            setTimeout(function () { row.remove(); showNext(replies, i + 1); }, 420 + Math.min(replies[i + 1].length, 140) * 8);
+            setTimeout(function () { row.remove(); showNext(replies, i + 1, askNow); }, 420 + Math.min(replies[i + 1].length, 140) * 8);
         } else {
             sending = false;
             sendBtn.disabled = input.value.trim() === '';
-            if (sentCount === 1) { offerDetails(); }
+            /* Two reasons to offer the card: it is the very first reply of the
+               conversation (owner, 24 Nov 2026), or Vee's own reply just asked
+               for contact details in words (owner, 24 Nov 2026: use the form,
+               with real validation, instead of waiting on free text). Never
+               stack a second card over one already open. */
+            if (!formVisible && (askNow || (sentCount === 1 && !detailsOffered))) { showDetailsCard(); }
         }
     }
 
     /* -------------------- the details card ----------------------------- */
 
-    /* Right after Vee's first reply (owner, 24 Nov 2026): a short card asking
-       for Name, Phone (prefixed with the dial code the visitor's own IP
-       already gave us), Email and an optional message, shown once per
-       conversation. Submitting it answers through the normal reply pipeline
+    /* A short card asking for Name, Phone (prefixed with the dial code the
+       visitor's own IP already gave us), Email and an optional message,
+       instead of Vee asking for them one at a time in plain chat text.
+       Submitting it answers through the normal reply pipeline
        (chat_submit_details() on the server), so the reply is a real answer,
        not a form receipt. Skipping it just leaves the ordinary input open. */
-    function offerDetails() {
-        if (detailsOffered) { return; }
+    function showDetailsCard() {
+        formVisible = true;
         detailsOffered = true;
         try { localStorage.setItem(DETAILS_KEY, '1'); } catch (e) {}
 
         var row = document.createElement('div');
         row.className = 'vee-row vee-vee';
         row.innerHTML = '<span class="vee-bubble-avatar"><img src="' + escapeHtml(cfg.avatar) + '" alt=""></span>' +
-            '<form class="vee-bubble vee-details">' +
+            '<form class="vee-bubble vee-details" novalidate>' +
                 '<p class="vee-details-h">So our team can reach you</p>' +
-                '<input class="vee-details-in" name="name" type="text" placeholder="Your name" autocomplete="name" required maxlength="60">' +
+                '<input class="vee-details-in" name="name" type="text" placeholder="Your name" autocomplete="name" maxlength="60">' +
                 '<div class="vee-details-phone"><span class="vee-details-dial">' + escapeHtml(cfg.dialCode || '+91') + '</span>' +
                     '<input class="vee-details-in" name="phone" type="tel" inputmode="tel" placeholder="Phone / WhatsApp" autocomplete="tel-national" maxlength="18"></div>' +
-                '<input class="vee-details-in" name="email" type="email" placeholder="Email address" autocomplete="email" required maxlength="120">' +
+                '<input class="vee-details-in" name="email" type="email" placeholder="Email address" autocomplete="email" maxlength="120">' +
                 '<textarea class="vee-details-in vee-details-msg" name="message" rows="2" maxlength="1000" placeholder="Anything else we should know? (optional)"></textarea>' +
+                '<p class="vee-details-err" hidden></p>' +
                 '<div class="vee-details-row">' +
                     '<button class="vee-details-send" type="submit">Send my details</button>' +
                     '<button class="vee-details-skip" type="button">Not now</button>' +
@@ -270,12 +279,22 @@
         var formEl = row.querySelector('.vee-details');
         var fName = formEl.querySelector('[name="name"]'), fEmail = formEl.querySelector('[name="email"]');
         var fPhone = formEl.querySelector('[name="phone"]'), fMessage = formEl.querySelector('[name="message"]');
-        formEl.querySelector('.vee-details-skip').addEventListener('click', function () { row.remove(); });
+        var fErr = formEl.querySelector('.vee-details-err');
+        function showErr(msg, el) {
+            fErr.textContent = msg;
+            fErr.hidden = false;
+            el.focus();
+        }
+        formEl.querySelector('.vee-details-skip').addEventListener('click', function () { formVisible = false; row.remove(); });
         formEl.addEventListener('submit', function (e) {
             e.preventDefault();
+            fErr.hidden = true;
             var name = fName.value.trim(), email = fEmail.value.trim(), phone = fPhone.value.trim();
-            var message = fMessage.value.trim();
-            if (!name || !email) { return; }
+            var message = fMessage.value.trim(), phoneDigits = phone.replace(/\D/g, '');
+            if (!name) { return showErr('Please add your name.', fName); }
+            if (!email || !EMAIL_RE.test(email)) { return showErr('That email does not look right. Please check it.', fEmail); }
+            if (phone !== '' && (phoneDigits.length < 6 || phoneDigits.length > 15)) { return showErr('That phone number does not look right. Please check it.', fPhone); }
+            formVisible = false;
             row.remove();
             addRow('visitor', name + (email ? ' · ' + email : '') + (phone ? ' · ' + cfg.dialCode + ' ' + phone : '') + (message ? '\n' + message : ''));
             send(null, {

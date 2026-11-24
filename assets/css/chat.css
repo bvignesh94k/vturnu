@@ -124,6 +124,7 @@
     font: 700 .85rem/1 var(--font); color: var(--ink-soft); background: var(--bg-tint);
 }
 .vee-details-phone .vee-details-in { flex: 1; }
+.vee-details-err { margin: -2px 0 0; font-size: .74rem; font-weight: 700; color: var(--u-pink); }
 .vee-details-row { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
 .vee-details-send {
     flex: none; border: none; border-radius: 999px; padding: 8px 15px; font: 700 .82rem/1 var(--font); color: #fff;
