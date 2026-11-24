@@ -419,6 +419,34 @@ check('polling again after those ids returns nothing new', chat_poll($lt1['sid']
 check('polling an unknown session is refused', chat_poll('0000000000000000000000000000000', 0)['ok'] === false);
 check('an empty owner reply is refused', !chat_owner_reply($ltSession['id'], '   '));
 
+/* ---------------- a plain "hi" gets a plain "hi" back ---------------- */
+
+chat_reset();
+$GLOBALS['CHAT_HTTP'] = chat_test_http([]);
+$hi1 = chat_send(['text' => 'hi', 'page' => '/'], '');
+check('a bare greeting gets a warm greeting back, not the handoff boilerplate',
+    $hi1['replies'][0] === 'Hi, how may I assist you today?', json_encode($hi1));
+check('a plain greeting is not treated as a handoff', $hi1['handoff'] === false);
+check('"Good morning" is recognised as a greeting too', chat_is_greeting('Good morning!'));
+check('"hi, I need a website" is a real question, not a bare greeting', !chat_is_greeting('hi, I need a website'));
+
+/* ---------------- the details card: one form instead of asking field by field ---------------- */
+
+chat_reset();
+$GLOBALS['CHAT_HTTP'] = chat_test_http([]);
+$d1 = chat_send(['text' => 'Do you build Shopify stores?', 'page' => '/web-design/', 'title' => 'Web Design'], '');
+$dSession = chat_store()->session($d1['sid']);
+check('the visitor has no contact details yet', $dSession['email'] === '' && $dSession['phone'] === '');
+$dRes = chat_submit_details(['sid' => $d1['sid'], 'name' => 'Priya Shah', 'email' => 'priya@example.com',
+    'phone' => '+1 2025551234', 'message' => '', 'page' => '/web-design/'], $d1['sid']);
+check('submitting details answers like a normal message, not a form receipt', $dRes['ok'] === true && !empty($dRes['replies']), json_encode($dRes));
+$dAfter = chat_store()->session($d1['sid']);
+check('the name, email and phone from the card are saved to the session', $dAfter['name'] === 'Priya Shah' && $dAfter['email'] === 'priya@example.com' && $dAfter['phone'] === '+12025551234', json_encode($dAfter));
+check('submitting details is treated as a fresh contact, so the team is notified', $dRes['notify'] === true);
+check('an invalid email on the details card is refused', chat_submit_details(['sid' => $d1['sid'], 'name' => 'Priya', 'email' => 'not-an-email', 'page' => '/'], $d1['sid'])['ok'] === false);
+check('a blank name on the details card is refused', chat_submit_details(['sid' => $d1['sid'], 'name' => '', 'email' => 'priya@example.com', 'page' => '/'], $d1['sid'])['ok'] === false);
+check('the widget gets the visitor\'s own dial code for the details card', chat_widget_config('', ['template' => 'home'])['dialCode'] !== '');
+
 /* ---------------- guards ---------------- */
 
 chat_reset();

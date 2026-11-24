@@ -427,6 +427,7 @@ HOW YOU WRITE
 - Reply in the language the visitor writes in.
 - Plain, confident words. Never use em dashes or en dashes. Never describe VTurnU with superlatives such as best, leading, top or number one. No hype.
 - The visitor has already seen your greeting, so do not greet again.
+- If the visitor only says hi, hello or similar with no question, reply with a short, warm "Hi, how may I assist you today?" (in their language), nothing else.
 
 WHAT YOU KNOW
 - Answer only from FACTS and PAGE NOTES. If they do not answer the question, do not guess: say you will pass it to the team, set handoff to true, and ask for an email or WhatsApp number if KNOWN SO FAR has none.
@@ -826,9 +827,29 @@ function chat_guess_intent(string $text): string
     };
 }
 
+/**
+ * A bare "hi", "hello", "good morning" and nothing else: no question to pass
+ * to anyone, so the canned "I've told the team" line (meant for a real
+ * enquiry with no model to answer it) read as nonsense here. Owner, 24 Nov
+ * 2026, after seeing it reply that way to a plain "hi".
+ */
+function chat_is_greeting(string $text): bool
+{
+    return (bool) preg_match('/^(hi+|hey+|hello+|yo|hola|namaste|good\s?(morning|afternoon|evening)|greetings)[\s.!?]*$/iu', trim($text));
+}
+
 /** What Vee says when it cannot ask a model: thanks, the right next step, and a request for contact details. */
 function chat_fallback_reply(array $s, string $text): array
 {
+    if (chat_is_greeting($text)) {
+        $first = $s['name'] !== '' ? crm_first_name($s['name']) : '';
+        return [
+            'reply' => ($first !== '' ? 'Hi ' . $first . ', ' : 'Hi, ') . 'how may I assist you today?',
+            'intent' => 'general', 'service' => '', 'handoff' => false, 'ask_contact' => false, 'summary' => '',
+            'lead' => ['name' => '', 'company' => '', 'website' => '', 'budget' => '', 'timeline' => ''],
+            'model' => 'fallback', 'ms' => 0, 'tokens_in' => 0, 'tokens_out' => 0,
+        ];
+    }
     $intent = chat_guess_intent($text);
     $first = $s['name'] !== '' ? crm_first_name($s['name']) : '';
     $lines = [
@@ -930,6 +951,9 @@ function chat_handle(array $in): array
         if ($action === 'poll') {
             return chat_poll($sid, (int) ($in['after'] ?? 0));
         }
+        if ($action === 'details') {
+            return chat_submit_details($in, $sid);
+        }
         return chat_send($in, $sid);
     } catch (Throwable $e) {
         error_log('chat_handle: ' . $e->getMessage());
@@ -956,6 +980,49 @@ function chat_poll(string $sid, int $afterId): array
     $messages = array_values(array_filter($store->messages($s['id'], $afterId),
         static fn(array $m): bool => in_array($m['role'], ['owner', 'system'], true)));
     return ['ok' => true, 'messages' => array_map(static fn(array $m): array => ['id' => $m['id'], 'role' => $m['role'], 'body' => $m['body']], $messages)];
+}
+
+/**
+ * The details card the widget shows right after its first reply (owner,
+ * 24 Nov 2026): Name, Phone (with the dial code chat_widget_config() already
+ * gave the widget from the visitor's IP), Email, and an optional message.
+ * Saves the contact straight onto the session, then answers through the same
+ * path as a typed message, so the reply is a real answer, not a form receipt.
+ */
+function chat_submit_details(array $in, string $sid): array
+{
+    $store = chat_store();
+    $s = $sid !== '' ? $store->session($sid) : null;
+    if (!$s || !security_rate_ok('chat-details', 10, 3600)) {
+        return ['ok' => false, 'error' => 'blocked'];
+    }
+    $name = crm_clean_line((string) ($in['name'] ?? ''), 60);
+    $email = strtolower(trim((string) ($in['email'] ?? '')));
+    $phoneRaw = trim((string) ($in['phone'] ?? ''));
+    $message = trim((string) preg_replace("/\n{3,}/", "\n\n", str_replace(["\r\n", "\r", "\0"], ["\n", "\n", ''], (string) ($in['message'] ?? ''))));
+    if (!preg_match("/^[\p{L}][\p{L} .'\-]{0,58}$/u", $name) || !filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($message) > CHAT_MAX_CHARS) {
+        return ['ok' => false, 'error' => 'invalid'];
+    }
+    $set = ['name' => $name, 'email' => $email];
+    if ($phoneRaw !== '') {
+        $phone = chat_normalise_phone($phoneRaw, $s['country']);
+        if (lead_phone_plausible($phone)) {
+            $set['phone'] = $phone;
+        }
+    }
+    $store->update($s['id'], $set);
+    if ($message === '') {
+        /* Nothing new to answer: fall back to whatever they first asked, now
+           that the team actually has a way to reach them. */
+        foreach ($store->messages($s['id']) as $m) {
+            if ($m['role'] === 'visitor') {
+                $message = (string) $m['body'];
+                break;
+            }
+        }
+    }
+    return chat_send(['sid' => $sid, 'text' => $message !== '' ? $message : 'Hi', 'page' => (string) ($in['page'] ?? ''),
+        'title' => (string) ($in['title'] ?? ''), 'attr' => (string) ($in['attr'] ?? ''), 'tz' => (string) ($in['tz'] ?? '')], $sid);
 }
 
 /** A visitor's message in, Vee's reply out. */
@@ -1414,5 +1481,9 @@ function chat_widget_config(string $slug, array $page): array
            2026), used as the launcher icon and every avatar; replaces the
            abstract VU mark used on the first deploy. */
         'avatar' => '/assets/img/vee/vee-avatar.png',
+        /* The phone field in the details card (see chat_submit_details()) shows
+           this dial code by default, from the visitor's own IP, so a US
+           visitor sees +1 rather than typing a country code themselves. */
+        'dialCode' => COUNTRY_DIAL_CODES[security_visitor_country()] ?? '+91',
     ];
 }

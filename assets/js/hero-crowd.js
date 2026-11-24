@@ -218,8 +218,7 @@
 
     /* --------------------------------------------------------------- crowd -- */
 
-    var heads = [], rotData = null, offData = null, count = 0;
-    var counter = document.getElementById('tt-n'), total = document.getElementById('tt-total');
+    var heads = [], rotData = null, offData = null;
     function seed(i) { var s = Math.sin(i * 127.1 + 3.7) * 43758.5453; return s - Math.floor(s); }
 
     /* Everything a head must stay clear of, in canvas pixels. Measuring the real
@@ -287,7 +286,6 @@
         gl.enableVertexAttribArray(4);
         gl.vertexAttribPointer(4, 4, gl.FLOAT, false, 0, 0);
         gl.vertexAttribDivisor(4, 1);
-        if (total) { total.textContent = heads.length; }
     }
 
     function resize() {
@@ -348,7 +346,7 @@
             var cx = (Math.random() * 1.5) - 0.3, cy = -0.55 - Math.random() * 0.3;
             reach([cx, cy], 0.34);
         }
-        var target = lookAll || pointer || headline, n = 0, moving = false;
+        var target = lookAll || pointer || headline, moving = false;
         for (var i = 0; i < heads.length; i++) {
             var h = heads[i];
             var fired = scrollFill > 0 && (i + 1) / heads.length < scrollFill;
@@ -370,14 +368,11 @@
             h.yaw += h.vy * dt;
             h.pitch += h.vp * dt;
             if (Math.abs(h.vy) > 0.004 || Math.abs(goal - h.a) > 0.004) { moving = true; }
-            if (h.a > 0.5) { n++; }
             rotData[i * 4] = h.yaw;
             rotData[i * 4 + 1] = h.pitch;
             rotData[i * 4 + 2] = h.a;
             rotData[i * 4 + 3] = h.pal;
         }
-        if (n !== count && counter) { counter.textContent = n; }
-        count = n;
         return moving;
     }
     function draw() {

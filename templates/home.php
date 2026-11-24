@@ -139,12 +139,6 @@ $cta_label = 'Start my growth plan';
     </div>
     <?php render_trust_badges('hero', 'Rated and listed on', true); ?>
   </div>
-
-  <p class="tt-score" aria-hidden="true">
-    <span class="tt-tally"><b id="tt-n">0</b> of <span id="tt-total">0</span> heads turned</span>
-    <span class="tt-hint tt-hint-pointer">Move your cursor</span>
-    <span class="tt-hint tt-hint-touch">Tap or scroll</span>
-  </p>
 </section>
 
 <?php /* ============================================================ LOGOS */ ?>

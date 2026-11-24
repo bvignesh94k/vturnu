@@ -149,23 +149,6 @@
 .tt-cta:focus-visible { outline: 3px solid var(--hp3-cyan); outline-offset: 3px; }
 .tt-link { font: 700 1rem/1 var(--hp3-head); color: var(--hp3-ink); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; text-decoration-color: var(--hp3-pink); padding: .8rem 0; }
 
-/* The live score: how many heads you have turned. It only makes sense while the
-   room can actually turn, so the still poster never carries it. */
-html:not(.js) .tt-score, .tt-hero.no-crowd .tt-score { display: none; }
-.tt-score {
-    position: absolute; z-index: 3; left: max(var(--hp3-gut), calc((100% - 1320px) / 2 + var(--hp3-gut))); bottom: clamp(1rem, 3vh, 2rem);
-    display: flex; align-items: baseline; gap: .55rem; margin: 0; padding: .55rem 1rem .6rem; border-radius: 12px;
-    background: rgba(243, 239, 231, .86); font: 600 .84rem/1.2 var(--hp3-head); color: var(--hp3-ink-2);
-    pointer-events: none;
-}
-.tt-score b { font: 400 1.7rem/1 var(--font-brand); color: var(--hp3-ink); font-variant-numeric: tabular-nums; margin-right: .2rem; }
-.tt-tally { display: none; }
-.tt-hero.is-live .tt-tally { display: inline; }
-.tt-hero.is-live .tt-hint::before { content: "·"; margin-right: .55rem; }
-.tt-hero.is-all .tt-hint { color: var(--hp3-pink); }
-@media (hover: none) { .tt-hint-pointer { display: none; } }
-@media (hover: hover) { .tt-hint-touch { display: none; } }
-
 /* The fixed mobile bar takes the bottom of the screen up to 920px. */
 @media (max-width: 920px) {
     .tt-hero { min-height: max(660px, calc(100svh - var(--hp3-hdr) - 56px)); }
@@ -177,8 +160,6 @@ html:not(.js) .tt-score, .tt-hero.no-crowd .tt-score { display: none; }
     .tt-lead { font-size: .98rem; }
     .tt-cta { width: 100%; justify-content: center; }
     .tt-link { width: 100%; text-align: center; }
-    .tt-score { font-size: .76rem; bottom: .7rem; padding: .4rem .7rem; }
-    .tt-score b { font-size: 1.3rem; }
 }
 @media (prefers-reduced-motion: reduce) {
     .tt-cta, .tt-cta span, .tt-crowd { transition: none; }

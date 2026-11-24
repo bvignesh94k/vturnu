@@ -20,6 +20,10 @@
     var LAST_ID_KEY = 'vee_last_id';
     var lastId = 0;
     try { lastId = parseInt(localStorage.getItem(LAST_ID_KEY) || '0', 10) || 0; } catch (e) {}
+    var DETAILS_KEY = 'vee_details_offered';
+    var detailsOffered = false;
+    try { detailsOffered = localStorage.getItem(DETAILS_KEY) === '1'; } catch (e) {}
+    var sentCount = 0;
 
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, function (c) {
@@ -170,17 +174,21 @@
         } catch (e) {}
     }
 
-    function send(text) {
-        if (!text || sending) { return; }
+    function send(text, extra) {
+        if ((!text && !(extra && extra.action === 'details')) || sending) { return; }
         sending = true;
         sendBtn.disabled = true;
-        addRow('visitor', text);
-        input.value = '';
-        input.style.height = 'auto';
+        var isDetails = !!(extra && extra.action === 'details');
+        if (!isDetails) {
+            sentCount++;
+            addRow('visitor', text);
+            input.value = '';
+            input.style.height = 'auto';
+        }
         var started = Date.now();
         var typingRow = showTyping();
 
-        var payload = {
+        var payload = isDetails ? extra : {
             sid: sid, text: text, page: location.pathname, title: document.title || '',
             attr: attribution(), tz: timeZone(), hp: hp.value,
         };
@@ -200,7 +208,8 @@
                 try { localStorage.setItem(LAST_ID_KEY, String(lastId)); } catch (e) {}
             }
             var replies = (res && res.ok && res.replies && res.replies.length) ? res.replies
-                : ['Sorry, something went wrong on our side. Please try again, or write to ' + cfg.email + '.'];
+                : [isDetails ? 'Thanks. Please also write to ' + cfg.email + ' in case this did not go through.'
+                    : 'Sorry, something went wrong on our side. Please try again, or write to ' + cfg.email + '.'];
             var delay = res && res.ok ? typingDelay(replies[0], elapsed) : 300;
             setTimeout(function () {
                 typingRow.remove();
@@ -223,7 +232,58 @@
         } else {
             sending = false;
             sendBtn.disabled = input.value.trim() === '';
+            if (sentCount === 1) { offerDetails(); }
         }
+    }
+
+    /* -------------------- the details card ----------------------------- */
+
+    /* Right after Vee's first reply (owner, 24 Nov 2026): a short card asking
+       for Name, Phone (prefixed with the dial code the visitor's own IP
+       already gave us), Email and an optional message, shown once per
+       conversation. Submitting it answers through the normal reply pipeline
+       (chat_submit_details() on the server), so the reply is a real answer,
+       not a form receipt. Skipping it just leaves the ordinary input open. */
+    function offerDetails() {
+        if (detailsOffered) { return; }
+        detailsOffered = true;
+        try { localStorage.setItem(DETAILS_KEY, '1'); } catch (e) {}
+
+        var row = document.createElement('div');
+        row.className = 'vee-row vee-vee';
+        row.innerHTML = '<span class="vee-bubble-avatar"><img src="' + escapeHtml(cfg.avatar) + '" alt=""></span>' +
+            '<form class="vee-bubble vee-details">' +
+                '<p class="vee-details-h">So our team can reach you</p>' +
+                '<input class="vee-details-in" name="name" type="text" placeholder="Your name" autocomplete="name" required maxlength="60">' +
+                '<div class="vee-details-phone"><span class="vee-details-dial">' + escapeHtml(cfg.dialCode || '+91') + '</span>' +
+                    '<input class="vee-details-in" name="phone" type="tel" inputmode="tel" placeholder="Phone / WhatsApp" autocomplete="tel-national" maxlength="18"></div>' +
+                '<input class="vee-details-in" name="email" type="email" placeholder="Email address" autocomplete="email" required maxlength="120">' +
+                '<textarea class="vee-details-in vee-details-msg" name="message" rows="2" maxlength="1000" placeholder="Anything else we should know? (optional)"></textarea>' +
+                '<div class="vee-details-row">' +
+                    '<button class="vee-details-send" type="submit">Send my details</button>' +
+                    '<button class="vee-details-skip" type="button">Not now</button>' +
+                '</div>' +
+            '</form>';
+        body.appendChild(row);
+        scrollDown();
+
+        var formEl = row.querySelector('.vee-details');
+        var fName = formEl.querySelector('[name="name"]'), fEmail = formEl.querySelector('[name="email"]');
+        var fPhone = formEl.querySelector('[name="phone"]'), fMessage = formEl.querySelector('[name="message"]');
+        formEl.querySelector('.vee-details-skip').addEventListener('click', function () { row.remove(); });
+        formEl.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var name = fName.value.trim(), email = fEmail.value.trim(), phone = fPhone.value.trim();
+            var message = fMessage.value.trim();
+            if (!name || !email) { return; }
+            row.remove();
+            addRow('visitor', name + (email ? ' · ' + email : '') + (phone ? ' · ' + cfg.dialCode + ' ' + phone : '') + (message ? '\n' + message : ''));
+            send(null, {
+                action: 'details', sid: sid, name: name, email: email,
+                phone: phone ? cfg.dialCode + ' ' + phone : '', message: message,
+                page: location.pathname, title: document.title || '', attr: attribution(), tz: timeZone(),
+            });
+        });
     }
 
     /* -------------------- live takeover: the owner's own replies -------- */
