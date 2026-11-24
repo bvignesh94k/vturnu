@@ -321,6 +321,15 @@ final class ChatPgStore
         $st->execute([$days]);
         return count($st->fetchAll());
     }
+
+    /** Erase one conversation and its messages for good (admin, a test chat or spam). */
+    public function delete(int $id): bool
+    {
+        $this->ready();
+        $st = db()->prepare('DELETE FROM chat_sessions WHERE id = ? RETURNING id');
+        $st->execute([$id]);
+        return (bool) $st->fetchColumn();
+    }
 }
 
 /* ------------------------------------------------------------------ */

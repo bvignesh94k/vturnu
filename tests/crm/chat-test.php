@@ -125,6 +125,16 @@ final class FakeChatStore
     {
         return 0;
     }
+
+    public function delete(int $id): bool
+    {
+        if (!isset($this->sessions[$id])) {
+            return false;
+        }
+        unset($this->sessions[$id]);
+        $this->messages = array_values(array_filter($this->messages, static fn(array $m): bool => $m['session_id'] !== $id));
+        return true;
+    }
 }
 
 /** A canned HTTP layer for chat_http_post(): a queue of responses, one per call, read in order. */
@@ -446,6 +456,12 @@ check('submitting details is treated as a fresh contact, so the team is notified
 check('an invalid email on the details card is refused', chat_submit_details(['sid' => $d1['sid'], 'name' => 'Priya', 'email' => 'not-an-email', 'page' => '/'], $d1['sid'])['ok'] === false);
 check('a blank name on the details card is refused', chat_submit_details(['sid' => $d1['sid'], 'name' => '', 'email' => 'priya@example.com', 'page' => '/'], $d1['sid'])['ok'] === false);
 check('the widget gets the visitor\'s own dial code for the details card', chat_widget_config('', ['template' => 'home'])['dialCode'] !== '');
+
+/* ---------------- erasing a chat for good (a test chat or spam) ---------------- */
+
+check('deleting a chat removes it and its messages', chat_store()->delete($dSession['id']) && chat_store()->sessionById($dSession['id']) === null
+    && chat_store()->messages($dSession['id']) === []);
+check('deleting an unknown chat id is a no-op, not an error', chat_store()->delete(999999) === false);
 
 /* ---------------- guards ---------------- */
 

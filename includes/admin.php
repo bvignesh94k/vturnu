@@ -454,6 +454,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $csent = chat_owner_reply($ccid, (string) ($_POST['text'] ?? '')) ? '1' : '0';
                 header('Location: /admin/?view=chat&id=' . $ccid . '&sent=' . $csent); exit;
 
+            /* A test chat or spam conversation, erased for good: it and its
+               messages, not just hidden like a lead's soft delete. */
+            case 'chat_delete':
+                chat_store()->delete((int) ($_POST['id'] ?? 0));
+                header('Location: /admin/?view=chats'); exit;
+
             case 'digest_now':
                 $d = crm_daily_digest(true);
                 $flash = $d['sent'] ? 'Digest sent to ' . ENQUIRY_TO . '.' : 'The digest could not be sent. Check that email is set up.';
@@ -1716,6 +1722,12 @@ label { display:block; font-size:.74rem; font-weight:800; text-transform:upperca
                 <?php if ($chat_s['summary'] !== ''): ?><p class="note" style="margin-top:10px"><strong>In short:</strong> <?= e_a($chat_s['summary']) ?></p><?php endif; ?>
                 <?php if ($chat_s['handoff']): ?><p class="note" style="margin-top:6px;color:#C22349;font-weight:700">Vee could not answer something here and promised a reply from the team.</p><?php endif; ?>
                 <?php if ($chat_s['enquiry_id']): ?><p style="margin-top:10px"><a class="btn grad sm" href="/admin/?view=lead&id=<?= (int) $chat_s['enquiry_id'] ?>">Open the lead</a></p><?php endif; ?>
+                <form method="post" style="margin-top:10px" onsubmit="return confirm('Delete this chat for good? This cannot be undone.')">
+                    <input type="hidden" name="action" value="chat_delete">
+                    <input type="hidden" name="csrf" value="<?= e_a($csrf) ?>">
+                    <input type="hidden" name="id" value="<?= (int) $chat_s['id'] ?>">
+                    <button class="btn danger sm" type="submit">Delete this chat</button>
+                </form>
             </div>
             <div class="panel" style="margin:0">
                 <h2>How they found this</h2>
