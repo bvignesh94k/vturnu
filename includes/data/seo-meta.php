@@ -233,4 +233,7 @@ return [
 'guides/complete-guide-to-business-lead-gen-seo' => ['The Complete Guide to B2B Lead Gen SEO: From Search to Sale', 'The complete guide to B2B lead generation SEO: buying-intent keywords, pages that convert, proof and tracking from first search to closed sale. Free to read.'],
 'guides/complete-guide-to-google-ads' => ['The Complete Guide to Google Ads for Small Businesses', 'The complete guide to Google Ads for small businesses: account structure, keywords, bidding, tracking and budget control, step by step. Free to read online.'],
 
+/* 24 Nov 2026: Vee, the live chat assistant on this site. */
+'blog/introducing-vee-ai-chat-assistant' => ['Vee: Our Free AI Chat Assistant for Websites | VTurnU', 'Meet Vee, the AI chat assistant answering sales questions live on vturnu.com, built on free AI infrastructure. See how it works, and get one for your site.'],
+
 ];

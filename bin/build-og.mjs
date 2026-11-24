@@ -548,6 +548,7 @@ const BLOG_ART = {
     'wordpress-seo-launch-checklist': 'launch', 'ai-search-competitor-benchmark': 'scorecard', 'linkedin-engagement-vs-buyer-intent': 'signal',
     'industrial-buyer-search-intent': 'matrix',
     'social-media-content-strategy-for-business': 'social', 'landing-page-optimization-guide': 'browser', 'ecommerce-conversion-rate-optimization': 'cart', 'branding-vs-performance-marketing': 'brand',
+    'introducing-vee-ai-chat-assistant': 'answer',
 };
 const SLUG_ART = [
     [/^updates(\/|$)/, 'pulse'],
