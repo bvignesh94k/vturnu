@@ -151,7 +151,7 @@ return [
 
 /* ---------- Search updates ---------- */
 'updates' => ['Google Search Updates Explained: Core, Spam & AI Changes', 'Google search updates explained in plain words: what Google announced, when each update started and finished, and what to check on your site next.'],
-'updates/november-core-update-2026' => ['Google November 2026 Core Update: Dates, Impact, Next Steps', 'Google\'s November 2026 core update began on 10 November and may take two weeks. What it is, how to check your traffic and what to do if rankings drop.'],
+'updates/november-core-update-2026' => ['Google November 2026 Core Update: Dates, Impact, Next Steps', 'Google\'s November 2026 core update ran from 10 to 24 November. What it is, when to check your traffic and what to do if rankings dropped.'],
 
 /* ---------- Blog ---------- */
 'blog/international-seo-checklist' => ['International SEO Checklist: 10 Steps to Rank in New Markets', 'Expanding abroad? Follow this 10-step international SEO checklist, with a free hreflang tag builder, URL structure advice and the mistakes to avoid.'],

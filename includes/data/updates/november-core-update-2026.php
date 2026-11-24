@@ -21,6 +21,7 @@ $g = [
     'drops' => 'https://developers.google.com/search/docs/monitor-debug/debugging-search-traffic-drops',
     'helpful' => 'https://developers.google.com/search/docs/fundamentals/creating-helpful-content',
     'ai' => 'https://developers.google.com/search/docs/appearance/ai-features',
+    'serdone' => 'https://www.seroundtable.com/google-november-2026-core-update-done-42571.html',
     'sej' => 'https://www.searchenginejournal.com/google-november-2026-core-update/596614/',
     'ser' => 'https://www.seroundtable.com/google-november-2026-core-update-42504.html',
     'ppc' => 'https://ppc.land/googles-core-update-shifts-rankings-for-up-to-2-weeks-before-black-friday/',
@@ -54,7 +55,11 @@ return [
     $took = $done ? (int) round((strtotime($u['finished']) - strtotime($u['started'])) / 86400) : 0;
     $checked = update_day((string) ($u['checked'] ?? ''), 'j F Y');
     ?>
+<?php if ($done): ?>
+<p class="bx-open">Google started its third core update of 2026 on 10 November and finished rolling it out on <?= e(update_day($u['finished'], 'j F')) ?>. If your search traffic moved up or down in the last few weeks, this is the most likely reason.</p>
+<?php else: ?>
 <p class="bx-open">On 10 November 2026, Google started rolling out its third core update of the year. If your search traffic moves up or down over the next few weeks, this is the most likely reason.</p>
+<?php endif; ?>
 <p>Core updates make people nervous because Google says very little about them. This one is no different: one line on Google's status dashboard, one short social post and no new guidance. So this page sticks to what is confirmed, explains it in plain words and gives you a simple plan for checking your own site without guessing.</p>
 
 <div class="answer-box post-answer">
@@ -92,6 +97,9 @@ return [
 <h2 id="what-google-said">What Google Has Said About the November 2026 Core Update</h2>
 <p>Google announced the update on its <?= ext_link($g['incident'], 'Search Status Dashboard') ?>. The entry says the update began at 10:06 a.m. Pacific time on 10 November 2026, applies globally and to all languages, and may take up to two weeks to roll out.</p>
 <p>Google Search Central also called it "a regular update designed to better surface relevant, satisfying content" in a LinkedIn post, as reported by <?= ext_link($g['sej'], 'Search Engine Journal') ?> and <?= ext_link($g['ser'], 'Search Engine Roundtable') ?>.</p>
+<?php if ($done): ?>
+<p>Google then marked the rollout complete on the dashboard: "The rollout was complete as of November 24, 2026," at 6:03 a.m. Pacific time (9:03 a.m. Eastern, 7:33 p.m. in India), about 14 days after it began, as reported by <?= ext_link($g['serdone'], 'Search Engine Roundtable') ?>. Roundtable also noted that the community did not see much movement until around 14 November, a few days after the announcement.</p>
+<?php endif; ?>
 <p>That is the whole announcement. Google did not publish a blog post, did not say which kinds of sites it expects to move and did not release new advice. If an article claims to know exactly what this update targets, treat that as a guess, not a fact.</p>
 
 <h2 id="updates-in-2026">How This Update Fits Into 2026</h2>
@@ -126,6 +134,9 @@ return [
 <p>Google confirmed the rollout finished on <?= e(update_day($u['finished'], 'l j F Y')) ?>. The first full week after it ends runs into the US holiday season: Thanksgiving falls on 26 November, Black Friday on 27 November and Cyber Monday on 30 November.</p>
 <?php else: ?>
 <p>If the rollout runs the full two weeks, it ends around <?= e(update_day($end, 'l j F')) ?>. That is two days before Thanksgiving in the US (26 November), three days before Black Friday (27 November) and six days before Cyber Monday (30 November).</p>
+<?php endif; ?>
+<?php if ($done): ?>
+<p>That puts the earliest fair comparison after the full week that ends on 1 December: compare 25 November to 1 December with 3 to 9 November.</p>
 <?php endif; ?>
 <p>Google's <?= ext_link($g['core'], 'advice') ?> is to wait at least a full week after a core update completes, then compare that week with a week before the update started. This time, the "after" week includes some of the busiest shopping days of the year. A raw comparison could make a store look like it gained from the update when it only gained from Black Friday, or make a B2B site look hit when its buyers were simply on holiday. <?= ext_link($g['ppc'], 'PPC Land') ?> and Search Engine Journal both flagged this timing.</p>
 
@@ -208,7 +219,7 @@ return [
     ?>
 <h2 id="final-thoughts">Final Thoughts</h2>
 <p>A core update is Google checking again which pages answer each search best. You cannot opt out of it, and you do not need to fear it. Wait for the rollout to finish, measure the right weeks, and spend your effort on the pages that matter most to your business.</p>
-<p>We will update this page when Google confirms the rollout is complete. New updates appear on our <a href="/updates/">search updates page</a> as soon as Google announces them.</p>
+<p><?= ($u['status'] ?? '') === 'complete' ? 'This page was updated when Google confirmed the rollout was complete.' : 'We will update this page when Google confirms the rollout is complete.' ?> New updates appear on our <a href="/updates/">search updates page</a> as soon as Google announces them.</p>
 
 <aside class="bx-cta bx-cta--main" aria-label="Start a conversation with VTurnU">
     <p class="bx-cta-h">Not Sure What the Update Did to Your Site?</p>
