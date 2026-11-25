@@ -188,3 +188,7 @@ AI assistants and AI crawlers (several angles), AI search visibility, hosting an
 - TechImply (info@techimply.com): $350 guest post, $550 brand mention or review, $750 listicle; also requires "human-written" content.
 - The Techism (thetechismofficial@gmail.com): now $25 per post and $25 per link insertion; contributor post 381626 from 4 Nov will not run free.
 - LeadGen App (editor@leadgenapp.io; the other session's Cliqforms pitch of 16 Nov): $300 per post, $220 per link insertion; bans AI-generated content.
+
+## 4f. Closed on 23 to 24 Nov 2026 (declined; both from this mailbox, not paid)
+- Passionate in Marketing: now asks a nominal fee to publish authored articles; declined (24 Nov).
+- Contact Center Pipeline: moving to paid, sponsored content from industry suppliers only; declined (23 Nov).

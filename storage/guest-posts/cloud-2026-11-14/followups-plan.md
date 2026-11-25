@@ -54,6 +54,7 @@ Second and final follow-ups (first follow-up was 14 Nov):
 - SC Media: editorial@cyberriskalliance.com
 
 ## Tue 24 Nov (batch B: due 23 and 24 Nov)
+DONE 25 Nov 2026, about 04:50 to 05:10 UTC (one day late; the previous turn was interrupted mid-check). All 20 follow-ups sent (11 full-article, 10 pitch; ASBN has no email route). Full-article follow-ups asked for a publish date; exclusivity already promised was reconfirmed where it applied (IT News Africa, The Media Online, New Digital Age, The CEO Magazine, Bizcommunity until 6 Dec). Next check for these: 1 Dec.
 First follow-ups on full articles:
 - Medianews4u: editor@medianews4u.com
 - CommPRO: editor@commpro.biz
@@ -80,6 +81,7 @@ First follow-ups on pitches:
 No email route: ASBN (submitted by the owner through its form). Check the site only.
 
 ## Wed 25 Nov
+DONE 25 Nov 2026, about 05:12 UTC. Follow-up sent (10 days after the pitch, as their guidelines ask). Next check: 8 Dec.
 - Management-Issues: editor@management-issues.com (pitch)
 
 ## Thu 26 Nov
