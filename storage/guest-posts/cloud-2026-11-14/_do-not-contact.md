@@ -192,3 +192,4 @@ AI assistants and AI crawlers (several angles), AI search visibility, hosting an
 ## 4f. Closed on 23 to 24 Nov 2026 (declined; both from this mailbox, not paid)
 - Passionate in Marketing: now asks a nominal fee to publish authored articles; declined (24 Nov).
 - Contact Center Pipeline: moving to paid, sponsored content from industry suppliers only; declined (23 Nov).
+- Passionate in Marketing: declined our free submission on 25 Nov after we declined their fee. Closed for good.

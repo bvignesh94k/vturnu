@@ -1,3 +1,11 @@
+# Update: 25 Nov 2026, later in the day (owner flagged two inbox replies directly)
+
+- **Digital Terminal**: editor Rajeev asked us to resend the article and looped in his desk team (editdesk@digitalterminal.in). Resent the Word file, image and photo in the same thread with a warm note offering same-day edits. Awaiting their decision; follow-up 2 Dec if silent.
+- **Passionate in Marketing**: after we declined their fee, they replied with a final no ("not the right fit at this time"). This is now closed for good; no further push, since paying was never on the table.
+- **The Recursive**: the second message in that thread is only their newsroom's automatic acknowledgement bot, not an editor. No human reply yet, so nothing to answer.
+
+---
+
 # Update: 24 to 25 Nov 2026 (Tuesday batch B and Wednesday Management-Issues checks, run together; the Tuesday check was interrupted mid-way and finished today)
 
 ## Replies since 23 Nov 05:40 UTC
