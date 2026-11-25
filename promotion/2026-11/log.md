@@ -164,3 +164,13 @@
 - Re-checks: Hubstaff Talent and Pick an Agency still live (logged out). Behance and AdForum block automated checks. Top Interactive Agencies: not listed. No replies from MarTech Series, NZ Marketing, CXM, UX Magazine, Zyppy List or Dynamic Business. martechseries.com is now blocked for this session as well, so its archive could not be re-checked.
 - Follow-ups: one polite follow-up each drafted in the original threads for MarTech Series (sent 7 Nov) and NZ Marketing (sent 8 Nov). They wait for the owner's approval; the NZ one goes on or after 22 Nov.
 - New articles and listings: none. Every new publisher and directory host tested (16 more today) is blocked for this session, so nothing new could be verified. Not padded with unverified sites.
+
+## Sunday 22 to Wednesday 25 November 2026 (days 9 to 12, run together)
+
+- The 22 and 24 Nov scheduled runs only reached this session on 24 and 25 Nov, so they ran as one batch.
+- Re-checks (logged out, 25 Nov): Pick an Agency live (website link has no nofollow, rel is noopener noreferrer); Hubstaff Talent live (all three vturnu.com links nofollow); Top Interactive Agencies site search shows "No results" for VTurnU; Behance and AdForum block automated checks (403); TechImply blocks automated checks (403). No replies to the MarTech Series, NZ Marketing, CXM or UX Magazine pitches or to the Zyppy enquiry. The two follow-up drafts are still unsent; the owner has not approved them.
+- Dynamic Business: rejected the story on 22 Nov for writing quality. The submitted version was not the draft in this folder; a feedback request was sent from the mailbox on 23 Nov by someone other than this session.
+- TechImply: the owner's profile went live on 20 Nov per TechImply's own email. Recorded as live (per email, not verified here).
+- Mailbox finding: connect@vturnu.com shows about 220 sent threads since 9 Nov, to dozens of publishers this session never contacted, so another session or person is running separate outreach, partly for Sai Impression. Not counted in this campaign's totals. Declined a sponsored offer correctly (Contact Center Pipeline). One reply on 23 Nov offered a link exchange to an unsolicited sender, which the campaign rules forbid; flagged to the owner.
+- Hubstaff: the owner's personal Hubstaff profile (separate from the agency page) was rejected; the agency page is still live.
+- New articles and listings today: none. Every new candidate host is blocked for this session, so nothing could be verified; not padded with unverified sites.
