@@ -174,3 +174,10 @@
 - Mailbox finding: connect@vturnu.com shows about 220 sent threads since 9 Nov, to dozens of publishers this session never contacted, so another session or person is running separate outreach, partly for Sai Impression. Not counted in this campaign's totals. Declined a sponsored offer correctly (Contact Center Pipeline). One reply on 23 Nov offered a link exchange to an unsolicited sender, which the campaign rules forbid; flagged to the owner.
 - Hubstaff: the owner's personal Hubstaff profile (separate from the agency page) was rejected; the agency page is still live.
 - New articles and listings today: none. Every new candidate host is blocked for this session, so nothing could be verified; not padded with unverified sites.
+
+## Thursday 26 and Friday 27 November 2026 (days 13 and 14, run together)
+
+- The 26 Nov scheduled run reached this session on 27 Nov, so the two days ran as one batch.
+- Re-checks (logged out, 27 Nov): Pick an Agency live (website link has no nofollow); Hubstaff Talent live (links nofollow); Top Interactive Agencies search still "No results"; Behance and TechImply block automated checks (403). No replies from CXM, UX Magazine, Zyppy List or Dynamic Business.
+- MarTech Series and NZ Marketing: the follow-up drafts were sent from the mailbox on 26 Nov (the drafts folder is empty and Sent shows both). This session did not send them, so the owner or another process did. The NZ editor's auto-reply says she is back on 27 Nov. No further follow-ups to either.
+- New articles and listings: none. Every new candidate host (MarTech Series, Marketing Mag AU, GEO Agencies, Clutch, The Manifest, GoodFirms, Sortlist) is still blocked for this session, so nothing could be verified; not padded with unverified sites.
