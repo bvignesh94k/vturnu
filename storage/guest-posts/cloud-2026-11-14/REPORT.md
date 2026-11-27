@@ -1,3 +1,23 @@
+# Update: 26 to 27 Nov 2026 (Thursday and Friday scheduled checks, both reached the session late and run together)
+
+## The first new article is live
+**GrowthFolks published our article on 25 Nov 2026:** https://growthfolks.io/business/how-to-improve-b2b-landing-page-with-low-traffic/ ("How to Improve a B2B Landing Page When Traffic Is Too Low for A/B Tests"). Verified today: the dofollow link to vturnu.com/blog/landing-page-optimization-guide/ is present and not marked nofollow. A thank-you went to Hanna, reconfirming VTurnU's promise to create a free agency profile on GrowthFolks once the platform launches in 2027. This is the first new third-party placement since the campaign began.
+
+## Other replies
+- **The CEO Magazine** declined ("does not offer the depth of executive insight we look for"). Closed with a short thank-you.
+- **MSDynamicsWorld, PrintWeek India/Haymarket, a University of Reading blog, NZ Marketing, theHRDIRECTOR**: all showed activity in the inbox, but each belongs to the other session that shares this mailbox, not to this campaign's own tracker. Left untouched, per the standing rule.
+
+## Live check
+Ran cleanly across all 29 pages plus the GrowthFolks blog listing. Nothing else new is live. HackerNoon still shows no published story.
+
+## Follow-ups sent (Thu 26 Nov batch)
+Label & Narrow Web, Panorama Consulting, Call Centre Helper (asked for a publish date), SCMR, Packaging Strategies, Recycling Today: all first follow-ups, next check 3 Dec. Logistics Insider: second and final follow-up, closed if still silent. e27: a last note, closed if still silent (told them to check the live site instead of waiting further). MSDynamicsWorld was skipped, since that thread already has its own back-and-forth with the other session.
+
+## Friday 27 Nov
+Reply check only, covered by the same sweep above; no further follow-ups were due.
+
+---
+
 # Update: 25 Nov 2026, later in the day (owner flagged two inbox replies directly)
 
 - **Digital Terminal**: editor Rajeev asked us to resend the article and looped in his desk team (editdesk@digitalterminal.in). Resent the Word file, image and photo in the same thread with a warm note offering same-day edits. Awaiting their decision; follow-up 2 Dec if silent.

@@ -85,6 +85,7 @@ DONE 25 Nov 2026, about 05:12 UTC. Follow-up sent (10 days after the pitch, as t
 - Management-Issues: editor@management-issues.com (pitch)
 
 ## Thu 26 Nov
+DONE 26 Nov 2026 (reached the session late, with the Fri 27 Nov check queued right behind it; both run together below). GrowthFolks published on 25 Nov before this check ran; thanked Hanna and reconfirmed the 2027 agency-profile promise. The CEO Magazine declined on 25 Nov; closed with a thank-you. Sent follow-ups: Label & Narrow Web, Panorama Consulting, Call Centre Helper, SCMR, Packaging Strategies, Recycling Today (all first follow-ups, next check 3 Dec); Logistics Insider (second and final, closed if silent); e27 (final note, closed if silent). MSDynamicsWorld not followed up: that thread is being handled by the other session that shares this mailbox (idea accepted, draft already sent), so no action here. TechJuice and Fibre2Fashion: no follow-up, as planned.
 - GrowthFolks: info@growthfolks.io (accepted 18 Nov; full article sent 19 Nov). Ask for a publishing date only if none has been given.
 - Label & Narrow Web: ghrinya@rodmanmedia.com (outline sent 19 Nov). If the editor has not answered the Sai Impression question, do not raise it again.
 - MSDynamicsWorld: jgumpert@msdynamicsworld.com (pitch sent 19 Nov)
@@ -100,6 +101,7 @@ DONE 25 Nov 2026, about 05:12 UTC. Follow-up sent (10 days after the pitch, as t
 - Logistics Insider: tariq@logisticsinsider.in. Second and final follow-up only if there is still no reply and the article is not live (first follow-up sent 19 Nov 07:41 UTC).
 
 ## Fri 27 Nov
+DONE 27 Nov 2026 (ran together with the delayed Thu 26 Nov check above; same reply sweep covers both days). No further follow-ups were due.
 - Reply check only.
 
 ## Mon 30 Nov (due 29 and 30 Nov)
