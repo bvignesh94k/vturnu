@@ -1,3 +1,11 @@
+# Update: 28 Nov 2026, 04:30 UTC scheduled check (Saturday, 10 am India time)
+
+- Replies since 27 Nov: only an automatic out-of-office from Recycling Today (DeAnne Toto, triggered again by the 26 Nov follow-up) and automatic acknowledgements on threads that belong to the other session (PrintWeek India, NZ Marketing, theHRDIRECTOR, an ISE insights pitch). No human replies and no bounces on this campaign's own threads.
+- Live check: ran cleanly across all 29 pages plus the GrowthFolks blog listing. Nothing new live; GrowthFolks remains the only new placement so far.
+- No follow-ups were due (weekend). New approvals: none since GrowthFolks.
+
+---
+
 # Update: 26 to 27 Nov 2026 (Thursday and Friday scheduled checks, both reached the session late and run together)
 
 ## The first new article is live
